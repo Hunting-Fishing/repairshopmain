@@ -4,13 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import { CalendarNavigation } from "@/components/calendar/CalendarNavigation";
 import { DayView } from "@/components/calendar/DayView";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
 
 export default function IndexPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [view, setView] = useState<"day" | "week" | "month">("day");
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<{
     start: Date;
@@ -76,40 +77,12 @@ export default function IndexPage() {
           <CalendarNavigation
             selectedDate={selectedDate}
             onDateChange={(date) => date && setSelectedDate(date)}
+            view={view}
+            onViewChange={setView}
           />
         </div>
 
         <div className="rounded-lg border bg-card p-6">
-          <div className="mb-6 flex items-center justify-between md:hidden">
-            <h2 className="text-lg font-semibold">
-              {format(selectedDate, "EEEE, MMMM d")}
-            </h2>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  const prevDay = new Date(selectedDate);
-                  prevDay.setDate(prevDay.getDate() - 1);
-                  setSelectedDate(prevDay);
-                }}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  const nextDay = new Date(selectedDate);
-                  nextDay.setDate(nextDay.getDate() + 1);
-                  setSelectedDate(nextDay);
-                }}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
           <DayView
             date={selectedDate}
             bookings={bookings || []}

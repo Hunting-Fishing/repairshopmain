@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { CalendarNavigation } from "@/components/calendar/CalendarNavigation";
 import { DayView } from "@/components/calendar/DayView";
 import { BookingDialog } from "@/components/calendar/BookingDialog";

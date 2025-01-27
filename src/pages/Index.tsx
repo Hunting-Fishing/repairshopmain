@@ -78,8 +78,8 @@ export default function IndexPage() {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="flex h-[calc(100vh-2rem)] flex-col gap-4 p-4">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Calendar</h1>
           <p className="text-muted-foreground">
@@ -92,19 +92,15 @@ export default function IndexPage() {
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-[300px_1fr]">
-        <div className="hidden md:block">
-          <CalendarNavigation
-            selectedDate={selectedDate}
-            onDateChange={(date) => date && setSelectedDate(date)}
-            view={view}
-            onViewChange={setView}
-          />
-        </div>
+      <CalendarNavigation
+        selectedDate={selectedDate}
+        onDateChange={(date) => date && setSelectedDate(date)}
+        view={view}
+        onViewChange={setView}
+      />
 
-        <div className="rounded-lg border bg-card p-6">
-          {renderCalendarView()}
-        </div>
+      <div className="flex-1 overflow-auto rounded-lg border bg-card p-6">
+        {renderCalendarView()}
       </div>
 
       <BookingDialog

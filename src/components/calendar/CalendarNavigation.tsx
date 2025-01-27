@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
@@ -86,12 +85,6 @@ export function CalendarNavigation({
             </div>
           </div>
         </div>
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={onDateChange}
-          className="rounded-md border"
-        />
       </CardContent>
     </Card>
   );

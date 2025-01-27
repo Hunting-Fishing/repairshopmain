@@ -7,6 +7,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import WorkOrders from "./pages/WorkOrders";
+import Calendar from "./pages/Calendar";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/work-orders" element={<WorkOrders />} />
+            <Route path="/calendar" element={<Calendar />} />
           </Routes>
         </AppLayout>
       </BrowserRouter>

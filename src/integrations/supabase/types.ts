@@ -9,6 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bookings: {
+        Row: {
+          assigned_technician_id: string | null
+          created_at: string
+          created_by: string
+          customer_name: string
+          end_time: string
+          id: string
+          job_description: string
+          organization_id: string
+          start_time: string
+          status: Database["public"]["Enums"]["booking_status"] | null
+          updated_at: string
+          updated_by: string
+          vehicle_info: string
+        }
+        Insert: {
+          assigned_technician_id?: string | null
+          created_at?: string
+          created_by: string
+          customer_name: string
+          end_time: string
+          id?: string
+          job_description: string
+          organization_id: string
+          start_time: string
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          updated_at?: string
+          updated_by: string
+          vehicle_info: string
+        }
+        Update: {
+          assigned_technician_id?: string | null
+          created_at?: string
+          created_by?: string
+          customer_name?: string
+          end_time?: string
+          id?: string
+          job_description?: string
+          organization_id?: string
+          start_time?: string
+          status?: Database["public"]["Enums"]["booking_status"] | null
+          updated_at?: string
+          updated_by?: string
+          vehicle_info?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_assigned_technician_id_fkey"
+            columns: ["assigned_technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string
@@ -91,7 +168,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never

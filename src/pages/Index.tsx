@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { CalendarNavigation } from "@/components/calendar/CalendarNavigation";
 import { DayView } from "@/components/calendar/DayView";
+import { WeekView } from "@/components/calendar/WeekView";
+import { MonthView } from "@/components/calendar/MonthView";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
 
 export default function IndexPage() {
@@ -57,6 +59,24 @@ export default function IndexPage() {
     setSelectedTimeSlot(null);
   };
 
+  const renderCalendarView = () => {
+    const props = {
+      date: selectedDate,
+      bookings: bookings || [],
+      isLoading,
+      onTimeSlotClick: handleTimeSlotClick,
+    };
+
+    switch (view) {
+      case "week":
+        return <WeekView {...props} />;
+      case "month":
+        return <MonthView {...props} />;
+      default:
+        return <DayView {...props} />;
+    }
+  };
+
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6 flex items-center justify-between">
@@ -83,12 +103,7 @@ export default function IndexPage() {
         </div>
 
         <div className="rounded-lg border bg-card p-6">
-          <DayView
-            date={selectedDate}
-            bookings={bookings || []}
-            isLoading={isLoading}
-            onTimeSlotClick={handleTimeSlotClick}
-          />
+          {renderCalendarView()}
         </div>
       </div>
 

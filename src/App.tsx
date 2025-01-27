@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import WorkOrders from "./pages/WorkOrders";
 import Calendar from "./pages/Calendar";
+import IndexPage from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -19,7 +20,8 @@ const App = () => (
       <BrowserRouter>
         <AppLayout>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<IndexPage />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/work-orders" element={<WorkOrders />} />
             <Route path="/calendar" element={<Calendar />} />

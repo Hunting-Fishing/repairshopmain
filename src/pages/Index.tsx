@@ -1,14 +1,13 @@
-import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { BookingDialog } from "@/components/calendar/BookingDialog";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { CalendarNavigation } from "@/components/calendar/CalendarNavigation";
 import { DayView } from "@/components/calendar/DayView";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { BookingDialog } from "@/components/calendar/BookingDialog";
 
 export default function IndexPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -58,80 +57,66 @@ export default function IndexPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Calendar</h1>
-        <p className="text-muted-foreground">
-          Manage your repair shop's schedule
-        </p>
+    <div className="container mx-auto py-6">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Calendar</h1>
+          <p className="text-muted-foreground">
+            Manage your repair shop's schedule
+          </p>
+        </div>
+        <Button onClick={() => setIsBookingDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          New Booking
+        </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-[300px_1fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>Date</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => date && setSelectedDate(date)}
-              className="rounded-md border"
-            />
-            <div className="mt-4 space-y-2">
+      <div className="grid gap-6 md:grid-cols-[300px_1fr]">
+        <div className="hidden md:block">
+          <CalendarNavigation
+            selectedDate={selectedDate}
+            onDateChange={(date) => date && setSelectedDate(date)}
+          />
+        </div>
+
+        <div className="rounded-lg border bg-card p-6">
+          <div className="mb-6 flex items-center justify-between md:hidden">
+            <h2 className="text-lg font-semibold">
+              {format(selectedDate, "EEEE, MMMM d")}
+            </h2>
+            <div className="flex gap-2">
               <Button
                 variant="outline"
-                className="w-full justify-start"
-                onClick={() => setSelectedDate(new Date())}
+                size="icon"
+                onClick={() => {
+                  const prevDay = new Date(selectedDate);
+                  prevDay.setDate(prevDay.getDate() - 1);
+                  setSelectedDate(prevDay);
+                }}
               >
-                Today
+                <ChevronLeft className="h-4 w-4" />
               </Button>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    const prevDay = new Date(selectedDate);
-                    prevDay.setDate(prevDay.getDate() - 1);
-                    setSelectedDate(prevDay);
-                  }}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    const nextDay = new Date(selectedDate);
-                    nextDay.setDate(nextDay.getDate() + 1);
-                    setSelectedDate(nextDay);
-                  }}
-                >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  const nextDay = new Date(selectedDate);
+                  nextDay.setDate(nextDay.getDate() + 1);
+                  setSelectedDate(nextDay);
+                }}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Schedule</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {format(selectedDate, "EEEE, MMMM d, yyyy")}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <DayView
-              date={selectedDate}
-              bookings={bookings || []}
-              isLoading={isLoading}
-              onTimeSlotClick={handleTimeSlotClick}
-            />
-          </CardContent>
-        </Card>
+          <DayView
+            date={selectedDate}
+            bookings={bookings || []}
+            isLoading={isLoading}
+            onTimeSlotClick={handleTimeSlotClick}
+          />
+        </div>
       </div>
 
       <BookingDialog

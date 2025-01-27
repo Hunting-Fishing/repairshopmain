@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { format } from "date-fns";
 
 interface CalendarNavigationProps {
   selectedDate: Date;
@@ -13,29 +14,16 @@ export function CalendarNavigation({
   onDateChange,
 }: CalendarNavigationProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Date</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={onDateChange}
-          className="rounded-md border"
-        />
-        <div className="mt-4 space-y-2">
-          <Button
-            variant="outline"
-            className="w-full justify-start"
-            onClick={() => onDateChange(new Date())}
-          >
-            Today
-          </Button>
+    <Card className="border-none shadow-none">
+      <CardContent className="p-0">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold">
+            {format(selectedDate, "MMMM yyyy")}
+          </h2>
           <div className="flex gap-2">
             <Button
               variant="outline"
-              className="flex-1"
+              size="icon"
               onClick={() => {
                 const prevDay = new Date(selectedDate);
                 prevDay.setDate(prevDay.getDate() - 1);
@@ -43,22 +31,26 @@ export function CalendarNavigation({
               }}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
             </Button>
             <Button
               variant="outline"
-              className="flex-1"
+              size="icon"
               onClick={() => {
                 const nextDay = new Date(selectedDate);
                 nextDay.setDate(nextDay.getDate() + 1);
                 onDateChange(nextDay);
               }}
             >
-              Next
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={onDateChange}
+          className="rounded-md border"
+        />
       </CardContent>
     </Card>
   );

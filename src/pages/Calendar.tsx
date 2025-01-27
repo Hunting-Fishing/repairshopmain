@@ -10,6 +10,7 @@ import { CalendarNavigation } from "@/components/calendar/CalendarNavigation";
 
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [view, setView] = useState<"day" | "week" | "month">("day");
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<{
     start: Date;
@@ -68,6 +69,8 @@ export default function CalendarPage() {
         <CalendarNavigation
           selectedDate={selectedDate}
           onDateChange={(date) => date && setSelectedDate(date)}
+          view={view}
+          onViewChange={setView}
         />
 
         <Card>

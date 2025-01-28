@@ -1,8 +1,10 @@
-import { startOfWeek, addDays, format } from "date-fns";
+import { startOfWeek, addDays, format, isBefore, isSameDay } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TimeColumn } from "./TimeColumn";
 import { DayColumn } from "./DayColumn";
 import { CalendarViewProps } from "@/types/calendar";
+import { ColorPalette, PAST_APPOINTMENT_COLORS } from "./ColorPalette";
+import { useState, useEffect } from "react";
 
 const WORKING_HOURS = {
   start: 8, // 8 AM
@@ -15,6 +17,16 @@ export function WeekView({
   isLoading,
   onTimeSlotClick,
 }: CalendarViewProps) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedPastColor, setSelectedPastColor] = useState(PAST_APPOINTMENT_COLORS[0]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const weekStart = startOfWeek(date);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const hours = Array.from(
@@ -40,18 +52,30 @@ export function WeekView({
     );
   }
 
+  const isPastTimeSlot = (time: Date) => {
+    return isBefore(time, currentTime) && isSameDay(time, currentTime);
+  };
+
   return (
-    <div className="relative grid grid-cols-8 gap-0.5 overflow-x-auto bg-muted/20">
-      <TimeColumn hours={hours} />
-      {weekDays.map((day) => (
-        <DayColumn
-          key={day.toISOString()}
-          day={day}
-          hours={hours}
-          bookings={bookings}
-          onTimeSlotClick={onTimeSlotClick}
-        />
-      ))}
+    <div className="space-y-4">
+      <ColorPalette 
+        selectedColor={selectedPastColor}
+        onColorSelect={setSelectedPastColor}
+      />
+      <div className="relative grid grid-cols-8 gap-0.5 overflow-x-auto bg-muted/20">
+        <TimeColumn hours={hours} />
+        {weekDays.map((day) => (
+          <DayColumn
+            key={day.toISOString()}
+            day={day}
+            hours={hours}
+            bookings={bookings}
+            onTimeSlotClick={onTimeSlotClick}
+            currentTime={currentTime}
+            pastColor={selectedPastColor}
+          />
+        ))}
+      </div>
     </div>
   );
 }

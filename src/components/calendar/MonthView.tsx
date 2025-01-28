@@ -1,8 +1,10 @@
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth, isBefore } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { CalendarViewProps } from "@/types/calendar";
 import { BookingCard } from "./BookingCard";
+import { ColorPalette, PAST_APPOINTMENT_COLORS } from "./ColorPalette";
+import { useState, useEffect } from "react";
 
 export function MonthView({
   date,
@@ -10,9 +12,23 @@ export function MonthView({
   isLoading,
   onTimeSlotClick,
 }: CalendarViewProps) {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedPastColor, setSelectedPastColor] = useState(PAST_APPOINTMENT_COLORS[0]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const monthStart = startOfMonth(date);
   const monthEnd = endOfMonth(date);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  const isPastTimeSlot = (time: Date) => {
+    return isBefore(time, currentTime) && isSameDay(time, currentTime);
+  };
 
   if (isLoading) {
     return (
@@ -25,47 +41,66 @@ export function MonthView({
   }
 
   return (
-    <div className="grid grid-cols-7 gap-4">
-      {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-        <div
-          key={day}
-          className="text-sm font-medium text-muted-foreground text-center pb-2"
-        >
-          {day}
-        </div>
-      ))}
-      {days.map((day) => {
-        const dayBookings = bookings.filter((booking) =>
-          isSameDay(new Date(booking.start_time), day)
-        );
-
-        return (
+    <div className="space-y-4">
+      <ColorPalette 
+        selectedColor={selectedPastColor}
+        onColorSelect={setSelectedPastColor}
+      />
+      <div className="grid grid-cols-7 gap-4">
+        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
           <div
-            key={day.toISOString()}
-            className={cn(
-              "min-h-[8rem] p-2 border rounded-lg",
-              !isSameMonth(day, date) && "bg-muted/50"
-            )}
+            key={day}
+            className="text-sm font-medium text-muted-foreground text-center pb-2"
           >
-            <div className="text-sm font-medium mb-2">{format(day, "d")}</div>
-            <div className="space-y-1">
-              {dayBookings.map((booking) => (
-                <div
-                  key={booking.id}
-                  onClick={() =>
-                    onTimeSlotClick(
-                      new Date(booking.start_time),
-                      new Date(booking.end_time)
-                    )
-                  }
-                >
-                  <BookingCard booking={booking} />
-                </div>
-              ))}
-            </div>
+            {day}
           </div>
-        );
-      })}
+        ))}
+        {days.map((day) => {
+          const dayBookings = bookings.filter((booking) =>
+            isSameDay(new Date(booking.start_time), day)
+          );
+
+          return (
+            <div
+              key={day.toISOString()}
+              className={cn(
+                "min-h-[8rem] p-2 border rounded-lg",
+                !isSameMonth(day, date) && "bg-muted/50",
+                isPastTimeSlot(day) && "border-solid"
+              )}
+              style={{
+                backgroundColor: isPastTimeSlot(day) 
+                  ? `${selectedPastColor}15` 
+                  : undefined,
+                borderColor: isPastTimeSlot(day) 
+                  ? selectedPastColor 
+                  : undefined
+              }}
+            >
+              <div className="text-sm font-medium mb-2">{format(day, "d")}</div>
+              <div className="space-y-1">
+                {dayBookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    onClick={() =>
+                      onTimeSlotClick(
+                        new Date(booking.start_time),
+                        new Date(booking.end_time)
+                      )
+                    }
+                  >
+                    <BookingCard 
+                      booking={booking} 
+                      isPast={isPastTimeSlot(new Date(booking.start_time))}
+                      pastColor={selectedPastColor}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

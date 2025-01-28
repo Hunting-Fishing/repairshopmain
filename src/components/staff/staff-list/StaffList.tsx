@@ -43,7 +43,6 @@ export function StaffList() {
 
       if (!userProfile?.organization_id) throw new Error("No organization found");
 
-      // Get all profiles in the organization
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select(`
@@ -62,21 +61,12 @@ export function StaffList() {
 
       if (error) throw error;
 
-      // Get emails from auth.users using RPC function
-      const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', {
-          org_id: userProfile.organization_id
-        }) as unknown as { 
-          data: Database['public']['Functions']['get_organization_user_emails']['Returns'], 
-          error: null 
-        } | { 
-          data: null, 
-          error: Error 
-        };
+      const { data: emailData } = await supabase
+        .rpc<'get_organization_user_emails', Database['public']['Functions']['get_organization_user_emails']['Returns']>(
+          'get_organization_user_emails',
+          { org_id: userProfile.organization_id }
+        );
 
-      if (emailError) throw emailError;
-
-      // Combine the data
       return profiles.map(profile => ({
         ...profile,
         email: emailData?.find(e => e.user_id === profile.id)?.email || ''

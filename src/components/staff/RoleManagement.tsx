@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { UserCircle, PencilIcon, Check, X } from "lucide-react";
+import { UserCircle, PencilIcon, X } from "lucide-react";
 import { useState } from "react";
 
 type StaffMember = {
@@ -19,7 +19,7 @@ export function RoleManagement() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: staffMembers } = useQuery({
+  const { data: staffMembers, isLoading } = useQuery({
     queryKey: ["staff-members"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -79,6 +79,36 @@ export function RoleManagement() {
     "parts",
     "hr",
   ];
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Staff Roles</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-32">
+            <p className="text-muted-foreground">Loading staff members...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!staffMembers?.length) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Staff Roles</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-32">
+            <p className="text-muted-foreground">No staff members found</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

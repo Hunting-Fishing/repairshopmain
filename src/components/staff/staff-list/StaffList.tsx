@@ -9,7 +9,7 @@ import { StaffTableHeader } from "./StaffTableHeader";
 import { StaffTableRow } from "./StaffTableRow";
 import { DatabaseFunctions } from "@/types/database/functions";
 
-type StaffMember = {
+interface StaffMember {
   id: string;
   first_name: string | null;
   last_name: string | null;
@@ -21,7 +21,11 @@ type StaffMember = {
   custom_roles: {
     name: string | null;
   } | null;
-};
+}
+
+interface UserProfile {
+  organization_id: string;
+}
 
 export function StaffList() {
   const { data: staffMembers, isLoading } = useQuery({

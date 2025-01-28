@@ -11,11 +11,11 @@ interface GeneralSettingsProps {
 
 export function GeneralSettings({ form }: GeneralSettingsProps) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-[#FEC6A1]">
+      <CardHeader className="bg-[#FDE1D3] rounded-t-lg">
         <CardTitle>General Settings</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         <FormField
           control={form.control}
           name="defaultView"
@@ -75,7 +75,7 @@ export function GeneralSettings({ form }: GeneralSettingsProps) {
               <FormItem>
                 <FormLabel>Working Hours Start</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <Input type="time" {...field} className="border-[#FEC6A1]" />
                 </FormControl>
                 <FormDescription>Set your shop's opening time</FormDescription>
                 <FormMessage />
@@ -90,7 +90,7 @@ export function GeneralSettings({ form }: GeneralSettingsProps) {
               <FormItem>
                 <FormLabel>Working Hours End</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <Input type="time" {...field} className="border-[#FEC6A1]" />
                 </FormControl>
                 <FormDescription>Set your shop's closing time</FormDescription>
                 <FormMessage />

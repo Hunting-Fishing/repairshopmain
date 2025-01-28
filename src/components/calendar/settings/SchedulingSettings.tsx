@@ -12,16 +12,16 @@ interface SchedulingSettingsProps {
 
 export function SchedulingSettings({ form }: SchedulingSettingsProps) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-[#FEC6A1]">
+      <CardHeader className="bg-[#FDE1D3] rounded-t-lg">
         <CardTitle>Scheduling Rules</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         <FormField
           control={form.control}
           name="showOverlappingBookings"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border border-[#FEC6A1] p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">
                   Show Overlapping Bookings
@@ -44,7 +44,7 @@ export function SchedulingSettings({ form }: SchedulingSettingsProps) {
           control={form.control}
           name="allowDoubleBookings"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border border-[#FEC6A1] p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">
                   Allow Double Bookings
@@ -102,6 +102,7 @@ export function SchedulingSettings({ form }: SchedulingSettingsProps) {
                   min="1"
                   max="10"
                   {...field}
+                  className="border-[#FEC6A1]"
                 />
               </FormControl>
               <FormDescription>

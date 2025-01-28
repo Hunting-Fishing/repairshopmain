@@ -19,7 +19,7 @@ export function CalendarSettingsForm() {
       workingHoursStart: "09:00",
       workingHoursEnd: "17:00",
       timeIncrement: "30",
-      theme: "light",
+      theme: "warm",
       showOverlappingBookings: true,
       allowDoubleBookings: false,
       bufferTime: "15",
@@ -36,46 +36,50 @@ export function CalendarSettingsForm() {
   }
 
   return (
-    <Tabs defaultValue="general" className="w-full">
-      <TabsList className="grid w-full grid-cols-4 mb-8">
-        <TabsTrigger value="general">General</TabsTrigger>
-        <TabsTrigger value="appearance">Appearance</TabsTrigger>
-        <TabsTrigger value="scheduling">Scheduling</TabsTrigger>
-        <TabsTrigger value="notifications">Notifications</TabsTrigger>
-      </TabsList>
+    <div className="max-w-4xl mx-auto">
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="scheduling">Scheduling</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+        </TabsList>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <TabsContent value="general">
-            <GeneralSettings form={form} />
-          </TabsContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <TabsContent value="general">
+              <GeneralSettings form={form} />
+            </TabsContent>
 
-          <TabsContent value="appearance">
-            <AppearanceSettings form={form} />
-          </TabsContent>
+            <TabsContent value="appearance">
+              <AppearanceSettings form={form} />
+            </TabsContent>
 
-          <TabsContent value="scheduling">
-            <SchedulingSettings form={form} />
-          </TabsContent>
+            <TabsContent value="scheduling">
+              <SchedulingSettings form={form} />
+            </TabsContent>
 
-          <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Notification settings will be implemented in the next phase
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
+            <TabsContent value="notifications">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Notification Preferences</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Notification settings will be implemented in the next phase
+                  </p>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          <div className="flex justify-end">
-            <Button type="submit">Save Changes</Button>
-          </div>
-        </form>
-      </Form>
-    </Tabs>
+            <div className="flex justify-end">
+              <Button type="submit" className="bg-[#FEC6A1] hover:bg-[#FDE1D3] text-gray-800">
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </Tabs>
+    </div>
   );
 }

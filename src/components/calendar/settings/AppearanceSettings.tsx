@@ -14,11 +14,11 @@ export function AppearanceSettings({ form }: AppearanceSettingsProps) {
   const [selectedColor, setSelectedColor] = useState("#9b87f5");
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="border-[#FEC6A1]">
+      <CardHeader className="bg-[#FDE1D3] rounded-t-lg">
         <CardTitle>Appearance Settings</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 pt-6">
         <FormField
           control={form.control}
           name="theme"

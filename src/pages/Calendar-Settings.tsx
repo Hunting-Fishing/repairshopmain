@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,29 +8,16 @@ import { GeneralTimeSettings } from "@/components/calendar/settings/form-section
 import { SchedulingRules } from "@/components/calendar/settings/form-sections/SchedulingRules";
 import { BufferSettings } from "@/components/calendar/settings/form-sections/BufferSettings";
 import { AppearanceSettings } from "@/components/calendar/settings/AppearanceSettings";
-
-const formSchema = z.object({
-  defaultView: z.enum(["day", "week", "month"]),
-  use24HourTime: z.boolean(),
-  workingHoursStart: z.string(),
-  workingHoursEnd: z.string(),
-  timeIncrement: z.string(),
-  allowOverlappingBookings: z.boolean(),
-  bufferBefore: z.string(),
-  bufferAfter: z.string(),
-  theme: z.string(),
-  primaryColor: z.string(),
-  secondaryColor: z.string(),
-});
+import { calendarSettingsFormSchema, type CalendarSettingsFormValues } from "@/components/calendar/settings/types";
 
 export default function CalendarSettings() {
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const form = useForm<CalendarSettingsFormValues>({
+    resolver: zodResolver(calendarSettingsFormSchema),
     defaultValues: {
       defaultView: "week",
       use24HourTime: false,
-      workingHoursStart: "09",
-      workingHoursEnd: "17",
+      workingHoursStart: "09:00",
+      workingHoursEnd: "17:00",
       timeIncrement: "30",
       allowOverlappingBookings: false,
       bufferBefore: "0",
@@ -42,7 +28,7 @@ export default function CalendarSettings() {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = (data: CalendarSettingsFormValues) => {
     console.log(data);
   };
 
@@ -81,7 +67,7 @@ export default function CalendarSettings() {
                 </TabsContent>
 
                 <TabsContent value="appearance">
-                  <AppearanceSettings />
+                  <AppearanceSettings form={form} />
                 </TabsContent>
 
                 <TabsContent value="scheduling" className="space-y-8">

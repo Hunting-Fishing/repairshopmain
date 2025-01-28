@@ -1,11 +1,11 @@
 export interface DatabaseFunctions {
   get_organization_user_emails: {
     Args: {
-      org_id: string
-    }
+      org_id: string;
+    };
     Returns: {
-      user_id: string
-      email: string
-    }[]
-  }
+      user_id: string;
+      email: string;
+    }[];
+  };
 }

@@ -7,17 +7,17 @@ interface ColorPaletteProps {
 
 export const PAST_APPOINTMENT_COLORS = [
   "#8B5CF6", // Vivid Purple (Primary)
-  "#7E69AB", // Secondary Purple
-  "#6E59A5", // Tertiary Purple
-  "#1A1F2C", // Dark Purple
-  "#0EA5E9", // Ocean Blue
+  "#22c55e", // Bright Green
+  "#16a34a", // Forest Green
+  "#15803d", // Deep Green
+  "#eab308", // Golden Yellow
+  "#facc15", // Bright Yellow
+  "#fbbf24", // Warm Yellow
+  "#dc2626", // Bright Red
+  "#ef4444", // Vibrant Red
+  "#b91c1c", // Deep Red
   "#3B82F6", // Bright Blue
   "#F97316", // Bright Orange
-  "#FB923C", // Light Orange
-  "#D946EF", // Magenta Pink
-  "#9333EA", // Deep Purple
-  "#6366F1", // Indigo
-  "#4F46E5", // Royal Blue
   "#7C3AED", // Violet
 ];
 

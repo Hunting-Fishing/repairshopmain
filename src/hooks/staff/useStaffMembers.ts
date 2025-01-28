@@ -53,7 +53,7 @@ export function useStaffMembers() {
 
       // Get emails for all users in the organization
       const { data: emailData, error: emailError } = await supabase
-        .rpc<EmailData>('get_organization_user_emails', { 
+        .rpc<EmailData[]>('get_organization_user_emails', { 
           org_id: userProfile.organization_id 
         });
 
@@ -63,7 +63,7 @@ export function useStaffMembers() {
       // Combine profile and email data
       return profiles.map(profile => ({
         ...profile,
-        email: emailData.find(e => e.user_id === profile.id)?.email || ''
+        email: emailData?.find(e => e.user_id === profile.id)?.email || '',
       })) as StaffMember[];
     },
     enabled: !!session?.user.id,

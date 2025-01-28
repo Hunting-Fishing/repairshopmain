@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
-import type { DatabaseFunctions } from "@/types/database";
+import type { Database } from "@/integrations/supabase/types";
 
 interface EmailData {
   user_id: string;
@@ -54,9 +54,9 @@ export function useStaffMembers() {
 
       // Get emails for all users in the organization
       const { data: emailData, error: emailError } = await supabase
-        .rpc<'get_organization_user_emails', EmailData[]>('get_organization_user_emails', { 
+        .rpc('get_organization_user_emails', { 
           org_id: userProfile.organization_id 
-        });
+        }) as { data: EmailData[] | null, error: unknown };
 
       if (emailError) throw emailError;
       if (!emailData) return [];

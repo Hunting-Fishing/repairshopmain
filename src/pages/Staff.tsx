@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TechnicianManagement } from "@/components/staff/TechnicianManagement";
 import { RoleManagement } from "@/components/staff/RoleManagement";
 import { AddStaffMember } from "@/components/staff/AddStaffMember";
+import { TechnicianSettings } from "@/components/staff/TechnicianSettings";
 
 export default function Staff() {
   return (
@@ -42,7 +43,7 @@ export default function Staff() {
         </TabsContent>
 
         <TabsContent value="settings">
-          <TechnicianManagement />
+          <TechnicianSettings />
         </TabsContent>
       </Tabs>
     </div>

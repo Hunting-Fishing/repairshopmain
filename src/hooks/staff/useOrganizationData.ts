@@ -3,21 +3,29 @@ import { supabase } from "@/integrations/supabase/client";
 import type { CustomRole } from "@/components/staff/role-management/types";
 
 export function useOrganizationData() {
-  const { data: userProfile } = useQuery({
-    queryKey: ["user-profile"],
+  const { data: session } = useQuery({
+    queryKey: ["session"],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No session found");
+      return session;
+    },
+  });
+
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile", session?.user.id],
+    queryFn: async () => {
+      if (!session?.user.id) return null;
 
       const { data, error } = await supabase
         .from("profiles")
         .select("organization_id")
         .eq('id', session.user.id)
-        .single();
-
+        .maybeSingle();
+      
       if (error) throw error;
       return data;
     },
+    enabled: !!session?.user.id,
   });
 
   const { data: customRoles = [] } = useQuery({
@@ -29,7 +37,7 @@ export function useOrganizationData() {
         .from("custom_roles")
         .select("*")
         .eq('organization_id', userProfile.organization_id);
-
+      
       if (error) throw error;
       return data as CustomRole[];
     },

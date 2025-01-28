@@ -1,7 +1,8 @@
 import { format, isSameDay, addHours, isBefore, isAfter } from "date-fns";
-import { cn } from "@/lib/utils";
 import { BookingCard } from "./BookingCard";
 import { Booking } from "@/types/calendar";
+import { TimeSlot } from "./TimeSlot";
+import { DayHeader } from "./DayHeader";
 
 interface DayColumnProps {
   day: Date;
@@ -34,12 +35,12 @@ export function DayColumn({
 
   return (
     <div className="relative min-w-[200px] border-l border-border first:border-l-0">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="border-b border-border px-2 py-3">
-          <div className="text-sm font-medium">{format(day, "EEE")}</div>
-          <div className="text-2xl font-bold">{format(day, "d")}</div>
-        </div>
-      </div>
+      <DayHeader 
+        date={day}
+        isPast={isBefore(day, currentTime)}
+        isToday={isSameDay(day, currentTime)}
+        pastColor={pastColor}
+      />
       
       <div className="relative">
         {hours.map((hour) => {
@@ -55,23 +56,14 @@ export function DayColumn({
           );
 
           return (
-            <div
+            <TimeSlot
               key={timeSlotStart.toISOString()}
-              className={cn(
-                "group relative h-14 border-b border-border px-2 transition-colors",
-                slotBookings.length === 0 && "hover:bg-accent cursor-pointer",
-                slotBookings.length > 0 && "bg-accent/5",
-                isPastTimeSlot(timeSlotStart) && "border-solid"
-              )}
-              style={{
-                backgroundColor: isPastTimeSlot(timeSlotStart) 
-                  ? `${pastColor}15` 
-                  : undefined,
-                borderColor: isPastTimeSlot(timeSlotStart) 
-                  ? pastColor 
-                  : undefined
-              }}
+              isPast={isPastTimeSlot(timeSlotStart)}
+              isCurrentTimeSlot={isCurrentTimeSlot(timeSlotStart, timeSlotEnd)}
+              hasBookings={slotBookings.length > 0}
+              pastColor={pastColor}
               onClick={() => onTimeSlotClick(timeSlotStart, timeSlotEnd)}
+              className="h-14 border-b border-border px-2"
             >
               {slotBookings.map((booking) => (
                 <BookingCard 
@@ -82,10 +74,7 @@ export function DayColumn({
                   pastColor={pastColor}
                 />
               ))}
-              {isCurrentTimeSlot(timeSlotStart, timeSlotEnd) && (
-                <div className="absolute left-0 w-1 h-full bg-primary rounded-l-lg" />
-              )}
-            </div>
+            </TimeSlot>
           );
         })}
       </div>

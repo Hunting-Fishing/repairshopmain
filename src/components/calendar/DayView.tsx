@@ -1,8 +1,9 @@
 import { format, addMinutes, isSameDay, isAfter, isBefore } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import { CalendarViewProps } from "@/types/calendar";
 import { BookingCard } from "./BookingCard";
+import { ColorPalette, PAST_APPOINTMENT_COLORS } from "./ColorPalette";
+import { TimeSlot } from "./TimeSlot";
 import { useState, useEffect } from "react";
 
 const WORKING_HOURS = {
@@ -11,14 +12,6 @@ const WORKING_HOURS = {
 };
 
 const TIME_SLOT_DURATION = 30; // minutes
-
-const PAST_APPOINTMENT_COLORS = [
-  "#9b87f5", // Primary Purple
-  "#7E69AB", // Secondary Purple
-  "#6E59A5", // Tertiary Purple
-  "#F2FCE2", // Soft Green
-  "#FEC6A1", // Soft Orange
-];
 
 export function DayView({
   date,
@@ -29,7 +22,6 @@ export function DayView({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedPastColor, setSelectedPastColor] = useState(PAST_APPOINTMENT_COLORS[0]);
 
-  // Update current time every minute
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
@@ -85,43 +77,21 @@ export function DayView({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 p-2 bg-background/95 sticky top-0 z-10 border-b">
-        <span className="text-sm font-medium">Past appointments color:</span>
-        <div className="flex gap-2">
-          {PAST_APPOINTMENT_COLORS.map((color) => (
-            <button
-              key={color}
-              className={cn(
-                "w-6 h-6 rounded-full border-2",
-                selectedPastColor === color ? "border-primary" : "border-transparent"
-              )}
-              style={{ backgroundColor: color }}
-              onClick={() => setSelectedPastColor(color)}
-            />
-          ))}
-        </div>
-      </div>
+      <ColorPalette 
+        selectedColor={selectedPastColor}
+        onColorSelect={setSelectedPastColor}
+      />
 
       <div className="space-y-2">
         {timeSlots.map((slot) => (
-          <div
+          <TimeSlot
             key={slot.time.toISOString()}
-            className={cn(
-              "group flex min-h-[4rem] cursor-pointer items-start gap-4 rounded-lg border p-3 transition-colors relative",
-              isPastTimeSlot(slot.time) && "border-solid",
-              isCurrentTimeSlot(slot.time, slot.end) && 
-                "border-primary border-2 bg-primary/5",
-              slot.bookings.length > 0 && "border-solid bg-accent/50"
-            )}
-            style={{
-              backgroundColor: isPastTimeSlot(slot.time) 
-                ? `${selectedPastColor}15` 
-                : undefined,
-              borderColor: isPastTimeSlot(slot.time) 
-                ? selectedPastColor 
-                : undefined
-            }}
+            isPast={isPastTimeSlot(slot.time)}
+            isCurrentTimeSlot={isCurrentTimeSlot(slot.time, slot.end)}
+            hasBookings={slot.bookings.length > 0}
+            pastColor={selectedPastColor}
             onClick={() => onTimeSlotClick(slot.time, slot.end)}
+            className="flex min-h-[4rem] items-start gap-4 rounded-lg border p-3"
           >
             <div className="w-16 text-sm font-medium text-muted-foreground">
               {format(slot.time, "HH:mm")}
@@ -137,10 +107,7 @@ export function DayView({
                 </div>
               ))}
             </div>
-            {isCurrentTimeSlot(slot.time, slot.end) && (
-              <div className="absolute left-0 w-1 h-full bg-primary rounded-l-lg" />
-            )}
-          </div>
+          </TimeSlot>
         ))}
       </div>
     </div>

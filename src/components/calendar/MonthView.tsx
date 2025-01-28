@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { CalendarViewProps } from "@/types/calendar";
 import { BookingCard } from "./BookingCard";
 import { ColorPalette, PAST_APPOINTMENT_COLORS } from "./ColorPalette";
+import { TimeSlot } from "./TimeSlot";
 import { useState, useEffect } from "react";
 
 export function MonthView({
@@ -28,10 +29,6 @@ export function MonthView({
 
   const isPastDay = (day: Date) => {
     return isBefore(startOfDay(day), startOfDay(currentTime));
-  };
-
-  const isPastTimeSlot = (time: Date) => {
-    return isBefore(time, currentTime) && isSameDay(time, currentTime);
   };
 
   if (isLoading) {
@@ -68,22 +65,16 @@ export function MonthView({
           const isToday = isSameDay(day, currentTime);
 
           return (
-            <div
+            <TimeSlot
               key={day.toISOString()}
+              isPast={isPast}
+              isCurrentTimeSlot={isToday}
+              hasBookings={dayBookings.length > 0}
+              pastColor={selectedPastColor}
               className={cn(
-                "min-h-[8rem] p-2 border rounded-lg transition-colors",
-                !isSameMonth(day, date) && "bg-muted/50",
-                isToday && "border-primary",
-                isPast && "border-solid"
+                "min-h-[8rem] p-2 rounded-lg",
+                !isSameMonth(day, date) && "bg-muted/50"
               )}
-              style={{
-                backgroundColor: (isPast || (isToday && isPastTimeSlot(day))) 
-                  ? `${selectedPastColor}15` 
-                  : undefined,
-                borderColor: (isPast || (isToday && isPastTimeSlot(day))) 
-                  ? selectedPastColor 
-                  : undefined
-              }}
             >
               <div className="text-sm font-medium mb-2">{format(day, "d")}</div>
               <div className="space-y-1">
@@ -99,13 +90,13 @@ export function MonthView({
                   >
                     <BookingCard 
                       booking={booking} 
-                      isPast={isPastTimeSlot(new Date(booking.start_time))}
+                      isPast={isPast}
                       pastColor={selectedPastColor}
                     />
                   </div>
                 ))}
               </div>
-            </div>
+            </TimeSlot>
           );
         })}
       </div>

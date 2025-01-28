@@ -8,6 +8,7 @@ import { GeneralTimeSettings } from "@/components/calendar/settings/form-section
 import { SchedulingRules } from "@/components/calendar/settings/form-sections/SchedulingRules";
 import { BufferSettings } from "@/components/calendar/settings/form-sections/BufferSettings";
 import { AppearanceSettings } from "@/components/calendar/settings/AppearanceSettings";
+import { TechnicianSettings } from "@/components/calendar/settings/form-sections/TechnicianSettings";
 import { calendarSettingsFormSchema, type CalendarSettingsFormValues } from "@/components/calendar/settings/types";
 
 export default function CalendarSettings() {
@@ -25,6 +26,9 @@ export default function CalendarSettings() {
       theme: "light",
       primaryColor: "#3b82f6",
       secondaryColor: "#f59e0b",
+      showTechnicianWorkload: true,
+      enableTechnicianColors: true,
+      technicianViewMode: "individual",
     },
   });
 
@@ -53,6 +57,7 @@ export default function CalendarSettings() {
                   <TabsTrigger value="general">General</TabsTrigger>
                   <TabsTrigger value="appearance">Appearance</TabsTrigger>
                   <TabsTrigger value="scheduling">Scheduling</TabsTrigger>
+                  <TabsTrigger value="technicians">Technicians</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="general" className="space-y-8">
@@ -79,6 +84,10 @@ export default function CalendarSettings() {
                     <h3 className="text-lg font-medium mb-4">Buffer Settings</h3>
                     <BufferSettings />
                   </div>
+                </TabsContent>
+
+                <TabsContent value="technicians">
+                  <TechnicianSettings form={form} />
                 </TabsContent>
               </Tabs>
             </CardContent>

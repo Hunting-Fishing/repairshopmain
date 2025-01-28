@@ -13,6 +13,9 @@ export const calendarSettingsFormSchema = z.object({
   bufferAfter: z.enum(["0", "15", "30"]),
   primaryColor: z.string(),
   secondaryColor: z.string(),
+  showTechnicianWorkload: z.boolean(),
+  enableTechnicianColors: z.boolean(),
+  technicianViewMode: z.enum(["individual", "combined", "filtered"]),
 });
 
 export type CalendarSettingsFormValues = z.infer<typeof calendarSettingsFormSchema>;

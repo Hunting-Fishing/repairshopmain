@@ -1,6 +1,6 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
-import Dashboard from "@/pages/Dashboard";
+import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import Customers from "@/pages/Customers";
 import WorkOrders from "@/pages/WorkOrders";
 import Calendar from "@/pages/Calendar";
@@ -40,7 +40,7 @@ export const routes: RouteObject[] = [
   },
   {
     path: "/dashboard",
-    element: protectedLayout(Dashboard)
+    element: protectedLayout(DashboardLayout)
   },
   {
     path: "/customers",

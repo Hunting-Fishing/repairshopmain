@@ -6,6 +6,7 @@ import { CalendarNavigation } from "@/components/calendar/CalendarNavigation";
 import { Booking } from "@/types/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { CalendarSettingsFormValues } from "../calendar/settings/types";
 
 interface CalendarSectionProps {
   selectedDate: Date;
@@ -44,7 +45,7 @@ export function CalendarSection({
         return null;
       }
 
-      return data?.calendar_settings;
+      return data?.calendar_settings as CalendarSettingsFormValues | null;
     }
   });
 

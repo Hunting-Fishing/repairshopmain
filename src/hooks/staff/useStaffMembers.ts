@@ -3,10 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
 import type { DatabaseFunctions } from "@/types/database/functions";
 
-interface EmailData {
-  user_id: string;
-  email: string;
-}
+type EmailData = DatabaseFunctions['get_organization_user_emails']['Returns'][number];
 
 export function useStaffMembers() {
   return useQuery({
@@ -46,7 +43,7 @@ export function useStaffMembers() {
 
       // Get staff emails with proper typing
       const { data: emailData, error: emailError } = await supabase
-        .rpc<EmailData, { org_id: string }>('get_organization_user_emails', { 
+        .rpc('get_organization_user_emails', { 
           org_id: userProfile.organization_id 
         });
 

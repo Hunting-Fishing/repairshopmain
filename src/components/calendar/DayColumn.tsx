@@ -12,12 +12,15 @@ interface DayColumnProps {
 
 export function DayColumn({ day, hours, bookings, onTimeSlotClick }: DayColumnProps) {
   return (
-    <div className="relative min-w-[200px]">
-      <div className="sticky top-0 z-10 bg-background pb-2 border-b">
-        <div className="text-sm font-medium">{format(day, "EEE d")}</div>
+    <div className="relative min-w-[200px] border-l border-border first:border-l-0">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="border-b border-border px-2 py-3">
+          <div className="text-sm font-medium">{format(day, "EEE")}</div>
+          <div className="text-2xl font-bold">{format(day, "d")}</div>
+        </div>
       </div>
       
-      <div className="relative space-y-2">
+      <div className="relative">
         {hours.map((hour) => {
           const timeSlotStart = new Date(day);
           timeSlotStart.setHours(hour, 0, 0, 0);
@@ -34,8 +37,9 @@ export function DayColumn({ day, hours, bookings, onTimeSlotClick }: DayColumnPr
             <div
               key={timeSlotStart.toISOString()}
               className={cn(
-                "h-14 w-full cursor-pointer rounded-md border border-dashed p-1 transition-colors hover:border-solid hover:bg-accent",
-                slotBookings.length > 0 && "border-solid bg-accent/50"
+                "group relative h-14 border-b border-border px-2 transition-colors",
+                slotBookings.length === 0 && "hover:bg-accent cursor-pointer",
+                slotBookings.length > 0 && "bg-accent/5"
               )}
               onClick={() => onTimeSlotClick(timeSlotStart, timeSlotEnd)}
             >

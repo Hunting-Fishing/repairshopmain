@@ -41,7 +41,7 @@ export function WeekView({
   }
 
   return (
-    <div className="relative grid grid-cols-8 gap-4 overflow-x-auto">
+    <div className="relative grid grid-cols-8 gap-0.5 overflow-x-auto bg-muted/20">
       <TimeColumn hours={hours} />
       {weekDays.map((day) => (
         <DayColumn

@@ -99,7 +99,7 @@ export default function IndexPage() {
         onViewChange={setView}
       />
 
-      <div className="flex-1 overflow-auto rounded-lg border bg-card p-6">
+      <div className="flex-1 overflow-auto rounded-lg border bg-background shadow-sm">
         {renderCalendarView()}
       </div>
 

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { StaffMemberRow } from "./role-management/StaffMemberRow";
 import { CustomRoleDialog } from "./role-management/CustomRoleDialog";
 import type { StaffMember, CustomRole } from "./role-management/types";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export function RoleManagement() {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -75,6 +76,24 @@ export function RoleManagement() {
     },
   });
 
+  // Calculate role counts
+  const getRoleCounts = () => {
+    if (!staffMembers) return [];
+    
+    const counts = new Map<string, number>();
+    staffMembers.forEach(member => {
+      const roleKey = member.role === 'custom' && member.custom_role_id && customRoles
+        ? customRoles.find(r => r.id === member.custom_role_id)?.name || 'Custom Role'
+        : member.role;
+      counts.set(roleKey, (counts.get(roleKey) || 0) + 1);
+    });
+    
+    return Array.from(counts.entries()).map(([role, count]) => ({
+      role: role.replace('_', ' ').toUpperCase(),
+      count
+    }));
+  };
+
   if (isLoadingStaff) {
     return (
       <Card>
@@ -93,23 +112,8 @@ export function RoleManagement() {
     );
   }
 
-  if (!staffMembers?.length) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            Staff Roles
-            <CustomRoleDialog />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-32">
-            <p className="text-muted-foreground">No staff members found</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const roleCounts = getRoleCounts();
+  const totalStaff = staffMembers?.length || 0;
 
   return (
     <Card>
@@ -121,19 +125,47 @@ export function RoleManagement() {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {staffMembers?.map((member) => (
-            <StaffMemberRow
-              key={member.id}
-              member={member}
-              customRoles={customRoles || []}
-              isEditing={editingId === member.id}
-              onEdit={() => setEditingId(member.id)}
-              onCancelEdit={() => setEditingId(null)}
-              onRoleChange={(newRole, customRoleId) => {
-                updateRole.mutate({ userId: member.id, newRole, customRoleId });
-              }}
-            />
-          ))}
+          {/* Role Summary Table */}
+          <div className="bg-muted/50 p-4 rounded-lg mb-6">
+            <h3 className="text-sm font-medium mb-2">Role Distribution ({totalStaff} Total Staff)</h3>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="text-right">Staff Count</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {roleCounts.map(({ role, count }) => (
+                  <TableRow key={role}>
+                    <TableCell>{role}</TableCell>
+                    <TableCell className="text-right">{count}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Staff Members List */}
+          {!staffMembers?.length ? (
+            <div className="flex items-center justify-center h-32">
+              <p className="text-muted-foreground">No staff members found</p>
+            </div>
+          ) : (
+            staffMembers.map((member) => (
+              <StaffMemberRow
+                key={member.id}
+                member={member}
+                customRoles={customRoles || []}
+                isEditing={editingId === member.id}
+                onEdit={() => setEditingId(member.id)}
+                onCancelEdit={() => setEditingId(null)}
+                onRoleChange={(newRole, customRoleId) => {
+                  updateRole.mutate({ userId: member.id, newRole, customRoleId });
+                }}
+              />
+            ))
+          )}
         </div>
       </CardContent>
     </Card>

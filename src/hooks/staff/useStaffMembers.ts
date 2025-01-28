@@ -40,12 +40,14 @@ export function useStaffMembers() {
         .eq("organization_id", userProfile.organization_id);
 
       if (staffError) throw staffError;
+      if (!profiles) return [];
 
       // Get staff emails with proper typing
       const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', { 
-          org_id: userProfile.organization_id 
-        });
+        .rpc<DatabaseFunctions['get_organization_user_emails']['Returns']>(
+          'get_organization_user_emails',
+          { org_id: userProfile.organization_id }
+        );
 
       if (emailError) throw emailError;
       if (!emailData) return [];
@@ -53,7 +55,7 @@ export function useStaffMembers() {
       // Combine profile and email data
       return profiles.map(profile => ({
         ...profile,
-        email: emailData.find(e => e.user_id === profile.id)?.email || ''
+        email: emailData.find((e: EmailData) => e.user_id === profile.id)?.email || ''
       })) as StaffMember[];
     },
   });

@@ -202,25 +202,40 @@ export type Database = {
         Row: {
           business_type: string | null
           created_at: string
+          default_labor_rate: number | null
           id: string
+          logo_url: string | null
           name: string
+          operating_hours: Json | null
+          parts_markup: number | null
           phone_number: string | null
+          tax_rate: number | null
           updated_at: string
         }
         Insert: {
           business_type?: string | null
           created_at?: string
+          default_labor_rate?: number | null
           id?: string
+          logo_url?: string | null
           name: string
+          operating_hours?: Json | null
+          parts_markup?: number | null
           phone_number?: string | null
+          tax_rate?: number | null
           updated_at?: string
         }
         Update: {
           business_type?: string | null
           created_at?: string
+          default_labor_rate?: number | null
           id?: string
+          logo_url?: string | null
           name?: string
+          operating_hours?: Json | null
+          parts_markup?: number | null
           phone_number?: string | null
+          tax_rate?: number | null
           updated_at?: string
         }
         Relationships: []
@@ -233,13 +248,19 @@ export type Database = {
           created_at: string
           custom_role_id: string | null
           first_name: string | null
+          hire_date: string | null
           id: string
+          invitation_sent_at: string | null
+          invitation_token: string | null
           last_name: string | null
+          notes: string | null
           organization_id: string | null
           phone_number: string | null
           postal_code: string | null
           role: Database["public"]["Enums"]["user_role"]
+          schedule: Json | null
           state_province: string | null
+          status: string | null
           street_address: string | null
           technician_settings: Json | null
           updated_at: string
@@ -251,13 +272,19 @@ export type Database = {
           created_at?: string
           custom_role_id?: string | null
           first_name?: string | null
+          hire_date?: string | null
           id: string
+          invitation_sent_at?: string | null
+          invitation_token?: string | null
           last_name?: string | null
+          notes?: string | null
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          schedule?: Json | null
           state_province?: string | null
+          status?: string | null
           street_address?: string | null
           technician_settings?: Json | null
           updated_at?: string
@@ -269,13 +296,19 @@ export type Database = {
           created_at?: string
           custom_role_id?: string | null
           first_name?: string | null
+          hire_date?: string | null
           id?: string
+          invitation_sent_at?: string | null
+          invitation_token?: string | null
           last_name?: string | null
+          notes?: string | null
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          schedule?: Json | null
           state_province?: string | null
+          status?: string | null
           street_address?: string | null
           technician_settings?: Json | null
           updated_at?: string
@@ -367,6 +400,57 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_certifications: {
+        Row: {
+          created_at: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string | null
+          issuer: string | null
+          name: string
+          organization_id: string | null
+          profile_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          issuer?: string | null
+          name: string
+          organization_id?: string | null
+          profile_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          issuer?: string | null
+          name?: string
+          organization_id?: string | null
+          profile_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_certifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_certifications_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

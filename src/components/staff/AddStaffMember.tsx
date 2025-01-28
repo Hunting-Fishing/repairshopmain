@@ -22,7 +22,6 @@ export function AddStaffMember() {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  // Get the current user's profile to get organization_id
   const { data: userProfile } = useQuery({
     queryKey: ["user-profile"],
     queryFn: async () => {
@@ -40,7 +39,6 @@ export function AddStaffMember() {
     },
   });
 
-  // Get custom roles based on organization_id
   const { data: customRoles = [] } = useQuery({
     queryKey: ["custom-roles", userProfile?.organization_id],
     queryFn: async () => {
@@ -64,6 +62,8 @@ export function AddStaffMember() {
       firstName: "",
       lastName: "",
       role: "technician",
+      phoneNumber: "",
+      notes: "",
     },
   });
 
@@ -94,6 +94,11 @@ export function AddStaffMember() {
           last_name: data.lastName,
           role: data.role,
           custom_role_id: data.role === "custom" ? data.customRoleId : null,
+          phone_number: data.phoneNumber,
+          hire_date: data.hireDate,
+          notes: data.notes,
+          schedule: data.schedule,
+          status: 'active',
         });
 
       if (profileError) throw profileError;

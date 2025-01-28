@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
-import type { Database } from "@/integrations/supabase/types";
+import type { DatabaseFunctions } from "@/types/database/functions";
 
 export function useStaffMembers() {
   return useQuery({
@@ -40,19 +40,22 @@ export function useStaffMembers() {
 
       if (staffError) throw staffError;
 
-      // Get staff emails
+      // Get staff emails with proper typing
       const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', {
+        .rpc<
+          DatabaseFunctions['get_organization_user_emails']['Returns'],
+          DatabaseFunctions['get_organization_user_emails']['Args']
+        >('get_organization_user_emails', {
           org_id: userProfile.organization_id
         });
 
       if (emailError) throw emailError;
       if (!emailData || !Array.isArray(emailData)) return [];
 
-      // Combine profile and email data with proper type checking
+      // Combine profile and email data with proper typing
       return profiles.map(profile => ({
         ...profile,
-        email: emailData.find((e: { user_id: string; email: string }) => e.user_id === profile.id)?.email || ''
+        email: emailData.find(e => e.user_id === profile.id)?.email || ''
       })) as StaffMember[];
     },
   });

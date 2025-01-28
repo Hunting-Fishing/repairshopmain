@@ -1,4 +1,4 @@
-import { Json } from "../auth"
+import { BookingStatus } from "../auth"
 
 export interface BookingRow {
   id: string
@@ -9,20 +9,20 @@ export interface BookingRow {
   assigned_technician_id: string | null
   start_time: string
   end_time: string
-  status: string | null
+  status: BookingStatus | null
   created_at: string
   updated_at: string
   created_by: string
   updated_by: string
 }
 
-export interface BookingInsert extends Partial<Omit<BookingRow, 'created_at' | 'updated_at'>> {
+export interface BookingInsert extends Partial<Omit<BookingRow, 'id' | 'created_at' | 'updated_at'>> {
   customer_name: string
   vehicle_info: string
   job_description: string
+  organization_id: string
   start_time: string
   end_time: string
-  organization_id: string
   created_by: string
   updated_by: string
 }

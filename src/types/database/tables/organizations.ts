@@ -14,7 +14,7 @@ export interface OrganizationRow {
   parts_markup: number | null
 }
 
-export interface OrganizationInsert extends Partial<Omit<OrganizationRow, 'created_at' | 'updated_at'>> {
+export interface OrganizationInsert extends Partial<Omit<OrganizationRow, 'id' | 'created_at' | 'updated_at'>> {
   name: string
 }
 

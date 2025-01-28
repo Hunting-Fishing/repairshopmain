@@ -1,7 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
-import type { DatabaseFunctions } from "@/types/database/functions";
+
+interface EmailData {
+  user_id: string;
+  email: string;
+}
 
 export function useStaffMembers() {
   return useQuery({
@@ -41,10 +45,9 @@ export function useStaffMembers() {
 
       // Get staff emails with proper typing
       const { data: emailData, error: emailError } = await supabase
-        .rpc<DatabaseFunctions['get_organization_user_emails']['Returns'], DatabaseFunctions['get_organization_user_emails']['Args']>(
-          'get_organization_user_emails',
-          { org_id: userProfile.organization_id }
-        );
+        .rpc<EmailData>('get_organization_user_emails', { 
+          org_id: userProfile.organization_id 
+        });
 
       if (emailError) throw emailError;
       if (!emailData) return [];

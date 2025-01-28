@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus } from "lucide-react";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Card,
@@ -17,10 +15,10 @@ import { Button } from "@/components/ui/button";
 import { CustomRoleDialog } from "./role-management/CustomRoleDialog";
 import { StaffMemberFormFields } from "./add-staff-member/StaffMemberFormFields";
 import { staffMemberSchema, type StaffMemberFormValues } from "./add-staff-member/schema";
+import { useAddStaffMember } from "@/hooks/staff/useAddStaffMember";
 
 export function AddStaffMember() {
-  const [isLoading, setIsLoading] = useState(false);
-  const queryClient = useQueryClient();
+  const { addStaffMember, isLoading } = useAddStaffMember();
 
   const { data: userProfile } = useQuery({
     queryKey: ["user-profile"],
@@ -73,55 +71,9 @@ export function AddStaffMember() {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: data.email,
-        password: Math.random().toString(36).slice(-8),
-        email_confirm: true,
-      });
-
-      if (authError) throw authError;
-
-      // Create profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: authData.user.id,
-          organization_id: userProfile.organization_id,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          role: data.role,
-          custom_role_id: data.role === "custom" ? data.customRoleId : null,
-          phone_number: data.phoneNumber,
-          hire_date: data.hireDate ? data.hireDate.toISOString().split('T')[0] : null,
-          notes: data.notes,
-          schedule: data.schedule,
-          status: 'active',
-        });
-
-      if (profileError) throw profileError;
-
-      // Add organization membership
-      const { error: membershipError } = await supabase
-        .from("organization_members")
-        .insert({
-          organization_id: userProfile.organization_id,
-          user_id: authData.user.id,
-          status: 'active'
-        });
-
-      if (membershipError) throw membershipError;
-
-      toast.success("Staff member added successfully");
-      queryClient.invalidateQueries({ queryKey: ["staff-members"] });
+    const success = await addStaffMember(data, userProfile.organization_id);
+    if (success) {
       form.reset();
-    } catch (error) {
-      console.error("Error adding staff member:", error);
-      toast.error("Failed to add staff member");
-    } finally {
-      setIsLoading(false);
     }
   };
 

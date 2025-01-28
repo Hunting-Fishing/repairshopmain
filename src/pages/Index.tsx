@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
 import { StatsCards } from "@/components/dashboard/StatsCards";
 import { CalendarSection } from "@/components/dashboard/CalendarSection";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { useCalendarBookings } from "@/hooks/useCalendarBookings";
 
 export default function Index() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -15,35 +13,8 @@ export default function Index() {
     start: Date;
     end: Date;
   } | null>(null);
-  const { toast } = useToast();
 
-  const { data: bookings, isLoading } = useQuery({
-    queryKey: ["bookings", format(selectedDate, "yyyy-MM-dd")],
-    queryFn: async () => {
-      const startOfDay = new Date(selectedDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(selectedDate);
-      endOfDay.setHours(23, 59, 59, 999);
-
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .gte("start_time", startOfDay.toISOString())
-        .lte("start_time", endOfDay.toISOString())
-        .order("start_time");
-
-      if (error) {
-        toast({
-          title: "Error fetching bookings",
-          description: error.message,
-          variant: "destructive",
-        });
-        return [];
-      }
-
-      return data;
-    },
-  });
+  const { data: bookings, isLoading } = useCalendarBookings(selectedDate);
 
   const handleTimeSlotClick = (start: Date, end: Date) => {
     setSelectedTimeSlot({ start, end });
@@ -57,12 +28,10 @@ export default function Index() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Overview of your repair shop's performance
-        </p>
-      </div>
+      <DashboardHeader
+        title="Dashboard"
+        description="Overview of your repair shop's performance"
+      />
 
       <StatsCards />
 

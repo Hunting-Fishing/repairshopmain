@@ -4,6 +4,7 @@ import { TechnicianManagement } from "@/components/staff/TechnicianManagement";
 import { RoleManagement } from "@/components/staff/RoleManagement";
 import { AddStaffMember } from "@/components/staff/AddStaffMember";
 import { TechnicianSettings } from "@/components/staff/TechnicianSettings";
+import { StaffList } from "@/components/staff/staff-list/StaffList";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { technicianSettingsFormSchema, type TechnicianSettingsFormValues } from "@/components/staff/types";
@@ -52,7 +53,7 @@ export default function Staff() {
         <TabsContent value="staff">
           <div className="space-y-4">
             <AddStaffMember />
-            <TechnicianManagement />
+            <StaffList />
           </div>
         </TabsContent>
 

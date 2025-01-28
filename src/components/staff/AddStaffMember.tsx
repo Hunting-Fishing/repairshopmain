@@ -28,20 +28,19 @@ export function AddStaffMember() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session found");
 
-      // Get organization_id from membership
-      const { data: memberData, error: memberError } = await supabase
-        .from("organization_members")
+      // Get user's profile first
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
         .select("organization_id")
-        .eq('user_id', session.user.id)
-        .eq('status', 'active')
+        .eq('id', session.user.id)
         .single();
 
-      if (memberError) throw memberError;
+      if (profileError) throw profileError;
 
       const { data, error } = await supabase
         .from("custom_roles")
         .select("*")
-        .eq('organization_id', memberData.organization_id);
+        .eq('organization_id', profileData.organization_id);
 
       if (error) throw error;
       return data;
@@ -64,15 +63,14 @@ export function AddStaffMember() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session found");
 
-      // Get organization_id from membership
-      const { data: memberData, error: memberError } = await supabase
-        .from("organization_members")
+      // Get user's profile to get organization_id
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
         .select("organization_id")
-        .eq('user_id', session.user.id)
-        .eq('status', 'active')
+        .eq('id', session.user.id)
         .single();
 
-      if (memberError) throw memberError;
+      if (profileError) throw profileError;
 
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: data.email,
@@ -83,24 +81,24 @@ export function AddStaffMember() {
       if (authError) throw authError;
 
       // Create profile
-      const { error: profileError } = await supabase
+      const { error: profileError2 } = await supabase
         .from("profiles")
         .insert({
           id: authData.user.id,
-          organization_id: memberData.organization_id,
+          organization_id: profileData.organization_id,
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
           custom_role_id: data.role === "custom" ? data.customRoleId : null,
         });
 
-      if (profileError) throw profileError;
+      if (profileError2) throw profileError2;
 
       // Add organization membership
       const { error: membershipError } = await supabase
         .from("organization_members")
         .insert({
-          organization_id: memberData.organization_id,
+          organization_id: profileData.organization_id,
           user_id: authData.user.id,
           status: 'active'
         });

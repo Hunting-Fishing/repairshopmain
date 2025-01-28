@@ -8,6 +8,8 @@ interface EmailData {
   email: string;
 }
 
+type RPCFunctions = Database['public']['Functions'];
+
 export function useStaffMembers() {
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -54,9 +56,9 @@ export function useStaffMembers() {
 
       // Get emails for all users in the organization
       const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', { 
+        .rpc<EmailData[]>('get_organization_user_emails', { 
           org_id: userProfile.organization_id 
-        }) as { data: EmailData[] | null, error: unknown };
+        });
 
       if (emailError) throw emailError;
       if (!emailData) return [];

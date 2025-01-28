@@ -1,7 +1,7 @@
 import { BookingRow, BookingInsert, BookingUpdate } from "./tables/bookings"
 import { OrganizationRow, OrganizationInsert, OrganizationUpdate } from "./tables/organizations"
 import { ProfileRow, ProfileInsert, ProfileUpdate } from "./tables/profiles"
-import { UserRole, BookingStatus, Json } from "./tables/auth"
+import { UserRole, BookingStatus, Json } from "./auth"
 import { DatabaseFunctions } from "./functions"
 
 export interface Database {

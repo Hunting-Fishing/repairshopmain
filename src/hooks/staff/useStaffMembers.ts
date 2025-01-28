@@ -48,7 +48,7 @@ export function useStaffMembers() {
       if (!profiles) return [];
 
       const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', {
+        .rpc<EmailData[]>('get_organization_user_emails', {
           org_id: userProfile.organization_id
         });
 

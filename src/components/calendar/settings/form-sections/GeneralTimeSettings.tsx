@@ -46,7 +46,7 @@ export function GeneralTimeSettings() {
                     const hour24 = i.toString().padStart(2, "0");
                     const hour12 = i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i - 12} PM`;
                     return (
-                      <SelectItem key={i} value={hour24}>
+                      <SelectItem key={i} value={`${hour24}:00`}>
                         {form.watch("use24HourTime") ? `${hour24}:00` : hour12}
                       </SelectItem>
                     );
@@ -75,7 +75,7 @@ export function GeneralTimeSettings() {
                     const hour24 = i.toString().padStart(2, "0");
                     const hour12 = i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i - 12} PM`;
                     return (
-                      <SelectItem key={i} value={hour24}>
+                      <SelectItem key={i} value={`${hour24}:00`}>
                         {form.watch("use24HourTime") ? `${hour24}:00` : hour12}
                       </SelectItem>
                     );

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { StaffMember, UserProfile, EmailData } from "./types";
+import { StaffMember, UserProfile, GetOrganizationUserEmailsResponse, GetOrganizationUserEmailsArgs } from "./types";
 
 export function useStaffMembers() {
   return useQuery({
@@ -36,9 +36,10 @@ export function useStaffMembers() {
       if (error) throw error;
 
       const { data: emailData } = await supabase
-        .rpc<EmailData[]>('get_organization_user_emails', { 
-          org_id: userProfile.organization_id 
-        });
+        .rpc<GetOrganizationUserEmailsResponse, GetOrganizationUserEmailsArgs>(
+          'get_organization_user_emails',
+          { org_id: userProfile.organization_id }
+        );
 
       return profiles.map(profile => ({
         ...profile,

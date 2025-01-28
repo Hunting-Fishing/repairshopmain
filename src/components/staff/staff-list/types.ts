@@ -1,4 +1,4 @@
-import { Database } from "@/integrations/supabase/types";
+import { Database } from "@/types/database";
 
 export interface StaffMember {
   id: string;
@@ -18,7 +18,8 @@ export interface UserProfile {
   organization_id: string;
 }
 
-export type EmailData = {
-  user_id: string;
-  email: string;
-};
+export type EmailData = Database["public"]["Functions"]["get_organization_user_emails"]["Returns"][number];
+
+export type GetOrganizationUserEmailsResponse = Database["public"]["Functions"]["get_organization_user_emails"]["Returns"];
+
+export type GetOrganizationUserEmailsArgs = Database["public"]["Functions"]["get_organization_user_emails"]["Args"];

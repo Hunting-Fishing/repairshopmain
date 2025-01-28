@@ -16,6 +16,11 @@ export const calendarSettingsFormSchema = z.object({
   showTechnicianWorkload: z.boolean(),
   enableTechnicianColors: z.boolean(),
   technicianViewMode: z.enum(["individual", "combined", "filtered"]),
+  showTechnicianAvailability: z.boolean(),
+  enableTechnicianSpecialties: z.boolean(),
+  technicianScheduleConflictHandling: z.enum(["warn", "block", "allow"]),
+  showTechnicianStats: z.boolean(),
+  enableAutoAssignment: z.boolean(),
 });
 
 export type CalendarSettingsFormValues = z.infer<typeof calendarSettingsFormSchema>;

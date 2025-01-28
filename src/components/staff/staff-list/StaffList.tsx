@@ -27,10 +27,6 @@ type StaffMember = {
   } | null;
 };
 
-type EmailSubquery = {
-  email: string;
-}[];
-
 export function StaffList() {
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ["staff-members"],
@@ -46,26 +42,29 @@ export function StaffList() {
 
       if (!userProfile?.organization_id) throw new Error("No organization found");
 
-      // Join with auth.users to get email
-      const { data, error } = await supabase
+      // First get all profiles in the organization
+      const { data: profiles, error } = await supabase
         .from("profiles")
         .select(`
           *,
           custom_roles (
             name
-          ),
-          email:id(
-            email
           )
         `)
         .eq("organization_id", userProfile.organization_id);
 
       if (error) throw error;
-      
-      // Transform the data to include email from the subquery
-      return data.map(staff => ({
-        ...staff,
-        email: (staff.email as EmailSubquery)?.[0]?.email || ''
+
+      // Then get the emails for these profiles from auth.users
+      const { data: emails } = await supabase
+        .from('auth')
+        .select('id, email')
+        .in('id', profiles.map(p => p.id));
+
+      // Combine the data
+      return profiles.map(profile => ({
+        ...profile,
+        email: emails?.find(e => e.id === profile.id)?.email || ''
       })) as StaffMember[];
     },
   });

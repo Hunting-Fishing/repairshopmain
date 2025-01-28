@@ -4,8 +4,26 @@ import { TechnicianManagement } from "@/components/staff/TechnicianManagement";
 import { RoleManagement } from "@/components/staff/RoleManagement";
 import { AddStaffMember } from "@/components/staff/AddStaffMember";
 import { TechnicianSettings } from "@/components/staff/TechnicianSettings";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { technicianSettingsFormSchema, type TechnicianSettingsFormValues } from "@/components/staff/types";
+import { Form } from "@/components/ui/form";
 
 export default function Staff() {
+  const form = useForm<TechnicianSettingsFormValues>({
+    resolver: zodResolver(technicianSettingsFormSchema),
+    defaultValues: {
+      showTechnicianWorkload: false,
+      showTechnicianAvailability: false,
+      showTechnicianStats: false,
+      enableAutoAssignment: false,
+      enableTechnicianSpecialties: false,
+      technicianScheduleConflictHandling: "warn",
+      enableTechnicianColors: false,
+      technicianViewMode: "individual",
+    },
+  });
+
   return (
     <div className="container mx-auto py-6">
       <div className="mb-6">
@@ -43,7 +61,11 @@ export default function Staff() {
         </TabsContent>
 
         <TabsContent value="settings">
-          <TechnicianSettings />
+          <Form {...form}>
+            <form className="space-y-8">
+              <TechnicianSettings form={form} />
+            </form>
+          </Form>
         </TabsContent>
       </Tabs>
     </div>

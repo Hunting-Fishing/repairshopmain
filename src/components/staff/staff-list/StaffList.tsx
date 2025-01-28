@@ -5,7 +5,7 @@ import {
 import { StaffListSkeleton } from "./StaffListSkeleton";
 import { StaffTableHeader } from "./StaffTableHeader";
 import { StaffTableRow } from "./StaffTableRow";
-import { useStaffMembers } from "./useStaffMembers";
+import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
 
 export function StaffList() {
   const { data: staffMembers, isLoading } = useStaffMembers();

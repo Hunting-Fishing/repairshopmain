@@ -86,23 +86,53 @@ export type Database = {
           },
         ]
       }
+      countries: {
+        Row: {
+          id: string
+          name: string
+          phone_code: string | null
+          postal_code_format: string | null
+          postal_code_regex: string | null
+        }
+        Insert: {
+          id: string
+          name: string
+          phone_code?: string | null
+          postal_code_format?: string | null
+          postal_code_regex?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          phone_code?: string | null
+          postal_code_format?: string | null
+          postal_code_regex?: string | null
+        }
+        Relationships: []
+      }
       organizations: {
         Row: {
+          business_type: string | null
           created_at: string
           id: string
           name: string
+          phone_number: string | null
           updated_at: string
         }
         Insert: {
+          business_type?: string | null
           created_at?: string
           id?: string
           name: string
+          phone_number?: string | null
           updated_at?: string
         }
         Update: {
+          business_type?: string | null
           created_at?: string
           id?: string
           name?: string
+          phone_number?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -116,6 +146,7 @@ export type Database = {
           id: string
           last_name: string | null
           organization_id: string | null
+          phone_number: string | null
           postal_code: string | null
           role: string
           state_province: string | null
@@ -130,6 +161,7 @@ export type Database = {
           id: string
           last_name?: string | null
           organization_id?: string | null
+          phone_number?: string | null
           postal_code?: string | null
           role?: string
           state_province?: string | null
@@ -144,6 +176,7 @@ export type Database = {
           id?: string
           last_name?: string | null
           organization_id?: string | null
+          phone_number?: string | null
           postal_code?: string | null
           role?: string
           state_province?: string | null
@@ -156,6 +189,35 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regions: {
+        Row: {
+          country_id: string
+          id: string
+          name: string
+          type: string
+        }
+        Insert: {
+          country_id: string
+          id: string
+          name: string
+          type: string
+        }
+        Update: {
+          country_id?: string
+          id?: string
+          name?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regions_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
             referencedColumns: ["id"]
           },
         ]

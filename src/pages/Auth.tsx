@@ -22,12 +22,27 @@ export default function Auth() {
   const { session, signIn, signUp } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
 
   // Redirect if already authenticated
   if (session) {
     navigate("/");
     return null;
   }
+
+  // Fetch business types for the signup form
+  const { data: businessTypes } = useQuery({
+    queryKey: ["businessTypes"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("business_types")
+        .select("*")
+        .order("name");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   // Fetch countries for the signup form
   const { data: countries } = useQuery({
@@ -45,16 +60,19 @@ export default function Auth() {
 
   // Fetch regions/states based on selected country
   const { data: regions } = useQuery({
-    queryKey: ["regions"],
+    queryKey: ["regions", selectedCountry],
     queryFn: async () => {
+      if (!selectedCountry) return [];
       const { data, error } = await supabase
         .from("regions")
         .select("*")
+        .eq("country_id", selectedCountry)
         .order("name");
       
       if (error) throw error;
       return data;
     },
+    enabled: !!selectedCountry,
   });
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -165,11 +183,18 @@ export default function Auth() {
                       placeholder="Business Phone"
                       required
                     />
-                    <Input
-                      name="businessType"
-                      placeholder="Business Type"
-                      required
-                    />
+                    <Select name="businessType" required>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Business Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {businessTypes?.map((type) => (
+                          <SelectItem key={type.id} value={type.name}>
+                            {type.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>Personal Information</Label>
@@ -213,7 +238,11 @@ export default function Auth() {
                       placeholder="City"
                       required
                     />
-                    <Select name="country" required>
+                    <Select 
+                      name="country" 
+                      required
+                      onValueChange={(value) => setSelectedCountry(value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select Country" />
                       </SelectTrigger>

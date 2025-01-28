@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { UseFormReturn } from "react-hook-form";
 
 export const calendarSettingsFormSchema = z.object({
   defaultView: z.enum(["day", "week", "month"]),

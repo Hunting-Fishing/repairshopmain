@@ -15,15 +15,16 @@ export function CalendarSettingsForm() {
     resolver: zodResolver(calendarSettingsFormSchema),
     defaultValues: {
       defaultView: "week",
-      timeFormat: "12",
+      use24HourTime: false,
       workingHoursStart: "09:00",
       workingHoursEnd: "17:00",
       timeIncrement: "30",
       theme: "warm",
-      showOverlappingBookings: true,
-      allowDoubleBookings: false,
-      bufferTime: "15",
-      maxAppointmentsPerSlot: "1",
+      allowOverlappingBookings: false,
+      bufferBefore: "0",
+      bufferAfter: "0",
+      primaryColor: "#FEC6A1",
+      secondaryColor: "#FDE1D3",
     },
   });
 

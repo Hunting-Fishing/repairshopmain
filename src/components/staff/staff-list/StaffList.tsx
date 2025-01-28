@@ -42,11 +42,17 @@ export function StaffList() {
 
       if (!userProfile?.organization_id) throw new Error("No organization found");
 
-      // First get all profiles in the organization
+      // Get all profiles in the organization
       const { data: profiles, error } = await supabase
         .from("profiles")
         .select(`
-          *,
+          id,
+          first_name,
+          last_name,
+          phone_number,
+          role,
+          hire_date,
+          status,
           custom_roles (
             name
           )
@@ -55,16 +61,18 @@ export function StaffList() {
 
       if (error) throw error;
 
-      // Then get the emails for these profiles from auth.users
-      const { data: emails } = await supabase
-        .from('auth')
-        .select('id, email')
-        .in('id', profiles.map(p => p.id));
+      // Get emails from auth.users using RPC function
+      const { data: emailData, error: emailError } = await supabase
+        .rpc('get_organization_user_emails', {
+          org_id: userProfile.organization_id
+        });
+
+      if (emailError) throw emailError;
 
       // Combine the data
       return profiles.map(profile => ({
         ...profile,
-        email: emails?.find(e => e.id === profile.id)?.email || ''
+        email: emailData?.find(e => e.user_id === profile.id)?.email || ''
       })) as StaffMember[];
     },
   });

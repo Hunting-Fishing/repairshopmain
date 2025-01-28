@@ -12,6 +12,7 @@ import CalendarSettings from "./pages/Calendar-Settings";
 import IndexPage from "./pages/Index";
 import Auth from "./pages/Auth";
 import ApplicationControl from "./pages/ApplicationControl";
+import Staff from "./pages/Staff";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
@@ -91,6 +92,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <CalendarSettings />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <Staff />
                   </AppLayout>
                 </ProtectedRoute>
               }

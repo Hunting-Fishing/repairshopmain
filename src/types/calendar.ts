@@ -19,4 +19,9 @@ export interface CalendarViewProps {
   bookings: Booking[];
   isLoading: boolean;
   onTimeSlotClick: (start: Date, end: Date) => void;
+  workingHours?: {
+    start: number;
+    end: number;
+  };
+  use24HourTime?: boolean;
 }

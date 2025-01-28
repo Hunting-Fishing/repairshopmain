@@ -160,6 +160,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          calendar_settings: Json | null
           city: string | null
           country: string | null
           created_at: string
@@ -175,6 +176,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          calendar_settings?: Json | null
           city?: string | null
           country?: string | null
           created_at?: string
@@ -190,6 +192,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          calendar_settings?: Json | null
           city?: string | null
           country?: string | null
           created_at?: string

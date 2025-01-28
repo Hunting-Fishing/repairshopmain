@@ -7,6 +7,7 @@ import {
 import { StaffListSkeleton } from "./StaffListSkeleton";
 import { StaffTableHeader } from "./StaffTableHeader";
 import { StaffTableRow } from "./StaffTableRow";
+import { DatabaseFunctions } from "@/types/database/functions";
 
 type StaffMember = {
   id: string;
@@ -21,11 +22,6 @@ type StaffMember = {
     name: string | null;
   } | null;
 };
-
-type EmailData = {
-  user_id: string;
-  email: string;
-}[];
 
 export function StaffList() {
   const { data: staffMembers, isLoading } = useQuery({
@@ -63,7 +59,7 @@ export function StaffList() {
       const { data: emailData } = await supabase
         .rpc('get_organization_user_emails', { 
           org_id: userProfile.organization_id 
-        }) as { data: EmailData | null };
+        }) as { data: DatabaseFunctions['get_organization_user_emails']['Returns'] };
 
       return profiles.map(profile => ({
         ...profile,

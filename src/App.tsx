@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Customers from "./pages/Customers";
 import WorkOrders from "./pages/WorkOrders";
 import Calendar from "./pages/Calendar";
+import CalendarSettings from "./pages/Calendar-Settings";
 import IndexPage from "./pages/Index";
 import Auth from "./pages/Auth";
 import ApplicationControl from "./pages/ApplicationControl";
@@ -80,6 +81,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <Calendar />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/calendar-settings"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <CalendarSettings />
                   </AppLayout>
                 </ProtectedRoute>
               }

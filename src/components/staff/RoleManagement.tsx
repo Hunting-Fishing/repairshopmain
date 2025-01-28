@@ -22,9 +22,13 @@ export function RoleManagement() {
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ["staff-members"],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No session found");
+
       const { data, error } = await supabase
         .from("profiles")
         .select("id, first_name, last_name, role")
+        .eq('organization_id', session.user.id)
         .order("role");
       
       if (error) throw error;

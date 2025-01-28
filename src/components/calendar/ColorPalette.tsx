@@ -42,5 +42,3 @@ export function ColorPalette({ selectedColor, onColorSelect }: ColorPaletteProps
     </div>
   );
 }
-
-export { PAST_APPOINTMENT_COLORS };

@@ -1,15 +1,12 @@
-import { ShopList } from "@/components/shops/ShopList";
-
 export default function IndexPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Auto Repair Shops</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Welcome</h1>
         <p className="text-muted-foreground">
-          View and manage repair shops in the network
+          Manage your auto repair business efficiently
         </p>
       </div>
-      <ShopList />
     </div>
   );
 }

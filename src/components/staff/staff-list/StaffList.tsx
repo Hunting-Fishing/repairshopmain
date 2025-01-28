@@ -22,6 +22,11 @@ type StaffMember = {
   } | null;
 };
 
+type EmailData = {
+  user_id: string;
+  email: string;
+}[];
+
 export function StaffList() {
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ["staff-members"],
@@ -58,11 +63,11 @@ export function StaffList() {
       const { data: emailData } = await supabase
         .rpc('get_organization_user_emails', { 
           org_id: userProfile.organization_id 
-        });
+        }) as { data: EmailData | null };
 
       return profiles.map(profile => ({
         ...profile,
-        email: emailData?.find((e: { user_id: string; email: string }) => e.user_id === profile.id)?.email || ''
+        email: emailData?.find((e) => e.user_id === profile.id)?.email || ''
       })) as StaffMember[];
     },
   });

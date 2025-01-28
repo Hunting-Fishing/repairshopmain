@@ -18,4 +18,7 @@ export interface UserProfile {
   organization_id: string;
 }
 
-export type EmailData = Database["public"]["Functions"]["get_organization_user_emails"]["Returns"][0];
+export type EmailData = {
+  user_id: string;
+  email: string;
+};

@@ -68,7 +68,7 @@ export function StaffList() {
 
       // Get emails from auth.users using RPC function
       const { data: emailData, error: emailError } = await supabase
-        .rpc<EmailData, { org_id: string }>('get_organization_user_emails', {
+        .rpc<{ user_id: string; email: string }>('get_organization_user_emails', {
           org_id: userProfile.organization_id
         });
 

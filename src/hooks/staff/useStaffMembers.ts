@@ -8,6 +8,10 @@ type GetOrganizationUserEmailsResponse = {
   email: string;
 }[];
 
+type GetOrganizationUserEmailsArgs = {
+  org_id: string;
+};
+
 export function useStaffMembers() {
   return useQuery({
     queryKey: ["staff-members"],
@@ -41,10 +45,12 @@ export function useStaffMembers() {
 
       if (error) throw error;
 
-      const { data: emailData } = await supabase.rpc<GetOrganizationUserEmailsResponse>(
-        'get_organization_user_emails',
-        { org_id: userProfile.organization_id }
-      );
+      const { data: emailData } = await supabase.rpc<
+        GetOrganizationUserEmailsResponse,
+        GetOrganizationUserEmailsArgs
+      >('get_organization_user_emails', {
+        org_id: userProfile.organization_id
+      });
 
       if (!emailData) return [];
 

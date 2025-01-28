@@ -3,7 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
 import type { DatabaseFunctions } from "@/types/database/functions";
 
-type EmailData = DatabaseFunctions['get_organization_user_emails']['Returns'][number];
+type EmailData = {
+  user_id: string;
+  email: string;
+};
 
 export function useStaffMembers() {
   return useQuery({
@@ -42,9 +45,11 @@ export function useStaffMembers() {
       if (staffError) throw staffError;
       if (!profiles) return [];
 
-      // Get staff emails with proper typing
+      // Get staff emails
       const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', { org_id: userProfile.organization_id });
+        .rpc('get_organization_user_emails', { 
+          org_id: userProfile.organization_id 
+        }) as { data: EmailData[] | null, error: any };
 
       if (emailError) throw emailError;
       if (!emailData) return [];
@@ -52,7 +57,7 @@ export function useStaffMembers() {
       // Combine profile and email data
       return profiles.map(profile => ({
         ...profile,
-        email: (emailData as EmailData[]).find((e) => e.user_id === profile.id)?.email || ''
+        email: emailData.find(e => e.user_id === profile.id)?.email || ''
       })) as StaffMember[];
     },
   });

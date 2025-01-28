@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { StaffListSkeleton } from "./StaffListSkeleton";
-import { Database } from "@/integrations/supabase/types";
+import { Database } from "@/types/database";
 
 type StaffMember = {
   id: string;

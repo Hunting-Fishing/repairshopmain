@@ -18,10 +18,21 @@ export function RoleManagement() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session found");
 
+      // First get the organization_id from organization_members
+      const { data: memberData, error: memberError } = await supabase
+        .from("organization_members")
+        .select("organization_id")
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (memberError) throw memberError;
+
+      // Then get all profiles in that organization
       const { data, error } = await supabase
         .from("profiles")
         .select("id, first_name, last_name, role, custom_role_id")
-        .eq('organization_id', session.user.id)
+        .eq('organization_id', memberData.organization_id)
         .order("role");
       
       if (error) throw error;
@@ -35,10 +46,20 @@ export function RoleManagement() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session found");
 
+      // Get organization_id from membership
+      const { data: memberData, error: memberError } = await supabase
+        .from("organization_members")
+        .select("organization_id")
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (memberError) throw memberError;
+
       const { data, error } = await supabase
         .from("custom_roles")
         .select("*")
-        .eq('organization_id', session.user.id);
+        .eq('organization_id', memberData.organization_id);
       
       if (error) throw error;
       return data as CustomRole[];

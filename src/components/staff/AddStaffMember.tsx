@@ -25,9 +25,24 @@ export function AddStaffMember() {
   const { data: customRoles = [] } = useQuery({
     queryKey: ["custom-roles"],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No session found");
+
+      // Get organization_id from membership
+      const { data: memberData, error: memberError } = await supabase
+        .from("organization_members")
+        .select("organization_id")
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (memberError) throw memberError;
+
       const { data, error } = await supabase
         .from("custom_roles")
-        .select("*");
+        .select("*")
+        .eq('organization_id', memberData.organization_id);
+
       if (error) throw error;
       return data;
     },
@@ -49,6 +64,16 @@ export function AddStaffMember() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session found");
 
+      // Get organization_id from membership
+      const { data: memberData, error: memberError } = await supabase
+        .from("organization_members")
+        .select("organization_id")
+        .eq('user_id', session.user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (memberError) throw memberError;
+
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: data.email,
         password: Math.random().toString(36).slice(-8),
@@ -57,11 +82,12 @@ export function AddStaffMember() {
 
       if (authError) throw authError;
 
+      // Create profile
       const { error: profileError } = await supabase
         .from("profiles")
         .insert({
           id: authData.user.id,
-          organization_id: session.user.id,
+          organization_id: memberData.organization_id,
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
@@ -69,6 +95,17 @@ export function AddStaffMember() {
         });
 
       if (profileError) throw profileError;
+
+      // Add organization membership
+      const { error: membershipError } = await supabase
+        .from("organization_members")
+        .insert({
+          organization_id: memberData.organization_id,
+          user_id: authData.user.id,
+          status: 'active'
+        });
+
+      if (membershipError) throw membershipError;
 
       toast.success("Staff member added successfully");
       queryClient.invalidateQueries({ queryKey: ["staff-members"] });

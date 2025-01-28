@@ -7,7 +7,6 @@ export function useStaffMembers() {
   return useQuery({
     queryKey: ["staff-members"],
     queryFn: async () => {
-      // Get current session
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session");
 
@@ -42,17 +41,15 @@ export function useStaffMembers() {
 
       // Get staff emails with proper typing
       const { data: emailData, error: emailError } = await supabase
-        .rpc<
-          DatabaseFunctions['get_organization_user_emails']['Returns'],
-          DatabaseFunctions['get_organization_user_emails']['Args']
-        >('get_organization_user_emails', {
-          org_id: userProfile.organization_id
-        });
+        .rpc<DatabaseFunctions['get_organization_user_emails']['Returns']>(
+          'get_organization_user_emails',
+          { org_id: userProfile.organization_id }
+        );
 
       if (emailError) throw emailError;
-      if (!emailData || !Array.isArray(emailData)) return [];
+      if (!emailData) return [];
 
-      // Combine profile and email data with proper typing
+      // Combine profile and email data
       return profiles.map(profile => ({
         ...profile,
         email: emailData.find(e => e.user_id === profile.id)?.email || ''

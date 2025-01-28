@@ -3,9 +3,9 @@ export interface DatabaseFunctions {
     Args: {
       org_id: string;
     };
-    Returns: Array<{
+    Returns: {
       user_id: string;
       email: string;
-    }>;
+    }[];
   };
 }

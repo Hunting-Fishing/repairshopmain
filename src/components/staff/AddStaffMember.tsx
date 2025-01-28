@@ -95,7 +95,7 @@ export function AddStaffMember() {
           role: data.role,
           custom_role_id: data.role === "custom" ? data.customRoleId : null,
           phone_number: data.phoneNumber,
-          hire_date: data.hireDate,
+          hire_date: data.hireDate ? data.hireDate.toISOString().split('T')[0] : null,
           notes: data.notes,
           schedule: data.schedule,
           status: 'active',

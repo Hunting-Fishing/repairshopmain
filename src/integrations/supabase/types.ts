@@ -173,6 +173,7 @@ export type Database = {
           role: string
           state_province: string | null
           street_address: string | null
+          technician_settings: Json | null
           updated_at: string
         }
         Insert: {
@@ -189,6 +190,7 @@ export type Database = {
           role?: string
           state_province?: string | null
           street_address?: string | null
+          technician_settings?: Json | null
           updated_at?: string
         }
         Update: {
@@ -205,6 +207,7 @@ export type Database = {
           role?: string
           state_province?: string | null
           street_address?: string | null
+          technician_settings?: Json | null
           updated_at?: string
         }
         Relationships: [
@@ -242,6 +245,77 @@ export type Database = {
             columns: ["country_id"]
             isOneToOne: false
             referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technician_specialties: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technician_specialties_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technician_specialty_assignments: {
+        Row: {
+          created_at: string
+          id: string
+          specialty_id: string
+          technician_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          specialty_id: string
+          technician_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          specialty_id?: string
+          technician_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technician_specialty_assignments_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "technician_specialties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technician_specialty_assignments_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

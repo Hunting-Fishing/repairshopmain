@@ -3,12 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
 import type { Database } from "@/integrations/supabase/types";
 
-interface EmailData {
+type EmailData = {
   user_id: string;
   email: string;
-}
+};
 
-type RPCFunctions = Database['public']['Functions'];
+type ProfileWithCustomRole = Database['public']['Tables']['profiles']['Row'] & {
+  custom_roles: {
+    name: string | null;
+  } | null;
+};
 
 export function useStaffMembers() {
   const { data: session } = useQuery({
@@ -54,17 +58,17 @@ export function useStaffMembers() {
       if (profilesError) throw profilesError;
       if (!profiles) return [];
 
-      // Get emails for all users in the organization
+      // Get emails for all users in the organization using RPC
       const { data: emailData, error: emailError } = await supabase
-        .rpc<'get_organization_user_emails', EmailData[]>('get_organization_user_emails', { 
-          org_id: userProfile.organization_id 
-        });
+        .rpc('get_organization_user_emails', {
+          org_id: userProfile.organization_id
+        }) as { data: EmailData[] | null, error: any };
 
       if (emailError) throw emailError;
       if (!emailData) return [];
 
-      // Combine profile and email data
-      return profiles.map(profile => ({
+      // Combine profile and email data with proper typing
+      return (profiles as ProfileWithCustomRole[]).map(profile => ({
         ...profile,
         email: emailData.find(e => e.user_id === profile.id)?.email || '',
       })) as StaffMember[];

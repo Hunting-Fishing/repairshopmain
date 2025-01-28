@@ -13,6 +13,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { StaffListSkeleton } from "./StaffListSkeleton";
 
+type StaffMember = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string;
+  phone_number: string | null;
+  role: string;
+  hire_date: string | null;
+  status: string | null;
+  custom_roles: {
+    name: string | null;
+  } | null;
+};
+
 export function StaffList() {
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ["staff-members"],
@@ -28,18 +42,27 @@ export function StaffList() {
 
       if (!userProfile?.organization_id) throw new Error("No organization found");
 
+      // Join with auth.users to get email
       const { data, error } = await supabase
         .from("profiles")
         .select(`
           *,
           custom_roles (
             name
+          ),
+          email:id(
+            email
           )
         `)
         .eq("organization_id", userProfile.organization_id);
 
       if (error) throw error;
-      return data;
+      
+      // Transform the data to include email from the subquery
+      return data.map(staff => ({
+        ...staff,
+        email: staff.email?.[0]?.email || ''
+      }));
     },
   });
 

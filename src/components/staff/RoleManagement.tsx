@@ -4,13 +4,14 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { StaffMemberRow } from "./role-management/StaffMemberRow";
-import type { StaffMember } from "./role-management/types";
+import { CustomRoleDialog } from "./role-management/CustomRoleDialog";
+import type { StaffMember, CustomRole } from "./role-management/types";
 
 export function RoleManagement() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: staffMembers, isLoading } = useQuery({
+  const { data: staffMembers, isLoading: isLoadingStaff } = useQuery({
     queryKey: ["staff-members"],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -18,7 +19,7 @@ export function RoleManagement() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, first_name, last_name, role")
+        .select("id, first_name, last_name, role, custom_role_id")
         .eq('organization_id', session.user.id)
         .order("role");
       
@@ -27,11 +28,38 @@ export function RoleManagement() {
     },
   });
 
+  const { data: customRoles } = useQuery({
+    queryKey: ["custom-roles"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No session found");
+
+      const { data, error } = await supabase
+        .from("custom_roles")
+        .select("*")
+        .eq('organization_id', session.user.id);
+      
+      if (error) throw error;
+      return data as CustomRole[];
+    },
+  });
+
   const updateRole = useMutation({
-    mutationFn: async ({ userId, newRole }: { userId: string; newRole: StaffMember["role"] }) => {
+    mutationFn: async ({ 
+      userId, 
+      newRole, 
+      customRoleId 
+    }: { 
+      userId: string; 
+      newRole: StaffMember["role"]; 
+      customRoleId?: string 
+    }) => {
       const { error } = await supabase
         .from("profiles")
-        .update({ role: newRole })
+        .update({ 
+          role: newRole,
+          custom_role_id: customRoleId 
+        })
         .eq("id", userId);
 
       if (error) throw error;
@@ -47,11 +75,14 @@ export function RoleManagement() {
     },
   });
 
-  if (isLoading) {
+  if (isLoadingStaff) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Staff Roles</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            Staff Roles
+            <CustomRoleDialog />
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-32">
@@ -66,7 +97,10 @@ export function RoleManagement() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Staff Roles</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            Staff Roles
+            <CustomRoleDialog />
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-32">
@@ -80,7 +114,10 @@ export function RoleManagement() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Staff Roles</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          Staff Roles
+          <CustomRoleDialog />
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -88,11 +125,12 @@ export function RoleManagement() {
             <StaffMemberRow
               key={member.id}
               member={member}
+              customRoles={customRoles || []}
               isEditing={editingId === member.id}
               onEdit={() => setEditingId(member.id)}
               onCancelEdit={() => setEditingId(null)}
-              onRoleChange={(newRole) => {
-                updateRole.mutate({ userId: member.id, newRole });
+              onRoleChange={(newRole, customRoleId) => {
+                updateRole.mutate({ userId: member.id, newRole, customRoleId });
               }}
             />
           ))}

@@ -196,6 +196,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          custom_role_id: string | null
           first_name: string | null
           id: string
           last_name: string | null
@@ -213,6 +214,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          custom_role_id?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
@@ -230,6 +232,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          custom_role_id?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
@@ -243,6 +246,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_custom_role_id_fkey"
+            columns: ["custom_role_id"]
+            isOneToOne: false
+            referencedRelation: "custom_roles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_organization_id_fkey"
             columns: ["organization_id"]

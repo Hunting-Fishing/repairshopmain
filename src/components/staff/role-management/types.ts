@@ -3,6 +3,13 @@ export type StaffMember = {
   first_name: string | null;
   last_name: string | null;
   role: "owner" | "management" | "technician" | "service_advisor" | "parts" | "hr" | "custom";
+  custom_role_id?: string | null;
+};
+
+export type CustomRole = {
+  id: string;
+  name: string;
+  organization_id: string;
 };
 
 export const roles: StaffMember["role"][] = [
@@ -12,6 +19,7 @@ export const roles: StaffMember["role"][] = [
   "service_advisor",
   "parts",
   "hr",
+  "custom"
 ];
 
 export const getRoleBadgeColor = (role: string) => {
@@ -28,6 +36,8 @@ export const getRoleBadgeColor = (role: string) => {
       return "bg-orange-500";
     case "hr":
       return "bg-pink-500";
+    case "custom":
+      return "bg-gray-500";
     default:
       return "bg-gray-500";
   }

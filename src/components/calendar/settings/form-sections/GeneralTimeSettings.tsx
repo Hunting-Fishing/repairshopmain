@@ -1,72 +1,61 @@
-import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { CalendarSettingsFormValues } from "../types";
+import { useFormContext } from "react-hook-form";
 
-interface GeneralTimeSettingsProps {
-  form: UseFormReturn<CalendarSettingsFormValues>;
-}
+export function GeneralTimeSettings() {
+  const form = useFormContext();
 
-export function GeneralTimeSettings({ form }: GeneralTimeSettingsProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <FormField
         control={form.control}
-        name="timeFormat"
+        name="workingHoursStart"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Time Format</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
+            <FormLabel>Working Hours Start</FormLabel>
+            <FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select time format" />
+                  <SelectValue placeholder="Select start time" />
                 </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="12">12-hour (AM/PM)</SelectItem>
-                <SelectItem value="24">24-hour</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormDescription>
-              Choose how times are displayed throughout the calendar
-            </FormDescription>
-            <FormMessage />
+                <SelectContent>
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <SelectItem key={i} value={i.toString().padStart(2, "0")}>
+                      {i.toString().padStart(2, "0")}:00
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormDescription>Set when your work day begins</FormDescription>
           </FormItem>
         )}
       />
 
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="workingHoursStart"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Working Hours Start</FormLabel>
-              <FormControl>
-                <Input type="time" {...field} className="border-[#FEC6A1]" />
-              </FormControl>
-              <FormDescription>Set your shop's opening time</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="workingHoursEnd"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Working Hours End</FormLabel>
-              <FormControl>
-                <Input type="time" {...field} className="border-[#FEC6A1]" />
-              </FormControl>
-              <FormDescription>Set your shop's closing time</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="workingHoursEnd"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Working Hours End</FormLabel>
+            <FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select end time" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <SelectItem key={i} value={i.toString().padStart(2, "0")}>
+                      {i.toString().padStart(2, "0")}:00
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormDescription>Set when your work day ends</FormDescription>
+          </FormItem>
+        )}
+      />
     </div>
   );
 }

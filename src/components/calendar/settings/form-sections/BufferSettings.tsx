@@ -1,62 +1,54 @@
-import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { CalendarSettingsFormValues } from "../types";
+import { useFormContext } from "react-hook-form";
 
-interface BufferSettingsProps {
-  form: UseFormReturn<CalendarSettingsFormValues>;
-}
+export function BufferSettings() {
+  const form = useFormContext();
 
-export function BufferSettings({ form }: BufferSettingsProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <FormField
         control={form.control}
-        name="bufferTime"
+        name="bufferBefore"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Buffer Time</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
+            <FormLabel>Buffer Time Before</FormLabel>
+            <FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select buffer time" />
+                  <SelectValue placeholder="Select buffer time before" />
                 </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="0">No buffer</SelectItem>
-                <SelectItem value="15">15 minutes</SelectItem>
-                <SelectItem value="30">30 minutes</SelectItem>
-                <SelectItem value="60">60 minutes</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormDescription>
-              Add padding time between appointments
-            </FormDescription>
-            <FormMessage />
+                <SelectContent>
+                  <SelectItem value="0">No buffer</SelectItem>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormControl>
+            <FormDescription>Add preparation time before each appointment</FormDescription>
           </FormItem>
         )}
       />
 
       <FormField
         control={form.control}
-        name="maxAppointmentsPerSlot"
+        name="bufferAfter"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Maximum Appointments Per Slot</FormLabel>
+            <FormLabel>Buffer Time After</FormLabel>
             <FormControl>
-              <Input
-                type="number"
-                min="1"
-                max="10"
-                {...field}
-                className="border-[#FEC6A1]"
-              />
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select buffer time after" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="0">No buffer</SelectItem>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                </SelectContent>
+              </Select>
             </FormControl>
-            <FormDescription>
-              Set the maximum number of concurrent appointments
-            </FormDescription>
-            <FormMessage />
+            <FormDescription>Add cleanup time after each appointment</FormDescription>
           </FormItem>
         )}
       />

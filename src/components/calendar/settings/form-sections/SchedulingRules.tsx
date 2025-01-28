@@ -1,56 +1,47 @@
-import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
+import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { UseFormReturn } from "react-hook-form";
-import { CalendarSettingsFormValues } from "../types";
+import { useFormContext } from "react-hook-form";
 
-interface SchedulingRulesProps {
-  form: UseFormReturn<CalendarSettingsFormValues>;
-}
+export function SchedulingRules() {
+  const form = useFormContext();
 
-export function SchedulingRules({ form }: SchedulingRulesProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <FormField
         control={form.control}
-        name="showOverlappingBookings"
+        name="timeIncrement"
         render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-[#FEC6A1] p-4">
-            <div className="space-y-0.5">
-              <FormLabel className="text-base">
-                Show Overlapping Bookings
-              </FormLabel>
-              <FormDescription>
-                Display multiple bookings in the same time slot
-              </FormDescription>
-            </div>
+          <FormItem>
+            <FormLabel>Time Increment</FormLabel>
             <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select time increment" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="15">15 minutes</SelectItem>
+                  <SelectItem value="30">30 minutes</SelectItem>
+                  <SelectItem value="60">1 hour</SelectItem>
+                </SelectContent>
+              </Select>
             </FormControl>
+            <FormDescription>Set the minimum bookable time slot duration</FormDescription>
           </FormItem>
         )}
       />
 
       <FormField
         control={form.control}
-        name="allowDoubleBookings"
+        name="allowOverlappingBookings"
         render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-[#FEC6A1] p-4">
+          <FormItem className="flex items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
-              <FormLabel className="text-base">
-                Allow Double Bookings
-              </FormLabel>
-              <FormDescription>
-                Enable multiple appointments at the same time
-              </FormDescription>
+              <FormLabel>Allow Overlapping Bookings</FormLabel>
+              <FormDescription>Enable multiple bookings for the same time slot</FormDescription>
             </div>
             <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
             </FormControl>
           </FormItem>
         )}

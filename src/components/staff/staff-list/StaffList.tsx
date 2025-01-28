@@ -27,6 +27,11 @@ type StaffMember = {
   } | null;
 };
 
+type EmailData = {
+  user_id: string;
+  email: string;
+};
+
 export function StaffList() {
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ["staff-members"],
@@ -63,7 +68,7 @@ export function StaffList() {
 
       // Get emails from auth.users using RPC function
       const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', {
+        .rpc<EmailData>('get_organization_user_emails', {
           org_id: userProfile.organization_id
         });
 

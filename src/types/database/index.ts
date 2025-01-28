@@ -1,8 +1,8 @@
-import { BookingRow, BookingInsert, BookingUpdate } from "./bookings";
-import { OrganizationRow, OrganizationInsert, OrganizationUpdate } from "./organizations";
-import { ProfileRow, ProfileInsert, ProfileUpdate } from "./profiles";
-import { UserRole, BookingStatus, Json } from "./auth";
-import { DatabaseFunctions } from "./functions";
+import { BookingRow, BookingInsert, BookingUpdate } from "./tables/bookings"
+import { OrganizationRow, OrganizationInsert, OrganizationUpdate } from "./tables/organizations"
+import { ProfileRow, ProfileInsert, ProfileUpdate } from "./tables/profiles"
+import { UserRole, BookingStatus, Json } from "./tables/auth"
+import { DatabaseFunctions } from "./functions"
 
 export interface Database {
   public: {
@@ -81,7 +81,7 @@ export interface Database {
   }
 }
 
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
-export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert'];
-export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update'];
-export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
+export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]

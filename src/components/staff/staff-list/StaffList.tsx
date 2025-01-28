@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { StaffListSkeleton } from "./StaffListSkeleton";
+import { Database } from "@/integrations/supabase/types";
 
 type StaffMember = {
   id: string;
@@ -25,11 +26,6 @@ type StaffMember = {
   custom_roles: {
     name: string | null;
   } | null;
-};
-
-type EmailData = {
-  user_id: string;
-  email: string;
 };
 
 export function StaffList() {
@@ -68,9 +64,15 @@ export function StaffList() {
 
       // Get emails from auth.users using RPC function
       const { data: emailData, error: emailError } = await supabase
-        .rpc<{ user_id: string; email: string }>('get_organization_user_emails', {
+        .rpc('get_organization_user_emails', {
           org_id: userProfile.organization_id
-        });
+        }) as unknown as { 
+          data: Database['public']['Functions']['get_organization_user_emails']['Returns'], 
+          error: null 
+        } | { 
+          data: null, 
+          error: Error 
+        };
 
       if (emailError) throw emailError;
 

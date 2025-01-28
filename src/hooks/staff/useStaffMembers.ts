@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
-import type { EmailData } from "@/types/email";
 import type { ProfileWithCustomRole } from "@/types/profile";
-import type { DatabaseFunctions } from "@/types/database/functions";
 
 export function useStaffMembers() {
   const { data: session } = useQuery({
@@ -49,16 +47,18 @@ export function useStaffMembers() {
       if (!profiles) return [];
 
       const { data: emailData, error: emailError } = await supabase
-        .rpc<'get_organization_user_emails', EmailData[]>('get_organization_user_emails', {
+        .rpc('get_organization_user_emails', {
           org_id: userProfile.organization_id
         });
 
       if (emailError) throw emailError;
       if (!emailData) return [];
 
+      const typedEmailData = emailData as Array<{ user_id: string; email: string }>;
+
       return (profiles as ProfileWithCustomRole[]).map(profile => ({
         ...profile,
-        email: emailData.find(e => e.user_id === profile.id)?.email || '',
+        email: typedEmailData.find(e => e.user_id === profile.id)?.email || '',
       })) as StaffMember[];
     },
     enabled: !!session?.user.id,

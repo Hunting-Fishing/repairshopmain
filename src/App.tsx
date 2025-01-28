@@ -10,6 +10,7 @@ import WorkOrders from "./pages/WorkOrders";
 import Calendar from "./pages/Calendar";
 import IndexPage from "./pages/Index";
 import Auth from "./pages/Auth";
+import ApplicationControl from "./pages/ApplicationControl";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
@@ -79,6 +80,16 @@ const App = () => (
                 <ProtectedRoute>
                   <AppLayout>
                     <Calendar />
+                  </AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/application-control"
+              element={
+                <ProtectedRoute>
+                  <AppLayout>
+                    <ApplicationControl />
                   </AppLayout>
                 </ProtectedRoute>
               }

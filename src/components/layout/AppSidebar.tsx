@@ -1,4 +1,4 @@
-import { Car, ClipboardList, Home, Users } from "lucide-react";
+import { Car, ClipboardList, Home, Users, Settings2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,7 @@ const menuItems = [
   { title: "Customers", icon: Users, path: "/customers" },
   { title: "Work Orders", icon: ClipboardList, path: "/work-orders" },
   { title: "Vehicles", icon: Car, path: "/vehicles" },
+  { title: "Application Control", icon: Settings2, path: "/application-control" },
 ];
 
 export function AppSidebar() {

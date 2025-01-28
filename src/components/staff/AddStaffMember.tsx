@@ -22,29 +22,39 @@ export function AddStaffMember() {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: customRoles = [] } = useQuery({
-    queryKey: ["custom-roles"],
+  // Get the current user's profile to get organization_id
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile"],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session found");
 
-      // Get user's profile first
-      const { data: profileData, error: profileError } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("organization_id")
         .eq('id', session.user.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Get custom roles based on organization_id
+  const { data: customRoles = [] } = useQuery({
+    queryKey: ["custom-roles", userProfile?.organization_id],
+    queryFn: async () => {
+      if (!userProfile?.organization_id) return [];
 
       const { data, error } = await supabase
         .from("custom_roles")
         .select("*")
-        .eq('organization_id', profileData.organization_id);
+        .eq('organization_id', userProfile.organization_id);
 
       if (error) throw error;
       return data;
     },
+    enabled: !!userProfile?.organization_id,
   });
 
   const form = useForm<StaffMemberFormValues>({
@@ -58,20 +68,14 @@ export function AddStaffMember() {
   });
 
   const onSubmit = async (data: StaffMemberFormValues) => {
+    if (!userProfile?.organization_id) {
+      toast.error("Organization not found");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No session found");
-
-      // Get user's profile to get organization_id
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("organization_id")
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
+      // Create auth user
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: data.email,
         password: Math.random().toString(36).slice(-8),
@@ -81,24 +85,24 @@ export function AddStaffMember() {
       if (authError) throw authError;
 
       // Create profile
-      const { error: profileError2 } = await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .insert({
           id: authData.user.id,
-          organization_id: profileData.organization_id,
+          organization_id: userProfile.organization_id,
           first_name: data.firstName,
           last_name: data.lastName,
           role: data.role,
           custom_role_id: data.role === "custom" ? data.customRoleId : null,
         });
 
-      if (profileError2) throw profileError2;
+      if (profileError) throw profileError;
 
       // Add organization membership
       const { error: membershipError } = await supabase
         .from("organization_members")
         .insert({
-          organization_id: profileData.organization_id,
+          organization_id: userProfile.organization_id,
           user_id: authData.user.id,
           status: 'active'
         });

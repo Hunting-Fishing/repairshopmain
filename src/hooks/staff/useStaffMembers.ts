@@ -2,6 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
 
+interface EmailData {
+  user_id: string;
+  email: string;
+}
+
 export function useStaffMembers() {
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -26,15 +31,15 @@ export function useStaffMembers() {
       if (profileError) throw profileError;
       if (!userProfile?.organization_id) throw new Error("No organization found");
 
-      // Get staff profiles
-      const { data: profiles, error: staffError } = await supabase
+      // Get all profiles in the organization
+      const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select(`
           id,
           first_name,
           last_name,
-          phone_number,
           role,
+          phone_number,
           hire_date,
           status,
           custom_roles (
@@ -43,12 +48,12 @@ export function useStaffMembers() {
         `)
         .eq("organization_id", userProfile.organization_id);
 
-      if (staffError) throw staffError;
+      if (profilesError) throw profilesError;
       if (!profiles) return [];
 
-      // Get staff emails
+      // Get emails for all users in the organization
       const { data: emailData, error: emailError } = await supabase
-        .rpc('get_organization_user_emails', { 
+        .rpc<EmailData>('get_organization_user_emails', { 
           org_id: userProfile.organization_id 
         });
 
@@ -58,8 +63,7 @@ export function useStaffMembers() {
       // Combine profile and email data
       return profiles.map(profile => ({
         ...profile,
-        email: (emailData as Array<{ user_id: string; email: string }>)
-          .find(e => e.user_id === profile.id)?.email || ''
+        email: emailData.find(e => e.user_id === profile.id)?.email || ''
       })) as StaffMember[];
     },
     enabled: !!session?.user.id,

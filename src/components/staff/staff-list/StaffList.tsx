@@ -27,6 +27,10 @@ type StaffMember = {
   } | null;
 };
 
+type EmailSubquery = {
+  email: string;
+}[];
+
 export function StaffList() {
   const { data: staffMembers, isLoading } = useQuery({
     queryKey: ["staff-members"],
@@ -61,8 +65,8 @@ export function StaffList() {
       // Transform the data to include email from the subquery
       return data.map(staff => ({
         ...staff,
-        email: staff.email?.[0]?.email || ''
-      }));
+        email: (staff.email as EmailSubquery)?.[0]?.email || ''
+      })) as StaffMember[];
     },
   });
 

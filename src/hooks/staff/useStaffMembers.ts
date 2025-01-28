@@ -41,7 +41,7 @@ export function useStaffMembers() {
 
       // Get staff emails with proper typing
       const { data: emailData, error: emailError } = await supabase
-        .rpc<DatabaseFunctions['get_organization_user_emails']['Returns']>(
+        .rpc<DatabaseFunctions['get_organization_user_emails']['Returns'], DatabaseFunctions['get_organization_user_emails']['Args']>(
           'get_organization_user_emails',
           { org_id: userProfile.organization_id }
         );

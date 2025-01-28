@@ -35,11 +35,10 @@ export function useStaffMembers() {
 
       if (error) throw error;
 
-      const { data: emailData } = await supabase
-        .rpc<GetOrganizationUserEmailsResponse, GetOrganizationUserEmailsArgs>(
-          'get_organization_user_emails',
-          { org_id: userProfile.organization_id }
-        );
+      const { data: emailData } = await supabase.rpc(
+        'get_organization_user_emails',
+        { org_id: userProfile.organization_id }
+      ) as { data: GetOrganizationUserEmailsResponse };
 
       return profiles.map(profile => ({
         ...profile,

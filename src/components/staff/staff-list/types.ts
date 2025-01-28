@@ -18,8 +18,11 @@ export interface UserProfile {
   organization_id: string;
 }
 
-export type EmailData = Database["public"]["Functions"]["get_organization_user_emails"]["Returns"][number];
+export type GetOrganizationUserEmailsResponse = {
+  user_id: string;
+  email: string;
+}[];
 
-export type GetOrganizationUserEmailsResponse = Database["public"]["Functions"]["get_organization_user_emails"]["Returns"];
-
-export type GetOrganizationUserEmailsArgs = Database["public"]["Functions"]["get_organization_user_emails"]["Args"];
+export type GetOrganizationUserEmailsArgs = {
+  org_id: string;
+};

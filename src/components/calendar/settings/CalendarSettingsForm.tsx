@@ -9,8 +9,12 @@ import { GeneralSettings } from "./GeneralSettings";
 import { AppearanceSettings } from "./AppearanceSettings";
 import { SchedulingSettings } from "./SchedulingSettings";
 import { calendarSettingsFormSchema, type CalendarSettingsFormValues } from "./types";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function CalendarSettingsForm() {
+  const queryClient = useQueryClient();
+  
   const form = useForm<CalendarSettingsFormValues>({
     resolver: zodResolver(calendarSettingsFormSchema),
     defaultValues: {
@@ -28,12 +32,42 @@ export function CalendarSettingsForm() {
     },
   });
 
-  function onSubmit(values: CalendarSettingsFormValues) {
-    toast({
-      title: "Settings updated",
-      description: "Your calendar settings have been saved successfully.",
-    });
-    console.log(values);
+  async function onSubmit(values: CalendarSettingsFormValues) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to save settings",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          calendar_settings: values
+        })
+        .eq('id', session.user.id);
+
+      if (error) throw error;
+
+      // Invalidate the calendar settings query to trigger a refresh
+      queryClient.invalidateQueries({ queryKey: ["calendar-settings"] });
+
+      toast({
+        title: "Settings updated",
+        description: "Your calendar settings have been saved successfully.",
+      });
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save settings. Please try again.",
+        variant: "destructive",
+      });
+    }
   }
 
   return (

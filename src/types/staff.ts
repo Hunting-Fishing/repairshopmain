@@ -1,5 +1,3 @@
-import { Database } from "./database";
-
 export type StaffMember = {
   id: string;
   first_name: string | null;

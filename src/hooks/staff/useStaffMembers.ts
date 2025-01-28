@@ -1,33 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
-import type { Database } from "@/types/database";
-
-type GetOrganizationUserEmailsResponse = {
-  user_id: string;
-  email: string;
-}[];
-
-type GetOrganizationUserEmailsArgs = {
-  org_id: string;
-};
 
 export function useStaffMembers() {
   return useQuery({
     queryKey: ["staff-members"],
     queryFn: async () => {
+      // Get current session
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("No session");
 
-      const { data: userProfile } = await supabase
+      // Get user's organization
+      const { data: userProfile, error: profileError } = await supabase
         .from("profiles")
         .select("organization_id")
         .eq("id", session.user.id)
         .single();
 
+      if (profileError) throw profileError;
       if (!userProfile?.organization_id) throw new Error("No organization found");
 
-      const { data: profiles, error } = await supabase
+      // Get staff profiles
+      const { data: profiles, error: staffError } = await supabase
         .from("profiles")
         .select(`
           id,
@@ -43,17 +37,18 @@ export function useStaffMembers() {
         `)
         .eq("organization_id", userProfile.organization_id);
 
-      if (error) throw error;
+      if (staffError) throw staffError;
 
-      const { data: emailData } = await supabase.rpc<
-        GetOrganizationUserEmailsResponse,
-        GetOrganizationUserEmailsArgs
-      >('get_organization_user_emails', {
-        org_id: userProfile.organization_id
-      });
+      // Get staff emails
+      const { data: emailData, error: emailError } = await supabase.rpc(
+        'get_organization_user_emails',
+        { org_id: userProfile.organization_id }
+      );
 
+      if (emailError) throw emailError;
       if (!emailData) return [];
 
+      // Combine profile and email data
       return profiles.map(profile => ({
         ...profile,
         email: emailData.find((e) => e.user_id === profile.id)?.email || ''

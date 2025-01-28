@@ -131,6 +131,38 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_roles: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_roles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           business_type: string | null
@@ -170,7 +202,7 @@ export type Database = {
           organization_id: string | null
           phone_number: string | null
           postal_code: string | null
-          role: string
+          role: Database["public"]["Enums"]["user_role"]
           state_province: string | null
           street_address: string | null
           technician_settings: Json | null
@@ -187,7 +219,7 @@ export type Database = {
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null
-          role?: string
+          role?: Database["public"]["Enums"]["user_role"]
           state_province?: string | null
           street_address?: string | null
           technician_settings?: Json | null
@@ -204,7 +236,7 @@ export type Database = {
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null
-          role?: string
+          role?: Database["public"]["Enums"]["user_role"]
           state_province?: string | null
           street_address?: string | null
           technician_settings?: Json | null
@@ -329,6 +361,14 @@ export type Database = {
     }
     Enums: {
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      user_role:
+        | "owner"
+        | "management"
+        | "technician"
+        | "service_advisor"
+        | "parts"
+        | "hr"
+        | "custom"
     }
     CompositeTypes: {
       [_ in never]: never

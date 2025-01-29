@@ -1,4 +1,4 @@
-import { Json } from "../auth"
+import { Json } from "../shared/json"
 
 export interface OrganizationRow {
   id: string

@@ -1,0 +1,1 @@
+export type BookingStatus = "scheduled" | "in_progress" | "completed" | "cancelled"

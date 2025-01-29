@@ -1,4 +1,5 @@
-import { BookingStatus } from "../auth"
+import { Json } from "../shared/json"
+import { BookingStatus } from "../enums"
 
 export interface BookingRow {
   id: string

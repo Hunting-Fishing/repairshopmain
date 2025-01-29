@@ -1,5 +1,5 @@
-import { Json } from "../auth"
-import type { UserRole } from "../auth"
+import { Json } from "../shared/json"
+import { UserRole } from "../enums"
 
 export interface ProfileRow {
   id: string

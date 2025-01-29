@@ -1,6 +1,27 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Zap, Mail, CreditCard, MessageSquare } from "lucide-react";
+import { 
+  Zap, 
+  Mail, 
+  CreditCard, 
+  MessageSquare, 
+  Calendar, 
+  Phone, 
+  FileText, 
+  TruckIcon, 
+  BarChart, 
+  MessageCircle, 
+  Clock, 
+  Database, 
+  ShoppingCart, 
+  Map, 
+  Bell, 
+  Printer, 
+  Camera,
+  Smartphone,
+  Cloud,
+  Tool
+} from "lucide-react";
 
 interface IntegrationCardProps {
   title: string;
@@ -59,6 +80,118 @@ export function IntegrationsTab() {
       icon: <MessageSquare className="w-6 h-6" />,
       status: "not_connected" as const,
       onConnect: () => console.log("Connect Chat Support"),
+    },
+    {
+      title: "Calendar Sync",
+      description: "Sync with Google Calendar or other calendar services",
+      icon: <Calendar className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Calendar"),
+    },
+    {
+      title: "SMS Notifications",
+      description: "Send text message updates to customers",
+      icon: <Phone className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect SMS"),
+    },
+    {
+      title: "Document Management",
+      description: "Store and manage digital documents securely",
+      icon: <FileText className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Document Management"),
+    },
+    {
+      title: "Parts Inventory",
+      description: "Connect with parts suppliers and manage inventory",
+      icon: <TruckIcon className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Parts Inventory"),
+    },
+    {
+      title: "Analytics",
+      description: "Track business performance and generate reports",
+      icon: <BarChart className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Analytics"),
+    },
+    {
+      title: "WhatsApp Business",
+      description: "Connect with customers through WhatsApp",
+      icon: <MessageCircle className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect WhatsApp"),
+    },
+    {
+      title: "Time Clock",
+      description: "Employee time tracking and management",
+      icon: <Clock className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Time Clock"),
+    },
+    {
+      title: "Vehicle Database",
+      description: "Access vehicle specifications and repair information",
+      icon: <Database className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Vehicle Database"),
+    },
+    {
+      title: "Online Store",
+      description: "Sell parts and services online",
+      icon: <ShoppingCart className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Online Store"),
+    },
+    {
+      title: "Maps Integration",
+      description: "Route planning and location services",
+      icon: <Map className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Maps"),
+    },
+    {
+      title: "Push Notifications",
+      description: "Send updates through mobile app notifications",
+      icon: <Bell className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Push Notifications"),
+    },
+    {
+      title: "Receipt Printer",
+      description: "Connect with receipt and invoice printers",
+      icon: <Printer className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Receipt Printer"),
+    },
+    {
+      title: "Photo Documentation",
+      description: "Manage and store vehicle repair photos",
+      icon: <Camera className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Photo Documentation"),
+    },
+    {
+      title: "Mobile App",
+      description: "Connect with your custom mobile application",
+      icon: <Smartphone className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Mobile App"),
+    },
+    {
+      title: "Cloud Backup",
+      description: "Automatic data backup and recovery",
+      icon: <Cloud className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Cloud Backup"),
+    },
+    {
+      title: "Diagnostic Tools",
+      description: "Connect with vehicle diagnostic equipment",
+      icon: <Tool className="w-6 h-6" />,
+      status: "not_connected" as const,
+      onConnect: () => console.log("Connect Diagnostic Tools"),
     },
   ];
 

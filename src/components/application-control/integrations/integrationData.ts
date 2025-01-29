@@ -85,6 +85,13 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect to CarFax"),
       },
       {
+        title: "Parts Canada",
+        description: "Access Canadian auto parts catalog and inventory",
+        icon: Warehouse,
+        status: "not_connected" as const,
+        onConnect: () => console.log("Connect to Parts Canada"),
+      },
+      {
         title: "Diagnostic Tools",
         description: "Connect with vehicle diagnostic equipment",
         icon: Wrench,

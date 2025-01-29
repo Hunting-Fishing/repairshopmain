@@ -163,6 +163,85 @@ export type Database = {
           },
         ]
       }
+      customers: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          created_by: string
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string
+          notes: string | null
+          organization_id: string
+          phone_number: string | null
+          postal_code: string | null
+          state_province: string | null
+          street_address: string | null
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          created_by: string
+          email?: string | null
+          first_name: string
+          id?: string
+          last_name: string
+          notes?: string | null
+          organization_id: string
+          phone_number?: string | null
+          postal_code?: string | null
+          state_province?: string | null
+          street_address?: string | null
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          notes?: string | null
+          organization_id?: string
+          phone_number?: string | null
+          postal_code?: string | null
+          state_province?: string | null
+          street_address?: string | null
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string

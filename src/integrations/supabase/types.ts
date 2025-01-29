@@ -765,7 +765,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_organization_membership: {
+        Args: {
+          user_id: string
+          org_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"

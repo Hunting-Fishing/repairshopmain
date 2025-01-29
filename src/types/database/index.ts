@@ -86,3 +86,11 @@ export type Tables<T extends keyof Database['public']['Tables']> = Database['pub
 export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
 export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
 export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T]
+
+// Re-export common types
+export type { ProfileRow, ProfileInsert, ProfileUpdate } from './tables/profiles'
+export type { BookingRow, BookingInsert, BookingUpdate } from './tables/bookings'
+export type { OrganizationRow, OrganizationInsert, OrganizationUpdate } from './tables/organizations'
+export type { UserRole, BookingStatus } from './enums'
+export type { Json } from './shared/json'
+export type { DatabaseFunctions } from './functions'

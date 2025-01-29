@@ -15,7 +15,7 @@ interface IntegrationCardProps {
 export const IntegrationCard = ({ 
   title, 
   description, 
-  icon: Icon, 
+  icon: Icon, // Fixed: Renamed to Icon (capital I)
   status, 
   onConnect 
 }: IntegrationCardProps) => {
@@ -49,7 +49,7 @@ export const IntegrationCard = ({
       <IntegrationDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        integration={{ title, description, icon, status }}
+        integration={{ title, description, icon: Icon, status }}
       />
     </>
   );

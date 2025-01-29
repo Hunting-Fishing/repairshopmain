@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Settings2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { CustomerForm } from "@/components/customers/CustomerForm";
-import { CustomerSettings } from "@/components/customers/CustomerSettings";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -82,48 +80,32 @@ export default function Customers() {
         </Dialog>
       </div>
 
-      <Tabs defaultValue="list" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="list">Customer List</TabsTrigger>
-          <TabsTrigger value="settings">
-            <Settings2 className="h-4 w-4 mr-2" />
-            Settings
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="list">
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>City</TableHead>
-                  <TableHead>State</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {customers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell className="font-medium">
-                      {customer.first_name} {customer.last_name}
-                    </TableCell>
-                    <TableCell>{customer.email}</TableCell>
-                    <TableCell>{customer.phone_number}</TableCell>
-                    <TableCell>{customer.city}</TableCell>
-                    <TableCell>{customer.state_province}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="settings">
-          <CustomerSettings />
-        </TabsContent>
-      </Tabs>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>City</TableHead>
+              <TableHead>State</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {customers.map((customer) => (
+              <TableRow key={customer.id}>
+                <TableCell className="font-medium">
+                  {customer.first_name} {customer.last_name}
+                </TableCell>
+                <TableCell>{customer.email}</TableCell>
+                <TableCell>{customer.phone_number}</TableCell>
+                <TableCell>{customer.city}</TableCell>
+                <TableCell>{customer.state_province}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

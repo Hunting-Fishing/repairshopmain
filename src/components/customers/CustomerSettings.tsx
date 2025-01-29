@@ -1,8 +1,32 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Award, BarChart3, History, Layout, UserPlus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 export function CustomerSettings() {
+  const { toast } = useToast();
+  const [tierSettings, setTierSettings] = useState({
+    bronze: { min: 0, max: 1000 },
+    silver: { min: 1001, max: 5000 },
+    gold: { min: 5001, max: null }
+  });
+  const [pointsSettings, setPointsSettings] = useState({
+    earning: { dollars: 1, points: 1 },
+    redeeming: { points: 100, dollars: 5 }
+  });
+
+  const handleSaveSettings = () => {
+    // TODO: Save settings to database
+    toast({
+      title: "Settings saved",
+      description: "Your loyalty program settings have been updated."
+    });
+  };
+
   return (
     <Tabs defaultValue="loyalty" className="space-y-4">
       <TabsList>
@@ -42,15 +66,78 @@ export function CustomerSettings() {
               <div className="grid gap-4 md:grid-cols-3">
                 <Card className="p-4">
                   <h4 className="font-medium">Bronze</h4>
-                  <p className="text-sm text-muted-foreground">0-1000 points</p>
+                  <div className="space-y-2 mt-2">
+                    <div>
+                      <Label htmlFor="bronze-min">Minimum Points</Label>
+                      <Input
+                        id="bronze-min"
+                        type="number"
+                        value={tierSettings.bronze.min}
+                        onChange={(e) => setTierSettings(prev => ({
+                          ...prev,
+                          bronze: { ...prev.bronze, min: parseInt(e.target.value) }
+                        }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="bronze-max">Maximum Points</Label>
+                      <Input
+                        id="bronze-max"
+                        type="number"
+                        value={tierSettings.bronze.max}
+                        onChange={(e) => setTierSettings(prev => ({
+                          ...prev,
+                          bronze: { ...prev.bronze, max: parseInt(e.target.value) }
+                        }))}
+                      />
+                    </div>
+                  </div>
                 </Card>
                 <Card className="p-4">
                   <h4 className="font-medium">Silver</h4>
-                  <p className="text-sm text-muted-foreground">1001-5000 points</p>
+                  <div className="space-y-2 mt-2">
+                    <div>
+                      <Label htmlFor="silver-min">Minimum Points</Label>
+                      <Input
+                        id="silver-min"
+                        type="number"
+                        value={tierSettings.silver.min}
+                        onChange={(e) => setTierSettings(prev => ({
+                          ...prev,
+                          silver: { ...prev.silver, min: parseInt(e.target.value) }
+                        }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="silver-max">Maximum Points</Label>
+                      <Input
+                        id="silver-max"
+                        type="number"
+                        value={tierSettings.silver.max}
+                        onChange={(e) => setTierSettings(prev => ({
+                          ...prev,
+                          silver: { ...prev.silver, max: parseInt(e.target.value) }
+                        }))}
+                      />
+                    </div>
+                  </div>
                 </Card>
                 <Card className="p-4">
                   <h4 className="font-medium">Gold</h4>
-                  <p className="text-sm text-muted-foreground">5001+ points</p>
+                  <div className="space-y-2 mt-2">
+                    <div>
+                      <Label htmlFor="gold-min">Minimum Points</Label>
+                      <Input
+                        id="gold-min"
+                        type="number"
+                        value={tierSettings.gold.min}
+                        onChange={(e) => setTierSettings(prev => ({
+                          ...prev,
+                          gold: { ...prev.gold, min: parseInt(e.target.value) }
+                        }))}
+                      />
+                    </div>
+                  </div>
                 </Card>
               </div>
             </div>
@@ -60,13 +147,73 @@ export function CustomerSettings() {
               <div className="grid gap-4 md:grid-cols-2">
                 <Card className="p-4">
                   <h4 className="font-medium">Earning Points</h4>
-                  <p className="text-sm text-muted-foreground">$1 spent = 1 point</p>
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <Label htmlFor="earning-dollars">$</Label>
+                        <Input
+                          id="earning-dollars"
+                          type="number"
+                          value={pointsSettings.earning.dollars}
+                          onChange={(e) => setPointsSettings(prev => ({
+                            ...prev,
+                            earning: { ...prev.earning, dollars: parseInt(e.target.value) }
+                          }))}
+                        />
+                      </div>
+                      <span className="mt-8">=</span>
+                      <div>
+                        <Label htmlFor="earning-points">Points</Label>
+                        <Input
+                          id="earning-points"
+                          type="number"
+                          value={pointsSettings.earning.points}
+                          onChange={(e) => setPointsSettings(prev => ({
+                            ...prev,
+                            earning: { ...prev.earning, points: parseInt(e.target.value) }
+                          }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </Card>
                 <Card className="p-4">
                   <h4 className="font-medium">Redeeming Points</h4>
-                  <p className="text-sm text-muted-foreground">100 points = $5 off</p>
+                  <div className="space-y-2 mt-2">
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <Label htmlFor="redeeming-points">Points</Label>
+                        <Input
+                          id="redeeming-points"
+                          type="number"
+                          value={pointsSettings.redeeming.points}
+                          onChange={(e) => setPointsSettings(prev => ({
+                            ...prev,
+                            redeeming: { ...prev.redeeming, points: parseInt(e.target.value) }
+                          }))}
+                        />
+                      </div>
+                      <span className="mt-8">=</span>
+                      <div>
+                        <Label htmlFor="redeeming-dollars">$</Label>
+                        <Input
+                          id="redeeming-dollars"
+                          type="number"
+                          value={pointsSettings.redeeming.dollars}
+                          onChange={(e) => setPointsSettings(prev => ({
+                            ...prev,
+                            redeeming: { ...prev.redeeming, dollars: parseInt(e.target.value) }
+                          }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </Card>
               </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button onClick={handleSaveSettings}>Save Settings</Button>
             </div>
           </CardContent>
         </Card>

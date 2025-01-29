@@ -57,6 +57,7 @@ export function useStaffMembers() {
       return profiles.map(profile => ({
         ...profile,
         email: emailData.find(e => e.user_id === profile.id)?.email || '',
+        custom_roles: profile.custom_roles ? { name: profile.custom_roles[0]?.name || null } : null
       })) as StaffMember[];
     },
     enabled: !!session?.user.id,

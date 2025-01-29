@@ -15,3 +15,12 @@ export type StaffMember = {
 export type UserProfile = {
   organization_id: string;
 };
+
+export type GetOrganizationUserEmailsResponse = Array<{
+  user_id: string;
+  email: string;
+}>;
+
+export type GetOrganizationUserEmailsArgs = {
+  org_id: string;
+};

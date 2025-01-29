@@ -1,4 +1,4 @@
-import { UserSquare2, Search, Filter, Download, Edit, Trash2, UserPlus } from "lucide-react";
+import { UserSquare2, Search, Filter, Download, Edit, Trash2, UserPlus, Settings2 } from "lucide-react";
 import { CustomerSettings } from "@/components/customers/CustomerSettings";
 import { CustomerForm } from "@/components/customers/CustomerForm";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -27,10 +29,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
 
 export default function CustomerManagement() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
@@ -59,6 +61,10 @@ export default function CustomerManagement() {
       return data;
     },
   });
+
+  const handleNavigateToControl = () => {
+    navigate("/customer-management");
+  };
 
   const handleExport = () => {
     if (!customers?.length) {
@@ -124,22 +130,10 @@ export default function CustomerManagement() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Add Customer
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
-              <DialogHeader>
-                <DialogTitle>Add New Customer</DialogTitle>
-              </DialogHeader>
-              <CustomerForm onSuccess={() => setOpen(false)} />
-            </DialogContent>
-          </Dialog>
-        </div>
+        <Button onClick={handleNavigateToControl} variant="outline">
+          <Settings2 className="h-4 w-4 mr-2" />
+          Control Settings
+        </Button>
       </div>
 
       <div className="flex items-center justify-between gap-4 mb-6">
@@ -178,6 +172,20 @@ export default function CustomerManagement() {
             <Download className="h-4 w-4" />
           </Button>
         </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add Customer
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Add New Customer</DialogTitle>
+            </DialogHeader>
+            <CustomerForm onSuccess={() => setOpen(false)} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="border rounded-lg">

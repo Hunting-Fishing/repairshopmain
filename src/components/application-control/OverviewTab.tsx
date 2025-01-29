@@ -1,4 +1,4 @@
-import { Building2, Users, Car, Wrench, Calendar } from "lucide-react";
+import { Building2, Users, Car, Wrench, Calendar, UserSquare2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ControlPanel } from "./ControlPanel";
 import { SystemStatus } from "./SystemStatus";
@@ -36,6 +36,12 @@ export function OverviewTab() {
       description: "Configure business hours and scheduling rules",
       icon: Calendar,
       action: () => navigate("/calendar-settings"),
+    },
+    {
+      title: "Customer Management",
+      description: "Manage customer profiles and preferences",
+      icon: UserSquare2,
+      action: () => navigate("/customers"),
     }
   ];
 

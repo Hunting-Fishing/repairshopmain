@@ -15,6 +15,8 @@ export const integrationCategories = {
         icon: Phone,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to Twilio"),
+        websiteUrl: "https://www.twilio.com",
+        documentationUrl: "https://www.twilio.com/docs",
       },
       {
         title: "Email Service",
@@ -22,6 +24,8 @@ export const integrationCategories = {
         icon: Mail,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Email Service"),
+        websiteUrl: "https://www.emailservice.com",
+        documentationUrl: "https://www.emailservice.com/docs",
       },
       {
         title: "WhatsApp Business",
@@ -29,6 +33,8 @@ export const integrationCategories = {
         icon: MessageCircle,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect WhatsApp"),
+        websiteUrl: "https://www.whatsapp.com/business",
+        documentationUrl: "https://www.whatsapp.com/business/api",
       },
       {
         title: "Push Notifications",
@@ -36,6 +42,8 @@ export const integrationCategories = {
         icon: Bell,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Push Notifications"),
+        websiteUrl: "https://www.pushnotifications.com",
+        documentationUrl: "https://www.pushnotifications.com/docs",
       },
     ],
   },
@@ -48,6 +56,8 @@ export const integrationCategories = {
         icon: Car,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to NHTSA"),
+        websiteUrl: "https://www.nhtsa.gov/data",
+        documentationUrl: "https://www.nhtsa.gov/nhtsa-datasets-and-apis",
       },
       {
         title: "NEXPART",
@@ -55,6 +65,8 @@ export const integrationCategories = {
         icon: Warehouse,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to NEXPART"),
+        websiteUrl: "https://www.nexpart.com",
+        documentationUrl: "https://www.nexpart.com/api",
       },
       {
         title: "Mitchell1",
@@ -62,6 +74,8 @@ export const integrationCategories = {
         icon: BookOpen,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to Mitchell1"),
+        websiteUrl: "https://www.mitchell1.com",
+        documentationUrl: "https://www.mitchell1.com/api",
       },
       {
         title: "MOTOR",
@@ -69,6 +83,8 @@ export const integrationCategories = {
         icon: Database,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to MOTOR"),
+        websiteUrl: "https://www.motor.com",
+        documentationUrl: "https://www.motor.com/api",
       },
       {
         title: "ALLDATA",
@@ -76,6 +92,8 @@ export const integrationCategories = {
         icon: CircuitBoard,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to ALLDATA"),
+        websiteUrl: "https://www.alldata.com",
+        documentationUrl: "https://www.alldata.com/api",
       },
       {
         title: "CarFax",
@@ -83,6 +101,8 @@ export const integrationCategories = {
         icon: ClipboardList,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to CarFax"),
+        websiteUrl: "https://www.carfax.com",
+        documentationUrl: "https://www.carfax.com/api",
       },
       {
         title: "Parts Canada",
@@ -90,6 +110,8 @@ export const integrationCategories = {
         icon: Warehouse,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to Parts Canada"),
+        websiteUrl: "https://www.partscanada.ca",
+        documentationUrl: "https://www.partscanada.ca/api-documentation",
       },
       {
         title: "Diagnostic Tools",
@@ -97,6 +119,8 @@ export const integrationCategories = {
         icon: Wrench,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Diagnostic Tools"),
+        websiteUrl: "https://www.diagnostictools.com",
+        documentationUrl: "https://www.diagnostictools.com/api",
       },
     ],
   },
@@ -109,6 +133,8 @@ export const integrationCategories = {
         icon: Zap,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect to Zapier"),
+        websiteUrl: "https://zapier.com",
+        documentationUrl: "https://zapier.com/developer/documentation",
       },
       {
         title: "Payment Gateway",
@@ -116,6 +142,8 @@ export const integrationCategories = {
         icon: CreditCard,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Payment Gateway"),
+        websiteUrl: "https://www.paymentgateway.com",
+        documentationUrl: "https://www.paymentgateway.com/docs",
       },
       {
         title: "Analytics",
@@ -123,6 +151,8 @@ export const integrationCategories = {
         icon: BarChart,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Analytics"),
+        websiteUrl: "https://www.analytics.com",
+        documentationUrl: "https://www.analytics.com/docs",
       },
       {
         title: "Time Clock",
@@ -130,6 +160,8 @@ export const integrationCategories = {
         icon: Clock,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Time Clock"),
+        websiteUrl: "https://www.timeclock.com",
+        documentationUrl: "https://www.timeclock.com/docs",
       },
       {
         title: "Cloud Backup",
@@ -137,6 +169,8 @@ export const integrationCategories = {
         icon: Cloud,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Cloud Backup"),
+        websiteUrl: "https://www.cloudbackup.com",
+        documentationUrl: "https://www.cloudbackup.com/docs",
       },
       {
         title: "Mobile App",
@@ -144,6 +178,8 @@ export const integrationCategories = {
         icon: Smartphone,
         status: "not_connected" as const,
         onConnect: () => console.log("Connect Mobile App"),
+        websiteUrl: "https://www.mobileapp.com",
+        documentationUrl: "https://www.mobileapp.com/docs",
       },
     ],
   },

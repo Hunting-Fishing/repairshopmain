@@ -366,6 +366,101 @@ export type Database = {
           },
         ]
       }
+      integration_connections: {
+        Row: {
+          created_at: string
+          id: string
+          integration_id: string
+          last_sync_at: string | null
+          organization_id: string
+          settings: Json | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          integration_id: string
+          last_sync_at?: string | null
+          organization_id: string
+          settings?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          integration_id?: string
+          last_sync_at?: string | null
+          organization_id?: string
+          settings?: Json | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integration_connections_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "integrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "integration_connections_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integrations: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          documentation_url: string | null
+          id: string
+          integration_key: string
+          name: string
+          organization_id: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          integration_key: string
+          name: string
+          organization_id: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          integration_key?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integrations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShopList } from "@/components/shops/ShopList";
 import { OverviewTab } from "@/components/application-control/OverviewTab";
+import { IntegrationsTab } from "@/components/application-control/IntegrationsTab";
 
 export default function ApplicationControl() {
   return (
@@ -21,6 +22,7 @@ export default function ApplicationControl() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="shops">Shops</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -35,6 +37,18 @@ export default function ApplicationControl() {
             </CardHeader>
             <CardContent>
               <ShopList />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="integrations">
+          <Card>
+            <CardHeader>
+              <CardTitle>Integrations</CardTitle>
+              <CardDescription>Connect and manage third-party services</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <IntegrationsTab />
             </CardContent>
           </Card>
         </TabsContent>

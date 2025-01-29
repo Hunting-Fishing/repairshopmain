@@ -20,7 +20,7 @@ import {
   Camera,
   Smartphone,
   Cloud,
-  Tool
+  Wrench
 } from "lucide-react";
 
 interface IntegrationCardProps {
@@ -189,7 +189,7 @@ export function IntegrationsTab() {
     {
       title: "Diagnostic Tools",
       description: "Connect with vehicle diagnostic equipment",
-      icon: <Tool className="w-6 h-6" />,
+      icon: <Wrench className="w-6 h-6" />,
       status: "not_connected" as const,
       onConnect: () => console.log("Connect Diagnostic Tools"),
     },

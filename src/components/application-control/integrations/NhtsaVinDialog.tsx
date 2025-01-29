@@ -18,6 +18,13 @@ interface VehicleInfo {
   [key: string]: string;
 }
 
+const initialVehicleInfo: VehicleInfo = {
+  Make: '',
+  Model: '',
+  ModelYear: '',
+  VehicleType: ''
+};
+
 export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {
   const [vin, setVin] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,7 +50,7 @@ export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {
       if (error) throw error;
 
       if (data.Results) {
-        const vehicleData: VehicleInfo = {};
+        const vehicleData: VehicleInfo = { ...initialVehicleInfo };
         data.Results.forEach((result: any) => {
           if (result.Value && result.Value !== "null" && result.Value !== "Not Applicable") {
             vehicleData[result.Variable] = result.Value;

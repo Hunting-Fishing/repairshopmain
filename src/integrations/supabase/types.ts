@@ -455,6 +455,240 @@ export type Database = {
           },
         ]
       }
+      staff_communication_logs: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+          message_content: string
+          message_type: string
+          organization_id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          id?: string
+          message_content: string
+          message_type: string
+          organization_id: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          message_content?: string
+          message_type?: string
+          organization_id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_communication_logs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_communication_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_communication_logs_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_performance_metrics: {
+        Row: {
+          created_at: string | null
+          customer_satisfaction_score: number | null
+          efficiency_score: number | null
+          id: string
+          jobs_completed: number | null
+          metric_date: string
+          notes: string | null
+          organization_id: string
+          profile_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_satisfaction_score?: number | null
+          efficiency_score?: number | null
+          id?: string
+          jobs_completed?: number | null
+          metric_date: string
+          notes?: string | null
+          organization_id: string
+          profile_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_satisfaction_score?: number | null
+          efficiency_score?: number | null
+          id?: string
+          jobs_completed?: number | null
+          metric_date?: string
+          notes?: string | null
+          organization_id?: string
+          profile_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_performance_metrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_performance_metrics_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_time_off: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          end_date: string
+          id: string
+          notes: string | null
+          organization_id: string
+          profile_id: string
+          start_date: string
+          status: Database["public"]["Enums"]["time_off_status"] | null
+          type: Database["public"]["Enums"]["time_off_type"]
+          updated_at: string | null
+          updated_by: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          end_date: string
+          id?: string
+          notes?: string | null
+          organization_id: string
+          profile_id: string
+          start_date: string
+          status?: Database["public"]["Enums"]["time_off_status"] | null
+          type: Database["public"]["Enums"]["time_off_type"]
+          updated_at?: string | null
+          updated_by: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          end_date?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          profile_id?: string
+          start_date?: string
+          status?: Database["public"]["Enums"]["time_off_status"] | null
+          type?: Database["public"]["Enums"]["time_off_type"]
+          updated_at?: string | null
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_time_off_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_time_off_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_time_off_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_time_off_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_training: {
+        Row: {
+          completion_date: string | null
+          created_at: string | null
+          description: string | null
+          expiry_date: string | null
+          id: string
+          organization_id: string
+          profile_id: string
+          status: string | null
+          training_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          completion_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          organization_id: string
+          profile_id: string
+          status?: string | null
+          training_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          completion_date?: string | null
+          created_at?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          organization_id?: string
+          profile_id?: string
+          status?: string | null
+          training_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_training_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_training_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       technician_specialties: {
         Row: {
           created_at: string
@@ -535,6 +769,8 @@ export type Database = {
     }
     Enums: {
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      time_off_status: "pending" | "approved" | "rejected"
+      time_off_type: "vacation" | "sick" | "personal" | "training"
       user_role:
         | "owner"
         | "management"

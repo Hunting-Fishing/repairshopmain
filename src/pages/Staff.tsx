@@ -1,10 +1,11 @@
-import { UserPlus, Users, Shield, Settings2 } from "lucide-react";
+import { UserPlus, Users, Shield, Settings2, Calendar } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TechnicianManagement } from "@/components/staff/TechnicianManagement";
 import { RoleManagement } from "@/components/staff/RoleManagement";
 import { AddStaffMember } from "@/components/staff/AddStaffMember";
 import { TechnicianSettings } from "@/components/staff/TechnicianSettings";
 import { StaffList } from "@/components/staff/staff-list/StaffList";
+import { TimeOffList } from "@/components/staff/time-off/TimeOffList";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { technicianSettingsFormSchema, type TechnicianSettingsFormValues } from "@/components/staff/types";
@@ -48,6 +49,10 @@ export default function Staff() {
             <Settings2 className="h-4 w-4" />
             Settings
           </TabsTrigger>
+          <TabsTrigger value="time-off" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Time Off
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="staff">
@@ -67,6 +72,10 @@ export default function Staff() {
               <TechnicianSettings form={form} />
             </form>
           </Form>
+        </TabsContent>
+
+        <TabsContent value="time-off">
+          <TimeOffList />
         </TabsContent>
       </Tabs>
     </div>

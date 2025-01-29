@@ -1,26 +1,13 @@
 import { useForm } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Form } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useState } from "react";
+import { CustomerFormFields } from "./form/CustomerFormFields";
+import { CustomerAddressFields } from "./form/CustomerAddressFields";
+import { ChangeNotesDialog } from "./form/ChangeNotesDialog";
 
 interface CustomerFormProps {
   onSuccess: () => void;
@@ -40,136 +27,6 @@ interface CustomerFormValues {
   country: string;
   notes: string;
 }
-
-const FormFields = ({ form }: { form: any }) => (
-  <>
-    <div className="space-y-4">
-      <FormField
-        control={form.control}
-        name="first_name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>First Name</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="last_name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Last Name</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input type="email" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="phone_number"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Phone Number</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-    </div>
-    <div className="space-y-4 mt-4">
-      <FormField
-        control={form.control}
-        name="street_address"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Street Address</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="city"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>City</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="state_province"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>State/Province</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="postal_code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Postal Code</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Country</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-    </div>
-  </>
-);
 
 export function CustomerForm({ onSuccess, initialData, mode = "create" }: CustomerFormProps) {
   const { toast } = useToast();
@@ -342,42 +199,21 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <FormFields form={form} />
+          <CustomerFormFields form={form} />
+          <CustomerAddressFields form={form} />
           <Button type="submit" className="w-full">
             {mode === "create" ? "Add Customer" : "Update Customer"}
           </Button>
         </form>
       </Form>
 
-      <Dialog open={showNotesDialog} onOpenChange={setShowNotesDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Change Notes</DialogTitle>
-            <DialogDescription>
-              Please provide any notes about the changes you're making
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <Textarea
-              placeholder="Enter notes about your changes (optional)"
-              value={changeNotes}
-              onChange={(e) => setChangeNotes(e.target.value)}
-              className="min-h-[100px]"
-            />
-            <div className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowNotesDialog(false)}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleNotesSubmit}>
-                Save Changes
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ChangeNotesDialog
+        open={showNotesDialog}
+        onOpenChange={setShowNotesDialog}
+        notes={changeNotes}
+        onNotesChange={setChangeNotes}
+        onSubmit={handleNotesSubmit}
+      />
     </>
   );
 }

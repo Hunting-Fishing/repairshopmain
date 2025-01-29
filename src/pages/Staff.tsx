@@ -1,4 +1,4 @@
-import { UserPlus, Users, Shield, Settings2, Calendar, ChartLineUp } from "lucide-react";
+import { UserPlus, Users, Shield, Settings2, Calendar, LineChart } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TechnicianManagement } from "@/components/staff/TechnicianManagement";
 import { RoleManagement } from "@/components/staff/RoleManagement";
@@ -55,7 +55,7 @@ export default function Staff() {
             Time Off
           </TabsTrigger>
           <TabsTrigger value="performance" className="flex items-center gap-2">
-            <ChartLineUp className="h-4 w-4" />
+            <LineChart className="h-4 w-4" />
             Performance
           </TabsTrigger>
         </TabsList>

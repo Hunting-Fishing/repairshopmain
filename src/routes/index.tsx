@@ -9,6 +9,7 @@ import IndexPage from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import ApplicationControl from "@/pages/ApplicationControl";
 import Staff from "@/pages/Staff";
+import CustomerManagement from "@/pages/CustomerManagement";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -45,6 +46,10 @@ export const routes: RouteObject[] = [
   {
     path: "/customers",
     element: protectedLayout(Customers)
+  },
+  {
+    path: "/customer-management",
+    element: protectedLayout(CustomerManagement)
   },
   {
     path: "/work-orders",

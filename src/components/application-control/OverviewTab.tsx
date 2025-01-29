@@ -39,9 +39,9 @@ export function OverviewTab() {
     },
     {
       title: "Customer Management",
-      description: "Manage customer profiles and preferences",
+      description: "Configure customer settings and view analytics",
       icon: UserSquare2,
-      action: () => navigate("/customers"),
+      action: () => navigate("/customer-management"),
     }
   ];
 

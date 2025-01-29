@@ -163,6 +163,64 @@ export type Database = {
           },
         ]
       }
+      customer_loyalty_activities: {
+        Row: {
+          activity_type: string
+          created_at: string | null
+          created_by: string
+          customer_id: string
+          description: string | null
+          id: string
+          organization_id: string
+          points_earned: number
+          points_redeemed: number | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string | null
+          created_by: string
+          customer_id: string
+          description?: string | null
+          id?: string
+          organization_id: string
+          points_earned: number
+          points_redeemed?: number | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string | null
+          created_by?: string
+          customer_id?: string
+          description?: string | null
+          id?: string
+          organization_id?: string
+          points_earned?: number
+          points_redeemed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_loyalty_activities_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_loyalty_activities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_loyalty_activities_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           city: string | null
@@ -173,12 +231,17 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
+          lifetime_points: number | null
+          loyalty_join_date: string | null
+          loyalty_points: number | null
+          loyalty_tier: string | null
           notes: string | null
           organization_id: string
           phone_number: string | null
           postal_code: string | null
           state_province: string | null
           street_address: string | null
+          total_spend: number | null
           updated_at: string
           updated_by: string
         }
@@ -191,12 +254,17 @@ export type Database = {
           first_name: string
           id?: string
           last_name: string
+          lifetime_points?: number | null
+          loyalty_join_date?: string | null
+          loyalty_points?: number | null
+          loyalty_tier?: string | null
           notes?: string | null
           organization_id: string
           phone_number?: string | null
           postal_code?: string | null
           state_province?: string | null
           street_address?: string | null
+          total_spend?: number | null
           updated_at?: string
           updated_by: string
         }
@@ -209,12 +277,17 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string
+          lifetime_points?: number | null
+          loyalty_join_date?: string | null
+          loyalty_points?: number | null
+          loyalty_tier?: string | null
           notes?: string | null
           organization_id?: string
           phone_number?: string | null
           postal_code?: string | null
           state_province?: string | null
           street_address?: string | null
+          total_spend?: number | null
           updated_at?: string
           updated_by?: string
         }

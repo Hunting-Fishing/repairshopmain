@@ -163,6 +163,57 @@ export type Database = {
           },
         ]
       }
+      customer_history: {
+        Row: {
+          change_type: string
+          changed_by: string
+          created_at: string
+          customer_id: string
+          field_name: string
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+        }
+        Insert: {
+          change_type: string
+          changed_by: string
+          created_at?: string
+          customer_id: string
+          field_name: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+        }
+        Update: {
+          change_type?: string
+          changed_by?: string
+          created_at?: string
+          customer_id?: string
+          field_name?: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_history_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_loyalty_activities: {
         Row: {
           activity_type: string

@@ -13,9 +13,10 @@ interface ControlPanelProps {
   description: string;
   icon: LucideIcon;
   action: () => void;
+  buttonText?: string;
 }
 
-export function ControlPanel({ title, description, icon: Icon, action }: ControlPanelProps) {
+export function ControlPanel({ title, description, icon: Icon, action, buttonText = "Manage" }: ControlPanelProps) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center gap-4">
@@ -31,7 +32,7 @@ export function ControlPanel({ title, description, icon: Icon, action }: Control
           className="w-full"
           onClick={action}
         >
-          Manage
+          {buttonText}
         </Button>
       </CardContent>
     </Card>

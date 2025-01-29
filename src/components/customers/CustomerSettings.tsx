@@ -4,6 +4,7 @@ import { useState } from "react";
 import { LoyaltyTab } from "./loyalty/LoyaltyTab";
 import { LayoutSettings } from "./settings/LayoutSettings";
 import { DisplaySettings } from "./settings/DisplaySettings";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 export function CustomerSettings() {
   // Layout settings state

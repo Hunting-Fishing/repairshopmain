@@ -54,7 +54,7 @@ export function useStaffMembers() {
       if (emailError) throw emailError;
       if (!emailData) return [];
 
-      return (profiles as ProfileWithCustomRole[]).map(profile => ({
+      return profiles.map(profile => ({
         ...profile,
         email: emailData.find(e => e.user_id === profile.id)?.email || '',
       })) as StaffMember[];

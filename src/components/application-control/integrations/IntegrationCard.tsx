@@ -33,7 +33,8 @@ export const IntegrationCard = ({
   status, 
   websiteUrl, 
   documentationUrl, 
-  apis 
+  apis,
+  onConnect 
 }: IntegrationCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { data: connectionData } = useQuery({
@@ -97,7 +98,8 @@ export const IntegrationCard = ({
           status: connectionStatus,
           websiteUrl,
           documentationUrl,
-          apis
+          apis,
+          onConnect
         }}
       />
     </>

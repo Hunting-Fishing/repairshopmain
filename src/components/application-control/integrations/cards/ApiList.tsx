@@ -13,6 +13,18 @@ interface ApiListProps {
 }
 
 export const ApiList = ({ apis, status }: ApiListProps) => {
+  // Helper function to get the location based on API name
+  const getApiLocation = (apiName: string): string => {
+    switch (apiName) {
+      case "VIN Decoder API":
+        return "Application Control > Integrations > NHTSA";
+      case "Make/Model/Year API":
+        return "Application Control > Integrations > NHTSA";
+      default:
+        return "Not yet implemented";
+    }
+  };
+
   if (!apis?.length || status !== 'connected') return null;
 
   return (
@@ -25,7 +37,7 @@ export const ApiList = ({ apis, status }: ApiListProps) => {
             <span>{api.name}</span>
             {api.status === 'active' && (
               <span className="text-xs text-muted-foreground">
-                (Active)
+                (Active - {getApiLocation(api.name)})
               </span>
             )}
           </div>

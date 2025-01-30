@@ -295,6 +295,10 @@ export type Database = {
           total_spend: number | null
           updated_at: string
           updated_by: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_vin: string | null
+          vehicle_year: string | null
         }
         Insert: {
           city?: string | null
@@ -318,6 +322,10 @@ export type Database = {
           total_spend?: number | null
           updated_at?: string
           updated_by: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_vin?: string | null
+          vehicle_year?: string | null
         }
         Update: {
           city?: string | null
@@ -341,6 +349,10 @@ export type Database = {
           total_spend?: number | null
           updated_at?: string
           updated_by?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_vin?: string | null
+          vehicle_year?: string | null
         }
         Relationships: [
           {

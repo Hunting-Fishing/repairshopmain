@@ -19,6 +19,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { CustomerForm } from "@/components/customers/CustomerForm";
 
 export default function Customers() {
@@ -71,11 +72,13 @@ export default function Customers() {
               Add Customer
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Add New Customer</DialogTitle>
-            </DialogHeader>
-            <CustomerForm onSuccess={handleCustomerAdded} />
+          <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
+            <ScrollArea className="max-h-[80vh]">
+              <DialogHeader>
+                <DialogTitle>Add New Customer</DialogTitle>
+              </DialogHeader>
+              <CustomerForm onSuccess={handleCustomerAdded} />
+            </ScrollArea>
           </DialogContent>
         </Dialog>
       </div>

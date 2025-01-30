@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { IntegrationDialog } from "./IntegrationDialog";
 import { useQuery } from "@tanstack/react-query";
@@ -12,9 +12,9 @@ export const IntegrationCard = ({
   title, 
   description, 
   icon: Icon, 
-  status, 
-  websiteUrl, 
-  documentationUrl, 
+  status,
+  websiteUrl,
+  documentationUrl,
   apis,
   onConnect 
 }: IntegrationCardProps) => {
@@ -40,32 +40,19 @@ export const IntegrationCard = ({
     },
   });
 
-  const connectionStatus = connectionData?.status || status;
-
   return (
     <>
-      <Card className="transition-all hover:shadow-md">
-        <CardHeader className="flex flex-row items-start gap-4">
-          <div className="p-2 bg-secondary rounded-lg">
-            <Icon className="w-6 h-6" />
-          </div>
-          <div className="flex-1 space-y-1">
-            <IntegrationHeader 
-              title={title}
-              Icon={Icon}
-              status={connectionStatus}
-              onManage={() => setIsDialogOpen(true)}
-            />
-            <CardDescription className="text-sm">{description}</CardDescription>
-          </div>
+      <Card>
+        <CardHeader>
+          <IntegrationHeader 
+            title={title}
+            Icon={Icon}
+            status={connectionData?.status || status}
+            onManage={() => setIsDialogOpen(true)}
+          />
         </CardHeader>
-        <CardContent className="space-y-4">
-          <ApiList apis={apis} status={connectionStatus} />
-          {connectionData?.last_sync_at && (
-            <div className="text-sm text-muted-foreground">
-              Last synced: {new Date(connectionData.last_sync_at).toLocaleString()}
-            </div>
-          )}
+        <CardContent>
+          <ApiList apis={apis} status={connectionData?.status || status} />
           <IntegrationResources websiteUrl={websiteUrl} documentationUrl={documentationUrl} />
         </CardContent>
       </Card>
@@ -77,7 +64,7 @@ export const IntegrationCard = ({
           title, 
           description, 
           icon: Icon, 
-          status: connectionStatus,
+          status: connectionData?.status || status,
           websiteUrl,
           documentationUrl,
           apis,

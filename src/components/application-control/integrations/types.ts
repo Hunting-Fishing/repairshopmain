@@ -18,10 +18,7 @@ export interface IntegrationItem {
   apis?: ApiEndpoint[];
 }
 
-export interface IntegrationDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  integration: IntegrationItem;
+export interface IntegrationCategory {
+  title: string;
+  items: IntegrationItem[];
 }
-
-export interface IntegrationCardProps extends IntegrationItem {}

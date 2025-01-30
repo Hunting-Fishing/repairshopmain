@@ -11,42 +11,54 @@ interface NhtsaVinDialogProps {
   onClose: () => void;
 }
 
+// Organize vehicle information by categories
 export interface VehicleInfo {
+  // General Information
   Make: string;
   Model: string;
   ModelYear: string;
+  "Manufacturer Name": string;
+  "Plant City": string;
+  "Plant Country": string;
+  Trim: string;
   VehicleType: string;
+  
+  // Engine Specifications
   "Engine Number of Cylinders": string;
   "Displacement (L)": string;
   "Fuel Type - Primary": string;
   "Other Engine Info": string;
   Turbo: string;
+  
+  // Vehicle Details
   "Gross Vehicle Weight Rating From": string;
-  "Manufacturer Name": string;
-  "Plant City": string;
-  "Plant Country": string;
-  Trim: string;
   "Body Class": string;
   "Drive Type": string;
   Series: string;
+  
   [key: string]: string;
 }
 
 const initialVehicleInfo: VehicleInfo = {
+  // General Information
   Make: '',
   Model: '',
   ModelYear: '',
+  "Manufacturer Name": '',
+  "Plant City": '',
+  "Plant Country": '',
+  Trim: '',
   VehicleType: '',
+  
+  // Engine Specifications
   "Engine Number of Cylinders": '',
   "Displacement (L)": '',
   "Fuel Type - Primary": '',
   "Other Engine Info": '',
   Turbo: '',
+  
+  // Vehicle Details
   "Gross Vehicle Weight Rating From": '',
-  "Manufacturer Name": '',
-  "Plant City": '',
-  "Plant Country": '',
-  Trim: '',
   "Body Class": '',
   "Drive Type": '',
   Series: ''

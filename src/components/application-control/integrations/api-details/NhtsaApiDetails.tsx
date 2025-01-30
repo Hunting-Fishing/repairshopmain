@@ -1,5 +1,6 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlertCircle, Database, FileWarning, Shield, Wrench } from "lucide-react";
 import { ApiCard } from "./ApiCard";
 
@@ -78,25 +79,27 @@ export const NhtsaApiDetails = ({ connectionData }: NhtsaApiDetailsProps) => {
   ];
 
   return (
-    <div className="space-y-6 border rounded-lg p-6 bg-muted/50">
-      <div className="flex items-center justify-between">
-        <h3 className="font-medium text-lg">NHTSA API Integration Status</h3>
-        <Badge variant="default">Connected</Badge>
-      </div>
-      
-      <div className="divide-y">
-        {apis.map((api) => (
-          <ApiCard key={api.name} {...api} />
-        ))}
-      </div>
+    <ScrollArea className="h-[400px]">
+      <div className="space-y-6 border rounded-lg p-6 bg-muted/50">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium text-lg">NHTSA API Integration Status</h3>
+          <Badge variant="default">Connected</Badge>
+        </div>
+        
+        <div className="divide-y">
+          {apis.map((api) => (
+            <ApiCard key={api.name} {...api} />
+          ))}
+        </div>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Currently integrated with VIN Decoder API and Make/Model/Year API. Additional NHTSA APIs will be added in future updates.
-          For technical documentation and API specifications, visit the NHTSA API documentation portal.
-        </AlertDescription>
-      </Alert>
-    </div>
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Currently integrated with VIN Decoder API and Make/Model/Year API. Additional NHTSA APIs will be added in future updates.
+            For technical documentation and API specifications, visit the NHTSA API documentation portal.
+          </AlertDescription>
+        </Alert>
+      </div>
+    </ScrollArea>
   );
 };

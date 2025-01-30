@@ -1,5 +1,4 @@
 import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { IntegrationDialog } from "./IntegrationDialog";
 import { useQuery } from "@tanstack/react-query";
@@ -7,24 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { IntegrationHeader } from "./cards/IntegrationHeader";
 import { ApiList } from "./cards/ApiList";
 import { IntegrationResources } from "./cards/IntegrationResources";
-
-interface ApiEndpoint {
-  name: string;
-  status: "active" | "coming_soon";
-  endpoint?: string;
-  description: string;
-}
-
-interface IntegrationCardProps {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  status: "connected" | "not_connected";
-  onConnect: () => void;
-  websiteUrl?: string;
-  documentationUrl?: string;
-  apis?: ApiEndpoint[];
-}
+import { IntegrationCardProps } from "./types";
 
 export const IntegrationCard = ({ 
   title, 

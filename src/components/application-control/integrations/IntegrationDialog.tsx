@@ -1,25 +1,13 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Info, LucideIcon } from "lucide-react";
+import { ExternalLink, Info } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { NhtsaVinDialog } from "./NhtsaVinDialog";
 import { useState } from "react";
 import { NhtsaApiDetails } from "./api-details/NhtsaApiDetails";
-
-interface IntegrationDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  integration: {
-    title: string;
-    description: string;
-    icon: LucideIcon;
-    status: "connected" | "not_connected";
-    websiteUrl?: string;
-    documentationUrl?: string;
-  };
-}
+import { IntegrationDialogProps } from "./types";
 
 export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationDialogProps) => {
   const { toast } = useToast();
@@ -53,6 +41,7 @@ export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationD
     }
 
     try {
+      integration.onConnect();
       toast({
         title: "Connection initiated",
         description: "Please complete the authentication process.",

@@ -6,10 +6,33 @@ import { NhtsaVinDialog } from "./NhtsaVinDialog";
 import { NhtsaApiDetails } from "./api-details/NhtsaApiDetails";
 import { IntegrationDialogProps } from "./types";
 import { IntegrationResources } from "./cards/IntegrationResources";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationDialogProps) => {
   const { toast } = useToast();
   const [showNhtsaDialog, setShowNhtsaDialog] = useState(false);
+
+  const { data: connectionData } = useQuery({
+    queryKey: ["integration-connection", integration.title],
+    queryFn: async () => {
+      const { data: integrationData } = await supabase
+        .from("integrations")
+        .select("id")
+        .eq("name", integration.title)
+        .single();
+
+      if (!integrationData?.id) return null;
+
+      const { data: connection } = await supabase
+        .from("integration_connections")
+        .select("*")
+        .eq("integration_id", integrationData.id)
+        .single();
+
+      return connection;
+    },
+  });
 
   const handleConnect = () => {
     if (integration.title === "NHTSA Database") {
@@ -43,7 +66,7 @@ export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationD
             </DialogTitle>
           </DialogHeader>
 
-          {integration.title === "NHTSA Database" && <NhtsaApiDetails />}
+          {integration.title === "NHTSA Database" && <NhtsaApiDetails connectionData={connectionData} />}
           
           <IntegrationResources 
             websiteUrl={integration.websiteUrl} 

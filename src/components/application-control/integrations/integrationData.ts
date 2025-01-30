@@ -58,6 +58,32 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect to NHTSA"),
         websiteUrl: "https://www.nhtsa.gov/data",
         documentationUrl: "https://www.nhtsa.gov/nhtsa-datasets-and-apis",
+        apis: [
+          {
+            name: "VIN Decoder API",
+            status: "active" as const,
+            endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/",
+            description: "Decode VINs to get detailed vehicle specifications"
+          },
+          {
+            name: "Recall Database API",
+            status: "coming_soon" as const,
+            endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/recalls/",
+            description: "Access vehicle recall information and safety notices"
+          },
+          {
+            name: "Safety Ratings API",
+            status: "coming_soon" as const,
+            endpoint: "https://vpic.nhtsa.dot.gov/api/SafetyRatings/",
+            description: "Get NHTSA crash test ratings and safety evaluations"
+          },
+          {
+            name: "Technical Service Bulletins API",
+            status: "coming_soon" as const,
+            endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/tsbs/",
+            description: "Access manufacturer service bulletins and technical notices"
+          }
+        ]
       },
       {
         title: "NEXPART",
@@ -135,6 +161,7 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect to Zapier"),
         websiteUrl: "https://zapier.com",
         documentationUrl: "https://zapier.com/developer/documentation",
+        apis: []
       },
       {
         title: "Payment Gateway",
@@ -144,6 +171,7 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect Payment Gateway"),
         websiteUrl: "https://www.paymentgateway.com",
         documentationUrl: "https://www.paymentgateway.com/docs",
+        apis: []
       },
       {
         title: "Analytics",
@@ -153,6 +181,7 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect Analytics"),
         websiteUrl: "https://www.analytics.com",
         documentationUrl: "https://www.analytics.com/docs",
+        apis: []
       },
       {
         title: "Time Clock",
@@ -162,6 +191,7 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect Time Clock"),
         websiteUrl: "https://www.timeclock.com",
         documentationUrl: "https://www.timeclock.com/docs",
+        apis: []
       },
       {
         title: "Cloud Backup",
@@ -171,6 +201,7 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect Cloud Backup"),
         websiteUrl: "https://www.cloudbackup.com",
         documentationUrl: "https://www.cloudbackup.com/docs",
+        apis: []
       },
       {
         title: "Mobile App",
@@ -180,6 +211,7 @@ export const integrationCategories = {
         onConnect: () => console.log("Connect Mobile App"),
         websiteUrl: "https://www.mobileapp.com",
         documentationUrl: "https://www.mobileapp.com/docs",
+        apis: []
       },
     ],
   },

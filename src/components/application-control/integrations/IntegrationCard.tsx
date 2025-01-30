@@ -1,10 +1,17 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LucideIcon, ExternalLink, Info } from "lucide-react";
+import { LucideIcon, ExternalLink, Info, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { IntegrationDialog } from "./IntegrationDialog";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+
+interface ApiEndpoint {
+  name: string;
+  status: "active" | "coming_soon";
+  endpoint?: string;
+  description: string;
+}
 
 interface IntegrationCardProps {
   title: string;
@@ -14,6 +21,7 @@ interface IntegrationCardProps {
   onConnect: () => void;
   websiteUrl?: string;
   documentationUrl?: string;
+  apis?: ApiEndpoint[];
 }
 
 export const IntegrationCard = ({ 
@@ -23,7 +31,8 @@ export const IntegrationCard = ({
   status, 
   onConnect,
   websiteUrl,
-  documentationUrl
+  documentationUrl,
+  apis
 }: IntegrationCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -85,6 +94,24 @@ export const IntegrationCard = ({
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {connectionStatus === 'connected' && apis && apis.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Integrated APIs:</h4>
+              <div className="space-y-1">
+                {apis.map((api, index) => (
+                  <div key={index} className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span>{api.name}</span>
+                    {api.status === 'active' && (
+                      <span className="text-xs text-muted-foreground">
+                        (Active)
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {lastSyncDate && (
             <div className="text-sm text-muted-foreground">
               Last synced: {lastSyncDate}
@@ -126,7 +153,8 @@ export const IntegrationCard = ({
           icon: Icon, 
           status: connectionStatus,
           websiteUrl,
-          documentationUrl
+          documentationUrl,
+          apis
         }}
       />
     </>

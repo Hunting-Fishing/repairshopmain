@@ -1070,6 +1070,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_user_organization_id: {
+        Args: {
+          user_uuid: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"

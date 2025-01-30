@@ -22,3 +22,19 @@ export interface IntegrationCategory {
   title: string;
   items: IntegrationItem[];
 }
+
+export interface IntegrationCardProps extends IntegrationItem {
+  apis?: ApiEndpoint[];
+  websiteUrl?: string;
+  documentationUrl?: string;
+}
+
+export interface IntegrationDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  integration: IntegrationItem & {
+    websiteUrl?: string;
+    documentationUrl?: string;
+    apis?: ApiEndpoint[];
+  };
+}

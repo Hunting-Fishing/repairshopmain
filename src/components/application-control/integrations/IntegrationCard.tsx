@@ -27,7 +27,13 @@ interface IntegrationCardProps {
 }
 
 export const IntegrationCard = ({ 
-  title, description, icon: Icon, status, websiteUrl, documentationUrl, apis
+  title, 
+  description, 
+  icon: Icon, 
+  status, 
+  websiteUrl, 
+  documentationUrl, 
+  apis 
 }: IntegrationCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { data: connectionData } = useQuery({

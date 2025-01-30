@@ -6,52 +6,23 @@ import { NhtsaVinDialog } from "./NhtsaVinDialog";
 import { NhtsaApiDetails } from "./api-details/NhtsaApiDetails";
 import { IntegrationDialogProps } from "./types";
 import { IntegrationResources } from "./cards/IntegrationResources";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useIntegrationConnection } from "@/hooks/integrations/useIntegrationConnection";
 
 export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationDialogProps) => {
   const { toast } = useToast();
   const [showNhtsaDialog, setShowNhtsaDialog] = useState(false);
-
-  const { data: connectionData } = useQuery({
-    queryKey: ["integration-connection", integration.title],
-    queryFn: async () => {
-      const { data: integrationData } = await supabase
-        .from("integrations")
-        .select("id")
-        .eq("name", integration.title)
-        .single();
-
-      if (!integrationData?.id) return null;
-
-      const { data: connection } = await supabase
-        .from("integration_connections")
-        .select("*")
-        .eq("integration_id", integrationData.id)
-        .single();
-
-      return connection;
-    },
-  });
+  const { data: connectionData } = useIntegrationConnection(integration.title);
 
   const handleConnect = () => {
     if (integration.title === "NHTSA Database") {
       setShowNhtsaDialog(true);
       return;
     }
-
     try {
       integration.onConnect();
-      toast({
-        title: "Connection initiated",
-        description: "Please complete the authentication process.",
-      });
+      toast({ title: "Connection initiated", description: "Please complete the authentication process." });
     } catch (error) {
-      toast({
-        title: "Connection failed",
-        description: "There was an error connecting to the service.",
-        variant: "destructive",
-      });
+      toast({ title: "Connection failed", description: "There was an error connecting to the service.", variant: "destructive" });
     }
   };
 
@@ -65,14 +36,8 @@ export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationD
               {integration.title}
             </DialogTitle>
           </DialogHeader>
-
           {integration.title === "NHTSA Database" && <NhtsaApiDetails connectionData={connectionData} />}
-          
-          <IntegrationResources 
-            websiteUrl={integration.websiteUrl} 
-            documentationUrl={integration.documentationUrl} 
-          />
-
+          <IntegrationResources websiteUrl={integration.websiteUrl} documentationUrl={integration.documentationUrl} />
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onClose}>Close</Button>
             <Button onClick={handleConnect}>
@@ -81,14 +46,7 @@ export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationD
           </div>
         </DialogContent>
       </Dialog>
-
-      <NhtsaVinDialog 
-        isOpen={showNhtsaDialog} 
-        onClose={() => {
-          setShowNhtsaDialog(false);
-          onClose();
-        }} 
-      />
+      <NhtsaVinDialog isOpen={showNhtsaDialog} onClose={() => { setShowNhtsaDialog(false); onClose(); }} />
     </>
   );
 };

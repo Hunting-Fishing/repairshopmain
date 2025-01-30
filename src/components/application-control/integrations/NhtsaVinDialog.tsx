@@ -16,6 +16,19 @@ export interface VehicleInfo {
   Model: string;
   ModelYear: string;
   VehicleType: string;
+  "Engine Number of Cylinders": string;
+  "Displacement (L)": string;
+  "Fuel Type - Primary": string;
+  "Other Engine Info": string;
+  Turbo: string;
+  "Gross Vehicle Weight Rating From": string;
+  "Manufacturer Name": string;
+  "Plant City": string;
+  "Plant Country": string;
+  Trim: string;
+  "Body Class": string;
+  "Drive Type": string;
+  Series: string;
   [key: string]: string;
 }
 
@@ -23,7 +36,20 @@ const initialVehicleInfo: VehicleInfo = {
   Make: '',
   Model: '',
   ModelYear: '',
-  VehicleType: ''
+  VehicleType: '',
+  "Engine Number of Cylinders": '',
+  "Displacement (L)": '',
+  "Fuel Type - Primary": '',
+  "Other Engine Info": '',
+  Turbo: '',
+  "Gross Vehicle Weight Rating From": '',
+  "Manufacturer Name": '',
+  "Plant City": '',
+  "Plant Country": '',
+  Trim: '',
+  "Body Class": '',
+  "Drive Type": '',
+  Series: ''
 };
 
 export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {

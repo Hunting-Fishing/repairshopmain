@@ -1,13 +1,12 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { LucideIcon, ExternalLink, Info, AlertCircle, Database, Shield, FileWarning, Wrench } from "lucide-react";
+import { ExternalLink, Info, LucideIcon } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { NhtsaVinDialog } from "./NhtsaVinDialog";
 import { useState } from "react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
+import { NhtsaApiDetails } from "./api-details/NhtsaApiDetails";
 
 interface IntegrationDialogProps {
   isOpen: boolean;
@@ -67,126 +66,6 @@ export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationD
     }
   };
 
-  const renderNhtsaApiDetails = () => {
-    if (integration.title !== "NHTSA Database") return null;
-
-    const apis = [
-      {
-        name: "VIN Decoder API",
-        status: "active",
-        icon: Database,
-        endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/",
-        description: "Decode VINs to get detailed vehicle specifications",
-        documentation: "https://vpic.nhtsa.dot.gov/api/Home/Index/1",
-        features: [
-          "Vehicle make, model, and year",
-          "Engine specifications",
-          "Vehicle type and body class",
-          "Safety features",
-          "Manufacturing details"
-        ]
-      },
-      {
-        name: "Recall Database API",
-        status: "coming_soon",
-        icon: Shield,
-        endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/recalls/",
-        description: "Access vehicle recall information and safety notices",
-        features: [
-          "Active safety recalls",
-          "Recall descriptions and remedies",
-          "Affected components",
-          "Manufacturer communications"
-        ]
-      },
-      {
-        name: "Safety Ratings API",
-        status: "coming_soon",
-        icon: FileWarning,
-        endpoint: "https://vpic.nhtsa.dot.gov/api/SafetyRatings/",
-        description: "Get NHTSA crash test ratings and safety evaluations",
-        features: [
-          "Overall vehicle safety ratings",
-          "Crash test results",
-          "Safety feature evaluations",
-          "Side impact assessments"
-        ]
-      },
-      {
-        name: "Technical Service Bulletins API",
-        status: "coming_soon",
-        icon: Wrench,
-        endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/tsbs/",
-        description: "Access manufacturer service bulletins and technical notices",
-        features: [
-          "Service bulletins",
-          "Technical notifications",
-          "Repair procedures",
-          "Known issues and fixes"
-        ]
-      }
-    ];
-
-    return (
-      <div className="space-y-6 border rounded-lg p-6 bg-muted/50">
-        <div className="flex items-center justify-between">
-          <h3 className="font-medium text-lg">NHTSA API Integration Status</h3>
-          <Badge variant={connectionData ? "default" : "secondary"}>
-            {connectionData ? "Connected" : "Not Connected"}
-          </Badge>
-        </div>
-        
-        <div className="divide-y">
-          {apis.map((api) => (
-            <div key={api.name} className="py-4 first:pt-0 last:pb-0">
-              <div className="flex items-start gap-3">
-                <div className="mt-1">
-                  <api.icon className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div className="space-y-2 flex-1">
-                  <div className="flex items-center justify-between">
-                    <h4 className="font-medium flex items-center gap-2">
-                      {api.name}
-                      <Badge variant={api.status === 'active' ? "default" : "secondary"}>
-                        {api.status === 'active' ? 'Active' : 'Coming Soon'}
-                      </Badge>
-                    </h4>
-                  </div>
-                  
-                  {api.status === 'active' && (
-                    <div className="text-sm text-muted-foreground">
-                      <p className="font-medium">Endpoint:</p>
-                      <code className="bg-muted px-2 py-1 rounded text-xs">{api.endpoint}</code>
-                    </div>
-                  )}
-                  
-                  <p className="text-sm text-muted-foreground">{api.description}</p>
-                  
-                  <div className="grid grid-cols-1 gap-2 mt-2">
-                    {api.features.map((feature, index) => (
-                      <div key={index} className="text-sm flex items-center gap-2">
-                        <span className="text-xs">•</span>
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Currently integrated with VIN Decoder API. Additional NHTSA APIs will be added in future updates.
-            For technical documentation and API specifications, visit the NHTSA API documentation portal.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  };
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -201,25 +80,9 @@ export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationD
 
           <div className="grid gap-4 py-4">
             <div className="space-y-4">
-              <div>
-                <h3 className="font-medium mb-2">Connection Status</h3>
-                <p className={`text-sm ${connectionData ? 'text-green-500' : 'text-gray-500'}`}>
-                  {connectionData ? 'Connected' : 'Not Connected'}
-                </p>
-              </div>
-
-              {connectionData && (
-                <div>
-                  <h3 className="font-medium mb-2">Last Synced</h3>
-                  <p className="text-sm text-gray-500">
-                    {connectionData.last_sync_at 
-                      ? new Date(connectionData.last_sync_at).toLocaleString()
-                      : 'Never'}
-                  </p>
-                </div>
+              {integration.title === "NHTSA Database" && (
+                <NhtsaApiDetails connectionData={connectionData} />
               )}
-
-              {renderNhtsaApiDetails()}
 
               {(integration.websiteUrl || integration.documentationUrl) && (
                 <div className="space-y-2">

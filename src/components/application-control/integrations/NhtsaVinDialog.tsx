@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { VehicleInfoDisplay } from "./VehicleInfoDisplay";
 
 interface NhtsaVinDialogProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-interface VehicleInfo {
+export interface VehicleInfo {
   Make: string;
   Model: string;
   ModelYear: string;
@@ -28,7 +29,7 @@ const initialVehicleInfo: VehicleInfo = {
 export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {
   const [vin, setVin] = useState("");
   const [loading, setLoading] = useState(false);
-  const [vehicleInfo, setVehicleInfo] = useState<VehicleInfo | null>(null);
+  const [vehicleInfo, setVehicleInfo] = useState<VehicleInfo>(initialVehicleInfo);
   const { toast } = useToast();
 
   const handleDecodeVin = async () => {
@@ -98,19 +99,7 @@ export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {
             </Button>
           </div>
 
-          {vehicleInfo && (
-            <div className="mt-4 space-y-2">
-              <h3 className="font-medium">Vehicle Information:</h3>
-              <div className="grid grid-cols-2 gap-2 bg-secondary/50 p-4 rounded-lg">
-                {Object.entries(vehicleInfo).map(([key, value]) => (
-                  <div key={key} className="space-y-1">
-                    <p className="text-sm font-medium text-muted-foreground">{key}</p>
-                    <p className="text-sm">{value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <VehicleInfoDisplay vehicleInfo={vehicleInfo} />
         </div>
 
         <div className="flex justify-end">

@@ -26,7 +26,7 @@ export const IntegrationCard = ({
         .from("integrations")
         .select("id")
         .eq("name", title)
-        .single();
+        .maybeSingle();
 
       if (!integrationData?.id) return null;
 
@@ -34,7 +34,7 @@ export const IntegrationCard = ({
         .from("integration_connections")
         .select("*")
         .eq("integration_id", integrationData.id)
-        .single();
+        .maybeSingle();
 
       return connection;
     },

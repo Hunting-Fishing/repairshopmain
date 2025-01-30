@@ -9,7 +9,7 @@ export const useIntegrationConnection = (integrationTitle: string) => {
         .from("integrations")
         .select("id")
         .eq("name", integrationTitle)
-        .single();
+        .maybeSingle();
 
       if (!integrationData?.id) return null;
 
@@ -17,7 +17,7 @@ export const useIntegrationConnection = (integrationTitle: string) => {
         .from("integration_connections")
         .select("*")
         .eq("integration_id", integrationData.id)
-        .single();
+        .maybeSingle();
 
       return connection;
     },

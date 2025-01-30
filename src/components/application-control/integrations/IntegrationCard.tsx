@@ -1,10 +1,12 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { LucideIcon, ExternalLink, Info, CheckCircle } from "lucide-react";
+import { Card, CardHeader, CardDescription, CardContent } from "@/components/ui/card";
+import { LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { IntegrationDialog } from "./IntegrationDialog";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { IntegrationHeader } from "./cards/IntegrationHeader";
+import { ApiList } from "./cards/ApiList";
+import { IntegrationResources } from "./cards/IntegrationResources";
 
 interface ApiEndpoint {
   name: string;
@@ -25,17 +27,9 @@ interface IntegrationCardProps {
 }
 
 export const IntegrationCard = ({ 
-  title, 
-  description, 
-  icon: Icon,
-  status, 
-  onConnect,
-  websiteUrl,
-  documentationUrl,
-  apis
+  title, description, icon: Icon, status, websiteUrl, documentationUrl, apis
 }: IntegrationCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const { data: connectionData } = useQuery({
     queryKey: ["integration-connection", title],
     queryFn: async () => {
@@ -58,9 +52,6 @@ export const IntegrationCard = ({
   });
 
   const connectionStatus = connectionData?.status || status;
-  const lastSyncDate = connectionData?.last_sync_at 
-    ? new Date(connectionData.last_sync_at).toLocaleString()
-    : null;
 
   return (
     <>
@@ -70,77 +61,23 @@ export const IntegrationCard = ({
             <Icon className="w-6 h-6" />
           </div>
           <div className="flex-1 space-y-1">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl">{title}</CardTitle>
-              <div className="flex items-center gap-2">
-                <span 
-                  className={`text-sm px-2 py-1 rounded-full ${
-                    connectionStatus === 'connected' 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
-                  }`}
-                >
-                  {connectionStatus === 'connected' ? 'Connected' : 'Not Connected'}
-                </span>
-                <Button 
-                  variant={connectionStatus === 'connected' ? 'outline' : 'default'} 
-                  onClick={() => setIsDialogOpen(true)}
-                >
-                  {connectionStatus === 'connected' ? 'Manage' : 'Connect'}
-                </Button>
-              </div>
-            </div>
+            <IntegrationHeader 
+              title={title}
+              Icon={Icon}
+              status={connectionStatus}
+              onManage={() => setIsDialogOpen(true)}
+            />
             <CardDescription className="text-sm">{description}</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {connectionStatus === 'connected' && apis && apis.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Integrated APIs:</h4>
-              <div className="space-y-1">
-                {apis.map((api, index) => (
-                  <div key={index} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>{api.name}</span>
-                    {api.status === 'active' && (
-                      <span className="text-xs text-muted-foreground">
-                        (Active)
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {lastSyncDate && (
+          <ApiList apis={apis} status={connectionStatus} />
+          {connectionData?.last_sync_at && (
             <div className="text-sm text-muted-foreground">
-              Last synced: {lastSyncDate}
+              Last synced: {new Date(connectionData.last_sync_at).toLocaleString()}
             </div>
           )}
-          <div className="flex flex-wrap gap-2">
-            {websiteUrl && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="gap-1.5"
-                onClick={() => window.open(websiteUrl, '_blank')}
-              >
-                <ExternalLink className="w-4 h-4" />
-                Visit Website
-              </Button>
-            )}
-            {documentationUrl && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="gap-1.5"
-                onClick={() => window.open(documentationUrl, '_blank')}
-              >
-                <Info className="w-4 h-4" />
-                Documentation
-              </Button>
-            )}
-          </div>
+          <IntegrationResources websiteUrl={websiteUrl} documentationUrl={documentationUrl} />
         </CardContent>
       </Card>
 

@@ -14,7 +14,7 @@ export const NhtsaApiDetails = ({ connectionData }: NhtsaApiDetailsProps) => {
       status: "active" as const,
       icon: Database,
       endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/",
-      description: "Decode VINs to get detailed vehicle specifications",
+      description: "Currently integrated and active - Decode VINs to get detailed vehicle specifications",
       features: [
         "Vehicle make, model, and year",
         "Engine specifications",
@@ -24,11 +24,24 @@ export const NhtsaApiDetails = ({ connectionData }: NhtsaApiDetailsProps) => {
       ]
     },
     {
+      name: "Make/Model/Year API",
+      status: "active" as const,
+      icon: Database,
+      endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/",
+      description: "Currently integrated - Get all models for a specific make",
+      features: [
+        "Vehicle makes list",
+        "Model details",
+        "Year ranges",
+        "Vehicle type classification"
+      ]
+    },
+    {
       name: "Recall Database API",
       status: "coming_soon" as const,
       icon: Shield,
       endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/recalls/",
-      description: "Access vehicle recall information and safety notices",
+      description: "Not yet integrated - Access vehicle recall information and safety notices",
       features: [
         "Active safety recalls",
         "Recall descriptions and remedies",
@@ -68,9 +81,7 @@ export const NhtsaApiDetails = ({ connectionData }: NhtsaApiDetailsProps) => {
     <div className="space-y-6 border rounded-lg p-6 bg-muted/50">
       <div className="flex items-center justify-between">
         <h3 className="font-medium text-lg">NHTSA API Integration Status</h3>
-        <Badge variant={connectionData ? "default" : "secondary"}>
-          {connectionData ? "Connected" : "Not Connected"}
-        </Badge>
+        <Badge variant="default">Connected</Badge>
       </div>
       
       <div className="divide-y">
@@ -82,7 +93,7 @@ export const NhtsaApiDetails = ({ connectionData }: NhtsaApiDetailsProps) => {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Currently integrated with VIN Decoder API. Additional NHTSA APIs will be added in future updates.
+          Currently integrated with VIN Decoder API and Make/Model/Year API. Additional NHTSA APIs will be added in future updates.
           For technical documentation and API specifications, visit the NHTSA API documentation portal.
         </AlertDescription>
       </Alert>

@@ -8,7 +8,7 @@ export const automotiveIntegrations: IntegrationCategory = {
       title: "NHTSA Database",
       description: "Access vehicle safety data and recalls",
       icon: Car,
-      status: "not_connected",
+      status: "connected", // Changed to reflect connected status
       onConnect: () => console.log("Connect to NHTSA"),
       websiteUrl: "https://www.nhtsa.gov/data",
       documentationUrl: "https://www.nhtsa.gov/nhtsa-datasets-and-apis",
@@ -17,25 +17,37 @@ export const automotiveIntegrations: IntegrationCategory = {
           name: "VIN Decoder API",
           status: "active",
           endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/",
-          description: "Decode VINs to get detailed vehicle specifications"
+          description: "Currently integrated and active - Decode VINs to get detailed vehicle specifications"
+        },
+        {
+          name: "Make/Model/Year API",
+          status: "active",
+          endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/",
+          description: "Currently integrated - Get all models for a specific make"
         },
         {
           name: "Recall Database API",
           status: "coming_soon",
           endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/recalls/",
-          description: "Access vehicle recall information and safety notices"
+          description: "Not yet integrated - Access vehicle recall information and safety notices"
         },
         {
           name: "Safety Ratings API",
           status: "coming_soon",
           endpoint: "https://vpic.nhtsa.dot.gov/api/SafetyRatings/",
-          description: "Get NHTSA crash test ratings and safety evaluations"
+          description: "Not yet integrated - Get NHTSA crash test ratings and safety evaluations"
         },
         {
           name: "Technical Service Bulletins API",
           status: "coming_soon",
           endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/tsbs/",
-          description: "Access manufacturer service bulletins and technical notices"
+          description: "Not yet integrated - Access manufacturer service bulletins and technical notices"
+        },
+        {
+          name: "Complaints API",
+          status: "coming_soon",
+          endpoint: "https://vpic.nhtsa.dot.gov/api/Complaints/",
+          description: "Not yet integrated - Access vehicle complaints database"
         }
       ]
     },

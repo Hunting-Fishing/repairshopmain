@@ -62,7 +62,7 @@ export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
-          <VinDecoderForm onVehicleInfo={setVehicleInfo} />
+          <VinDecoderForm onVehicleInfo={setVehicleInfo} onClose={onClose} />
           <VehicleInfoDisplay vehicleInfo={vehicleInfo} />
         </div>
 

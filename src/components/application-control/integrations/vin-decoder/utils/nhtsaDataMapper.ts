@@ -14,28 +14,27 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     throw new Error('Invalid NHTSA data format');
   }
 
-  const vehicleData: VehicleInfo = {
+  const vehicleInfo: VehicleInfo = {
     Make: '',
     Model: '',
     ModelYear: '',
+    "Manufacturer Name": '',
+    "Plant City": '',
+    "Plant State": '',
+    "Plant Country": '',
+    Trim: '',
+    VehicleType: '',
     Series: '',
     Series2: '',
-    Trim: '',
-    VIN: vin,
-    BodyClass: '',
-    DisplacementL: '',
-    EngineConfiguration: '',
-    EngineCylinders: '',
-    EngineHP: '',
-    FuelTypePrimary: '',
-    GVWR: '',
-    DriveType: '',
-    Manufacturer: '',
-    PlantCity: '',
-    PlantCountry: '',
-    PlantState: '',
-    TransmissionStyle: '',
-    VehicleType: ''
+    "Engine Number of Cylinders": '',
+    "Displacement (L)": '',
+    "Fuel Type - Primary": '',
+    "Other Engine Info": '',
+    Turbo: '',
+    "Gross Vehicle Weight Rating From": '',
+    "Body Class": '',
+    "Drive Type": '',
+    VIN: vin
   };
 
   data.Results.forEach((result: NhtsaResult) => {
@@ -43,68 +42,65 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     if (value && value !== "null" && value !== "Not Applicable") {
       switch (result.Variable) {
         case "Make":
-          vehicleData.Make = value;
+          vehicleInfo.Make = value;
           break;
         case "Model":
-          vehicleData.Model = value;
+          vehicleInfo.Model = value;
           break;
         case "Model Year":
-          vehicleData.ModelYear = value;
-          break;
-        case "Trim":
-          vehicleData.Trim = value;
-          break;
-        case "Body Class":
-          vehicleData.BodyClass = value;
-          break;
-        case "Displacement (L)":
-          vehicleData.DisplacementL = value;
-          break;
-        case "Engine Configuration":
-          vehicleData.EngineConfiguration = value;
-          break;
-        case "Engine Number of Cylinders":
-          vehicleData.EngineCylinders = value;
-          break;
-        case "Engine HP":
-          vehicleData.EngineHP = value;
-          break;
-        case "Fuel Type - Primary":
-          vehicleData.FuelTypePrimary = value;
-          break;
-        case "GVWR":
-          vehicleData.GVWR = value;
-          break;
-        case "Drive Type":
-          vehicleData.DriveType = value;
+          vehicleInfo.ModelYear = value;
           break;
         case "Manufacturer Name":
-          vehicleData.Manufacturer = value;
+          vehicleInfo["Manufacturer Name"] = value;
           break;
         case "Plant City":
-          vehicleData.PlantCity = value;
-          break;
-        case "Plant Country":
-          vehicleData.PlantCountry = value;
+          vehicleInfo["Plant City"] = value;
           break;
         case "Plant State":
-          vehicleData.PlantState = value;
+          vehicleInfo["Plant State"] = value;
           break;
-        case "Transmission Style":
-          vehicleData.TransmissionStyle = value;
+        case "Plant Country":
+          vehicleInfo["Plant Country"] = value;
+          break;
+        case "Trim":
+          vehicleInfo.Trim = value;
+          break;
+        case "Body Class":
+          vehicleInfo["Body Class"] = value;
+          break;
+        case "Displacement (L)":
+          vehicleInfo["Displacement (L)"] = value;
+          break;
+        case "Engine Number of Cylinders":
+          vehicleInfo["Engine Number of Cylinders"] = value;
+          break;
+        case "Fuel Type - Primary":
+          vehicleInfo["Fuel Type - Primary"] = value;
+          break;
+        case "Other Engine Info":
+          vehicleInfo["Other Engine Info"] = value;
+          break;
+        case "Turbo":
+          vehicleInfo.Turbo = value;
+          break;
+        case "Gross Vehicle Weight Rating From":
+          vehicleInfo["Gross Vehicle Weight Rating From"] = value;
+          break;
+        case "Drive Type":
+          vehicleInfo["Drive Type"] = value;
           break;
         case "Vehicle Type":
-          vehicleData.VehicleType = value;
+          vehicleInfo.VehicleType = value;
           break;
         case "Series":
-          vehicleData.Series = value;
+          vehicleInfo.Series = value;
           break;
         case "Series2":
-          vehicleData.Series2 = value;
+          vehicleInfo.Series2 = value;
           break;
       }
     }
   });
 
-  return vehicleData;
+  return vehicleInfo;
 };

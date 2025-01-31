@@ -1,6 +1,10 @@
 import { VehicleInfo } from "../../NhtsaVinDialog";
 
-export const mapNhtsaDataToVehicleInfo = (data: any[], vin: string): VehicleInfo => {
+export const mapNhtsaData = (data: any): VehicleInfo => {
+  if (!data?.Results || !Array.isArray(data.Results)) {
+    throw new Error('Invalid NHTSA data format');
+  }
+
   const vehicleData: VehicleInfo = {
     Make: '',
     Model: '',
@@ -21,10 +25,9 @@ export const mapNhtsaDataToVehicleInfo = (data: any[], vin: string): VehicleInfo
     "Drive Type": '',
     Series: '',
     Series2: '',
-    VIN: vin,
   };
 
-  data.forEach((result) => {
+  data.Results.forEach((result: any) => {
     const value = result.Value;
     if (value && value !== "null" && value !== "Not Applicable") {
       switch (result.Variable) {
@@ -95,7 +98,6 @@ export const mapNhtsaDataToVehicleInfo = (data: any[], vin: string): VehicleInfo
           vehicleData.Series2 = value;
           break;
         default:
-          // Log unhandled fields for debugging
           console.log(`Unhandled field: ${result.Variable} = ${value}`);
       }
     }

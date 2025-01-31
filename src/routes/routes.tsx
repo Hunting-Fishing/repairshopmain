@@ -13,7 +13,11 @@ import ApplicationControl from "@/pages/ApplicationControl";
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: (
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    ),
     children: [
       {
         index: true,

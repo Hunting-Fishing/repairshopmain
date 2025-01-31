@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface Customer {
   id: string;
@@ -22,14 +23,25 @@ interface CustomerTableProps {
   customers: Customer[];
   onEdit?: (customer: Customer) => void;
   onDelete?: (customer: Customer) => void;
+  isLoading?: boolean;
 }
 
-export function CustomerTable({ customers, onEdit, onDelete }: CustomerTableProps) {
+export function CustomerTable({ customers, onEdit, onDelete, isLoading }: CustomerTableProps) {
   const navigate = useNavigate();
 
   const handleRowClick = (customerId: string) => {
     navigate(`/customers/${customerId}`);
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-12 w-full" />
+      </div>
+    );
+  }
 
   return (
     <Table>

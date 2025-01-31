@@ -11,7 +11,6 @@ export interface Vehicle {
     displacement: string;
     fuel_type: string;
     other_info: string;
-    turbo: string;
     drive_type: string;
     gvwr: string;
     manufacturer: string;

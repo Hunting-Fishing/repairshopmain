@@ -5,66 +5,63 @@ interface VehicleDetailsProps {
 }
 
 export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
+  const categories = {
+    "General Information": [
+      { label: "VIN", value: vehicle.vin },
+      { label: "Make", value: vehicle.make },
+      { label: "Model", value: vehicle.model },
+      { label: "Year", value: vehicle.year },
+      { label: "Body Style", value: vehicle.body_class },
+    ],
+    "Engine Information": [
+      { 
+        label: "Engine", 
+        value: vehicle.engine_info?.displacement 
+          ? `${vehicle.engine_info.displacement}L ${vehicle.engine_info.cylinders}-cylinder`
+          : null 
+      },
+      { label: "Fuel Type", value: vehicle.engine_info?.fuel_type },
+      { label: "Drive Type", value: vehicle.engine_info?.drive_type },
+      { label: "GVWR", value: vehicle.engine_info?.gvwr },
+    ],
+    "Additional Details": [
+      { label: "Manufacturer", value: vehicle.engine_info?.manufacturer },
+      { label: "Plant Country", value: vehicle.engine_info?.plant_country },
+      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type },
+      { 
+        label: "Additional Info", 
+        value: vehicle.engine_info?.other_info,
+        fullWidth: true 
+      },
+    ]
+  };
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
-      <div>
-        <p className="text-muted-foreground">VIN</p>
-        <p>{vehicle.vin || 'Not available'}</p>
-      </div>
-      <div>
-        <p className="text-muted-foreground">Make</p>
-        <p>{vehicle.make || 'Not available'}</p>
-      </div>
-      <div>
-        <p className="text-muted-foreground">Model</p>
-        <p>{vehicle.model || 'Not available'}</p>
-      </div>
-      <div>
-        <p className="text-muted-foreground">Year</p>
-        <p>{vehicle.year || 'Not available'}</p>
-      </div>
-      {vehicle.engine_info && (
-        <>
-          <div>
-            <p className="text-muted-foreground">Engine Size</p>
-            <p>{vehicle.engine_info.displacement ? `${vehicle.engine_info.displacement} L` : 'Not available'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Cylinders</p>
-            <p>{vehicle.engine_info.cylinders || 'Not available'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Fuel Type</p>
-            <p>{vehicle.engine_info.fuel_type || 'Not available'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Drive Type</p>
-            <p>{vehicle.engine_info.drive_type || 'Not available'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Turbo</p>
-            <p>{vehicle.engine_info.turbo || 'Not available'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">GVWR</p>
-            <p>{vehicle.engine_info.gvwr || 'Not available'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Body Style</p>
-            <p>{vehicle.body_class || 'Not available'}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Manufacturer</p>
-            <p>{vehicle.engine_info.manufacturer || 'Not available'}</p>
-          </div>
-          {vehicle.engine_info.other_info && (
-            <div className="col-span-2">
-              <p className="text-muted-foreground">Additional Details</p>
-              <p>{vehicle.engine_info.other_info}</p>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+      {Object.entries(categories).map(([category, fields]) => {
+        const hasData = fields.some(field => field.value);
+        if (!hasData) return null;
+
+        return (
+          <div key={category} className="space-y-3">
+            <h3 className="font-medium text-muted-foreground">{category}</h3>
+            <div className="space-y-2">
+              {fields.map(({ label, value, fullWidth }) => {
+                if (!value) return null;
+                return (
+                  <div 
+                    key={label} 
+                    className={`${fullWidth ? 'col-span-full' : ''}`}
+                  >
+                    <p className="text-muted-foreground">{label}</p>
+                    <p className="font-medium">{value}</p>
+                  </div>
+                );
+              })}
             </div>
-          )}
-        </>
-      )}
+          </div>
+        );
+      })}
     </div>
   );
 };

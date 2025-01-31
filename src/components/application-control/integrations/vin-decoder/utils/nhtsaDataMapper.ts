@@ -18,10 +18,6 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     Make: '',
     Model: '',
     ModelYear: '',
-    "Manufacturer Name": '',
-    "Plant City": '',
-    "Plant State": '',
-    "Plant Country": '',
     Trim: '',
     VehicleType: '',
     Series: '',
@@ -29,76 +25,36 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     "Engine Number of Cylinders": '',
     "Displacement (L)": '',
     "Fuel Type - Primary": '',
-    "Other Engine Info": '',
+    "Engine Configuration": '',
     Turbo: '',
-    "Gross Vehicle Weight Rating From": '',
     "Body Class": '',
     "Drive Type": '',
+    "Gross Vehicle Weight Rating": '',
     VIN: vin
   };
 
+  const fieldMappings: { [key: string]: keyof VehicleInfo } = {
+    "Make": "Make",
+    "Model": "Model",
+    "Model Year": "ModelYear",
+    "Trim": "Trim",
+    "Vehicle Type": "VehicleType",
+    "Series": "Series",
+    "Series2": "Series2",
+    "Engine Number of Cylinders": "Engine Number of Cylinders",
+    "Displacement (L)": "Displacement (L)",
+    "Fuel Type - Primary": "Fuel Type - Primary",
+    "Engine Configuration": "Engine Configuration",
+    "Turbo": "Turbo",
+    "Body Class": "Body Class",
+    "Drive Type": "Drive Type",
+    "Gross Vehicle Weight Rating From": "Gross Vehicle Weight Rating"
+  };
+
   data.Results.forEach((result: NhtsaResult) => {
-    const value = result.Value;
-    if (value && value !== "null" && value !== "Not Applicable") {
-      switch (result.Variable) {
-        case "Make":
-          vehicleInfo.Make = value;
-          break;
-        case "Model":
-          vehicleInfo.Model = value;
-          break;
-        case "Model Year":
-          vehicleInfo.ModelYear = value;
-          break;
-        case "Manufacturer Name":
-          vehicleInfo["Manufacturer Name"] = value;
-          break;
-        case "Plant City":
-          vehicleInfo["Plant City"] = value;
-          break;
-        case "Plant State":
-          vehicleInfo["Plant State"] = value;
-          break;
-        case "Plant Country":
-          vehicleInfo["Plant Country"] = value;
-          break;
-        case "Trim":
-          vehicleInfo.Trim = value;
-          break;
-        case "Body Class":
-          vehicleInfo["Body Class"] = value;
-          break;
-        case "Displacement (L)":
-          vehicleInfo["Displacement (L)"] = value;
-          break;
-        case "Engine Number of Cylinders":
-          vehicleInfo["Engine Number of Cylinders"] = value;
-          break;
-        case "Fuel Type - Primary":
-          vehicleInfo["Fuel Type - Primary"] = value;
-          break;
-        case "Other Engine Info":
-          vehicleInfo["Other Engine Info"] = value;
-          break;
-        case "Turbo":
-          vehicleInfo.Turbo = value;
-          break;
-        case "Gross Vehicle Weight Rating From":
-          vehicleInfo["Gross Vehicle Weight Rating From"] = value;
-          break;
-        case "Drive Type":
-          vehicleInfo["Drive Type"] = value;
-          break;
-        case "Vehicle Type":
-          vehicleInfo.VehicleType = value;
-          break;
-        case "Series":
-          vehicleInfo.Series = value;
-          break;
-        case "Series2":
-          vehicleInfo.Series2 = value;
-          break;
-      }
+    const mappedField = fieldMappings[result.Variable];
+    if (mappedField && result.Value && result.Value !== "null" && result.Value !== "Not Applicable") {
+      vehicleInfo[mappedField] = result.Value;
     }
   });
 

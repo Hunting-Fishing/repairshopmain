@@ -9,16 +9,12 @@ interface NhtsaVinDialogProps {
   onClose: () => void;
 }
 
-// Organize vehicle information by categories
+// Simplified vehicle information interface based on actual NHTSA data
 export interface VehicleInfo {
   // General Information
   Make: string;
   Model: string;
   ModelYear: string;
-  "Manufacturer Name": string;
-  "Plant City": string;
-  "Plant State": string;
-  "Plant Country": string;
   Trim: string;
   VehicleType: string;
   Series: string;
@@ -29,23 +25,33 @@ export interface VehicleInfo {
   "Engine Number of Cylinders": string;
   "Displacement (L)": string;
   "Fuel Type - Primary": string;
-  "Other Engine Info": string;
+  "Engine Configuration": string;
   Turbo: string;
   
   // Vehicle Details
-  "Gross Vehicle Weight Rating From": string;
   "Body Class": string;
   "Drive Type": string;
+  "Gross Vehicle Weight Rating": string;
   
   [key: string]: string | undefined;
 }
 
 const initialVehicleInfo: VehicleInfo = {
-  Make: '', Model: '', ModelYear: '', "Manufacturer Name": '', "Plant City": '',
-  "Plant State": '', "Plant Country": '', Trim: '', VehicleType: '', Series: '',
-  Series2: '', "Engine Number of Cylinders": '', "Displacement (L)": '',
-  "Fuel Type - Primary": '', "Other Engine Info": '', Turbo: '',
-  "Gross Vehicle Weight Rating From": '', "Body Class": '', "Drive Type": ''
+  Make: '', 
+  Model: '', 
+  ModelYear: '', 
+  Trim: '', 
+  VehicleType: '', 
+  Series: '',
+  Series2: '', 
+  "Engine Number of Cylinders": '', 
+  "Displacement (L)": '',
+  "Fuel Type - Primary": '', 
+  "Engine Configuration": '', 
+  Turbo: '',
+  "Body Class": '', 
+  "Drive Type": '',
+  "Gross Vehicle Weight Rating": ''
 };
 
 export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {

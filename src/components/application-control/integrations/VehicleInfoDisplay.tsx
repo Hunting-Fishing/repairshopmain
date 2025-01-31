@@ -15,10 +15,6 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
       "Make",
       "Model",
       "ModelYear",
-      "Manufacturer Name",
-      "Plant City",
-      "Plant State",
-      "Plant Country",
       "Trim",
       "VehicleType",
       "Series",
@@ -28,13 +24,13 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
       "Engine Number of Cylinders",
       "Displacement (L)",
       "Fuel Type - Primary",
-      "Other Engine Info",
+      "Engine Configuration",
       "Turbo"
     ],
     "Vehicle Details": [
-      "Gross Vehicle Weight Rating From",
       "Body Class",
-      "Drive Type"
+      "Drive Type",
+      "Gross Vehicle Weight Rating"
     ]
   };
 

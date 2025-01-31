@@ -10,7 +10,7 @@ interface VehicleRequest {
   make?: string;
   model?: string;
   year?: string;
-  type: 'recalls' | 'safety' | 'complaints';
+  type: 'decode' | 'recalls' | 'safety' | 'complaints';
 }
 
 serve(async (req) => {
@@ -23,6 +23,9 @@ serve(async (req) => {
     let url = '';
     
     switch (type) {
+      case 'decode':
+        url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`;
+        break;
       case 'recalls':
         url = vin 
           ? `https://api.nhtsa.gov/recalls/recallsByVehicle?vin=${vin}`
@@ -38,8 +41,10 @@ serve(async (req) => {
         throw new Error('Invalid request type');
     }
 
+    console.log(`Fetching vehicle information from: ${url}`);
     const response = await fetch(url);
     const data = await response.json();
+    console.log('NHTSA API Response:', data);
 
     return new Response(
       JSON.stringify(data),

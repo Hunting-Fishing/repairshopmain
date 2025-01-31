@@ -65,7 +65,7 @@ export function CustomerDetail() {
             </TabsList>
 
             <TabsContent value="info" className="mt-4">
-              <CustomerForm customerId={customerId} initialData={customer} />
+              <CustomerForm onSuccess={() => {}} initialData={customer} mode="edit" />
             </TabsContent>
 
             <TabsContent value="vehicles" className="mt-4">

@@ -1,14 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { Index } from "@/pages/Index";
-import { Auth } from "@/pages/Auth";
-import { Calendar } from "@/pages/Calendar";
-import { CalendarSettings } from "@/pages/Calendar-Settings";
-import { Staff } from "@/pages/Staff";
-import { Customers } from "@/pages/Customers";
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import Calendar from "@/pages/Calendar";
+import CalendarSettings from "@/pages/Calendar-Settings";
+import Staff from "@/pages/Staff";
+import Customers from "@/pages/Customers";
 import { CustomerDetail } from "@/pages/CustomerDetail";
-import { WorkOrders } from "@/pages/WorkOrders";
-import { ApplicationControl } from "@/pages/ApplicationControl";
+import WorkOrders from "@/pages/WorkOrders";
+import ApplicationControl from "@/pages/ApplicationControl";
 
 export const router = createBrowserRouter([
   {

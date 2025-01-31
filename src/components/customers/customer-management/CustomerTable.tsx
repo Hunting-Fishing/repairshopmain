@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit, Trash } from "lucide-react";
 
-interface Customer {
+export interface Customer {
   id: string;
   first_name: string;
   last_name: string;

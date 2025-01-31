@@ -9,7 +9,7 @@ import { VinLookupSection } from "./form/VinLookupSection";
 import { VehicleInfoSection } from "./form/VehicleInfoSection";
 import { CustomerFormValues } from "./types/customerTypes";
 
-interface CustomerFormProps {
+export interface CustomerFormProps {
   onSuccess: () => void;
   initialData?: any;
   mode?: "create" | "edit";

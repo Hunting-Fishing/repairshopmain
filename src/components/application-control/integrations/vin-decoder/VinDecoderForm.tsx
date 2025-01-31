@@ -65,6 +65,7 @@ export const VinDecoderForm = ({ onVehicleInfo }: VinDecoderFormProps) => {
               case "Model Year":
               case "Manufacturer Name":
               case "Plant Country":
+              case "Plant City":
               case "Trim":
               case "Vehicle Type":
               case "Engine Number of Cylinders":
@@ -75,11 +76,10 @@ export const VinDecoderForm = ({ onVehicleInfo }: VinDecoderFormProps) => {
               case "Gross Vehicle Weight Rating From":
               case "Body Class":
               case "Drive Type":
-                vehicleData[result.Variable] = value;
+                vehicleData[result.Variable as keyof VehicleInfo] = value;
                 break;
-              // Handle any special cases or field name mappings
               case "Series":
-                vehicleData["Series"] = value;
+                vehicleData.Series = value;
                 break;
               default:
                 // Log unhandled fields for debugging

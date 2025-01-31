@@ -11,28 +11,29 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "Make", value: vehicle.make },
       { label: "Model", value: vehicle.model },
       { label: "Year", value: vehicle.year },
-      { label: "Body Style", value: vehicle.body_class },
+      { label: "Trim", value: vehicle.trim },
+      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type },
+      { label: "Plant Country", value: vehicle.engine_info?.plant_country },
     ],
     "Engine Information": [
       { 
         label: "Engine", 
-        value: vehicle.engine_info?.displacement 
+        value: vehicle.engine_info?.displacement && vehicle.engine_info?.cylinders
           ? `${vehicle.engine_info.displacement}L ${vehicle.engine_info.cylinders}-cylinder`
           : null 
       },
       { label: "Fuel Type", value: vehicle.engine_info?.fuel_type },
-      { label: "Drive Type", value: vehicle.engine_info?.drive_type },
-      { label: "GVWR", value: vehicle.engine_info?.gvwr },
-    ],
-    "Additional Details": [
-      { label: "Manufacturer", value: vehicle.engine_info?.manufacturer },
-      { label: "Plant Country", value: vehicle.engine_info?.plant_country },
-      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type },
+      { label: "Turbo", value: vehicle.engine_info?.turbo },
       { 
-        label: "Additional Info", 
+        label: "Additional Engine Info", 
         value: vehicle.engine_info?.other_info,
         fullWidth: true 
       },
+    ],
+    "Exterior & Mechanical": [
+      { label: "Body Style", value: vehicle.body_class },
+      { label: "Drive Type", value: vehicle.engine_info?.drive_type },
+      { label: "GVWR", value: vehicle.engine_info?.gvwr },
     ]
   };
 

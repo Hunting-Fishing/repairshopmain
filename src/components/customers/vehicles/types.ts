@@ -16,5 +16,6 @@ export interface Vehicle {
     manufacturer: string;
     plant_country: string;
     vehicle_type: string;
+    turbo: string;
   };
 }

@@ -53,14 +53,44 @@ export const VinDecoderForm = ({ onVehicleInfo }: VinDecoderFormProps) => {
           Series: '',
           VIN: vin
         };
-        
+
+        // Map NHTSA API results to our vehicle data structure
         data.Results.forEach((result: any) => {
-          if (result.Value && result.Value !== "null" && result.Value !== "Not Applicable") {
-            vehicleData[result.Variable] = result.Value;
+          const value = result.Value;
+          // Only store non-null and non-"Not Applicable" values
+          if (value && value !== "null" && value !== "Not Applicable") {
+            switch (result.Variable) {
+              case "Make":
+              case "Model":
+              case "Model Year":
+              case "Manufacturer Name":
+              case "Plant Country":
+              case "Trim":
+              case "Vehicle Type":
+              case "Engine Number of Cylinders":
+              case "Displacement (L)":
+              case "Fuel Type - Primary":
+              case "Other Engine Info":
+              case "Turbo":
+              case "Gross Vehicle Weight Rating From":
+              case "Body Class":
+              case "Drive Type":
+                vehicleData[result.Variable] = value;
+                break;
+              // Handle any special cases or field name mappings
+              case "Series":
+                vehicleData["Series"] = value;
+                break;
+              default:
+                // Log unhandled fields for debugging
+                console.log(`Unhandled field: ${result.Variable} = ${value}`);
+            }
           }
         });
-        
+
+        console.log('Decoded vehicle data:', vehicleData);
         onVehicleInfo(vehicleData);
+        
         toast({
           title: "Success",
           description: "VIN decoded successfully",

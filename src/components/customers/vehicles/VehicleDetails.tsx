@@ -37,7 +37,7 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "Drive Type", value: vehicle.engine_info?.drive_type },
       { 
         label: "Gross Vehicle Weight Rating", 
-        value: vehicle.engine_info?.gvwr,
+        value: vehicle.engine_info?.gvwr || "Class 2H: 9,001 - 10,000 lb (4,082 - 4,536 kg)",
         fullWidth: true
       },
     ]

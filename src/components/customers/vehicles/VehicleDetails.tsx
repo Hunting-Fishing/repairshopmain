@@ -36,7 +36,7 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "Body Style", value: vehicle.body_class },
       { label: "Drive Type", value: vehicle.engine_info?.drive_type },
       { 
-        label: "GVWR", 
+        label: "Gross Vehicle Weight Rating", 
         value: vehicle.engine_info?.gvwr,
         fullWidth: true
       },

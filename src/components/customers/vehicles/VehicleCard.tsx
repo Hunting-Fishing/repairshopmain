@@ -14,7 +14,7 @@ export const VehicleCard = ({ vehicle, onInfoRequest }: VehicleCardProps) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Car className="h-5 w-5 text-muted-foreground" />
-          <h3 className="font-medium">
+          <h3 className="font-medium text-lg">
             {vehicle.year} {vehicle.make} {vehicle.model}
           </h3>
         </div>

@@ -23,7 +23,9 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
           : null 
       },
       { label: "Fuel Type", value: vehicle.engine_info?.fuel_type },
-      { label: "Turbo", value: vehicle.engine_info?.turbo },
+      { label: "Turbo", value: vehicle.engine_info?.turbo ? "Yes" : "No" },
+      { label: "Displacement", value: vehicle.engine_info?.displacement ? `${vehicle.engine_info.displacement}L` : null },
+      { label: "Cylinders", value: vehicle.engine_info?.cylinders },
       { 
         label: "Additional Engine Info", 
         value: vehicle.engine_info?.other_info,
@@ -33,7 +35,11 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
     "Exterior & Mechanical": [
       { label: "Body Style", value: vehicle.body_class },
       { label: "Drive Type", value: vehicle.engine_info?.drive_type },
-      { label: "GVWR", value: vehicle.engine_info?.gvwr },
+      { 
+        label: "GVWR", 
+        value: vehicle.engine_info?.gvwr,
+        fullWidth: true
+      },
     ]
   };
 
@@ -44,7 +50,7 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
         if (!hasData) return null;
 
         return (
-          <div key={category} className="space-y-3">
+          <div key={category} className={`space-y-3 ${category === "Engine Information" ? "col-span-full md:col-span-2 lg:col-span-1" : ""}`}>
             <h3 className="font-medium text-muted-foreground">{category}</h3>
             <div className="space-y-2">
               {fields.map(({ label, value, fullWidth }) => {
@@ -54,7 +60,7 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
                     key={label} 
                     className={`${fullWidth ? 'col-span-full' : ''}`}
                   >
-                    <p className="text-muted-foreground">{label}</p>
+                    <p className="text-muted-foreground text-xs">{label}</p>
                     <p className="font-medium">{value}</p>
                   </div>
                 );

@@ -10,13 +10,20 @@ interface VehicleCardProps {
 
 export const VehicleCard = ({ vehicle, onInfoRequest }: VehicleCardProps) => {
   return (
-    <div className="border rounded-lg p-4 space-y-2 hover:bg-secondary/50 transition-colors">
+    <div className="border rounded-lg p-4 space-y-4 hover:bg-secondary/50 transition-colors">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Car className="h-5 w-5 text-muted-foreground" />
-          <h3 className="font-medium text-lg">
-            {vehicle.year} {vehicle.make} {vehicle.model}
-          </h3>
+          <div>
+            <h3 className="font-medium text-xl">
+              {vehicle.year} {vehicle.make} {vehicle.model}
+            </h3>
+            {vehicle.trim && (
+              <p className="text-muted-foreground text-sm">
+                {vehicle.trim} Trim
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex gap-2">
           <Button 

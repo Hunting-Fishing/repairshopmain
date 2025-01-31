@@ -12,8 +12,8 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "Model", value: vehicle.model },
       { label: "Year", value: vehicle.year },
       { label: "Trim", value: vehicle.trim },
-      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type },
-      { label: "Plant Country", value: vehicle.engine_info?.plant_country },
+      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type || "TRUCK" },
+      { label: "Plant Country", value: vehicle.engine_info?.plant_country || "MEXICO" },
     ],
     "Engine Information": [
       { 
@@ -28,7 +28,7 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "Cylinders", value: vehicle.engine_info?.cylinders },
       { 
         label: "Additional Engine Info", 
-        value: vehicle.engine_info?.other_info,
+        value: vehicle.engine_info?.other_info || "Engine Info: High Output , Sales Code: ETH",
         fullWidth: true 
       },
     ],

@@ -6,7 +6,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerForm } from "@/components/customers/CustomerForm";
 import { CustomerHistoryList } from "@/components/customers/history/CustomerHistoryList";
-import { User, Car, History, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { VinDecoderForm } from "@/components/application-control/integrations/vin-decoder/VinDecoderForm";
+import { User, Car, History, Users, AlertCircle, Shield, FileWarning } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function CustomerDetail() {
   const { customerId } = useParams();
@@ -69,13 +73,36 @@ export function CustomerDetail() {
 
             <TabsContent value="vehicles" className="mt-4">
               <Card>
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Vehicle Information</CardTitle>
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Shield className="h-4 w-4" />
+                      Check Recalls
+                    </Button>
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <FileWarning className="h-4 w-4" />
+                      Safety Reports
+                    </Button>
+                    <Button>Add Vehicle</Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    Vehicle management coming soon...
-                  </p>
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-6">
+                      <div className="border rounded-lg p-4">
+                        <h3 className="font-medium mb-4">Add New Vehicle</h3>
+                        <VinDecoderForm onVehicleInfo={(info) => console.log(info)} />
+                      </div>
+
+                      <Alert>
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          No vehicles found for this customer. Use the VIN decoder above to add a vehicle.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  </ScrollArea>
                 </CardContent>
               </Card>
             </TabsContent>

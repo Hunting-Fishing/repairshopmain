@@ -5,15 +5,16 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { VehicleInfo } from "../NhtsaVinDialog";
-import { mapNhtsaData } from "./utils/nhtsaDataMapper";
+import { mapNhtsaDataToVehicleInfo } from "./utils/nhtsaDataMapper";
 
 interface VinDecoderFormProps {
   onVehicleInfo: (info: VehicleInfo) => void;
+  onClose: () => void;
 }
 
-export const VinDecoderForm = ({ onVehicleInfo }: VinDecoderFormProps) => {
+export const VinDecoderForm = ({ onVehicleInfo, onClose }: VinDecoderFormProps) => {
   const [vin, setVin] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,45 +28,63 @@ export const VinDecoderForm = ({ onVehicleInfo }: VinDecoderFormProps) => {
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('vehicle-info', {
-        body: { type: 'decode', vin }
-      });
+      const response = await fetch(
+        'https://agtjuxiysmzhmpnbuzmc.supabase.co/functions/v1/vehicle-info',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            type: 'decode',
+            vin: vin,
+          }),
+        }
+      );
 
-      if (error) throw error;
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
-      const mappedData = mapNhtsaData(data);
-      mappedData.VIN = vin; // Ensure VIN is included in the response
-      onVehicleInfo(mappedData);
-    } catch (error) {
-      console.error('Error decoding VIN:', error);
+      const vehicleInfo = mapNhtsaDataToVehicleInfo(data, vin);
+      onVehicleInfo(vehicleInfo);
+      onClose();
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Failed to decode VIN. Please try again.",
+        title: "Error decoding VIN",
+        description: error.message || "Failed to decode VIN",
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-2">
-        <Label htmlFor="vin">Vehicle Identification Number (VIN)</Label>
+      <div>
+        <Label htmlFor="vin">VIN (Vehicle Identification Number)</Label>
         <Input
           id="vin"
-          placeholder="Enter 17-character VIN"
           value={vin}
           onChange={(e) => setVin(e.target.value.toUpperCase())}
+          placeholder="Enter VIN"
           maxLength={17}
-          minLength={17}
+          className="font-mono"
         />
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Decoding..." : "Decode VIN"}
-      </Button>
+      <div className="flex justify-end gap-2">
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? "Decoding..." : "Decode VIN"}
+        </Button>
+      </div>
     </form>
   );
 };

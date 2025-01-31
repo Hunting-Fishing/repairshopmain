@@ -32,6 +32,7 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     VIN: vin
   };
 
+  // Create a map for direct field mappings
   const fieldMappings: { [key: string]: keyof VehicleInfo } = {
     "Make": "Make",
     "Model": "Model",
@@ -49,12 +50,20 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     "Plant Country": "Plant Country"
   };
 
+  // Log the raw data for debugging
+  console.log('Raw NHTSA Data:', data.Results);
+
   data.Results.forEach((result: NhtsaResult) => {
     const mappedField = fieldMappings[result.Variable];
     if (mappedField && result.Value && result.Value !== "null" && result.Value !== "Not Applicable") {
       vehicleInfo[mappedField] = result.Value;
+      // Log each mapped field for debugging
+      console.log(`Mapping ${result.Variable} to ${mappedField}:`, result.Value);
     }
   });
+
+  // Log the final mapped vehicle info
+  console.log('Mapped Vehicle Info:', vehicleInfo);
 
   return vehicleInfo;
 };

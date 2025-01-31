@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CustomerSettings } from "@/components/customers/CustomerSettings";
 import { CustomerHeader } from "@/components/customers/customer-management/CustomerHeader";
 import { CustomerToolbar } from "@/components/customers/customer-management/CustomerToolbar";
-import { CustomerTable } from "@/components/customers/customer-management/CustomerTable";
+import { CustomerTable, Customer } from "@/components/customers/customer-management/CustomerTable";
 
 export default function CustomerManagement() {
   const { toast } = useToast();
@@ -70,12 +70,12 @@ export default function CustomerManagement() {
     });
   };
 
-  const handleDeleteCustomer = async (customerId: string) => {
+  const handleDeleteCustomer = async (customer: Customer) => {
     try {
       const { error } = await supabase
         .from("customers")
         .delete()
-        .eq("id", customerId);
+        .eq("id", customer.id);
 
       if (error) throw error;
 
@@ -104,7 +104,7 @@ export default function CustomerManagement() {
         onOpenChange={setOpen}
       />
       <CustomerTable
-        customers={customers}
+        customers={customers ?? []}
         isLoading={isLoading}
         onDelete={handleDeleteCustomer}
       />

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CustomerForm } from "@/components/customers/CustomerForm";
-import { CustomerTable } from "@/components/customers/customer-management/CustomerTable";
+import { CustomerTable, Customer } from "@/components/customers/customer-management/CustomerTable";
 
 export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -40,12 +40,12 @@ export default function Customers() {
     },
   });
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (customer: Customer) => {
     try {
       const { error } = await supabase
         .from("customers")
         .delete()
-        .eq("id", id);
+        .eq("id", customer.id);
 
       if (error) throw error;
 

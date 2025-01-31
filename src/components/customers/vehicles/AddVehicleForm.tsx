@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { VinDecoderForm } from "@/components/application-control/integrations/vin-decoder/VinDecoderForm";
+import { NhtsaVinDialog } from "@/components/application-control/integrations/NhtsaVinDialog";
 import { useQueryClient } from "@tanstack/react-query";
+import { Car } from "lucide-react";
 
 interface AddVehicleFormProps {
   customerId: string;
@@ -12,6 +13,7 @@ interface AddVehicleFormProps {
 
 export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) => {
   const [loading, setLoading] = useState(false);
+  const [showVinDialog, setShowVinDialog] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -73,7 +75,23 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
 
   return (
     <div className="space-y-4">
-      <VinDecoderForm onVehicleInfo={handleVehicleInfo} />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Car className="h-5 w-5 text-muted-foreground" />
+          <span className="font-medium">Add New Vehicle</span>
+        </div>
+        <Button 
+          onClick={() => setShowVinDialog(true)} 
+          disabled={loading}
+        >
+          Lookup VIN
+        </Button>
+      </div>
+
+      <NhtsaVinDialog
+        isOpen={showVinDialog}
+        onClose={() => setShowVinDialog(false)}
+      />
     </div>
   );
 };

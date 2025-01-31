@@ -20,6 +20,7 @@ export interface VehicleInfo {
   "Plant Country": string;
   Trim: string;
   VehicleType: string;
+  VIN?: string;
   
   // Engine Specifications
   "Engine Number of Cylinders": string;
@@ -34,7 +35,7 @@ export interface VehicleInfo {
   "Drive Type": string;
   Series: string;
   
-  [key: string]: string;
+  [key: string]: string | undefined;
 }
 
 const initialVehicleInfo: VehicleInfo = {

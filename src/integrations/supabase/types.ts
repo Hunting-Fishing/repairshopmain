@@ -1070,6 +1070,86 @@ export type Database = {
           },
         ]
       }
+      vehicles: {
+        Row: {
+          body_class: string | null
+          created_at: string
+          created_by: string
+          customer_id: string
+          engine_info: Json | null
+          id: string
+          make: string | null
+          model: string | null
+          organization_id: string
+          trim: string | null
+          updated_at: string
+          updated_by: string
+          vin: string | null
+          year: string | null
+        }
+        Insert: {
+          body_class?: string | null
+          created_at?: string
+          created_by: string
+          customer_id: string
+          engine_info?: Json | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          organization_id: string
+          trim?: string | null
+          updated_at?: string
+          updated_by: string
+          vin?: string | null
+          year?: string | null
+        }
+        Update: {
+          body_class?: string | null
+          created_at?: string
+          created_by?: string
+          customer_id?: string
+          engine_info?: Json | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          organization_id?: string
+          trim?: string | null
+          updated_at?: string
+          updated_by?: string
+          vin?: string | null
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -146,7 +146,7 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
   return (
     <ScrollArea className="h-[300px]">
       <div className="space-y-4">
-        {vehicles.map((vehicle) => (
+        {vehicles?.map((vehicle) => (
           <div
             key={vehicle.id}
             className="border rounded-lg p-4 space-y-2 hover:bg-secondary/50 transition-colors"
@@ -185,7 +185,7 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">VIN</p>
                 <p>{vehicle.vin}</p>
@@ -198,8 +198,56 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
               )}
               {vehicle.body_class && (
                 <div>
-                  <p className="text-muted-foreground">Body Class</p>
+                  <p className="text-muted-foreground">Body Style</p>
                   <p>{vehicle.body_class}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.displacement && (
+                <div>
+                  <p className="text-muted-foreground">Engine Size</p>
+                  <p>{vehicle.engine_info.displacement} L</p>
+                </div>
+              )}
+              {vehicle.engine_info?.cylinders && (
+                <div>
+                  <p className="text-muted-foreground">Cylinders</p>
+                  <p>{vehicle.engine_info.cylinders}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.fuel_type && (
+                <div>
+                  <p className="text-muted-foreground">Fuel Type</p>
+                  <p>{vehicle.engine_info.fuel_type}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.drive_type && (
+                <div>
+                  <p className="text-muted-foreground">Drive Type</p>
+                  <p>{vehicle.engine_info.drive_type}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.transmission && (
+                <div>
+                  <p className="text-muted-foreground">Transmission</p>
+                  <p>{vehicle.engine_info.transmission}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.gvwr && (
+                <div>
+                  <p className="text-muted-foreground">GVWR</p>
+                  <p>{vehicle.engine_info.gvwr}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.manufacturer && (
+                <div>
+                  <p className="text-muted-foreground">Manufacturer</p>
+                  <p>{vehicle.engine_info.manufacturer}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.plant_country && (
+                <div>
+                  <p className="text-muted-foreground">Country of Origin</p>
+                  <p>{vehicle.engine_info.plant_country}</p>
                 </div>
               )}
             </div>

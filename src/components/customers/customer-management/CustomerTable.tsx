@@ -1,4 +1,5 @@
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Car, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -27,6 +28,12 @@ interface CustomerTableProps {
 }
 
 export function CustomerTable({ customers, isLoading, onDelete }: CustomerTableProps) {
+  const navigate = useNavigate();
+
+  const handleRowClick = (customerId: string) => {
+    navigate(`/customers/${customerId}`);
+  };
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -55,7 +62,11 @@ export function CustomerTable({ customers, isLoading, onDelete }: CustomerTableP
             </TableRow>
           ) : (
             customers?.map((customer) => (
-              <TableRow key={customer.id}>
+              <TableRow 
+                key={customer.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => handleRowClick(customer.id)}
+              >
                 <TableCell>
                   {customer.first_name} {customer.last_name}
                 </TableCell>
@@ -74,13 +85,46 @@ export function CustomerTable({ customers, isLoading, onDelete }: CustomerTableP
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="mr-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="mr-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/customers/${customer.id}/edit`);
+                    }}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="icon"
-                    onClick={() => onDelete(customer.id)}
+                    className="mr-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/customers/${customer.id}/vehicles`);
+                    }}
+                  >
+                    <Car className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="mr-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/customers/${customer.id}/family`);
+                    }}
+                  >
+                    <Users className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(customer.id);
+                    }}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

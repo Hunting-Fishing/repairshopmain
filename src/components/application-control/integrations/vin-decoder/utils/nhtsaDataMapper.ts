@@ -14,56 +14,31 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     throw new Error('Invalid NHTSA data format');
   }
 
-  const vehicleInfo: VehicleInfo = {
-    Make: '',
-    Model: '',
-    ModelYear: '',
-    Trim: '',
-    VehicleType: '',
-    "Engine Number of Cylinders": '',
-    "Displacement (L)": '',
-    "Fuel Type - Primary": '',
-    "Other Engine Info": '',
-    Turbo: '',
-    "Body Class": '',
-    "Drive Type": '',
-    "Gross Vehicle Weight Rating": '',
-    "Plant Country": '',
+  // Initialize vehicleInfo with empty values
+  const vehicleInfo: any = {
     VIN: vin
-  };
-
-  // Create a map for direct field mappings
-  const fieldMappings: { [key: string]: keyof VehicleInfo } = {
-    "Make": "Make",
-    "Model": "Model",
-    "Model Year": "ModelYear",
-    "Trim": "Trim",
-    "Vehicle Type": "VehicleType",
-    "Engine Number of Cylinders": "Engine Number of Cylinders",
-    "Displacement (L)": "Displacement (L)",
-    "Fuel Type - Primary": "Fuel Type - Primary",
-    "Other Engine Info": "Other Engine Info",
-    "Turbo": "Turbo",
-    "Body Class": "Body Class",
-    "Drive Type": "Drive Type",
-    "Gross Vehicle Weight Rating From": "Gross Vehicle Weight Rating",
-    "Plant Country": "Plant Country"
   };
 
   // Log the raw data for debugging
   console.log('Raw NHTSA Data:', data.Results);
 
+  // Process all results and include any field that has a valid value
   data.Results.forEach((result: NhtsaResult) => {
-    const mappedField = fieldMappings[result.Variable];
-    if (mappedField && result.Value && result.Value !== "null" && result.Value !== "Not Applicable") {
-      vehicleInfo[mappedField] = result.Value;
-      // Log each mapped field for debugging
-      console.log(`Mapping ${result.Variable} to ${mappedField}:`, result.Value);
+    if (result.Value && 
+        result.Value !== "null" && 
+        result.Value !== "Not Applicable" &&
+        result.Value.trim() !== "") {
+      // Clean up the field name to use as a key
+      const fieldName = result.Variable.trim();
+      vehicleInfo[fieldName] = result.Value.trim();
+      
+      // Log each valid field for debugging
+      console.log(`Found valid field - ${fieldName}:`, result.Value);
     }
   });
 
   // Log the final mapped vehicle info
-  console.log('Mapped Vehicle Info:', vehicleInfo);
+  console.log('Complete Vehicle Info:', vehicleInfo);
 
   return vehicleInfo;
 };

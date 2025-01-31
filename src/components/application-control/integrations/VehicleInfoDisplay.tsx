@@ -8,57 +8,23 @@ interface VehicleInfoDisplayProps {
 export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => {
   if (!vehicleInfo || Object.keys(vehicleInfo).length === 0) return null;
 
-  // Group the information into categories
-  const categories = {
-    "General Information": [
-      "VIN",
-      "Make",
-      "Model",
-      "ModelYear",
-      "Trim",
-      "VehicleType",
-      "Plant Country"
-    ],
-    "Engine Specifications": [
-      "Engine Number of Cylinders",
-      "Displacement (L)",
-      "Fuel Type - Primary",
-      "Other Engine Info",
-      "Turbo"
-    ],
-    "Vehicle Details": [
-      "Body Class",
-      "Drive Type",
-      "Gross Vehicle Weight Rating"
-    ]
-  };
+  // Filter out empty values and organize fields
+  const fields = Object.entries(vehicleInfo)
+    .filter(([_, value]) => value && value !== "null" && value !== "Not Applicable" && value.trim() !== "")
+    .sort((a, b) => a[0].localeCompare(b[0]));
 
   return (
-    <ScrollArea className="h-[300px] mt-4">
+    <ScrollArea className="h-[400px] mt-4">
       <div className="space-y-4">
         <h3 className="font-medium">Vehicle Information:</h3>
-        {Object.entries(categories).map(([category, fields]) => {
-          const hasData = fields.some(field => vehicleInfo[field as keyof VehicleInfo]);
-          if (!hasData) return null;
-
-          return (
-            <div key={category} className="space-y-2">
-              <h4 className="text-sm font-medium text-muted-foreground">{category}</h4>
-              <div className="grid grid-cols-2 gap-2 bg-secondary/50 p-4 rounded-lg">
-                {fields.map(field => {
-                  const value = vehicleInfo[field as keyof VehicleInfo];
-                  if (!value) return null;
-                  return (
-                    <div key={field} className="space-y-1">
-                      <p className="text-sm font-medium text-muted-foreground">{field}</p>
-                      <p className="text-sm">{value}</p>
-                    </div>
-                  );
-                })}
-              </div>
+        <div className="grid grid-cols-1 gap-4">
+          {fields.map(([field, value]) => (
+            <div key={field} className="bg-secondary/50 p-4 rounded-lg">
+              <p className="text-sm font-medium text-muted-foreground">{field}</p>
+              <p className="text-sm mt-1">{value}</p>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </ScrollArea>
   );

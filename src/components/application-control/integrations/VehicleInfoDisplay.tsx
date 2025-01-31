@@ -17,14 +17,13 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
       "ModelYear",
       "Trim",
       "VehicleType",
-      "Series",
-      "Series2"
+      "Plant Country"
     ],
     "Engine Specifications": [
       "Engine Number of Cylinders",
       "Displacement (L)",
       "Fuel Type - Primary",
-      "Engine Configuration",
+      "Other Engine Info",
       "Turbo"
     ],
     "Vehicle Details": [
@@ -39,7 +38,7 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
       <div className="space-y-4">
         <h3 className="font-medium">Vehicle Information:</h3>
         {Object.entries(categories).map(([category, fields]) => {
-          const hasData = fields.some(field => vehicleInfo[field]);
+          const hasData = fields.some(field => vehicleInfo[field as keyof VehicleInfo]);
           if (!hasData) return null;
 
           return (
@@ -47,11 +46,12 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
               <h4 className="text-sm font-medium text-muted-foreground">{category}</h4>
               <div className="grid grid-cols-2 gap-2 bg-secondary/50 p-4 rounded-lg">
                 {fields.map(field => {
-                  if (!vehicleInfo[field]) return null;
+                  const value = vehicleInfo[field as keyof VehicleInfo];
+                  if (!value) return null;
                   return (
                     <div key={field} className="space-y-1">
                       <p className="text-sm font-medium text-muted-foreground">{field}</p>
-                      <p className="text-sm">{vehicleInfo[field]}</p>
+                      <p className="text-sm">{value}</p>
                     </div>
                   );
                 })}

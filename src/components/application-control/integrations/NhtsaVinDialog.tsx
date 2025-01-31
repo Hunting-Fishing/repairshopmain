@@ -9,7 +9,7 @@ interface NhtsaVinDialogProps {
   onClose: () => void;
 }
 
-// Simplified vehicle information interface based on actual NHTSA data
+// Updated interface based on actual NHTSA data structure
 export interface VehicleInfo {
   // General Information
   Make: string;
@@ -17,41 +17,37 @@ export interface VehicleInfo {
   ModelYear: string;
   Trim: string;
   VehicleType: string;
-  Series: string;
-  Series2: string;
   VIN?: string;
   
   // Engine Specifications
   "Engine Number of Cylinders": string;
   "Displacement (L)": string;
   "Fuel Type - Primary": string;
-  "Engine Configuration": string;
+  "Other Engine Info": string;
   Turbo: string;
   
   // Vehicle Details
   "Body Class": string;
   "Drive Type": string;
   "Gross Vehicle Weight Rating": string;
-  
-  [key: string]: string | undefined;
+  "Plant Country": string;
 }
 
 const initialVehicleInfo: VehicleInfo = {
-  Make: '', 
-  Model: '', 
-  ModelYear: '', 
-  Trim: '', 
-  VehicleType: '', 
-  Series: '',
-  Series2: '', 
-  "Engine Number of Cylinders": '', 
+  Make: '',
+  Model: '',
+  ModelYear: '',
+  Trim: '',
+  VehicleType: '',
+  "Engine Number of Cylinders": '',
   "Displacement (L)": '',
-  "Fuel Type - Primary": '', 
-  "Engine Configuration": '', 
+  "Fuel Type - Primary": '',
+  "Other Engine Info": '',
   Turbo: '',
-  "Body Class": '', 
+  "Body Class": '',
   "Drive Type": '',
-  "Gross Vehicle Weight Rating": ''
+  "Gross Vehicle Weight Rating": '',
+  "Plant Country": ''
 };
 
 export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {

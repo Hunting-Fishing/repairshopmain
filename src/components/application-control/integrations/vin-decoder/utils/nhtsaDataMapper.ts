@@ -20,16 +20,15 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     ModelYear: '',
     Trim: '',
     VehicleType: '',
-    Series: '',
-    Series2: '',
     "Engine Number of Cylinders": '',
     "Displacement (L)": '',
     "Fuel Type - Primary": '',
-    "Engine Configuration": '',
+    "Other Engine Info": '',
     Turbo: '',
     "Body Class": '',
     "Drive Type": '',
     "Gross Vehicle Weight Rating": '',
+    "Plant Country": '',
     VIN: vin
   };
 
@@ -39,16 +38,15 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     "Model Year": "ModelYear",
     "Trim": "Trim",
     "Vehicle Type": "VehicleType",
-    "Series": "Series",
-    "Series2": "Series2",
     "Engine Number of Cylinders": "Engine Number of Cylinders",
     "Displacement (L)": "Displacement (L)",
     "Fuel Type - Primary": "Fuel Type - Primary",
-    "Engine Configuration": "Engine Configuration",
+    "Other Engine Info": "Other Engine Info",
     "Turbo": "Turbo",
     "Body Class": "Body Class",
     "Drive Type": "Drive Type",
-    "Gross Vehicle Weight Rating From": "Gross Vehicle Weight Rating"
+    "Gross Vehicle Weight Rating From": "Gross Vehicle Weight Rating",
+    "Plant Country": "Plant Country"
   };
 
   data.Results.forEach((result: NhtsaResult) => {

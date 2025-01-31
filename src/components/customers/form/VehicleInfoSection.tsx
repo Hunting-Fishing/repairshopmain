@@ -11,6 +11,18 @@ export const VehicleInfoSection = ({ form }: VehicleInfoSectionProps) => {
     <div className="space-y-4">
       <FormField
         control={form.control}
+        name="vehicle_vin"
+        render={({ field }) => (
+          <FormItem>
+            <Label>VIN</Label>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
         name="vehicle_make"
         render={({ field }) => (
           <FormItem>

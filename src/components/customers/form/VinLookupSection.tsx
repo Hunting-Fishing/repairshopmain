@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Car } from "lucide-react";
 
 interface VinLookupSectionProps {
-  onVehicleFound: (vehicleInfo: { make: string; model: string; year: string }) => void;
+  onVehicleFound: (vehicleInfo: { make: string; model: string; year: string; vin: string }) => void;
 }
 
 export const VinLookupSection = ({ onVehicleFound }: VinLookupSectionProps) => {
@@ -37,7 +37,8 @@ export const VinLookupSection = ({ onVehicleFound }: VinLookupSectionProps) => {
         const vehicleInfo = {
           make: data.Results.find((r: any) => r.Variable === "Make")?.Value || "",
           model: data.Results.find((r: any) => r.Variable === "Model")?.Value || "",
-          year: data.Results.find((r: any) => r.Variable === "ModelYear")?.Value || "",
+          year: data.Results.find((r: any) => r.Variable === "Model Year")?.Value || "",
+          vin: vin, // Include the VIN in the response
         };
         
         onVehicleFound(vehicleInfo);

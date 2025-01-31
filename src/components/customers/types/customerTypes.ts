@@ -9,7 +9,4 @@ export interface CustomerFormValues {
   postal_code: string;
   country: string;
   notes: string;
-  vehicle_make: string;
-  vehicle_model: string;
-  vehicle_year: string;
 }

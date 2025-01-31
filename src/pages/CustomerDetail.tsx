@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerForm } from "@/components/customers/CustomerForm";
-import { VehicleInfoSection } from "@/components/customers/form/VehicleInfoSection";
 import { CustomerHistoryList } from "@/components/customers/history/CustomerHistoryList";
 import { User, Car, History, Users } from "lucide-react";
 
@@ -74,7 +73,9 @@ export function CustomerDetail() {
                   <CardTitle>Vehicle Information</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <VehicleInfoSection form={{ control: {} }} />
+                  <p className="text-muted-foreground">
+                    Vehicle management coming soon...
+                  </p>
                 </CardContent>
               </Card>
             </TabsContent>

@@ -50,7 +50,8 @@ export const VinDecoderForm = ({ onVehicleInfo }: VinDecoderFormProps) => {
           "Gross Vehicle Weight Rating From": '',
           "Body Class": '',
           "Drive Type": '',
-          Series: ''
+          Series: '',
+          VIN: vin
         };
         
         data.Results.forEach((result: any) => {

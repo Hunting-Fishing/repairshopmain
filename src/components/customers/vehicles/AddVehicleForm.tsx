@@ -38,6 +38,13 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
           cylinders: vehicleInfo["Engine Number of Cylinders"] || "",
           displacement: vehicleInfo["Displacement (L)"] || "",
           fuel_type: vehicleInfo["Fuel Type - Primary"] || "",
+          other_info: vehicleInfo["Other Engine Info"] || "",
+          turbo: vehicleInfo["Turbo"] || "",
+          drive_type: vehicleInfo["Drive Type"] || "",
+          gvwr: vehicleInfo["Gross Vehicle Weight Rating From"] || "",
+          manufacturer: vehicleInfo["Manufacturer Name"] || "",
+          plant_country: vehicleInfo["Plant Country"] || "",
+          vehicle_type: vehicleInfo["Vehicle Type"] || ""
         },
         created_by: profile.user?.id,
         updated_by: profile.user?.id,

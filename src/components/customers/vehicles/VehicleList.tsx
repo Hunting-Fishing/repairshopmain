@@ -21,7 +21,18 @@ interface Vehicle {
   year: string;
   trim: string;
   body_class: string;
-  engine_info: any;
+  engine_info: {
+    cylinders: string;
+    displacement: string;
+    fuel_type: string;
+    other_info: string;
+    turbo: string;
+    drive_type: string;
+    gvwr: string;
+    manufacturer: string;
+    plant_country: string;
+    vehicle_type: string;
+  };
 }
 
 interface VehicleListProps {
@@ -190,6 +201,18 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
                 <p className="text-muted-foreground">VIN</p>
                 <p>{vehicle.vin}</p>
               </div>
+              <div>
+                <p className="text-muted-foreground">Make</p>
+                <p>{vehicle.make}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Model</p>
+                <p>{vehicle.model}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Year</p>
+                <p>{vehicle.year}</p>
+              </div>
               {vehicle.trim && (
                 <div>
                   <p className="text-muted-foreground">Trim</p>
@@ -202,16 +225,16 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
                   <p>{vehicle.body_class}</p>
                 </div>
               )}
+              {vehicle.engine_info?.cylinders && (
+                <div>
+                  <p className="text-muted-foreground">Engine Cylinders</p>
+                  <p>{vehicle.engine_info.cylinders}</p>
+                </div>
+              )}
               {vehicle.engine_info?.displacement && (
                 <div>
                   <p className="text-muted-foreground">Engine Size</p>
                   <p>{vehicle.engine_info.displacement} L</p>
-                </div>
-              )}
-              {vehicle.engine_info?.cylinders && (
-                <div>
-                  <p className="text-muted-foreground">Cylinders</p>
-                  <p>{vehicle.engine_info.cylinders}</p>
                 </div>
               )}
               {vehicle.engine_info?.fuel_type && (
@@ -220,16 +243,22 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
                   <p>{vehicle.engine_info.fuel_type}</p>
                 </div>
               )}
+              {vehicle.engine_info?.other_info && (
+                <div>
+                  <p className="text-muted-foreground">Engine Details</p>
+                  <p>{vehicle.engine_info.other_info}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.turbo && (
+                <div>
+                  <p className="text-muted-foreground">Turbo</p>
+                  <p>{vehicle.engine_info.turbo}</p>
+                </div>
+              )}
               {vehicle.engine_info?.drive_type && (
                 <div>
                   <p className="text-muted-foreground">Drive Type</p>
                   <p>{vehicle.engine_info.drive_type}</p>
-                </div>
-              )}
-              {vehicle.engine_info?.transmission && (
-                <div>
-                  <p className="text-muted-foreground">Transmission</p>
-                  <p>{vehicle.engine_info.transmission}</p>
                 </div>
               )}
               {vehicle.engine_info?.gvwr && (
@@ -248,6 +277,12 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
                 <div>
                   <p className="text-muted-foreground">Country of Origin</p>
                   <p>{vehicle.engine_info.plant_country}</p>
+                </div>
+              )}
+              {vehicle.engine_info?.vehicle_type && (
+                <div>
+                  <p className="text-muted-foreground">Vehicle Type</p>
+                  <p>{vehicle.engine_info.vehicle_type}</p>
                 </div>
               )}
             </div>

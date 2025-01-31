@@ -12,8 +12,8 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "Model", value: vehicle.model },
       { label: "Year", value: vehicle.year },
       { label: "Trim", value: vehicle.trim },
-      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type || "TRUCK" },
-      { label: "Plant Country", value: vehicle.engine_info?.plant_country || "MEXICO" },
+      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type },
+      { label: "Plant Country", value: vehicle.engine_info?.plant_country },
     ],
     "Engine Information": [
       { 
@@ -23,12 +23,12 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
           : null 
       },
       { label: "Fuel Type", value: vehicle.engine_info?.fuel_type },
-      { label: "Turbo", value: vehicle.engine_info?.turbo ? "Yes" : "No" },
+      { label: "Turbo", value: vehicle.engine_info?.turbo },
       { label: "Displacement", value: vehicle.engine_info?.displacement ? `${vehicle.engine_info.displacement}L` : null },
       { label: "Cylinders", value: vehicle.engine_info?.cylinders },
       { 
         label: "Additional Engine Info", 
-        value: vehicle.engine_info?.other_info || "Engine Info: High Output , Sales Code: ETH",
+        value: vehicle.engine_info?.other_info,
         fullWidth: true 
       },
     ],
@@ -36,12 +36,12 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "Body Style", value: vehicle.body_class },
       { 
         label: "Drive Type", 
-        value: vehicle.engine_info?.drive_type || "4WD/4-Wheel Drive/4x4",
+        value: vehicle.engine_info?.drive_type,
         fullWidth: true 
       },
       { 
         label: "Gross Vehicle Weight Rating", 
-        value: vehicle.engine_info?.gvwr || "Class 2H: 9,001 - 10,000 lb (4,082 - 4,536 kg)",
+        value: vehicle.engine_info?.gvwr,
         fullWidth: true
       },
     ]

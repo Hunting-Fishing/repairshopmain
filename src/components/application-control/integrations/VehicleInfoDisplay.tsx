@@ -11,14 +11,18 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
   // Group the information into categories
   const categories = {
     "General Information": [
+      "VIN",
       "Make",
       "Model",
       "ModelYear",
       "Manufacturer Name",
       "Plant City",
+      "Plant State",
       "Plant Country",
       "Trim",
-      "VehicleType"
+      "VehicleType",
+      "Series",
+      "Series2"
     ],
     "Engine Specifications": [
       "Engine Number of Cylinders",
@@ -30,8 +34,7 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
     "Vehicle Details": [
       "Gross Vehicle Weight Rating From",
       "Body Class",
-      "Drive Type",
-      "Series"
+      "Drive Type"
     ]
   };
 

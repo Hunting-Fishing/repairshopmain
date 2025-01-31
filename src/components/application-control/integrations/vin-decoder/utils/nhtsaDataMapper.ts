@@ -8,6 +8,7 @@ export const mapNhtsaDataToVehicleInfo = (data: any[], vin: string): VehicleInfo
     "Manufacturer Name": '',
     "Plant City": '',
     "Plant Country": '',
+    "Plant State": '',
     Trim: '',
     VehicleType: '',
     "Engine Number of Cylinders": '',
@@ -19,6 +20,8 @@ export const mapNhtsaDataToVehicleInfo = (data: any[], vin: string): VehicleInfo
     "Body Class": '',
     "Drive Type": '',
     Series: '',
+    Series2: '',
+    VIN: vin,
   };
 
   data.forEach((result) => {
@@ -42,6 +45,9 @@ export const mapNhtsaDataToVehicleInfo = (data: any[], vin: string): VehicleInfo
           break;
         case "Plant Country":
           vehicleData["Plant Country"] = value;
+          break;
+        case "Plant State":
+          vehicleData["Plant State"] = value;
           break;
         case "Trim":
           vehicleData.Trim = value;
@@ -85,14 +91,15 @@ export const mapNhtsaDataToVehicleInfo = (data: any[], vin: string): VehicleInfo
         case "Series":
           vehicleData.Series = value;
           break;
+        case "Series2":
+          vehicleData.Series2 = value;
+          break;
         default:
+          // Log unhandled fields for debugging
           console.log(`Unhandled field: ${result.Variable} = ${value}`);
       }
     }
   });
-
-  // Add the VIN to the vehicle data
-  vehicleData.VIN = vin;
 
   return vehicleData;
 };

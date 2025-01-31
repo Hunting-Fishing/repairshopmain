@@ -34,7 +34,11 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
     ],
     "Exterior & Mechanical": [
       { label: "Body Style", value: vehicle.body_class },
-      { label: "Drive Type", value: vehicle.engine_info?.drive_type },
+      { 
+        label: "Drive Type", 
+        value: vehicle.engine_info?.drive_type || "4WD/4-Wheel Drive/4x4",
+        fullWidth: true 
+      },
       { 
         label: "Gross Vehicle Weight Rating", 
         value: vehicle.engine_info?.gvwr || "Class 2H: 9,001 - 10,000 lb (4,082 - 4,536 kg)",

@@ -13,7 +13,11 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
     queryFn: async () => {
       let query = supabase
         .from('inventory_items')
-        .select('*, category:category_id(name), supplier:supplier_id(name)');
+        .select(`
+          *,
+          category:category_id(name),
+          supplier:supplier_id(name)
+        `);
 
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
@@ -21,20 +25,36 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
 
       const { data, error } = await query;
       
-      if (error) throw error;
-      return data || [];
+      if (error) {
+        console.error('Error fetching inventory items:', error);
+        throw error;
+      }
+      
+      return data;
     }
   });
 
   if (isLoading) {
-    return <div>Loading inventory items...</div>;
+    return (
+      <Card>
+        <CardContent className="py-10">
+          <p className="text-center text-muted-foreground">Loading inventory items...</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (error) {
-    return <div>Error loading inventory items: {error.message}</div>;
+    return (
+      <Card>
+        <CardContent className="py-10">
+          <p className="text-center text-red-500">Error loading inventory items: {error.message}</p>
+        </CardContent>
+      </Card>
+    );
   }
 
-  if (!items?.length) {
+  if (!items || items.length === 0) {
     return (
       <Card>
         <CardContent className="py-10">
@@ -50,26 +70,26 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
         <Card key={item.id} className="hover:shadow-md transition-shadow">
           <CardHeader>
             <CardTitle>{item.name}</CardTitle>
-            <CardDescription>SKU: {item.sku}</CardDescription>
+            <CardDescription>SKU: {item.sku || 'N/A'}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Quantity</span>
-                <span className="font-medium">{item.quantity_in_stock}</span>
+                <span className="font-medium">{item.quantity_in_stock || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Category</span>
-                <span>{item.category?.name}</span>
+                <span>{item.category?.name || 'Uncategorized'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Supplier</span>
-                <span>{item.supplier?.name}</span>
+                <span>{item.supplier?.name || 'No supplier'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Price</span>
                 <span className="font-medium">
-                  ${item.selling_price?.toFixed(2)}
+                  ${item.selling_price?.toFixed(2) || '0.00'}
                 </span>
               </div>
             </div>

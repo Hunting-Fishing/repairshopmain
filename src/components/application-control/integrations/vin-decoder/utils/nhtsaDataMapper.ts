@@ -39,7 +39,7 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
 
   if (modelYearResult?.Value) {
     vehicleInfo.ModelYear = modelYearResult.Value.trim();
-    console.log("Found Model Year:", modelYearResult.Value.trim());
+    console.log("Found Model Year:", vehicleInfo.ModelYear);
   }
 
   // Second pass: map all other fields

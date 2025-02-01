@@ -45,10 +45,7 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
   // Second pass: map all other fields
   data.Results.forEach((result: NhtsaResult) => {
     if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
-      const key = result.Variable;
-      
-      // Map NHTSA fields to our vehicle info fields
-      switch (key) {
+      switch (result.Variable) {
         case "Make":
           vehicleInfo.Make = result.Value.trim();
           break;

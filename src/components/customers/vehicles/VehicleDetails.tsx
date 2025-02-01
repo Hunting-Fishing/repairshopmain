@@ -5,12 +5,14 @@ interface VehicleDetailsProps {
 }
 
 export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
+  console.log('Vehicle Details Props:', vehicle);
+
   const categories = {
     "General Information": [
       { label: "VIN", value: vehicle.vin },
       { label: "Make", value: vehicle.make },
       { label: "Model", value: vehicle.model },
-      { label: "Year", value: vehicle.year },
+      { label: "Year", value: vehicle.year || "Not specified" },
       { label: "Trim", value: vehicle.trim },
       { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type },
       { label: "Plant Country", value: vehicle.engine_info?.plant_country },
@@ -46,9 +48,6 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       },
     ]
   };
-
-  console.log('Vehicle Details Props:', vehicle);
-  console.log('Engine Info:', vehicle.engine_info);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">

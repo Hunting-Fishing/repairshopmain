@@ -21,7 +21,7 @@ export function CategoryList({
   selectedCategoryId,
   onSelectCategory 
 }: CategoryListProps) {
-  if (!categories?.length) {
+  if (!categories || categories.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-4">
         No categories yet. Add your first category!
@@ -45,7 +45,7 @@ export function CategoryList({
               <div className="space-y-1 text-left">
                 <h4 className="text-sm font-medium leading-none">{category.name}</h4>
                 {category.description && (
-                  <p className="text-sm text-muted-foreground">{category.description}</p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{category.description}</p>
                 )}
               </div>
               {selectedCategoryId === category.id && (

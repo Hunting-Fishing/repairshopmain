@@ -6,12 +6,11 @@ import { useInventoryCategories } from "./categories/useInventoryCategories";
 import { useState } from "react";
 
 export function InventoryCategories() {
-  const { categories } = useInventoryCategories();
+  const { categories, isLoading } = useInventoryCategories();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
 
   const handleSelectCategory = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
-    // You can add additional logic here when a category is selected
     console.log("Selected category:", categoryId);
   };
 
@@ -28,11 +27,15 @@ export function InventoryCategories() {
         <CardDescription>Inventory category management</CardDescription>
       </CardHeader>
       <CardContent>
-        <CategoryList 
-          categories={categories} 
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={handleSelectCategory}
-        />
+        {isLoading ? (
+          <div className="text-center text-muted-foreground py-4">Loading categories...</div>
+        ) : (
+          <CategoryList 
+            categories={categories} 
+            selectedCategoryId={selectedCategoryId}
+            onSelectCategory={handleSelectCategory}
+          />
+        )}
       </CardContent>
     </Card>
   );

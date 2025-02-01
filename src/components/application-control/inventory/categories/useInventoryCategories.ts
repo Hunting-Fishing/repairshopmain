@@ -5,8 +5,8 @@ import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 export function useInventoryCategories() {
   const { userProfile } = useOrganizationData();
 
-  const { data: categories } = useQuery({
-    queryKey: ['inventory-categories'],
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: ['inventory-categories', userProfile?.organization_id],
     queryFn: async () => {
       if (!userProfile?.organization_id) return [];
       
@@ -14,11 +14,18 @@ export function useInventoryCategories() {
         .from('inventory_categories')
         .select('*')
         .eq('organization_id', userProfile.organization_id)
+        .order('name')
         .throwOnError();
+
+      if (error) {
+        console.error('Error fetching categories:', error);
+        return [];
+      }
+
       return data || [];
     },
     enabled: !!userProfile?.organization_id
   });
 
-  return { categories };
+  return { categories, isLoading };
 }

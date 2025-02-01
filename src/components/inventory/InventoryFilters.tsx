@@ -9,6 +9,7 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface InventoryFiltersProps {
   onFilterChange: (filters: {
@@ -26,20 +27,24 @@ export function InventoryFilters({ onFilterChange }: InventoryFiltersProps) {
   });
 
   const handleFilterChange = (key: keyof typeof filters) => {
-    const newFilters = {
-      ...filters,
-      [key]: !filters[key],
-    };
+    const newFilters = { ...filters, [key]: !filters[key] };
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
 
+  const activeFilters = Object.values(filters).filter(Boolean).length;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" className="relative">
           <Filter className="h-4 w-4 mr-2" />
           Filter
+          {activeFilters > 0 && (
+            <Badge variant="secondary" className="ml-2">
+              {activeFilters}
+            </Badge>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

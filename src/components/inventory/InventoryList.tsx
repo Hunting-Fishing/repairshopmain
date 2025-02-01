@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, PackageOpen } from "lucide-react";
+import { AlertTriangle, Package, DollarSign } from "lucide-react";
 
 interface InventoryListProps {
   searchQuery: string;
@@ -29,7 +29,6 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
         query = query.ilike('name', `%${searchQuery}%`);
       }
 
-      // Apply filters
       if (filters.lowStock) {
         query = query.lt('quantity_in_stock', 10);
       }
@@ -41,45 +40,14 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
       }
 
       const { data, error } = await query;
-      
-      if (error) {
-        console.error('Error fetching inventory items:', error);
-        throw error;
-      }
-      
+      if (error) throw error;
       return data;
     }
   });
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="py-10">
-          <p className="text-center text-muted-foreground">Loading inventory items...</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardContent className="py-10">
-          <p className="text-center text-red-500">Error loading inventory items: {error.message}</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!items || items.length === 0) {
-    return (
-      <Card>
-        <CardContent className="py-10">
-          <p className="text-center text-muted-foreground">No inventory items found</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  if (isLoading) return <div className="text-center py-8">Loading inventory items...</div>;
+  if (error) return <div className="text-center text-red-500 py-8">Error loading inventory</div>;
+  if (!items?.length) return <div className="text-center py-8">No items found</div>;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -87,38 +55,37 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
         <Card key={item.id} className="hover:shadow-md transition-shadow">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>{item.name}</CardTitle>
-              {item.quantity_in_stock === 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  Out of Stock
-                </Badge>
-              )}
-              {item.quantity_in_stock > 0 && item.quantity_in_stock <= (item.reorder_point || 5) && (
-                <Badge variant="secondary" className="ml-2">
-                  Low Stock
-                </Badge>
-              )}
+              <CardTitle className="text-lg">{item.name}</CardTitle>
+              {item.quantity_in_stock === 0 ? (
+                <Badge variant="destructive">Out of Stock</Badge>
+              ) : item.quantity_in_stock <= (item.reorder_point || 5) ? (
+                <Badge variant="secondary">Low Stock</Badge>
+              ) : null}
             </div>
             <CardDescription>SKU: {item.sku || 'N/A'}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Quantity</span>
                 <span className="font-medium">{item.quantity_in_stock || 0}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Category</span>
                 <span>{item.category?.name || 'Uncategorized'}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Supplier</span>
                 <span>{item.supplier?.name || 'No supplier'}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Price</span>
-                <span className="font-medium">
-                  ${item.selling_price?.toFixed(2) || '0.00'}
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Unit Cost</span>
+                <span className="font-medium">${item.unit_cost?.toFixed(2) || '0.00'}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">Total Value</span>
+                <span className="font-medium text-green-600">
+                  ${((item.quantity_in_stock || 0) * (item.unit_cost || 0)).toFixed(2)}
                 </span>
               </div>
               {item.quantity_in_stock <= (item.reorder_point || 5) && (

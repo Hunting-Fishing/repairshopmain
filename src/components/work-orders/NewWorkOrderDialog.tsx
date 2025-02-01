@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WorkOrderForm } from "./WorkOrderForm";
+import { useState } from "react";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -22,6 +23,7 @@ const workOrderSchema = z.object({
 type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 export function NewWorkOrderDialog() {
+  const [open, setOpen] = useState(false);
   const form = useForm<WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
     defaultValues: {
@@ -33,11 +35,13 @@ export function NewWorkOrderDialog() {
 
   const onSubmit = (data: WorkOrderFormValues) => {
     console.log(data);
+    setOpen(false);
+    form.reset();
     // TODO: Implement work order creation
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />

@@ -49,7 +49,10 @@ export function WorkOrderForm({ form }: WorkOrderFormProps) {
           <FormItem className="flex flex-col">
             <FormLabel>Customer</FormLabel>
             <CustomerSearchCommand 
-              onSelect={(id) => form.setValue("customerId", id)}
+              onSelect={(id, vehicleInfo) => {
+                form.setValue("customerId", id);
+                form.setValue("vehicleInfo", vehicleInfo);
+              }}
               className="border-input"
             />
             <FormMessage />
@@ -63,14 +66,7 @@ export function WorkOrderForm({ form }: WorkOrderFormProps) {
           <FormItem>
             <FormLabel>Vehicle Information</FormLabel>
             <FormControl>
-              <Textarea 
-                placeholder="2019 Toyota Camry" 
-                {...field}
-                value={selectedCustomer ? 
-                  `${selectedCustomer.vehicle_year || ''} ${selectedCustomer.vehicle_make || ''} ${selectedCustomer.vehicle_model || ''}`.trim() : 
-                  field.value
-                }
-              />
+              <Textarea {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>

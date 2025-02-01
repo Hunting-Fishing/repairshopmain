@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Vehicle } from "./types";
 import { VehicleInfoContent } from "./VehicleInfoContent";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VehicleInfoDialogProps {
   vehicle: Vehicle | null;
@@ -39,21 +40,18 @@ export const VehicleInfoDialog = ({ vehicle, infoType, onClose }: VehicleInfoDia
         year: vehicle.year,
       });
 
-      const response = await fetch('https://agtjuxiysmzhmpnbuzmc.supabase.co/functions/v1/vehicle-info', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('vehicle-info', {
+        body: {
           type: infoType,
           vin: vehicle.vin,
           make: vehicle.make,
           model: vehicle.model,
           year: vehicle.year,
-        }),
+        },
       });
 
-      const data = await response.json();
+      if (error) throw error;
+      
       console.log('Vehicle Info Response:', data);
       setVehicleInfo(data);
     } catch (error) {

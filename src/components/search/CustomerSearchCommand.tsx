@@ -142,9 +142,9 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
             {customers?.map((customer) => (
               <CommandItem
                 key={customer.id}
-                value={customer.id}
+                value={`${customer.first_name} ${customer.last_name}`}
                 onSelect={() => onSelect(customer.id)}
-                className="flex flex-col items-start gap-1 py-3"
+                className="cursor-pointer hover:bg-accent hover:text-accent-foreground flex flex-col items-start gap-1 py-3"
               >
                 <div className="flex items-center gap-2 text-sm">
                   <User className="h-4 w-4" />

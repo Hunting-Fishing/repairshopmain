@@ -12,7 +12,7 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "VIN", value: vehicle.vin },
       { label: "Make", value: vehicle.make },
       { label: "Model", value: vehicle.model },
-      { label: "Year", value: vehicle.year },  // Simply use the year value directly
+      { label: "Year", value: vehicle.year || "N/A" },
       { label: "Trim", value: vehicle.trim || "N/A" },
       { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type || "N/A" },
       { label: "Plant Country", value: vehicle.engine_info?.plant_country || "N/A" },

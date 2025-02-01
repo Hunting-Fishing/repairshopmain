@@ -19,7 +19,7 @@ export const VehicleInfoSection = ({ form }: VehicleInfoSectionProps) => {
     form.setValue("vehicle_vin", vehicleInfo.VIN);
     form.setValue("vehicle_make", vehicleInfo.Make);
     form.setValue("vehicle_model", vehicleInfo.Model);
-    form.setValue("vehicle_year", vehicleInfo.ModelYear);
+    form.setValue("vehicle_year", vehicleInfo.ModelYear); // Make sure we're using ModelYear
   };
 
   return (

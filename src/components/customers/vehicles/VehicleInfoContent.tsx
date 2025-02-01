@@ -25,22 +25,36 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
         <div className="space-y-4">
           {vehicleInfo.results?.map((recall: any, index: number) => (
             <div key={index} className="border p-4 rounded-lg">
-              <h4 className="font-medium">{recall.Component}</h4>
-              <p className="text-sm text-muted-foreground mt-2">{recall.Summary}</p>
+              <div className="flex justify-between items-start">
+                <h4 className="font-medium">{recall.Component}</h4>
+                <span className="text-sm text-red-500">
+                  {recall.RecallStatus || 'Recall Incomplete'}
+                </span>
+              </div>
               <div className="mt-4 space-y-2">
                 <div>
-                  <span className="text-sm font-medium">Consequence:</span>
-                  <p className="text-sm text-muted-foreground">{recall.Consequence}</p>
+                  <span className="text-sm font-medium">Summary:</span>
+                  <p className="text-sm text-muted-foreground">{recall.Summary}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Safety Risk:</span>
+                  <p className="text-sm text-muted-foreground">{recall.SafetyRiskDescription}</p>
                 </div>
                 <div>
                   <span className="text-sm font-medium">Remedy:</span>
                   <p className="text-sm text-muted-foreground">{recall.Remedy}</p>
                 </div>
-                {recall.NHTSACampaignNumber && (
-                  <p className="text-xs text-muted-foreground mt-2">
+                <div className="pt-2 space-y-1">
+                  <p className="text-xs text-muted-foreground">
+                    Manufacturer Recall Number: {recall.ManufacturerRecallNumber}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
                     NHTSA Campaign Number: {recall.NHTSACampaignNumber}
                   </p>
-                )}
+                  <p className="text-xs text-muted-foreground">
+                    Report Date: {recall.ReportReceivedDate}
+                  </p>
+                </div>
               </div>
             </div>
           ))}

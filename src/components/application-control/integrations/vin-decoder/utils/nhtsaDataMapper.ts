@@ -45,9 +45,10 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
   // Second pass: map all other fields
   data.Results.forEach((result: NhtsaResult) => {
     if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
-      const key = result.Variable as keyof VehicleInfo;
-      if (key in vehicleInfo && key !== "Model Year") { // Skip Model Year as it's already handled
-        vehicleInfo[key] = result.Value.trim();
+      const key = result.Variable;
+      // Skip Model Year as it's already handled
+      if (key !== "Model Year" && key in vehicleInfo) {
+        (vehicleInfo as any)[key] = result.Value.trim();
       }
     }
   });

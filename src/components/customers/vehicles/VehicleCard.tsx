@@ -17,9 +17,17 @@ interface VehicleCardProps {
   vehicle: Vehicle;
   onInfoRequest: (type: 'recalls' | 'safety' | 'complaints') => void;
   onVehicleRemoved?: () => void;
+  onVehicleSelect?: (vehicle: Vehicle) => void;
+  selectable?: boolean;
 }
 
-export const VehicleCard = ({ vehicle, onInfoRequest, onVehicleRemoved }: VehicleCardProps) => {
+export const VehicleCard = ({ 
+  vehicle, 
+  onInfoRequest, 
+  onVehicleRemoved,
+  onVehicleSelect,
+  selectable = false 
+}: VehicleCardProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
@@ -48,12 +56,23 @@ export const VehicleCard = ({ vehicle, onInfoRequest, onVehicleRemoved }: Vehicl
     }
   };
 
+  const handleClick = () => {
+    if (selectable && onVehicleSelect) {
+      onVehicleSelect(vehicle);
+    }
+  };
+
   return (
     <>
       <Collapsible
         open={isExpanded}
         onOpenChange={setIsExpanded}
-        className="border rounded-lg p-4 space-y-4 hover:bg-secondary/50 transition-colors"
+        className={`border rounded-lg p-4 space-y-4 ${
+          selectable 
+            ? 'cursor-pointer hover:bg-secondary/50 transition-colors'
+            : ''
+        }`}
+        onClick={handleClick}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

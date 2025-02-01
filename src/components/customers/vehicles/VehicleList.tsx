@@ -36,13 +36,6 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
     queryClient.invalidateQueries({ queryKey: ["vehicles", customerId] });
   };
 
-  const handleVehicleClick = (vehicle: Vehicle) => {
-    console.log('Vehicle clicked:', vehicle); // Debug log
-    if (onVehicleSelect) {
-      onVehicleSelect(vehicle);
-    }
-  };
-
   if (isLoading) return <div>Loading vehicles...</div>;
 
   if (!vehicles || vehicles.length === 0) {
@@ -58,14 +51,7 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
     <ScrollArea className="h-[300px]">
       <div className="space-y-4">
         {vehicles.map((vehicle) => (
-          <div
-            key={vehicle.id}
-            onClick={() => handleVehicleClick(vehicle)}
-            className={cn(
-              "cursor-pointer transition-colors",
-              onVehicleSelect && "hover:bg-accent hover:text-accent-foreground rounded-lg"
-            )}
-          >
+          <div key={vehicle.id}>
             <VehicleCard
               vehicle={vehicle}
               onInfoRequest={(type) => {
@@ -73,6 +59,8 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
                 setInfoType(type);
               }}
               onVehicleRemoved={handleVehicleRemoved}
+              onVehicleSelect={onVehicleSelect}
+              selectable={!!onVehicleSelect}
             />
           </div>
         ))}

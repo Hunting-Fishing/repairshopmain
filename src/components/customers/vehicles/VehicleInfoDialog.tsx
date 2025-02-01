@@ -5,7 +5,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Vehicle } from "./types";
 import { VehicleInfoContent } from "./VehicleInfoContent";
@@ -19,6 +19,12 @@ interface VehicleInfoDialogProps {
 export const VehicleInfoDialog = ({ vehicle, infoType, onClose }: VehicleInfoDialogProps) => {
   const [vehicleInfo, setVehicleInfo] = useState<any>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (vehicle && infoType) {
+      fetchVehicleInfo();
+    }
+  }, [vehicle, infoType]);
 
   const fetchVehicleInfo = async () => {
     if (!vehicle || !infoType) return;
@@ -40,6 +46,7 @@ export const VehicleInfoDialog = ({ vehicle, infoType, onClose }: VehicleInfoDia
       });
 
       const data = await response.json();
+      console.log('Vehicle Info Response:', data);
       setVehicleInfo(data);
     } catch (error) {
       console.error('Error fetching vehicle information:', error);
@@ -48,6 +55,23 @@ export const VehicleInfoDialog = ({ vehicle, infoType, onClose }: VehicleInfoDia
         description: "Failed to fetch vehicle information",
         variant: "destructive",
       });
+    }
+  };
+
+  const getDialogTitle = () => {
+    if (!vehicle) return '';
+    const baseTitle = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+    const recallCount = vehicleInfo?.Count || 0;
+    
+    switch (infoType) {
+      case 'recalls':
+        return `Recalls (${recallCount}) - ${baseTitle}`;
+      case 'safety':
+        return `Safety Ratings - ${baseTitle}`;
+      case 'complaints':
+        return `Consumer Complaints - ${baseTitle}`;
+      default:
+        return baseTitle;
     }
   };
 
@@ -61,12 +85,7 @@ export const VehicleInfoDialog = ({ vehicle, infoType, onClose }: VehicleInfoDia
     >
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            {infoType === 'recalls' && 'Recall Information'}
-            {infoType === 'safety' && 'Safety Ratings'}
-            {infoType === 'complaints' && 'Consumer Complaints'}
-            {vehicle && ` - ${vehicle.year} ${vehicle.make} ${vehicle.model}`}
-          </DialogTitle>
+          <DialogTitle>{getDialogTitle()}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[60vh]">
           <VehicleInfoContent 

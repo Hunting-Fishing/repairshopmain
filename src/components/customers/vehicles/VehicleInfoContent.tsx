@@ -1,3 +1,6 @@
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+
 interface VehicleInfoContentProps {
   infoType: 'recalls' | 'safety' | 'complaints' | null;
   vehicleInfo: any;
@@ -8,14 +11,37 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
 
   switch (infoType) {
     case 'recalls':
+      if (!vehicleInfo.results || vehicleInfo.results.length === 0) {
+        return (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              No recalls found for this vehicle.
+            </AlertDescription>
+          </Alert>
+        );
+      }
       return (
         <div className="space-y-4">
           {vehicleInfo.results?.map((recall: any, index: number) => (
             <div key={index} className="border p-4 rounded-lg">
               <h4 className="font-medium">{recall.Component}</h4>
-              <p className="text-sm text-muted-foreground">{recall.Summary}</p>
-              <p className="text-sm mt-2">Consequence: {recall.Consequence}</p>
-              <p className="text-sm">Remedy: {recall.Remedy}</p>
+              <p className="text-sm text-muted-foreground mt-2">{recall.Summary}</p>
+              <div className="mt-4 space-y-2">
+                <div>
+                  <span className="text-sm font-medium">Consequence:</span>
+                  <p className="text-sm text-muted-foreground">{recall.Consequence}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium">Remedy:</span>
+                  <p className="text-sm text-muted-foreground">{recall.Remedy}</p>
+                </div>
+                {recall.NHTSACampaignNumber && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    NHTSA Campaign Number: {recall.NHTSACampaignNumber}
+                  </p>
+                )}
+              </div>
             </div>
           ))}
         </div>

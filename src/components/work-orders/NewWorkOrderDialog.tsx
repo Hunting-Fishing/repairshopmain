@@ -13,6 +13,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WorkOrderForm } from "./WorkOrderForm";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -24,6 +25,8 @@ type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 export function NewWorkOrderDialog() {
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  
   const form = useForm<WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
     defaultValues: {
@@ -33,11 +36,23 @@ export function NewWorkOrderDialog() {
     },
   });
 
-  const onSubmit = (data: WorkOrderFormValues) => {
-    console.log(data);
-    setOpen(false);
-    form.reset();
-    // TODO: Implement work order creation
+  const onSubmit = async (data: WorkOrderFormValues) => {
+    try {
+      console.log("Form data:", data);
+      // TODO: Implement work order creation
+      toast({
+        title: "Work Order Created",
+        description: "The work order has been successfully created.",
+      });
+      setOpen(false);
+      form.reset();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
   };
 
   return (

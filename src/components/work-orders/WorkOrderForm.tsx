@@ -22,9 +22,10 @@ type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 interface WorkOrderFormProps {
   form: UseFormReturn<WorkOrderFormValues>;
+  onCustomerSelect?: (customerId: string, vehicleInfo: string) => void;
 }
 
-export function WorkOrderForm({ form }: WorkOrderFormProps) {
+export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
   const { data: selectedCustomer } = useQuery({
     queryKey: ["customer", form.watch("customerId")],
     queryFn: async () => {
@@ -40,6 +41,12 @@ export function WorkOrderForm({ form }: WorkOrderFormProps) {
     enabled: !!form.watch("customerId"),
   });
 
+  const handleCustomerVehicleSelect = (customerId: string, vehicleInfo: string) => {
+    form.setValue("customerId", customerId);
+    form.setValue("vehicleInfo", vehicleInfo);
+    onCustomerSelect?.(customerId, vehicleInfo);
+  };
+
   return (
     <>
       <FormField
@@ -49,10 +56,7 @@ export function WorkOrderForm({ form }: WorkOrderFormProps) {
           <FormItem className="flex flex-col">
             <FormLabel>Customer</FormLabel>
             <CustomerSearchCommand 
-              onSelect={(id, vehicleInfo) => {
-                form.setValue("customerId", id);
-                form.setValue("vehicleInfo", vehicleInfo);
-              }}
+              onSelect={handleCustomerVehicleSelect}
               className="border-input"
             />
             <FormMessage />

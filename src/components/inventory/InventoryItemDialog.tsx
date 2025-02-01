@@ -4,15 +4,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface InventoryItemFormData {
   name: string;
   sku: string;
   description?: string;
-  category?: string;
-  supplier?: string;
+  category_id?: string;
+  supplier_id?: string;
   quantity_in_stock: number;
   unit_cost?: number;
   selling_price?: number;
@@ -22,6 +24,7 @@ interface InventoryItemFormData {
 
 export function InventoryItemDialog() {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
   const form = useForm<InventoryItemFormData>();
 
   const { data: categories } = useQuery({
@@ -53,9 +56,13 @@ export function InventoryItemDialog() {
         .insert([data]);
 
       if (error) throw error;
+      
+      toast.success('Inventory item created successfully');
+      queryClient.invalidateQueries({ queryKey: ['inventory-items'] });
       setOpen(false);
     } catch (error) {
       console.error('Error creating inventory item:', error);
+      toast.error('Failed to create inventory item');
     }
   };
 
@@ -92,6 +99,54 @@ export function InventoryItemDialog() {
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="category_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="supplier_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Supplier</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a supplier" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {suppliers?.map((supplier) => (
+                        <SelectItem key={supplier.id} value={supplier.id}>
+                          {supplier.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -137,6 +192,32 @@ export function InventoryItemDialog() {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="reorder_point"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Reorder Point</FormLabel>
+                  <FormControl>
+                    <Input type="number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Location</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <Button type="submit" className="w-full">Create Item</Button>
           </form>
         </Form>

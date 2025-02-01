@@ -1,10 +1,16 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
+import { AlertTriangle, PackageOpen } from "lucide-react";
 
 interface InventoryListProps {
   searchQuery: string;
-  filters: any;
+  filters: {
+    lowStock?: boolean;
+    outOfStock?: boolean;
+    needsReorder?: boolean;
+  };
 }
 
 export function InventoryList({ searchQuery, filters }: InventoryListProps) {
@@ -21,6 +27,17 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
 
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
+      }
+
+      // Apply filters
+      if (filters.lowStock) {
+        query = query.lt('quantity_in_stock', 10);
+      }
+      if (filters.outOfStock) {
+        query = query.eq('quantity_in_stock', 0);
+      }
+      if (filters.needsReorder) {
+        query = query.lt('quantity_in_stock', 'reorder_point');
       }
 
       const { data, error } = await query;
@@ -69,7 +86,19 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
       {items.map((item) => (
         <Card key={item.id} className="hover:shadow-md transition-shadow">
           <CardHeader>
-            <CardTitle>{item.name}</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>{item.name}</CardTitle>
+              {item.quantity_in_stock === 0 && (
+                <Badge variant="destructive" className="ml-2">
+                  Out of Stock
+                </Badge>
+              )}
+              {item.quantity_in_stock > 0 && item.quantity_in_stock <= (item.reorder_point || 5) && (
+                <Badge variant="warning" className="ml-2">
+                  Low Stock
+                </Badge>
+              )}
+            </div>
             <CardDescription>SKU: {item.sku || 'N/A'}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -92,6 +121,12 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
                   ${item.selling_price?.toFixed(2) || '0.00'}
                 </span>
               </div>
+              {item.quantity_in_stock <= (item.reorder_point || 5) && (
+                <div className="mt-4 p-2 bg-yellow-50 text-yellow-800 rounded-md flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  <span className="text-sm">Reorder needed</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

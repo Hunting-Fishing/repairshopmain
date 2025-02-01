@@ -1,14 +1,17 @@
-import { Package, Search, Plus } from "lucide-react";
+import { Package, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { InventoryItemDialog } from "@/components/inventory/InventoryItemDialog";
 import { InventoryFilters } from "@/components/inventory/InventoryFilters";
 import { InventoryList } from "@/components/inventory/InventoryList";
 
 export default function Inventory() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState({
+    lowStock: false,
+    outOfStock: false,
+    needsReorder: false,
+  });
 
   return (
     <div className="space-y-6">

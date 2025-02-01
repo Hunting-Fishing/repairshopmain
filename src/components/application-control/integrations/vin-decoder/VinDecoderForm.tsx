@@ -76,9 +76,15 @@ export const VinDecoderForm = ({ onVehicleInfo, onClose }: VinDecoderFormProps) 
         // Populate the vehicleInfo object with data from the API response
         functionData.Results.forEach((result: any) => {
           if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
-            const key = result.Variable as keyof VehicleInfo;
-            if (key in vehicleInfo) {
-              vehicleInfo[key] = result.Value.trim();
+            // Special handling for ModelYear
+            if (result.Variable === "Model Year") {
+              vehicleInfo.ModelYear = result.Value.trim();
+              console.log("Found Model Year:", result.Value.trim());
+            } else {
+              const key = result.Variable as keyof VehicleInfo;
+              if (key in vehicleInfo) {
+                vehicleInfo[key] = result.Value.trim();
+              }
             }
           }
         });

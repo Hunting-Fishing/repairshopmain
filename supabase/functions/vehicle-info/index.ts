@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 interface VehicleRequest {
-  type: 'recalls' | 'safety' | 'complaints';
+  type: 'recalls' | 'safety' | 'complaints' | 'decode';
   vin?: string;
   make?: string;
   model?: string;
@@ -26,6 +26,13 @@ serve(async (req) => {
     console.log('Request parameters:', { type, vin, make, model, year });
     
     switch (type) {
+      case 'decode':
+        if (!vin) {
+          throw new Error('VIN is required for decoding');
+        }
+        url = `https://api.nhtsa.gov/vehicles/DecodeVin/${encodeURIComponent(vin)}?format=json`;
+        break;
+
       case 'recalls':
         if (vin) {
           url = `https://api.nhtsa.gov/recalls/recallsByVIN/${encodeURIComponent(vin)}`;
@@ -59,6 +66,14 @@ serve(async (req) => {
     const data = await response.json();
     console.log('NHTSA API Response:', data);
 
+    // Return the appropriate response based on request type
+    if (type === 'decode') {
+      return new Response(
+        JSON.stringify(data),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Transform recall data to match our expected format
     if (type === 'recalls') {
       const results = data.results || [];
@@ -84,6 +99,7 @@ serve(async (req) => {
       JSON.stringify(data),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
+
   } catch (error) {
     console.error('Error fetching vehicle information:', error);
     return new Response(

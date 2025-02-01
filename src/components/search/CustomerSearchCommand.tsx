@@ -6,6 +6,7 @@ import { Car, Phone, User, Hash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CustomerVehicleDialog } from "@/components/customers/vehicles/CustomerVehicleDialog";
 
 interface CustomerSearchCommandProps {
   onSelect: (customerId: string, vehicleInfo: string) => void;
@@ -24,6 +25,8 @@ const searchFields = [
 
 export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCommandProps) {
   const [filters, setFilters] = useState<Record<string, string>>({});
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+
   const { data: customers } = useQuery({
     queryKey: ["customers", filters],
     queryFn: async () => {
@@ -35,13 +38,6 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
     },
     enabled: Object.values(filters).some(value => value.length > 0),
   });
-
-  const handleSelect = (customer: any) => {
-    const vehicleInfo = [customer.vehicle_year, customer.vehicle_make, customer.vehicle_model]
-      .filter(Boolean)
-      .join(" ");
-    onSelect(customer.id, vehicleInfo);
-  };
 
   return (
     <div className="space-y-4">
@@ -65,7 +61,7 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
               <CommandItem 
                 key={customer.id} 
                 value={`${customer.first_name} ${customer.last_name}`}
-                onSelect={() => handleSelect(customer)}
+                onSelect={() => setSelectedCustomerId(customer.id)}
                 className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
               >
                 <div className="flex flex-col gap-1">
@@ -97,6 +93,12 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
           </CommandGroup>
         </CommandList>
       </Command>
+
+      <CustomerVehicleDialog
+        customerId={selectedCustomerId}
+        onClose={() => setSelectedCustomerId(null)}
+        onSelect={onSelect}
+      />
     </div>
   );
 }

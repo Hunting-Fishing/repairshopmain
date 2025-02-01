@@ -10,9 +10,10 @@ import { Vehicle } from "./types";
 
 interface VehicleListProps {
   customerId: string;
+  onVehicleSelect?: (vehicleInfo: string) => void;
 }
 
-export const VehicleList = ({ customerId }: VehicleListProps) => {
+export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) => {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [infoType, setInfoType] = useState<'recalls' | 'safety' | 'complaints' | null>(null);
   const queryClient = useQueryClient();
@@ -34,6 +35,13 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
     queryClient.invalidateQueries({ queryKey: ["vehicles", customerId] });
   };
 
+  const handleVehicleClick = (vehicle: Vehicle) => {
+    if (onVehicleSelect) {
+      const vehicleInfo = `${vehicle.year} ${vehicle.make} ${vehicle.model}`.trim();
+      onVehicleSelect(vehicleInfo);
+    }
+  };
+
   if (isLoading) return <div>Loading vehicles...</div>;
 
   if (!vehicles || vehicles.length === 0) {
@@ -49,15 +57,23 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
     <ScrollArea className="h-[300px]">
       <div className="space-y-4">
         {vehicles.map((vehicle) => (
-          <VehicleCard
+          <div
             key={vehicle.id}
-            vehicle={vehicle}
-            onInfoRequest={(type) => {
-              setSelectedVehicle(vehicle);
-              setInfoType(type);
-            }}
-            onVehicleRemoved={handleVehicleRemoved}
-          />
+            onClick={() => handleVehicleClick(vehicle)}
+            className={cn(
+              "cursor-pointer transition-colors",
+              onVehicleSelect && "hover:bg-accent hover:text-accent-foreground rounded-lg"
+            )}
+          >
+            <VehicleCard
+              vehicle={vehicle}
+              onInfoRequest={(type) => {
+                setSelectedVehicle(vehicle);
+                setInfoType(type);
+              }}
+              onVehicleRemoved={handleVehicleRemoved}
+            />
+          </div>
         ))}
       </div>
 

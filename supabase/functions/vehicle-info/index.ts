@@ -20,11 +20,12 @@ const API_ENDPOINTS = {
   VIN_DECODE: 'https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/',
   RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVehicle',
   VIN_RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVIN/',
-  SAFETY: 'https://api.nhtsa.gov/SafetyRatings/vehicle/',
+  SAFETY: 'https://api.nhtsa.gov/SafetyRatings',
   COMPLAINTS: 'https://api.nhtsa.gov/complaints/complaintsByVehicle',
 } as const;
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -62,7 +63,10 @@ serve(async (req) => {
         if (!make || !model || !year) {
           throw new Error('Make, model, and year are required for safety ratings');
         }
-        url = `${API_ENDPOINTS.SAFETY}${encodeURIComponent(year)}/${encodeURIComponent(make)}/${encodeURIComponent(model)}?format=json`;
+        // Format make and model according to NHTSA requirements
+        const formattedMake = make.toUpperCase();
+        const formattedModel = model.toUpperCase().replace(/\s+/g, '');
+        url = `${API_ENDPOINTS.SAFETY}/vehicle/${encodeURIComponent(year)}/${encodeURIComponent(formattedMake)}/${encodeURIComponent(formattedModel)}?format=json`;
         break;
 
       case 'complaints':

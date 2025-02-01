@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { NewWorkOrderDialog } from "@/components/work-orders/NewWorkOrderDialog";
+import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand";
+import { useState } from "react";
 
 const workOrders = [
   {
@@ -42,6 +44,8 @@ const getStatusColor = (status: string) => {
 };
 
 export default function WorkOrders() {
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -54,35 +58,42 @@ export default function WorkOrders() {
         <NewWorkOrderDialog />
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Vehicle</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {workOrders.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.vehicle}</TableCell>
-                <TableCell>{order.description}</TableCell>
-                <TableCell>
-                  <Badge variant="secondary" className={getStatusColor(order.status)}>
-                    {order.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>{order.date}</TableCell>
+      <div className="flex flex-col gap-4">
+        <CustomerSearchCommand 
+          onSelect={setSelectedCustomerId}
+          className="max-w-2xl"
+        />
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Vehicle</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Date</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {workOrders.map((order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="font-medium">{order.id}</TableCell>
+                  <TableCell>{order.customer}</TableCell>
+                  <TableCell>{order.vehicle}</TableCell>
+                  <TableCell>{order.description}</TableCell>
+                  <TableCell>
+                    <Badge variant="secondary" className={getStatusColor(order.status)}>
+                      {order.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{order.date}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

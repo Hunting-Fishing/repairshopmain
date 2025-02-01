@@ -14,27 +14,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Plus, ChevronsUpDown, Check } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CustomerSearchCommand } from "../search/CustomerSearchCommand";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -45,10 +33,6 @@ const workOrderSchema = z.object({
 type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 export function NewWorkOrderDialog() {
-  const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-
   const form = useForm<WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
     defaultValues: {
@@ -58,47 +42,25 @@ export function NewWorkOrderDialog() {
     },
   });
 
-  const { data: customers, isLoading } = useQuery({
-    queryKey: ["customers", searchQuery],
+  const { data: selectedCustomer } = useQuery({
+    queryKey: ["customer", form.watch("customerId")],
     queryFn: async () => {
-      const query = supabase
+      const { data, error } = await supabase
         .from("customers")
-        .select("id, first_name, last_name, phone_number, vehicle_make, vehicle_model, vehicle_year")
-        .order("last_name", { ascending: true });
+        .select("*")
+        .eq("id", form.watch("customerId"))
+        .single();
 
-      if (searchQuery) {
-        query.or(
-          `first_name.ilike.%${searchQuery}%,` +
-          `last_name.ilike.%${searchQuery}%,` +
-          `phone_number.ilike.%${searchQuery}%,` +
-          `vehicle_make.ilike.%${searchQuery}%,` +
-          `vehicle_model.ilike.%${searchQuery}%`
-        );
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error fetching customers",
-          description: error.message,
-        });
-        throw error;
-      }
-
+      if (error) throw error;
       return data;
     },
+    enabled: !!form.watch("customerId"),
   });
 
   const onSubmit = (data: WorkOrderFormValues) => {
     console.log(data);
     // TODO: Implement work order creation
   };
-
-  const selectedCustomer = customers?.find(
-    (customer) => customer.id === form.watch("customerId")
-  );
 
   return (
     <Dialog>
@@ -108,7 +70,7 @@ export function NewWorkOrderDialog() {
           New Work Order
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Create New Work Order</DialogTitle>
         </DialogHeader>
@@ -120,68 +82,18 @@ export function NewWorkOrderDialog() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Customer</FormLabel>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={open}
-                          className="justify-between w-full"
-                        >
-                          {field.value
-                            ? selectedCustomer
-                              ? `${selectedCustomer.first_name} ${selectedCustomer.last_name}`
-                              : "Select customer"
-                            : "Select customer"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[400px] p-0">
-                      <Command>
-                        <CommandInput
-                          placeholder="Search customers..."
-                          value={searchQuery}
-                          onValueChange={setSearchQuery}
-                        />
-                        <CommandList>
-                          <CommandEmpty>No customers found.</CommandEmpty>
-                          <CommandGroup>
-                            {customers?.map((customer) => (
-                              <CommandItem
-                                key={customer.id}
-                                value={customer.id}
-                                onSelect={() => {
-                                  form.setValue("customerId", customer.id);
-                                  setOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    field.value === customer.id
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                <div className="flex flex-col">
-                                  <span>
-                                    {customer.first_name} {customer.last_name}
-                                  </span>
-                                  <span className="text-sm text-muted-foreground">
-                                    {customer.phone_number} •{" "}
-                                    {customer.vehicle_year} {customer.vehicle_make}{" "}
-                                    {customer.vehicle_model}
-                                  </span>
-                                </div>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
+                  <CustomerSearchCommand 
+                    onSelect={(id) => form.setValue("customerId", id)}
+                    className="border-input"
+                  />
+                  {selectedCustomer && (
+                    <div className="mt-2 rounded-md bg-muted p-2 text-sm">
+                      <p>Selected: {selectedCustomer.first_name} {selectedCustomer.last_name}</p>
+                      {selectedCustomer.phone_number && (
+                        <p className="text-muted-foreground">Phone: {selectedCustomer.phone_number}</p>
+                      )}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -193,7 +105,14 @@ export function NewWorkOrderDialog() {
                 <FormItem>
                   <FormLabel>Vehicle Information</FormLabel>
                   <FormControl>
-                    <Input placeholder="2019 Toyota Camry" {...field} />
+                    <Input 
+                      placeholder="2019 Toyota Camry" 
+                      {...field}
+                      value={selectedCustomer ? 
+                        `${selectedCustomer.vehicle_year || ''} ${selectedCustomer.vehicle_make || ''} ${selectedCustomer.vehicle_model || ''}`.trim() : 
+                        field.value
+                      }
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

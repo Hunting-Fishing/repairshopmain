@@ -9,29 +9,48 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 
 export function InventoryCategories() {
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const { toast } = useToast();
+  const { userProfile } = useOrganizationData();
 
   const { data: categories, refetch } = useQuery({
     queryKey: ['inventory-categories'],
     queryFn: async () => {
+      if (!userProfile?.organization_id) return [];
+      
       const { data, error } = await supabase
         .from('inventory_categories')
         .select('*')
+        .eq('organization_id', userProfile.organization_id)
         .throwOnError();
       return data || [];
-    }
+    },
+    enabled: !!userProfile?.organization_id
   });
 
   const handleAddCategory = async () => {
+    if (!userProfile?.organization_id) {
+      toast({
+        title: "Error",
+        description: "Organization ID not found. Please try again later.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('inventory_categories')
-        .insert([{ name, description }]);
+        .insert([{ 
+          name, 
+          description,
+          organization_id: userProfile.organization_id 
+        }]);
 
       if (error) throw error;
 

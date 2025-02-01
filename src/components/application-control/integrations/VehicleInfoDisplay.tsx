@@ -13,6 +13,8 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
     .filter(([_, value]) => value && value !== "null" && value !== "Not Applicable" && value.trim() !== "")
     .sort((a, b) => a[0].localeCompare(b[0]));
 
+  console.log('Displaying fields:', fields);
+
   return (
     <ScrollArea className="h-[400px] mt-4">
       <div className="space-y-4">

@@ -7,6 +7,7 @@ import { VinDecoderForm } from "./vin-decoder/VinDecoderForm";
 interface NhtsaVinDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  onVehicleInfo?: (vehicleInfo: VehicleInfo) => void;
 }
 
 // Updated interface based on actual NHTSA data structure
@@ -50,8 +51,13 @@ const initialVehicleInfo: VehicleInfo = {
   "Plant Country": ''
 };
 
-export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {
+export const NhtsaVinDialog = ({ isOpen, onClose, onVehicleInfo }: NhtsaVinDialogProps) => {
   const [vehicleInfo, setVehicleInfo] = useState<VehicleInfo>(initialVehicleInfo);
+
+  const handleVehicleInfoUpdate = (info: VehicleInfo) => {
+    setVehicleInfo(info);
+    onVehicleInfo?.(info);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
@@ -64,7 +70,7 @@ export const NhtsaVinDialog = ({ isOpen, onClose }: NhtsaVinDialogProps) => {
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
-          <VinDecoderForm onVehicleInfo={setVehicleInfo} onClose={onClose} />
+          <VinDecoderForm onVehicleInfo={handleVehicleInfoUpdate} onClose={onClose} />
           <VehicleInfoDisplay vehicleInfo={vehicleInfo} />
         </div>
 

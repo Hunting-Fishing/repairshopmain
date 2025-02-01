@@ -30,7 +30,7 @@ serve(async (req) => {
         if (!vin) {
           throw new Error('VIN is required for decoding');
         }
-        url = `https://api.nhtsa.gov/vehicles/DecodeVin/${encodeURIComponent(vin)}?format=json`;
+        url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${encodeURIComponent(vin)}?format=json`;
         break;
 
       case 'recalls':

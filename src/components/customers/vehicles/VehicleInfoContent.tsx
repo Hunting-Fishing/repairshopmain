@@ -1,5 +1,6 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface VehicleInfoContentProps {
   infoType: 'recalls' | 'safety' | 'complaints' | null;
@@ -26,12 +27,16 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
           {vehicleInfo.results?.map((recall: any, index: number) => (
             <div key={index} className="border p-4 rounded-lg">
               <div className="flex justify-between items-start">
-                <h4 className="font-medium">{recall.Component}</h4>
-                <span className="text-sm text-red-500">
-                  {recall.RecallStatus || 'Recall Incomplete'}
-                </span>
+                <h4 className="font-medium">Recall Date: {recall.ReportReceivedDate}</h4>
+                <Badge variant={recall.RecallStatus === 'Recall Incomplete' ? 'destructive' : 'default'}>
+                  {recall.RecallStatus || 'Status Unknown'}
+                </Badge>
               </div>
               <div className="mt-4 space-y-2">
+                <div>
+                  <span className="text-sm font-medium">Component:</span>
+                  <p className="text-sm text-muted-foreground">{recall.Component}</p>
+                </div>
                 <div>
                   <span className="text-sm font-medium">Summary:</span>
                   <p className="text-sm text-muted-foreground">{recall.Summary}</p>
@@ -50,9 +55,6 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
                   </p>
                   <p className="text-xs text-muted-foreground">
                     NHTSA Campaign Number: {recall.NHTSACampaignNumber}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Report Date: {recall.ReportReceivedDate}
                   </p>
                 </div>
               </div>

@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { VehicleInfo } from "../NhtsaVinDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   vin: z.string().length(17, {
@@ -41,24 +42,19 @@ export const VinDecoderForm = ({ onVehicleInfo, onClose }: VinDecoderFormProps) 
     setLoading(true);
     try {
       console.log("Fetching VIN data for:", values.vin);
-      const response = await fetch(
-        "https://agtjuxiysmzhmpnbuzmc.supabase.co/functions/v1/vehicle-info",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            type: "decode",
-            vin: values.vin,
-          }),
+      
+      const { data: functionData, error: functionError } = await supabase.functions.invoke('vehicle-info', {
+        body: {
+          type: "decode",
+          vin: values.vin,
         }
-      );
+      });
 
-      const data = await response.json();
-      console.log("Raw NHTSA Response:", data);
+      if (functionError) throw functionError;
 
-      if (data.Results) {
+      console.log("Raw NHTSA Response:", functionData);
+
+      if (functionData.Results) {
         const vehicleInfo: VehicleInfo = {
           Make: '',
           Model: '',
@@ -78,7 +74,7 @@ export const VinDecoderForm = ({ onVehicleInfo, onClose }: VinDecoderFormProps) 
         };
 
         // Populate the vehicleInfo object with data from the API response
-        data.Results.forEach((result: any) => {
+        functionData.Results.forEach((result: any) => {
           if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
             const key = result.Variable as keyof VehicleInfo;
             if (key in vehicleInfo) {

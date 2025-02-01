@@ -12,34 +12,29 @@ interface CustomerSearchCommandProps {
   className?: string;
 }
 
-type SearchFilters = Record<string, string>;
+const searchFields = [
+  { key: "first_name", label: "First Name", icon: User },
+  { key: "last_name", label: "Last Name", icon: User },
+  { key: "phone_number", label: "Phone", icon: Phone },
+  { key: "vehicle_vin", label: "VIN", icon: Hash },
+  { key: "vehicle_make", label: "Make", icon: Car },
+  { key: "vehicle_model", label: "Model", icon: Car },
+  { key: "vehicle_year", label: "Year", icon: Car },
+];
 
 export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCommandProps) {
-  const [filters, setFilters] = useState<SearchFilters>({});
-
+  const [filters, setFilters] = useState<Record<string, string>>({});
   const { data: customers } = useQuery({
     queryKey: ["customers", filters],
     queryFn: async () => {
       let query = supabase.from("customers").select("*").order("last_name");
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) query = query.ilike(key, `%${value}%`);
-      });
+      Object.entries(filters).forEach(([key, value]) => value && query.ilike(key, `%${value}%`));
       const { data, error } = await query;
       if (error) throw error;
       return data;
     },
     enabled: Object.values(filters).some(value => value.length > 0),
   });
-
-  const searchFields = [
-    { key: "first_name", label: "First Name" },
-    { key: "last_name", label: "Last Name" },
-    { key: "phone_number", label: "Phone Number" },
-    { key: "vehicle_vin", label: "VIN" },
-    { key: "vehicle_make", label: "Make" },
-    { key: "vehicle_model", label: "Model" },
-    { key: "vehicle_year", label: "Year" },
-  ];
 
   return (
     <div className="space-y-4">
@@ -55,44 +50,22 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
           </div>
         ))}
       </div>
-
       <Command className={cn("rounded-lg border shadow-md", className)}>
         <CommandList>
           <CommandEmpty>No customers found.</CommandEmpty>
           <CommandGroup heading="Results">
             {customers?.map((customer) => (
-              <CommandItem
-                key={customer.id}
-                value={`${customer.first_name} ${customer.last_name}`}
-                onSelect={() => onSelect(customer.id)}
-                className="cursor-pointer hover:bg-accent hover:text-accent-foreground flex flex-col items-start gap-1 py-3"
-              >
-                <div className="flex items-center gap-2 text-sm">
-                  <User className="h-4 w-4" />
-                  <span className="font-medium">{customer.first_name} {customer.last_name}</span>
+              <CommandItem key={customer.id} value={`${customer.first_name} ${customer.last_name}`} onSelect={() => onSelect(customer.id)} className="cursor-pointer hover:bg-accent hover:text-accent-foreground">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2"><User className="h-4 w-4" />{customer.first_name} {customer.last_name}</div>
+                  {customer.phone_number && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Phone className="h-4 w-4" />{customer.phone_number}</div>}
+                  {customer.vehicle_vin && <div className="flex items-center gap-2 text-sm text-muted-foreground"><Hash className="h-4 w-4" />VIN: {customer.vehicle_vin}</div>}
+                  {(customer.vehicle_make || customer.vehicle_model || customer.vehicle_year) && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Car className="h-4 w-4" />{[customer.vehicle_year, customer.vehicle_make, customer.vehicle_model].filter(Boolean).join(" ")}
+                    </div>
+                  )}
                 </div>
-                {customer.phone_number && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Phone className="h-4 w-4" />
-                    <span>{customer.phone_number}</span>
-                  </div>
-                )}
-                {customer.vehicle_vin && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Hash className="h-4 w-4" />
-                    <span>VIN: {customer.vehicle_vin}</span>
-                  </div>
-                )}
-                {(customer.vehicle_make || customer.vehicle_model || customer.vehicle_year) && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Car className="h-4 w-4" />
-                    <span>
-                      {[customer.vehicle_year, customer.vehicle_make, customer.vehicle_model]
-                        .filter(Boolean)
-                        .join(" ")}
-                    </span>
-                  </div>
-                )}
               </CommandItem>
             ))}
           </CommandGroup>

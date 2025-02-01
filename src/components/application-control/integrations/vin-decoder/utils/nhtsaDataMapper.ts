@@ -81,6 +81,7 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse): VehicleInfo => {
     }
   });
 
+  console.log("Raw NHTSA Response:", data.Results);
   console.log("Mapped Vehicle Info:", vehicleInfo);
   return vehicleInfo;
 };

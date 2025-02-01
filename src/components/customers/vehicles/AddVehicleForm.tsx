@@ -51,7 +51,7 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
         vin: vehicleInfo.VIN,
         make: vehicleInfo.Make,
         model: vehicleInfo.Model,
-        year: vehicleInfo.ModelYear,
+        year: vehicleInfo.ModelYear, // Using ModelYear directly from the API response
         trim: vehicleInfo.Trim,
         body_class: vehicleInfo["Body Class"],
         engine_info: cleanEngineInfo,

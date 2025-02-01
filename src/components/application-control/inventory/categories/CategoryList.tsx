@@ -1,5 +1,8 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Category {
   id: string;
@@ -9,9 +12,15 @@ interface Category {
 
 interface CategoryListProps {
   categories: Category[];
+  selectedCategoryId?: string;
+  onSelectCategory?: (categoryId: string) => void;
 }
 
-export function CategoryList({ categories }: CategoryListProps) {
+export function CategoryList({ 
+  categories, 
+  selectedCategoryId,
+  onSelectCategory 
+}: CategoryListProps) {
   if (!categories?.length) {
     return (
       <div className="text-center text-muted-foreground py-4">
@@ -25,14 +34,24 @@ export function CategoryList({ categories }: CategoryListProps) {
       <div className="space-y-4">
         {categories.map((category) => (
           <div key={category.id}>
-            <div className="flex items-center justify-between p-2 rounded-lg hover:bg-muted transition-colors">
-              <div className="space-y-1">
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-between hover:bg-muted transition-colors",
+                selectedCategoryId === category.id && "bg-muted"
+              )}
+              onClick={() => onSelectCategory?.(category.id)}
+            >
+              <div className="space-y-1 text-left">
                 <h4 className="text-sm font-medium leading-none">{category.name}</h4>
                 {category.description && (
                   <p className="text-sm text-muted-foreground">{category.description}</p>
                 )}
               </div>
-            </div>
+              {selectedCategoryId === category.id && (
+                <Check className="h-4 w-4 text-primary" />
+              )}
+            </Button>
             <Separator className="mt-2" />
           </div>
         ))}

@@ -3,9 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { AddCategoryDialog } from "./categories/AddCategoryDialog";
 import { CategoryList } from "./categories/CategoryList";
 import { useInventoryCategories } from "./categories/useInventoryCategories";
+import { useState } from "react";
 
 export function InventoryCategories() {
   const { categories } = useInventoryCategories();
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
+
+  const handleSelectCategory = (categoryId: string) => {
+    setSelectedCategoryId(categoryId);
+    // You can add additional logic here when a category is selected
+    console.log("Selected category:", categoryId);
+  };
 
   return (
     <Card>
@@ -20,7 +28,11 @@ export function InventoryCategories() {
         <CardDescription>Inventory category management</CardDescription>
       </CardHeader>
       <CardContent>
-        <CategoryList categories={categories} />
+        <CategoryList 
+          categories={categories} 
+          selectedCategoryId={selectedCategoryId}
+          onSelectCategory={handleSelectCategory}
+        />
       </CardContent>
     </Card>
   );

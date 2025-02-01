@@ -27,9 +27,9 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
           {vehicleInfo.results?.map((recall: any, index: number) => (
             <div key={index} className="border p-4 rounded-lg">
               <div className="flex justify-between items-start">
-                <h4 className="font-medium">Recall Date: {recall.ReportReceivedDate}</h4>
-                <Badge variant={recall.RecallStatus === 'Incomplete' ? 'destructive' : 'default'}>
-                  {recall.RecallStatus}
+                <h4 className="font-medium">Report Date: {recall.ReportReceivedDate}</h4>
+                <Badge variant="destructive">
+                  Open Recall
                 </Badge>
               </div>
               <div className="mt-4 space-y-2">
@@ -43,7 +43,7 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
                 </div>
                 {recall.Consequence && (
                   <div>
-                    <span className="text-sm font-medium">Consequence:</span>
+                    <span className="text-sm font-medium">Safety Risk:</span>
                     <p className="text-sm text-muted-foreground">{recall.Consequence}</p>
                   </div>
                 )}

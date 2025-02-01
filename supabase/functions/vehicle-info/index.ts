@@ -56,21 +56,19 @@ serve(async (req) => {
 
     // Transform the recall data to match our expected format
     if (type === 'recalls') {
-      // The API returns data in a nested structure
       const results = data.results || [];
       return new Response(
         JSON.stringify({
           Count: results.length,
           results: results.map((recall: any) => ({
-            ...recall,
-            RecallStatus: recall.completionDate ? 'Completed' : 'Incomplete',
-            ReportReceivedDate: recall.reportReceivedDate || recall.reportDate,
+            ReportReceivedDate: recall.reportReceivedDate,
+            RecallStatus: 'Incomplete', // NHTSA API doesn't provide completion status
             Component: recall.component,
             Summary: recall.summary,
             Consequence: recall.consequence,
             Remedy: recall.remedy,
             Notes: recall.notes,
-            NHTSACampaignNumber: recall.nhtsaCampaignNumber,
+            NHTSACampaignNumber: recall.NHTSACampaignNumber,
             ManufacturerRecallNumber: recall.manufacturerCampaignNumber
           }))
         }),

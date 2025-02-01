@@ -1,33 +1,26 @@
 import { NhtsaResponse, NhtsaResult } from "../types";
+import { VehicleInfo } from "../../NhtsaVinDialog";
 
-export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse) => {
-  const vehicleInfo: any = {
+export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse): VehicleInfo => {
+  const vehicleInfo: VehicleInfo = {
     VIN: "",
     Make: "",
     Model: "",
     ModelYear: "",
     Trim: "",
-    "Body Class": "",
+    VehicleType: "",
     "Engine Number of Cylinders": "",
     "Displacement (L)": "",
     "Fuel Type - Primary": "",
     "Other Engine Info": "",
+    Turbo: "",
+    "Body Class": "",
     "Drive Type": "",
     "Gross Vehicle Weight Rating": "",
-    "Plant Country": "",
-    "Vehicle Type": "",
-    "Manufacturer Name": "",
-    "Turbo": "",
+    "Plant Country": ""
   };
 
-  // First pass: get the VIN
-  data.Results.forEach((result: NhtsaResult) => {
-    if (result.Variable === "VIN" && result.Value) {
-      vehicleInfo.VIN = result.Value.trim();
-    }
-  });
-
-  // Second pass: map all other fields
+  // Map all fields
   data.Results.forEach((result: NhtsaResult) => {
     if (!result.Value || result.Value === "Not Applicable" || result.Value.trim() === "") {
       return;
@@ -36,6 +29,9 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse) => {
     const value = result.Value.trim();
     
     switch (result.Variable) {
+      case "VIN":
+        vehicleInfo.VIN = value;
+        break;
       case "Model Year":
         vehicleInfo.ModelYear = value;
         break;

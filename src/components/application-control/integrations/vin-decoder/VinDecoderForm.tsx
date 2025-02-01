@@ -33,7 +33,10 @@ export const VinDecoderForm = ({ onVehicleInfo, onClose }: {
       });
       if (functionError) throw functionError;
       
-      const vehicleInfo = mapNhtsaDataToVehicleInfo(functionData, values.vin);
+      const vehicleInfo = mapNhtsaDataToVehicleInfo(functionData);
+      if (values.vin) {
+        vehicleInfo.VIN = values.vin;
+      }
       onVehicleInfo(vehicleInfo);
       toast({ title: "Success", description: "Vehicle information retrieved successfully" });
     } catch (error) {

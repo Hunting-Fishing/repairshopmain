@@ -13,7 +13,8 @@ export const VehicleInfoDisplay = ({ vehicleInfo }: VehicleInfoDisplayProps) => 
     "Vehicle Information": [
       { label: "Make", value: vehicleInfo.Make },
       { label: "Model", value: vehicleInfo.Model },
-      { label: "Year", value: vehicleInfo.ModelYear },
+      { label: "Model Year", value: vehicleInfo.ModelYear },
+      { label: "Production Date", value: vehicleInfo.ProductionDate },
       { label: "Trim", value: vehicleInfo.Trim },
       { label: "Body Style", value: vehicleInfo["Body Class"] },
       { label: "Vehicle Type", value: vehicleInfo.VehicleType },

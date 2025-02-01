@@ -7,6 +7,7 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse): VehicleInfo => {
     Make: "",
     Model: "",
     ModelYear: "",
+    ProductionDate: "",
     Trim: "",
     VehicleType: "",
     "Engine Number of Cylinders": "",
@@ -34,6 +35,9 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse): VehicleInfo => {
         break;
       case "Model Year":
         vehicleInfo.ModelYear = value;
+        break;
+      case "Production Date":
+        vehicleInfo.ProductionDate = value;
         break;
       case "Make":
         vehicleInfo.Make = value;
@@ -77,5 +81,6 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse): VehicleInfo => {
     }
   });
 
+  console.log("Mapped Vehicle Info:", vehicleInfo);
   return vehicleInfo;
 };

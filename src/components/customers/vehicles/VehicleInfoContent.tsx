@@ -1,6 +1,7 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Star, StarHalf } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 interface VehicleInfoContentProps {
   infoType: 'recalls' | 'safety' | 'complaints' | null;
@@ -94,16 +95,74 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
         </div>
       );
     case 'safety':
+      if (!vehicleInfo.Results || vehicleInfo.Results.length === 0) {
+        return (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              No safety ratings found for this vehicle.
+            </AlertDescription>
+          </Alert>
+        );
+      }
+
       return (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {vehicleInfo.Results?.map((rating: any, index: number) => (
-            <div key={index} className="border p-4 rounded-lg">
-              <h4 className="font-medium">Overall Rating: {rating.OverallRating}</h4>
-              <div className="grid grid-cols-2 gap-4 mt-2">
-                <p className="text-sm">Frontal Crash: {rating.FrontalCrashRating}</p>
-                <p className="text-sm">Side Crash: {rating.SideCrashRating}</p>
-                <p className="text-sm">Rollover: {rating.RolloverRating}</p>
+            <div key={index} className="border p-6 rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">
+                  {rating.VehicleDescription || 'Overall Safety Rating'}
+                </h3>
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-current" />
+                  {rating.OverallRating || 'N/A'}
+                </Badge>
               </div>
+
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Frontal Crash</span>
+                    <span className="font-medium">{rating.FrontalCrashRating || 'N/A'}/5</span>
+                  </div>
+                  <Progress value={rating.FrontalCrashRating ? (rating.FrontalCrashRating / 5) * 100 : 0} />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Side Crash</span>
+                    <span className="font-medium">{rating.SideCrashRating || 'N/A'}/5</span>
+                  </div>
+                  <Progress value={rating.SideCrashRating ? (rating.SideCrashRating / 5) * 100 : 0} />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Rollover</span>
+                    <span className="font-medium">{rating.RolloverRating || 'N/A'}/5</span>
+                  </div>
+                  <Progress value={rating.RolloverRating ? (rating.RolloverRating / 5) * 100 : 0} />
+                </div>
+              </div>
+
+              {rating.ComplaintsCount !== undefined && (
+                <div className="mt-4 pt-4 border-t">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Complaints Filed</span>
+                    <span>{rating.ComplaintsCount}</span>
+                  </div>
+                </div>
+              )}
+
+              {rating.RecallsCount !== undefined && (
+                <div className="pt-2">
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>Total Recalls</span>
+                    <span>{rating.RecallsCount}</span>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

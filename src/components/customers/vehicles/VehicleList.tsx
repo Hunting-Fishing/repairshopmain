@@ -7,6 +7,7 @@ import { useState } from "react";
 import { VehicleCard } from "./VehicleCard";
 import { VehicleInfoDialog } from "./VehicleInfoDialog";
 import { Vehicle } from "./types";
+import { cn } from "@/lib/utils";
 
 interface VehicleListProps {
   customerId: string;

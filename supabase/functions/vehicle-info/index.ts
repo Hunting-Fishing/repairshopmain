@@ -27,9 +27,14 @@ serve(async (req) => {
         url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`;
         break;
       case 'recalls':
-        url = vin 
-          ? `https://api.nhtsa.gov/recalls/recallsByVehicle?vin=${vin}`
-          : `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${make}&model=${model}&modelYear=${year}`;
+        // Prioritize VIN-based recall search if VIN is available
+        if (vin) {
+          console.log('Searching recalls by VIN:', vin);
+          url = `https://api.nhtsa.gov/recalls/recallsByVIN?vin=${vin}`;
+        } else {
+          console.log('Searching recalls by make/model/year:', { make, model, year });
+          url = `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${make}&model=${model}&modelYear=${year}`;
+        }
         break;
       case 'safety':
         url = `https://api.nhtsa.gov/SafetyRatings/VehicleId/${year}/${make}/${model}`;

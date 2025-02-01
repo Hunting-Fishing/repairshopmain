@@ -30,11 +30,19 @@ export const VehicleInfoDialog = ({ vehicle, infoType, onClose }: VehicleInfoDia
     if (!vehicle || !infoType) return;
     
     try {
+      // Log the request parameters for debugging
+      console.log('Fetching vehicle info with:', {
+        type: infoType,
+        vin: vehicle.vin,
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year,
+      });
+
       const response = await fetch('https://agtjuxiysmzhmpnbuzmc.supabase.co/functions/v1/vehicle-info', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
           type: infoType,

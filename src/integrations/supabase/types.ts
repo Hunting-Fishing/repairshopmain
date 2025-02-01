@@ -473,6 +473,265 @@ export type Database = {
           },
         ]
       }
+      inventory_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          parent_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_categories_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_history: {
+        Row: {
+          change_type: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          inventory_item_id: string | null
+          new_value: Json | null
+          notes: string | null
+          old_value: Json | null
+          organization_id: string
+          quantity_change: number | null
+          reference_id: string | null
+          reference_type: string | null
+        }
+        Insert: {
+          change_type: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          inventory_item_id?: string | null
+          new_value?: Json | null
+          notes?: string | null
+          old_value?: Json | null
+          organization_id: string
+          quantity_change?: number | null
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Update: {
+          change_type?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          inventory_item_id?: string | null
+          new_value?: Json | null
+          notes?: string | null
+          old_value?: Json | null
+          organization_id?: string
+          quantity_change?: number | null
+          reference_id?: string | null
+          reference_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_history_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_history_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_items: {
+        Row: {
+          barcode: string | null
+          category: string | null
+          condition: string | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          location: string | null
+          manufacturer: string | null
+          name: string
+          organization_id: string
+          quantity_in_stock: number | null
+          reorder_point: number | null
+          reorder_quantity: number | null
+          selling_price: number | null
+          sku: string | null
+          status: string | null
+          subcategory: string | null
+          supplier: string | null
+          unit_cost: number | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          barcode?: string | null
+          category?: string | null
+          condition?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          name: string
+          organization_id: string
+          quantity_in_stock?: number | null
+          reorder_point?: number | null
+          reorder_quantity?: number | null
+          selling_price?: number | null
+          sku?: string | null
+          status?: string | null
+          subcategory?: string | null
+          supplier?: string | null
+          unit_cost?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          barcode?: string | null
+          category?: string | null
+          condition?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          manufacturer?: string | null
+          name?: string
+          organization_id?: string
+          quantity_in_stock?: number | null
+          reorder_point?: number | null
+          reorder_quantity?: number | null
+          selling_price?: number | null
+          sku?: string | null
+          status?: string | null
+          subcategory?: string | null
+          supplier?: string | null
+          unit_cost?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inventory_suppliers: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          organization_id: string
+          phone: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          organization_id: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          organization_id?: string
+          phone?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_suppliers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string

@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShopList } from "@/components/shops/ShopList";
 import { OverviewTab } from "@/components/application-control/OverviewTab";
 import { IntegrationsTab } from "@/components/application-control/IntegrationsTab";
+import { InventoryTab } from "@/components/application-control/inventory/InventoryTab";
 
 export default function ApplicationControl() {
   return (
@@ -22,6 +23,7 @@ export default function ApplicationControl() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="shops">Shops</TabsTrigger>
+          <TabsTrigger value="inventory">Inventory</TabsTrigger>
           <TabsTrigger value="integrations">Integrations</TabsTrigger>
         </TabsList>
         
@@ -37,6 +39,18 @@ export default function ApplicationControl() {
             </CardHeader>
             <CardContent>
               <ShopList />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="inventory">
+          <Card>
+            <CardHeader>
+              <CardTitle>Inventory Management</CardTitle>
+              <CardDescription>Configure and manage your inventory system</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <InventoryTab />
             </CardContent>
           </Card>
         </TabsContent>

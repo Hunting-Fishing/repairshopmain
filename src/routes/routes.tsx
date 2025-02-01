@@ -9,6 +9,7 @@ import Customers from "@/pages/Customers";
 import { CustomerDetail } from "@/pages/CustomerDetail";
 import WorkOrders from "@/pages/WorkOrders";
 import ApplicationControl from "@/pages/ApplicationControl";
+import Inventory from "@/pages/Inventory";
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
       {
         path: "work-orders",
         element: <WorkOrders />,
+      },
+      {
+        path: "inventory",
+        element: <Inventory />,
       },
       {
         path: "application-control",

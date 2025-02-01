@@ -28,7 +28,12 @@ export const VehicleFormSelects = ({
   onMakeChange,
   onModelChange,
 }: VehicleFormSelectsProps) => {
-  const years = Array.from({ length: 30 }, (_, i) => new Date().getFullYear() - i);
+  // Generate years from current year back to 1981
+  const currentYear = new Date().getFullYear();
+  const years = Array.from(
+    { length: currentYear - 1981 + 1 }, 
+    (_, i) => currentYear - i
+  );
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

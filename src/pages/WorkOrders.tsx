@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus } from "lucide-react";
+import { NewWorkOrderDialog } from "@/components/work-orders/NewWorkOrderDialog";
 
 const workOrders = [
   {
@@ -52,10 +51,7 @@ export default function WorkOrders() {
             Manage repair jobs and track progress
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          New Work Order
-        </Button>
+        <NewWorkOrderDialog />
       </div>
 
       <div className="rounded-md border">

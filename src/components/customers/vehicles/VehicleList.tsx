@@ -37,6 +37,7 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
   };
 
   const handleVehicleClick = (vehicle: Vehicle) => {
+    console.log('Vehicle clicked:', vehicle); // Debug log
     if (onVehicleSelect) {
       onVehicleSelect(vehicle);
     }

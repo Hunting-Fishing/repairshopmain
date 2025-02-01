@@ -5,14 +5,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-/**
- * Supported request types for the vehicle information API
- */
-type RequestType = 'decode' | 'recalls' | 'safety' | 'complaints';
+type RequestType = 'decode' | 'recalls' | 'vin_recalls' | 'safety' | 'complaints';
 
-/**
- * Interface for the incoming request body
- */
 interface VehicleRequest {
   type: RequestType;
   vin?: string;
@@ -21,19 +15,16 @@ interface VehicleRequest {
   year?: string;
 }
 
-/**
- * Constants for NHTSA API endpoints
- * DO NOT MODIFY these URLs without thorough testing
- */
+// IMPORTANT: DO NOT MODIFY THESE URLs WITHOUT THOROUGH TESTING
 const API_ENDPOINTS = {
   VIN_DECODE: 'https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/',
   RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVehicle',
+  VIN_RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVIN/',
   SAFETY: 'https://api.nhtsa.gov/SafetyRatings/vehicle/',
   COMPLAINTS: 'https://api.nhtsa.gov/complaints/complaintsByVehicle',
 } as const;
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -51,6 +42,13 @@ serve(async (req) => {
           throw new Error('VIN is required for decoding');
         }
         url = `${API_ENDPOINTS.VIN_DECODE}${encodeURIComponent(vin)}?format=json`;
+        break;
+
+      case 'vin_recalls':
+        if (!vin) {
+          throw new Error('VIN is required for VIN-based recall lookup');
+        }
+        url = `${API_ENDPOINTS.VIN_RECALLS}${encodeURIComponent(vin)}`;
         break;
 
       case 'recalls':

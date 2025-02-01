@@ -31,18 +31,21 @@ export const VehicleInfoDialog = ({ vehicle, infoType, onClose }: VehicleInfoDia
     if (!vehicle || !infoType) return;
     
     try {
-      // Log the request parameters for debugging
+      // For recalls, prioritize VIN-based lookup if VIN is available
+      const useVinLookup = infoType === 'recalls' && vehicle.vin;
+      
       console.log('Fetching vehicle info with:', {
-        type: infoType,
+        type: useVinLookup ? 'vin_recalls' : infoType,
         vin: vehicle.vin,
         make: vehicle.make,
         model: vehicle.model,
         year: vehicle.year,
+        usingVin: useVinLookup
       });
 
       const { data, error } = await supabase.functions.invoke('vehicle-info', {
         body: {
-          type: infoType,
+          type: useVinLookup ? 'vin_recalls' : infoType,
           vin: vehicle.vin,
           make: vehicle.make,
           model: vehicle.model,

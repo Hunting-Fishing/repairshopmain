@@ -5,35 +5,24 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface VehicleRequest {
-  vin?: string;
-  make?: string;
-  model?: string;
-  year?: string;
-  type: 'decode' | 'recalls' | 'safety' | 'complaints';
-}
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { type, vin, make, model, year } = await req.json() as VehicleRequest;
+    const { type, vin, make, model, year } = await req.json();
     let url = '';
     
+    console.log('Request parameters:', { type, vin, make, model, year });
+    
     switch (type) {
-      case 'decode':
-        url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`;
-        break;
       case 'recalls':
         // First try VIN-based recall search
         if (vin) {
-          console.log('Searching recalls by VIN:', vin);
-          url = `https://api.nhtsa.gov/recalls/recallsByVIN/${vin}`;
+          url = `https://api.nhtsa.gov/recalls/recallsByVIN/${encodeURIComponent(vin)}`;
         } else if (make && model && year) {
           // Fallback to make/model/year search
-          console.log('Searching recalls by make/model/year:', { make, model, year });
           url = `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
         } else {
           throw new Error('Insufficient vehicle information for recall search');
@@ -49,7 +38,7 @@ serve(async (req) => {
         throw new Error('Invalid request type');
     }
 
-    console.log(`Fetching vehicle information from: ${url}`);
+    console.log('Fetching from URL:', url);
     const response = await fetch(url);
     const data = await response.json();
     console.log('NHTSA API Response:', data);
@@ -61,15 +50,14 @@ serve(async (req) => {
         JSON.stringify({
           Count: results.length,
           results: results.map((recall: any) => ({
-            ReportReceivedDate: recall.reportReceivedDate,
-            RecallStatus: 'Incomplete', // NHTSA API doesn't provide completion status
-            Component: recall.component,
-            Summary: recall.summary,
-            Consequence: recall.consequence,
-            Remedy: recall.remedy,
-            Notes: recall.notes,
-            NHTSACampaignNumber: recall.NHTSACampaignNumber,
-            ManufacturerRecallNumber: recall.manufacturerCampaignNumber
+            ReportReceivedDate: recall.ReportReceivedDate || recall.reportReceivedDate,
+            Component: recall.Component || recall.component,
+            Summary: recall.Summary || recall.summary,
+            Consequence: recall.Consequence || recall.consequence,
+            Remedy: recall.Remedy || recall.remedy,
+            Notes: recall.Notes || recall.notes,
+            NHTSACampaignNumber: recall.NHTSACampaignNumber || recall.nhtsaCampaignNumber,
+            ManufacturerRecallNumber: recall.ManufacturerRecallNumber || recall.manufacturerCampaignNumber
           }))
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

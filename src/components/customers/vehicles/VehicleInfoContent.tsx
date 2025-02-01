@@ -10,6 +10,8 @@ interface VehicleInfoContentProps {
 export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContentProps) => {
   if (!vehicleInfo) return null;
 
+  console.log('Vehicle Info in Content:', vehicleInfo);
+
   switch (infoType) {
     case 'recalls':
       if (!vehicleInfo.results || vehicleInfo.results.length === 0) {

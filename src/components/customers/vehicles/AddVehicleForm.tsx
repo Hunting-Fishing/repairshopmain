@@ -27,6 +27,24 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
         .eq("id", profile.user?.id)
         .single();
 
+      // Clean up the engine info object to only include non-null values
+      const engineInfo = {
+        cylinders: vehicleInfo["Engine Number of Cylinders"] || null,
+        displacement: vehicleInfo["Displacement (L)"] || null,
+        fuel_type: vehicleInfo["Fuel Type - Primary"] || null,
+        other_info: vehicleInfo["Other Engine Info"] || null,
+        turbo: vehicleInfo["Turbo"] || null,
+        drive_type: vehicleInfo["Drive Type"] || null,
+        gvwr: vehicleInfo["Gross Vehicle Weight Rating From"] || null,
+        manufacturer: vehicleInfo["Manufacturer Name"] || null,
+        plant_country: vehicleInfo["Plant Country"] || null,
+        vehicle_type: vehicleInfo["Vehicle Type"] || null
+      };
+
+      const cleanEngineInfo = Object.fromEntries(
+        Object.entries(engineInfo).filter(([_, value]) => value != null)
+      );
+
       const { error } = await supabase.from("vehicles").insert({
         customer_id: customerId,
         organization_id: userData.organization_id,
@@ -36,18 +54,7 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
         year: vehicleInfo.ModelYear || "",
         trim: vehicleInfo.Trim || "",
         body_class: vehicleInfo["Body Class"] || "",
-        engine_info: {
-          cylinders: vehicleInfo["Engine Number of Cylinders"] || "",
-          displacement: vehicleInfo["Displacement (L)"] || "",
-          fuel_type: vehicleInfo["Fuel Type - Primary"] || "",
-          other_info: vehicleInfo["Other Engine Info"] || "",
-          turbo: vehicleInfo["Turbo"] || "",
-          drive_type: vehicleInfo["Drive Type"] || "",
-          gvwr: vehicleInfo["Gross Vehicle Weight Rating From"] || "",
-          manufacturer: vehicleInfo["Manufacturer Name"] || "",
-          plant_country: vehicleInfo["Plant Country"] || "",
-          vehicle_type: vehicleInfo["Vehicle Type"] || ""
-        },
+        engine_info: cleanEngineInfo,
         created_by: profile.user?.id,
         updated_by: profile.user?.id,
       });
@@ -60,12 +67,13 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
       });
 
       queryClient.invalidateQueries({ queryKey: ["vehicles", customerId] });
+      setShowVinDialog(false);
       onSuccess?.();
     } catch (error: any) {
       console.error("Error adding vehicle:", error);
       toast({
         title: "Error",
-        description: "Failed to add vehicle",
+        description: "Failed to add vehicle: " + error.message,
         variant: "destructive",
       });
     } finally {
@@ -91,6 +99,7 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
       <NhtsaVinDialog
         isOpen={showVinDialog}
         onClose={() => setShowVinDialog(false)}
+        onVehicleInfo={handleVehicleInfo}
       />
     </div>
   );

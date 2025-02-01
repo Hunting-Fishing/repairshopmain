@@ -1,20 +1,12 @@
-import { Car, Shield, FileWarning, Info, Trash2, ChevronDown } from "lucide-react";
+import { Car, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "./types";
 import { VehicleDetails } from "./VehicleDetails";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { VehicleActions } from "./VehicleActions";
+import { DeleteVehicleDialog } from "./DeleteVehicleDialog";
 import {
   Collapsible,
   CollapsibleContent,
@@ -40,12 +32,10 @@ export const VehicleCard = ({ vehicle, onInfoRequest, onVehicleRemoved }: Vehicl
         .eq('id', vehicle.id);
 
       if (error) throw error;
-
       toast({
         title: "Vehicle removed",
         description: "The vehicle has been successfully removed.",
       });
-
       onVehicleRemoved?.();
     } catch (error: any) {
       toast({
@@ -73,44 +63,15 @@ export const VehicleCard = ({ vehicle, onInfoRequest, onVehicleRemoved }: Vehicl
                 {vehicle.year} {vehicle.make} {vehicle.model}
               </h3>
               {vehicle.trim && (
-                <p className="text-muted-foreground text-sm">
-                  {vehicle.trim} Trim
-                </p>
+                <p className="text-muted-foreground text-sm">{vehicle.trim} Trim</p>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => onInfoRequest('recalls')}
-            >
-              <Shield className="h-4 w-4 mr-2" />
-              Recalls
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => onInfoRequest('safety')}
-            >
-              <FileWarning className="h-4 w-4 mr-2" />
-              Safety
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => onInfoRequest('complaints')}
-            >
-              <Info className="h-4 w-4 mr-2" />
-              Complaints
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => setShowDeleteDialog(true)}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <VehicleActions 
+              onInfoRequest={onInfoRequest}
+              onDeleteClick={() => setShowDeleteDialog(true)}
+            />
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm">
                 <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
@@ -124,20 +85,11 @@ export const VehicleCard = ({ vehicle, onInfoRequest, onVehicleRemoved }: Vehicl
         </CollapsibleContent>
       </Collapsible>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove Vehicle</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to remove this vehicle? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Remove</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteVehicleDialog 
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDelete}
+      />
     </>
   );
 };

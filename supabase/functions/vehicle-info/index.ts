@@ -15,17 +15,15 @@ interface VehicleRequest {
   year?: string;
 }
 
-// IMPORTANT: DO NOT MODIFY THESE URLs - they are the official NHTSA endpoints
 const API_ENDPOINTS = {
   VIN_DECODE: 'https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/',
   RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVehicle',
   VIN_RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVIN/',
   SAFETY: 'https://api.nhtsa.gov/SafetyRatings',
   COMPLAINTS: 'https://api.nhtsa.gov/complaints/complaintsByVehicle',
-} as const;
+};
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -39,16 +37,12 @@ serve(async (req) => {
 
     switch (type) {
       case 'decode':
-        if (!vin) {
-          throw new Error('VIN is required for decoding');
-        }
+        if (!vin) throw new Error('VIN is required for decoding');
         url = `${API_ENDPOINTS.VIN_DECODE}${encodeURIComponent(vin)}?format=json`;
         break;
 
       case 'vin_recalls':
-        if (!vin) {
-          throw new Error('VIN is required for VIN-based recall lookup');
-        }
+        if (!vin) throw new Error('VIN is required for VIN-based recall lookup');
         url = `${API_ENDPOINTS.VIN_RECALLS}${encodeURIComponent(vin)}?format=json`;
         break;
 
@@ -64,9 +58,13 @@ serve(async (req) => {
           throw new Error('Make, model, and year are required for safety ratings');
         }
         // Format make and model according to NHTSA requirements
-        const formattedMake = make.toUpperCase();
-        const formattedModel = model.toUpperCase().replace(/\s+/g, '');
-        url = `${API_ENDPOINTS.SAFETY}/vehicle/${encodeURIComponent(year)}/${encodeURIComponent(formattedMake)}/${encodeURIComponent(formattedModel)}?format=json`;
+        // Remove spaces and special characters, convert to uppercase
+        const formattedMake = make.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const formattedModel = model.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        
+        // The NHTSA Safety Ratings API expects a specific URL structure
+        url = `${API_ENDPOINTS.SAFETY}/modelyear/${encodeURIComponent(year)}/make/${encodeURIComponent(formattedMake)}/model/${encodeURIComponent(formattedModel)}?format=json`;
+        console.log('Safety ratings URL:', url);
         break;
 
       case 'complaints':

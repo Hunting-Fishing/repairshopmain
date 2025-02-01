@@ -16,30 +16,10 @@ export const VehicleInfoSection = ({ form }: VehicleInfoSectionProps) => {
   const handleVehicleInfo = (vehicleInfo: any) => {
     console.log("Raw Vehicle Info from NHTSA:", vehicleInfo);
     
-    // Log all possible year-related fields to debug
-    console.log("Year fields:", {
-      ModelYear: vehicleInfo.ModelYear,
-      Year: vehicleInfo.Year,
-      manufactureYear: vehicleInfo.ManufactureYear,
-      modelYear: vehicleInfo.modelYear
-    });
-
-    // Try to get the year from various possible fields
-    const year = vehicleInfo.ModelYear || 
-                 vehicleInfo.Year || 
-                 vehicleInfo.ManufactureYear || 
-                 vehicleInfo.modelYear || 
-                 "";
-
-    // Convert year to string and trim any whitespace
-    const yearString = year?.toString().trim() || "";
-    
-    console.log("Final year value being set:", yearString);
-    
     form.setValue("vehicle_vin", vehicleInfo.VIN);
     form.setValue("vehicle_make", vehicleInfo.Make);
     form.setValue("vehicle_model", vehicleInfo.Model);
-    form.setValue("vehicle_year", yearString);
+    form.setValue("vehicle_year", vehicleInfo.ModelYear);
   };
 
   return (

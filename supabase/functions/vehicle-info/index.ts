@@ -15,7 +15,7 @@ interface VehicleRequest {
   year?: string;
 }
 
-// IMPORTANT: DO NOT MODIFY THESE URLs WITHOUT THOROUGH TESTING
+// IMPORTANT: DO NOT MODIFY THESE URLs - they are the official NHTSA endpoints
 const API_ENDPOINTS = {
   VIN_DECODE: 'https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/',
   RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVehicle',
@@ -48,28 +48,28 @@ serve(async (req) => {
         if (!vin) {
           throw new Error('VIN is required for VIN-based recall lookup');
         }
-        url = `${API_ENDPOINTS.VIN_RECALLS}${encodeURIComponent(vin)}`;
+        url = `${API_ENDPOINTS.VIN_RECALLS}${encodeURIComponent(vin)}?format=json`;
         break;
 
       case 'recalls':
         if (!make || !model || !year) {
           throw new Error('Make, model, and year are required for recalls');
         }
-        url = `${API_ENDPOINTS.RECALLS}?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+        url = `${API_ENDPOINTS.RECALLS}?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}&format=json`;
         break;
 
       case 'safety':
         if (!make || !model || !year) {
           throw new Error('Make, model, and year are required for safety ratings');
         }
-        url = `${API_ENDPOINTS.SAFETY}${encodeURIComponent(year)}/${encodeURIComponent(make)}/${encodeURIComponent(model)}`;
+        url = `${API_ENDPOINTS.SAFETY}${encodeURIComponent(year)}/${encodeURIComponent(make)}/${encodeURIComponent(model)}?format=json`;
         break;
 
       case 'complaints':
         if (!make || !model || !year) {
           throw new Error('Make, model, and year are required for complaints');
         }
-        url = `${API_ENDPOINTS.COMPLAINTS}?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+        url = `${API_ENDPOINTS.COMPLAINTS}?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}&format=json`;
         break;
 
       default:

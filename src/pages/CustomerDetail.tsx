@@ -78,15 +78,7 @@ export function CustomerDetail() {
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle>Vehicle Information</CardTitle>
-                  <div className="flex gap-2">
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
-                      Check Recalls
-                    </Button>
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <FileWarning className="h-4 w-4" />
-                      Safety Reports
-                    </Button>
+                  <div className="flex justify-end">
                     <Button onClick={() => setShowAddVehicle(!showAddVehicle)}>
                       {showAddVehicle ? "Cancel" : "Add Vehicle"}
                     </Button>

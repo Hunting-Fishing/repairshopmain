@@ -5,58 +5,75 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+/**
+ * Supported request types for the vehicle information API
+ */
+type RequestType = 'decode' | 'recalls' | 'safety' | 'complaints';
+
+/**
+ * Interface for the incoming request body
+ */
 interface VehicleRequest {
-  type: 'recalls' | 'safety' | 'complaints' | 'decode';
+  type: RequestType;
   vin?: string;
   make?: string;
   model?: string;
   year?: string;
 }
 
+/**
+ * Constants for NHTSA API endpoints
+ * DO NOT MODIFY these URLs without thorough testing
+ */
+const API_ENDPOINTS = {
+  VIN_DECODE: 'https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/',
+  RECALLS: 'https://api.nhtsa.gov/recalls/recallsByVehicle',
+  SAFETY: 'https://api.nhtsa.gov/SafetyRatings/vehicle/',
+  COMPLAINTS: 'https://api.nhtsa.gov/complaints/complaintsByVehicle',
+} as const;
+
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const requestData = await req.json() as VehicleRequest;
+    const requestData: VehicleRequest = await req.json();
+    console.log('Request data:', requestData);
+
+    let url: string;
     const { type, vin, make, model, year } = requestData;
-    let url = '';
-    
-    console.log('Request parameters:', { type, vin, make, model, year });
-    
+
     switch (type) {
       case 'decode':
         if (!vin) {
           throw new Error('VIN is required for decoding');
         }
-        url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${encodeURIComponent(vin)}?format=json`;
+        url = `${API_ENDPOINTS.VIN_DECODE}${encodeURIComponent(vin)}?format=json`;
         break;
 
       case 'recalls':
-        if (vin) {
-          url = `https://api.nhtsa.gov/recalls/recallsByVIN/${encodeURIComponent(vin)}`;
-        } else if (make && model && year) {
-          url = `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
-        } else {
-          throw new Error('Insufficient vehicle information for recall search');
+        if (!make || !model || !year) {
+          throw new Error('Make, model, and year are required for recalls');
         }
+        url = `${API_ENDPOINTS.RECALLS}?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
         break;
-        
+
       case 'safety':
         if (!make || !model || !year) {
           throw new Error('Make, model, and year are required for safety ratings');
         }
-        url = `https://api.nhtsa.gov/SafetyRatings/vehicle/${encodeURIComponent(year)}/${encodeURIComponent(make)}/${encodeURIComponent(model)}`;
+        url = `${API_ENDPOINTS.SAFETY}${encodeURIComponent(year)}/${encodeURIComponent(make)}/${encodeURIComponent(model)}`;
         break;
-        
+
       case 'complaints':
         if (!make || !model || !year) {
           throw new Error('Make, model, and year are required for complaints');
         }
-        url = `https://api.nhtsa.gov/complaints/complaintsByVehicle?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+        url = `${API_ENDPOINTS.COMPLAINTS}?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
         break;
-        
+
       default:
         throw new Error(`Invalid request type: ${type}`);
     }
@@ -64,36 +81,7 @@ serve(async (req) => {
     console.log('Fetching from URL:', url);
     const response = await fetch(url);
     const data = await response.json();
-    console.log('NHTSA API Response:', data);
-
-    // Return the appropriate response based on request type
-    if (type === 'decode') {
-      return new Response(
-        JSON.stringify(data),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Transform recall data to match our expected format
-    if (type === 'recalls') {
-      const results = data.results || [];
-      return new Response(
-        JSON.stringify({
-          Count: results.length,
-          results: results.map((recall: any) => ({
-            ReportReceivedDate: recall.ReportReceivedDate || recall.reportReceivedDate,
-            Component: recall.Component || recall.component,
-            Summary: recall.Summary || recall.summary,
-            Consequence: recall.Consequence || recall.consequence,
-            Remedy: recall.Remedy || recall.remedy,
-            Notes: recall.Notes || recall.notes,
-            NHTSACampaignNumber: recall.NHTSACampaignNumber || recall.nhtsaCampaignNumber,
-            ManufacturerRecallNumber: recall.ManufacturerRecallNumber || recall.manufacturerCampaignNumber
-          }))
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    console.log('API Response:', data);
 
     return new Response(
       JSON.stringify(data),
@@ -101,11 +89,11 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error fetching vehicle information:', error);
+    console.error('Error:', error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: 'Failed to fetch vehicle information',
-        details: error.message 
+        details: error.message
       }),
       { 
         status: 500,

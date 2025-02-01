@@ -17,7 +17,19 @@ export function CustomerVehicleDialog({ customerId, onClose, onSelect }: Custome
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
     if (customerId) {
-      const vehicleInfo = `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim || ''}`.trim();
+      // Create a detailed vehicle info string including all relevant information
+      const vehicleInfo = [
+        vehicle.year,
+        vehicle.make,
+        vehicle.model,
+        vehicle.trim,
+        vehicle.vin ? `VIN: ${vehicle.vin}` : '',
+        vehicle.engine_info?.displacement ? `${vehicle.engine_info.displacement}L` : '',
+        vehicle.engine_info?.cylinders ? `${vehicle.engine_info.cylinders}-cyl` : '',
+        vehicle.engine_info?.fuel_type || '',
+        vehicle.body_class || ''
+      ].filter(Boolean).join(' ').trim();
+
       onSelect(customerId, vehicleInfo);
       onClose();
     }

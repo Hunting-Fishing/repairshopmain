@@ -6,55 +6,34 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { CustomerSearchCommand } from "../search/CustomerSearchCommand";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand";
+import { Vehicle } from "@/components/customers/vehicles/types";
 import type { UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-
-const workOrderSchema = z.object({
-  customerId: z.string().min(1),
-  vehicleInfo: z.string().min(1),
-  jobDescription: z.string().min(1),
-});
-
-type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 interface WorkOrderFormProps {
-  form: UseFormReturn<WorkOrderFormValues>;
+  form: UseFormReturn<{
+    customerId: string;
+    vehicleInfo: string;
+    jobDescription: string;
+  }>;
   onCustomerSelect?: (customerId: string, vehicleInfo: string) => void;
 }
 
 export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
-  const { data: selectedCustomer } = useQuery({
-    queryKey: ["customer", form.watch("customerId")],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("customers")
-        .select("*")
-        .eq("id", form.watch("customerId"))
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!form.watch("customerId"),
-  });
-
   const handleCustomerVehicleSelect = (customerId: string, vehicleInfo: string) => {
-    form.setValue("customerId", customerId);
-    form.setValue("vehicleInfo", vehicleInfo);
+    form.setValue('customerId', customerId);
+    form.setValue('vehicleInfo', vehicleInfo);
     onCustomerSelect?.(customerId, vehicleInfo);
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <FormField
         control={form.control}
         name="customerId"
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Customer</FormLabel>
+        render={() => (
+          <FormItem>
+            <FormLabel>Customer & Vehicle</FormLabel>
             <CustomerSearchCommand 
               onSelect={handleCustomerVehicleSelect}
               className="border-input"
@@ -63,6 +42,7 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
           </FormItem>
         )}
       />
+
       <FormField
         control={form.control}
         name="vehicleInfo"
@@ -70,12 +50,17 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
           <FormItem>
             <FormLabel>Vehicle Information</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea 
+                {...field}
+                readOnly
+                placeholder="Vehicle information will appear here after selection"
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
+
       <FormField
         control={form.control}
         name="jobDescription"
@@ -84,14 +69,14 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
             <FormLabel>Job Description</FormLabel>
             <FormControl>
               <Textarea 
-                placeholder="Describe the work to be done..."
                 {...field}
+                placeholder="Enter the job description..."
               />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 }

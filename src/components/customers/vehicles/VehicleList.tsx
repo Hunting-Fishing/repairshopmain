@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 interface VehicleListProps {
   customerId: string;
-  onVehicleSelect?: (vehicleInfo: string) => void;
+  onVehicleSelect?: (vehicle: Vehicle) => void;
 }
 
 export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) => {
@@ -38,8 +38,7 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
 
   const handleVehicleClick = (vehicle: Vehicle) => {
     if (onVehicleSelect) {
-      const vehicleInfo = `${vehicle.year} ${vehicle.make} ${vehicle.model}`.trim();
-      onVehicleSelect(vehicleInfo);
+      onVehicleSelect(vehicle);
     }
   };
 

@@ -4,6 +4,7 @@ import { AddVehicleForm } from "./AddVehicleForm";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Vehicle } from "./types";
 
 interface CustomerVehicleDialogProps {
   customerId: string | null;
@@ -14,8 +15,9 @@ interface CustomerVehicleDialogProps {
 export function CustomerVehicleDialog({ customerId, onClose, onSelect }: CustomerVehicleDialogProps) {
   const [showAddVehicle, setShowAddVehicle] = useState(false);
 
-  const handleVehicleSelect = (vehicleInfo: string) => {
+  const handleVehicleSelect = (vehicle: Vehicle) => {
     if (customerId) {
+      const vehicleInfo = `${vehicle.year} ${vehicle.make} ${vehicle.model} ${vehicle.trim || ''}`.trim();
       onSelect(customerId, vehicleInfo);
       onClose();
     }

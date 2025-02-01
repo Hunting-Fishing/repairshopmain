@@ -16,6 +16,7 @@ export interface VehicleInfo {
   Make: string;
   Model: string;
   ModelYear: string;
+  ProductionDate: string;
   Trim: string;
   VehicleType: string;
   VIN?: string;
@@ -38,6 +39,7 @@ const initialVehicleInfo: VehicleInfo = {
   Make: '',
   Model: '',
   ModelYear: '',
+  ProductionDate: '',
   Trim: '',
   VehicleType: '',
   "Engine Number of Cylinders": '',

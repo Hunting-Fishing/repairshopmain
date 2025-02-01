@@ -38,6 +38,20 @@ export const NhtsaApiDetails = ({ connectionData }: NhtsaApiDetailsProps) => {
       ]
     },
     {
+      name: "vPIC API",
+      status: "active" as const,
+      icon: Database,
+      endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/",
+      description: "Vehicle Product Information Catalog - Comprehensive vehicle data",
+      features: [
+        "Complete vehicle specifications",
+        "Manufacturer details",
+        "Vehicle types and categories",
+        "Equipment data",
+        "Plant information"
+      ]
+    },
+    {
       name: "Recall Database API",
       status: "coming_soon" as const,
       icon: Shield,
@@ -95,7 +109,7 @@ export const NhtsaApiDetails = ({ connectionData }: NhtsaApiDetailsProps) => {
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Currently integrated with VIN Decoder API and Make/Model/Year API. Additional NHTSA APIs will be added in future updates.
+            Currently integrated with VIN Decoder API, Make/Model/Year API, and vPIC API. Additional NHTSA APIs will be added in future updates.
             For technical documentation and API specifications, visit the NHTSA API documentation portal.
           </AlertDescription>
         </Alert>

@@ -8,7 +8,7 @@ export const automotiveIntegrations: IntegrationCategory = {
       title: "NHTSA Database",
       description: "Access vehicle safety data and recalls",
       icon: Car,
-      status: "connected", // Changed to reflect connected status
+      status: "connected",
       onConnect: () => console.log("Connect to NHTSA"),
       websiteUrl: "https://www.nhtsa.gov/data",
       documentationUrl: "https://www.nhtsa.gov/nhtsa-datasets-and-apis",
@@ -24,6 +24,12 @@ export const automotiveIntegrations: IntegrationCategory = {
           status: "active",
           endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMake/",
           description: "Currently integrated - Get all models for a specific make"
+        },
+        {
+          name: "vPIC API",
+          status: "active",
+          endpoint: "https://vpic.nhtsa.dot.gov/api/vehicles/",
+          description: "Vehicle Product Information Catalog - Comprehensive vehicle data including makes, models, and specifications"
         },
         {
           name: "Recall Database API",

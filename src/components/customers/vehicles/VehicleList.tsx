@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Car, AlertCircle } from "lucide-react";
@@ -15,6 +15,7 @@ interface VehicleListProps {
 export const VehicleList = ({ customerId }: VehicleListProps) => {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [infoType, setInfoType] = useState<'recalls' | 'safety' | 'complaints' | null>(null);
+  const queryClient = useQueryClient();
 
   const { data: vehicles, isLoading } = useQuery({
     queryKey: ["vehicles", customerId],
@@ -28,6 +29,10 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
       return data as Vehicle[];
     },
   });
+
+  const handleVehicleRemoved = () => {
+    queryClient.invalidateQueries({ queryKey: ["vehicles", customerId] });
+  };
 
   if (isLoading) return <div>Loading vehicles...</div>;
 
@@ -51,6 +56,7 @@ export const VehicleList = ({ customerId }: VehicleListProps) => {
               setSelectedVehicle(vehicle);
               setInfoType(type);
             }}
+            onVehicleRemoved={handleVehicleRemoved}
           />
         ))}
       </div>

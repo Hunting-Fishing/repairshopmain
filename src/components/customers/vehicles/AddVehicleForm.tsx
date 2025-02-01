@@ -35,7 +35,7 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
         other_info: vehicleInfo["Other Engine Info"] || null,
         turbo: vehicleInfo["Turbo"] || null,
         drive_type: vehicleInfo["Drive Type"] || null,
-        gvwr: vehicleInfo["Gross Vehicle Weight Rating From"] || null,
+        gvwr: vehicleInfo["Gross Vehicle Weight Rating"] || null,
         manufacturer: vehicleInfo["Manufacturer Name"] || null,
         plant_country: vehicleInfo["Plant Country"] || null,
         vehicle_type: vehicleInfo["Vehicle Type"] || null
@@ -48,12 +48,12 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
       const { error } = await supabase.from("vehicles").insert({
         customer_id: customerId,
         organization_id: userData.organization_id,
-        vin: vehicleInfo.VIN || "",
-        make: vehicleInfo.Make || "",
-        model: vehicleInfo.Model || "",
-        year: vehicleInfo.ModelYear || "",
-        trim: vehicleInfo.Trim || "",
-        body_class: vehicleInfo["Body Class"] || "",
+        vin: vehicleInfo.VIN,
+        make: vehicleInfo.Make,
+        model: vehicleInfo.Model,
+        year: vehicleInfo.ModelYear,  // Updated to use ModelYear
+        trim: vehicleInfo.Trim,
+        body_class: vehicleInfo["Body Class"],
         engine_info: cleanEngineInfo,
         created_by: profile.user?.id,
         updated_by: profile.user?.id,

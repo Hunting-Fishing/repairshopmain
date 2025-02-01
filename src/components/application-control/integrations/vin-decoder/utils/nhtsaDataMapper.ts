@@ -44,48 +44,52 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
 
   // Second pass: map all other fields
   data.Results.forEach((result: NhtsaResult) => {
-    if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
-      switch (result.Variable) {
-        case "Make":
-          vehicleInfo.Make = result.Value.trim();
-          break;
-        case "Model":
-          vehicleInfo.Model = result.Value.trim();
-          break;
-        case "Trim":
-          vehicleInfo.Trim = result.Value.trim();
-          break;
-        case "Vehicle Type":
-          vehicleInfo.VehicleType = result.Value.trim();
-          break;
-        case "Engine Number of Cylinders":
-          vehicleInfo["Engine Number of Cylinders"] = result.Value.trim();
-          break;
-        case "Displacement (L)":
-          vehicleInfo["Displacement (L)"] = result.Value.trim();
-          break;
-        case "Fuel Type - Primary":
-          vehicleInfo["Fuel Type - Primary"] = result.Value.trim();
-          break;
-        case "Other Engine Info":
-          vehicleInfo["Other Engine Info"] = result.Value.trim();
-          break;
-        case "Body Class":
-          vehicleInfo["Body Class"] = result.Value.trim();
-          break;
-        case "Drive Type":
-          vehicleInfo["Drive Type"] = result.Value.trim();
-          break;
-        case "Gross Vehicle Weight Rating From":
-          vehicleInfo["Gross Vehicle Weight Rating"] = result.Value.trim();
-          break;
-        case "Plant Country":
-          vehicleInfo["Plant Country"] = result.Value.trim();
-          break;
-        case "Turbo":
-          vehicleInfo.Turbo = result.Value.trim();
-          break;
-      }
+    if (!result.Value || result.Value === "Not Applicable" || result.Value.trim() === "") {
+      return;
+    }
+
+    const value = result.Value.trim();
+    
+    switch (result.Variable) {
+      case "Make":
+        vehicleInfo.Make = value;
+        break;
+      case "Model":
+        vehicleInfo.Model = value;
+        break;
+      case "Trim":
+        vehicleInfo.Trim = value;
+        break;
+      case "Vehicle Type":
+        vehicleInfo.VehicleType = value;
+        break;
+      case "Engine Number of Cylinders":
+        vehicleInfo["Engine Number of Cylinders"] = value;
+        break;
+      case "Displacement (L)":
+        vehicleInfo["Displacement (L)"] = value;
+        break;
+      case "Fuel Type - Primary":
+        vehicleInfo["Fuel Type - Primary"] = value;
+        break;
+      case "Other Engine Info":
+        vehicleInfo["Other Engine Info"] = value;
+        break;
+      case "Body Class":
+        vehicleInfo["Body Class"] = value;
+        break;
+      case "Drive Type":
+        vehicleInfo["Drive Type"] = value;
+        break;
+      case "Gross Vehicle Weight Rating From":
+        vehicleInfo["Gross Vehicle Weight Rating"] = value;
+        break;
+      case "Plant Country":
+        vehicleInfo["Plant Country"] = value;
+        break;
+      case "Turbo":
+        vehicleInfo.Turbo = value;
+        break;
     }
   });
 

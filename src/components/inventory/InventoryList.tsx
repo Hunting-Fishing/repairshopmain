@@ -8,28 +8,40 @@ interface InventoryListProps {
 }
 
 export function InventoryList({ searchQuery, filters }: InventoryListProps) {
-  const { data: items, isLoading } = useQuery({
+  const { data: items, isLoading, error } = useQuery({
     queryKey: ['inventory-items', searchQuery, filters],
     queryFn: async () => {
       let query = supabase
         .from('inventory_items')
-        .select(`
-          *,
-          inventory_categories (name),
-          inventory_suppliers (name)
-        `);
+        .select('*, category:category_id(name), supplier:supplier_id(name)');
 
       if (searchQuery) {
         query = query.ilike('name', `%${searchQuery}%`);
       }
 
-      const { data, error } = await query.throwOnError();
+      const { data, error } = await query;
+      
+      if (error) throw error;
       return data || [];
     }
   });
 
   if (isLoading) {
     return <div>Loading inventory items...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading inventory items: {error.message}</div>;
+  }
+
+  if (!items?.length) {
+    return (
+      <Card>
+        <CardContent className="py-10">
+          <p className="text-center text-muted-foreground">No inventory items found</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -48,11 +60,11 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Category</span>
-                <span>{item.inventory_categories?.name}</span>
+                <span>{item.category?.name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Supplier</span>
-                <span>{item.inventory_suppliers?.name}</span>
+                <span>{item.supplier?.name}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-muted-foreground">Price</span>

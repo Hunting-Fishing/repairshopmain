@@ -588,7 +588,7 @@ export type Database = {
       inventory_items: {
         Row: {
           barcode: string | null
-          category: string | null
+          category_id: string | null
           condition: string | null
           created_at: string | null
           created_by: string | null
@@ -605,14 +605,14 @@ export type Database = {
           sku: string | null
           status: string | null
           subcategory: string | null
-          supplier: string | null
+          supplier_id: string | null
           unit_cost: number | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
           barcode?: string | null
-          category?: string | null
+          category_id?: string | null
           condition?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -629,14 +629,14 @@ export type Database = {
           sku?: string | null
           status?: string | null
           subcategory?: string | null
-          supplier?: string | null
+          supplier_id?: string | null
           unit_cost?: number | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
           barcode?: string | null
-          category?: string | null
+          category_id?: string | null
           condition?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -653,12 +653,19 @@ export type Database = {
           sku?: string | null
           status?: string | null
           subcategory?: string | null
-          supplier?: string | null
+          supplier_id?: string | null
           unit_cost?: number | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "inventory_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "inventory_items_created_by_fkey"
             columns: ["created_by"]
@@ -671,6 +678,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
             referencedColumns: ["id"]
           },
           {

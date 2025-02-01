@@ -6,7 +6,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { CustomerSearchCommand } from "../search/CustomerSearchCommand";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,14 +47,6 @@ export function WorkOrderForm({ form }: WorkOrderFormProps) {
               onSelect={(id) => form.setValue("customerId", id)}
               className="border-input"
             />
-            {selectedCustomer && (
-              <div className="mt-2 rounded-md bg-muted p-2 text-sm">
-                <p>Selected: {selectedCustomer.first_name} {selectedCustomer.last_name}</p>
-                {selectedCustomer.phone_number && (
-                  <p className="text-muted-foreground">Phone: {selectedCustomer.phone_number}</p>
-                )}
-              </div>
-            )}
             <FormMessage />
           </FormItem>
         )}
@@ -67,7 +58,7 @@ export function WorkOrderForm({ form }: WorkOrderFormProps) {
           <FormItem>
             <FormLabel>Vehicle Information</FormLabel>
             <FormControl>
-              <Input 
+              <Textarea 
                 placeholder="2019 Toyota Camry" 
                 {...field}
                 value={selectedCustomer ? 

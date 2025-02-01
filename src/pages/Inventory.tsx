@@ -13,6 +13,18 @@ export default function Inventory() {
     needsReorder: false,
   });
 
+  const handleFilterChange = (newFilters: {
+    lowStock?: boolean;
+    outOfStock?: boolean;
+    needsReorder?: boolean;
+  }) => {
+    setFilters({
+      lowStock: newFilters.lowStock ?? false,
+      outOfStock: newFilters.outOfStock ?? false,
+      needsReorder: newFilters.needsReorder ?? false,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -38,7 +50,7 @@ export default function Inventory() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <InventoryFilters onFilterChange={setFilters} />
+        <InventoryFilters onFilterChange={handleFilterChange} />
       </div>
 
       <InventoryList searchQuery={searchQuery} filters={filters} />

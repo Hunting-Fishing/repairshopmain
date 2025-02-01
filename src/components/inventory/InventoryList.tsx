@@ -94,7 +94,7 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
                 </Badge>
               )}
               {item.quantity_in_stock > 0 && item.quantity_in_stock <= (item.reorder_point || 5) && (
-                <Badge variant="warning" className="ml-2">
+                <Badge variant="secondary" className="ml-2">
                   Low Stock
                 </Badge>
               )}

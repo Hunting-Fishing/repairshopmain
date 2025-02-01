@@ -10,13 +10,18 @@ import { CustomerSearchCommand } from "../search/CustomerSearchCommand";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+
+const workOrderSchema = z.object({
+  customerId: z.string().min(1),
+  vehicleInfo: z.string().min(1),
+  jobDescription: z.string().min(1),
+});
+
+type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 interface WorkOrderFormProps {
-  form: UseFormReturn<{
-    customerId: string;
-    vehicleInfo: string;
-    jobDescription: string;
-  }>;
+  form: UseFormReturn<WorkOrderFormValues>;
 }
 
 export function WorkOrderForm({ form }: WorkOrderFormProps) {

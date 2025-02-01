@@ -14,10 +14,11 @@ export const VehicleInfoSection = ({ form }: VehicleInfoSectionProps) => {
   const [showVinDialog, setShowVinDialog] = useState(false);
 
   const handleVehicleInfo = (vehicleInfo: any) => {
+    console.log("Vehicle Info from NHTSA:", vehicleInfo);
     form.setValue("vehicle_vin", vehicleInfo.VIN);
     form.setValue("vehicle_make", vehicleInfo.Make);
     form.setValue("vehicle_model", vehicleInfo.Model);
-    form.setValue("vehicle_year", vehicleInfo.ModelYear);
+    form.setValue("vehicle_year", vehicleInfo.ModelYear?.toString() || "");
   };
 
   return (
@@ -88,6 +89,7 @@ export const VehicleInfoSection = ({ form }: VehicleInfoSectionProps) => {
       <NhtsaVinDialog 
         isOpen={showVinDialog} 
         onClose={() => setShowVinDialog(false)} 
+        onVehicleInfo={handleVehicleInfo}
       />
     </div>
   );

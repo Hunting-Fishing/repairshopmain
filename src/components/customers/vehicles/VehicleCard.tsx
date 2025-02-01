@@ -60,7 +60,7 @@ export const VehicleCard = ({ vehicle, onInfoRequest, onVehicleRemoved }: Vehicl
             <Car className="h-5 w-5 text-muted-foreground" />
             <div>
               <h3 className="font-medium text-xl">
-                {vehicle.year} {vehicle.make} {vehicle.model}
+                {vehicle.year && `${vehicle.year} `}{vehicle.make} {vehicle.model}
               </h3>
               {vehicle.trim && (
                 <p className="text-muted-foreground text-sm">{vehicle.trim} Trim</p>

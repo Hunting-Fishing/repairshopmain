@@ -12,38 +12,38 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
       { label: "VIN", value: vehicle.vin },
       { label: "Make", value: vehicle.make },
       { label: "Model", value: vehicle.model },
-      { label: "Year", value: vehicle.year || "Not specified" },
-      { label: "Trim", value: vehicle.trim },
-      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type },
-      { label: "Plant Country", value: vehicle.engine_info?.plant_country },
+      { label: "Year", value: vehicle.year || "N/A" },
+      { label: "Trim", value: vehicle.trim || "N/A" },
+      { label: "Vehicle Type", value: vehicle.engine_info?.vehicle_type || "N/A" },
+      { label: "Plant Country", value: vehicle.engine_info?.plant_country || "N/A" },
     ],
     "Engine Information": [
       { 
         label: "Engine", 
         value: vehicle.engine_info?.displacement && vehicle.engine_info?.cylinders
           ? `${vehicle.engine_info.displacement}L ${vehicle.engine_info.cylinders}-cylinder`
-          : null 
+          : "N/A"
       },
-      { label: "Fuel Type", value: vehicle.engine_info?.fuel_type },
-      { label: "Turbo", value: vehicle.engine_info?.turbo },
-      { label: "Displacement", value: vehicle.engine_info?.displacement ? `${vehicle.engine_info.displacement}L` : null },
-      { label: "Cylinders", value: vehicle.engine_info?.cylinders },
+      { label: "Fuel Type", value: vehicle.engine_info?.fuel_type || "N/A" },
+      { label: "Turbo", value: vehicle.engine_info?.turbo || "N/A" },
+      { label: "Displacement", value: vehicle.engine_info?.displacement ? `${vehicle.engine_info.displacement}L` : "N/A" },
+      { label: "Cylinders", value: vehicle.engine_info?.cylinders || "N/A" },
       { 
         label: "Additional Engine Info", 
-        value: vehicle.engine_info?.other_info,
+        value: vehicle.engine_info?.other_info || "N/A",
         fullWidth: true 
       },
     ],
     "Exterior & Mechanical": [
-      { label: "Body Style", value: vehicle.body_class },
+      { label: "Body Style", value: vehicle.body_class || "N/A" },
       { 
         label: "Drive Type", 
-        value: vehicle.engine_info?.drive_type,
+        value: vehicle.engine_info?.drive_type || "N/A",
         fullWidth: true 
       },
       { 
         label: "Gross Vehicle Weight Rating", 
-        value: vehicle.engine_info?.gvwr,
+        value: vehicle.engine_info?.gvwr || "N/A",
         fullWidth: true
       },
     ]
@@ -52,7 +52,8 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
       {Object.entries(categories).map(([category, fields]) => {
-        const hasData = fields.some(field => field.value);
+        // Only show categories that have at least one non-N/A value
+        const hasData = fields.some(field => field.value && field.value !== "N/A");
         if (!hasData) return null;
 
         return (
@@ -60,7 +61,7 @@ export const VehicleDetails = ({ vehicle }: VehicleDetailsProps) => {
             <h3 className="font-medium text-muted-foreground">{category}</h3>
             <div className="space-y-2">
               {fields.map(({ label, value, fullWidth }) => {
-                if (!value) return null;
+                if (!value || value === "N/A") return null;
                 return (
                   <div 
                     key={label} 

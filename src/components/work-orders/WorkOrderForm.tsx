@@ -7,15 +7,19 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand";
-import { Vehicle } from "@/components/customers/vehicles/types";
-import type { UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+
+const workOrderSchema = z.object({
+  customerId: z.string().min(1, "Customer selection is required"),
+  vehicleInfo: z.string().min(1, "Vehicle information is required"),
+  jobDescription: z.string().min(1, "Job description is required"),
+});
+
+type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 interface WorkOrderFormProps {
-  form: UseFormReturn<{
-    customerId: string;
-    vehicleInfo: string;
-    jobDescription: string;
-  }>;
+  form: UseFormReturn<WorkOrderFormValues>;
   onCustomerSelect?: (customerId: string, vehicleInfo: string) => void;
 }
 

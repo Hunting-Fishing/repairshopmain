@@ -1,46 +1,31 @@
-import { VehicleInfo } from "../../NhtsaVinDialog";
+import { NhtsaResponse, NhtsaResult } from "../types";
 
-interface NhtsaResult {
-  Variable: string;
-  Value: string | null;
-}
-
-interface NhtsaResponse {
-  Results?: NhtsaResult[];
-}
-
-export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): VehicleInfo => {
-  if (!data?.Results || !Array.isArray(data.Results)) {
-    throw new Error('Invalid NHTSA data format');
-  }
-
-  const vehicleInfo: VehicleInfo = {
-    Make: '',
-    Model: '',
-    ModelYear: '',
-    Trim: '',
-    VehicleType: '',
-    "Engine Number of Cylinders": '',
-    "Displacement (L)": '',
-    "Fuel Type - Primary": '',
-    "Other Engine Info": '',
-    Turbo: '',
-    "Body Class": '',
-    "Drive Type": '',
-    "Gross Vehicle Weight Rating": '',
-    "Plant Country": '',
-    VIN: vin
+export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse) => {
+  const vehicleInfo: any = {
+    VIN: "",
+    Make: "",
+    Model: "",
+    ModelYear: "",
+    Trim: "",
+    "Body Class": "",
+    "Engine Number of Cylinders": "",
+    "Displacement (L)": "",
+    "Fuel Type - Primary": "",
+    "Other Engine Info": "",
+    "Drive Type": "",
+    "Gross Vehicle Weight Rating": "",
+    "Plant Country": "",
+    "Vehicle Type": "",
+    "Manufacturer Name": "",
+    "Turbo": "",
   };
 
-  // First pass: find the Model Year specifically
-  const modelYearResult = data.Results.find(
-    result => result.Variable === "Model Year" && result.Value
-  );
-
-  if (modelYearResult?.Value) {
-    vehicleInfo.ModelYear = modelYearResult.Value.trim();
-    console.log("Found Model Year:", vehicleInfo.ModelYear);
-  }
+  // First pass: get the VIN
+  data.Results.forEach((result: NhtsaResult) => {
+    if (result.Variable === "VIN" && result.Value) {
+      vehicleInfo.VIN = result.Value.trim();
+    }
+  });
 
   // Second pass: map all other fields
   data.Results.forEach((result: NhtsaResult) => {
@@ -51,6 +36,9 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     const value = result.Value.trim();
     
     switch (result.Variable) {
+      case "Model Year":
+        vehicleInfo.ModelYear = value;
+        break;
       case "Make":
         vehicleInfo.Make = value;
         break;
@@ -93,6 +81,5 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     }
   });
 
-  console.log("Processed Vehicle Info:", vehicleInfo);
   return vehicleInfo;
 };

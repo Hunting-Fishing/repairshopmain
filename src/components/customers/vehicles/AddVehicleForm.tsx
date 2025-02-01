@@ -18,6 +18,7 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
   const queryClient = useQueryClient();
 
   const handleVehicleInfo = async (vehicleInfo: any) => {
+    console.log("Raw NHTSA Vehicle Info:", vehicleInfo);
     setLoading(true);
     try {
       const { data: profile } = await supabase.auth.getUser();
@@ -27,7 +28,6 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
         .eq("id", profile.user?.id)
         .single();
 
-      // Clean up the engine info object to only include non-null values
       const engineInfo = {
         cylinders: vehicleInfo["Engine Number of Cylinders"] || null,
         displacement: vehicleInfo["Displacement (L)"] || null,
@@ -51,7 +51,7 @@ export const AddVehicleForm = ({ customerId, onSuccess }: AddVehicleFormProps) =
         vin: vehicleInfo.VIN,
         make: vehicleInfo.Make,
         model: vehicleInfo.Model,
-        year: vehicleInfo.ModelYear,  // Updated to use ModelYear
+        year: vehicleInfo.ModelYear,
         trim: vehicleInfo.Trim,
         body_class: vehicleInfo["Body Class"],
         engine_info: cleanEngineInfo,

@@ -14,31 +14,38 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
     throw new Error('Invalid NHTSA data format');
   }
 
-  // Initialize vehicleInfo with empty values
-  const vehicleInfo: any = {
+  const vehicleInfo: VehicleInfo = {
+    Make: '',
+    Model: '',
+    ModelYear: '',
+    Trim: '',
+    VehicleType: '',
+    "Engine Number of Cylinders": '',
+    "Displacement (L)": '',
+    "Fuel Type - Primary": '',
+    "Other Engine Info": '',
+    Turbo: '',
+    "Body Class": '',
+    "Drive Type": '',
+    "Gross Vehicle Weight Rating": '',
+    "Plant Country": '',
     VIN: vin
   };
 
-  // Log the raw data for debugging
-  console.log('Raw NHTSA Data:', data.Results);
-
-  // Process all results and include any field that has a valid value
   data.Results.forEach((result: NhtsaResult) => {
-    if (result.Value && 
-        result.Value !== "null" && 
-        result.Value !== "Not Applicable" &&
-        result.Value.trim() !== "") {
-      // Clean up the field name to use as a key
-      const fieldName = result.Variable.trim();
-      vehicleInfo[fieldName] = result.Value.trim();
-      
-      // Log each valid field for debugging
-      console.log(`Found valid field - ${fieldName}:`, result.Value);
+    if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
+      if (result.Variable === "Model Year") {
+        vehicleInfo.ModelYear = result.Value.trim();
+        console.log("Found Model Year:", result.Value.trim());
+      } else {
+        const key = result.Variable as keyof VehicleInfo;
+        if (key in vehicleInfo) {
+          vehicleInfo[key] = result.Value.trim();
+        }
+      }
     }
   });
 
-  // Log the final mapped vehicle info
-  console.log('Complete Vehicle Info:', vehicleInfo);
-
+  console.log("Processed Vehicle Info:", vehicleInfo);
   return vehicleInfo;
 };

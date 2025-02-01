@@ -46,9 +46,48 @@ export const mapNhtsaDataToVehicleInfo = (data: NhtsaResponse, vin: string): Veh
   data.Results.forEach((result: NhtsaResult) => {
     if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
       const key = result.Variable;
-      // Skip Model Year as it's already handled
-      if (key !== "Model Year" && key in vehicleInfo) {
-        (vehicleInfo as any)[key] = result.Value.trim();
+      
+      // Map NHTSA fields to our vehicle info fields
+      switch (key) {
+        case "Make":
+          vehicleInfo.Make = result.Value.trim();
+          break;
+        case "Model":
+          vehicleInfo.Model = result.Value.trim();
+          break;
+        case "Trim":
+          vehicleInfo.Trim = result.Value.trim();
+          break;
+        case "Vehicle Type":
+          vehicleInfo.VehicleType = result.Value.trim();
+          break;
+        case "Engine Number of Cylinders":
+          vehicleInfo["Engine Number of Cylinders"] = result.Value.trim();
+          break;
+        case "Displacement (L)":
+          vehicleInfo["Displacement (L)"] = result.Value.trim();
+          break;
+        case "Fuel Type - Primary":
+          vehicleInfo["Fuel Type - Primary"] = result.Value.trim();
+          break;
+        case "Other Engine Info":
+          vehicleInfo["Other Engine Info"] = result.Value.trim();
+          break;
+        case "Body Class":
+          vehicleInfo["Body Class"] = result.Value.trim();
+          break;
+        case "Drive Type":
+          vehicleInfo["Drive Type"] = result.Value.trim();
+          break;
+        case "Gross Vehicle Weight Rating From":
+          vehicleInfo["Gross Vehicle Weight Rating"] = result.Value.trim();
+          break;
+        case "Plant Country":
+          vehicleInfo["Plant Country"] = result.Value.trim();
+          break;
+        case "Turbo":
+          vehicleInfo.Turbo = result.Value.trim();
+          break;
       }
     }
   });

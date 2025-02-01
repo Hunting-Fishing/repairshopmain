@@ -59,10 +59,31 @@ export const VinDecoderForm = ({ onVehicleInfo, onClose }: VinDecoderFormProps) 
       console.log("Raw NHTSA Response:", data);
 
       if (data.Results) {
-        const vehicleInfo: VehicleInfo = {};
+        const vehicleInfo: VehicleInfo = {
+          Make: '',
+          Model: '',
+          ModelYear: '',
+          Trim: '',
+          VehicleType: '',
+          "Engine Number of Cylinders": '',
+          "Displacement (L)": '',
+          "Fuel Type - Primary": '',
+          "Other Engine Info": '',
+          Turbo: '',
+          "Body Class": '',
+          "Drive Type": '',
+          "Gross Vehicle Weight Rating": '',
+          "Plant Country": '',
+          VIN: values.vin
+        };
+
+        // Populate the vehicleInfo object with data from the API response
         data.Results.forEach((result: any) => {
-          if (result.Value && result.Value !== "Not Applicable") {
-            vehicleInfo[result.Variable] = result.Value;
+          if (result.Value && result.Value !== "Not Applicable" && result.Value.trim() !== "") {
+            const key = result.Variable as keyof VehicleInfo;
+            if (key in vehicleInfo) {
+              vehicleInfo[key] = result.Value.trim();
+            }
           }
         });
 

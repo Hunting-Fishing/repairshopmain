@@ -27,13 +27,16 @@ serve(async (req) => {
         url = `https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/${vin}?format=json`;
         break;
       case 'recalls':
-        // Prioritize VIN-based recall search if VIN is available
+        // First try VIN-based recall search
         if (vin) {
           console.log('Searching recalls by VIN:', vin);
-          url = `https://api.nhtsa.gov/recalls/recallsByVIN?vin=${vin}`;
-        } else {
+          url = `https://api.nhtsa.gov/recalls/recallsByVIN/${vin}`;
+        } else if (make && model && year) {
+          // Fallback to make/model/year search
           console.log('Searching recalls by make/model/year:', { make, model, year });
-          url = `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${make}&model=${model}&modelYear=${year}`;
+          url = `https://api.nhtsa.gov/recalls/recallsByVehicle?make=${encodeURIComponent(make)}&model=${encodeURIComponent(model)}&modelYear=${encodeURIComponent(year)}`;
+        } else {
+          throw new Error('Insufficient vehicle information for recall search');
         }
         break;
       case 'safety':
@@ -51,6 +54,30 @@ serve(async (req) => {
     const data = await response.json();
     console.log('NHTSA API Response:', data);
 
+    // Transform the recall data to match our expected format
+    if (type === 'recalls') {
+      // The API returns data in a nested structure
+      const results = data.results || [];
+      return new Response(
+        JSON.stringify({
+          Count: results.length,
+          results: results.map((recall: any) => ({
+            ...recall,
+            RecallStatus: recall.completionDate ? 'Completed' : 'Incomplete',
+            ReportReceivedDate: recall.reportReceivedDate || recall.reportDate,
+            Component: recall.component,
+            Summary: recall.summary,
+            Consequence: recall.consequence,
+            Remedy: recall.remedy,
+            Notes: recall.notes,
+            NHTSACampaignNumber: recall.nhtsaCampaignNumber,
+            ManufacturerRecallNumber: recall.manufacturerCampaignNumber
+          }))
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(
       JSON.stringify(data),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -58,7 +85,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error fetching vehicle information:', error);
     return new Response(
-      JSON.stringify({ error: 'Failed to fetch vehicle information' }),
+      JSON.stringify({ error: 'Failed to fetch vehicle information', details: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

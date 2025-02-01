@@ -28,8 +28,8 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
             <div key={index} className="border p-4 rounded-lg">
               <div className="flex justify-between items-start">
                 <h4 className="font-medium">Recall Date: {recall.ReportReceivedDate}</h4>
-                <Badge variant={recall.RecallStatus === 'Recall Incomplete' ? 'destructive' : 'default'}>
-                  {recall.RecallStatus || 'Status Unknown'}
+                <Badge variant={recall.RecallStatus === 'Incomplete' ? 'destructive' : 'default'}>
+                  {recall.RecallStatus}
                 </Badge>
               </div>
               <div className="mt-4 space-y-2">
@@ -41,10 +41,12 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
                   <span className="text-sm font-medium">Summary:</span>
                   <p className="text-sm text-muted-foreground">{recall.Summary}</p>
                 </div>
-                <div>
-                  <span className="text-sm font-medium">Safety Risk:</span>
-                  <p className="text-sm text-muted-foreground">{recall.SafetyRiskDescription}</p>
-                </div>
+                {recall.Consequence && (
+                  <div>
+                    <span className="text-sm font-medium">Consequence:</span>
+                    <p className="text-sm text-muted-foreground">{recall.Consequence}</p>
+                  </div>
+                )}
                 <div>
                   <span className="text-sm font-medium">Remedy:</span>
                   <p className="text-sm text-muted-foreground">{recall.Remedy}</p>

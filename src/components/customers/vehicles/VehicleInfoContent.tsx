@@ -1,5 +1,5 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface VehicleInfoContentProps {
@@ -24,14 +24,36 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
           </Alert>
         );
       }
+
+      // Filter out aftermarket part recalls and format dates
+      const relevantRecalls = vehicleInfo.results?.filter((recall: any) => {
+        // Exclude recalls that are specifically for aftermarket parts
+        const isAftermarket = recall.Summary?.toLowerCase().includes('aftermarket') ||
+                            recall.Manufacturer?.toLowerCase().includes('aftermarket');
+        return !isAftermarket;
+      });
+
+      if (relevantRecalls.length === 0) {
+        return (
+          <Alert>
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <AlertDescription>
+              No active recalls found for this vehicle.
+            </AlertDescription>
+          </Alert>
+        );
+      }
+
       return (
         <div className="space-y-4">
-          {vehicleInfo.results?.map((recall: any, index: number) => (
+          {relevantRecalls.map((recall: any, index: number) => (
             <div key={index} className="border p-4 rounded-lg">
               <div className="flex justify-between items-start">
-                <h4 className="font-medium">Report Date: {recall.ReportReceivedDate}</h4>
+                <h4 className="font-medium">
+                  Report Date: {new Date(recall.ReportReceivedDate).toLocaleDateString()}
+                </h4>
                 <Badge variant="destructive">
-                  Open Recall
+                  Safety Recall
                 </Badge>
               </div>
               <div className="mt-4 space-y-2">
@@ -55,11 +77,16 @@ export const VehicleInfoContent = ({ infoType, vehicleInfo }: VehicleInfoContent
                 </div>
                 <div className="pt-2 space-y-1">
                   <p className="text-xs text-muted-foreground">
-                    Manufacturer Recall Number: {recall.ManufacturerRecallNumber}
+                    Manufacturer: {recall.Manufacturer}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     NHTSA Campaign Number: {recall.NHTSACampaignNumber}
                   </p>
+                  {recall.ManufacturerRecallNumber && (
+                    <p className="text-xs text-muted-foreground">
+                      Manufacturer Recall Number: {recall.ManufacturerRecallNumber}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

@@ -15,10 +15,16 @@ export const VehicleInfoSection = ({ form }: VehicleInfoSectionProps) => {
 
   const handleVehicleInfo = (vehicleInfo: any) => {
     console.log("Vehicle Info from NHTSA:", vehicleInfo);
+    // Ensure we're getting the ModelYear from the correct property
+    const year = vehicleInfo.ModelYear || vehicleInfo.Year || "";
+    
     form.setValue("vehicle_vin", vehicleInfo.VIN);
     form.setValue("vehicle_make", vehicleInfo.Make);
     form.setValue("vehicle_model", vehicleInfo.Model);
-    form.setValue("vehicle_year", vehicleInfo.ModelYear?.toString() || "");
+    form.setValue("vehicle_year", year.toString());
+    
+    // Log the values being set
+    console.log("Setting year value:", year);
   };
 
   return (

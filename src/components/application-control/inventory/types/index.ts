@@ -27,15 +27,15 @@ export interface InventoryItemFormData {
   barcode?: string;
 }
 
-// UI specific types
-export interface InventoryFilter {
-  category?: string;
-  supplier?: string;
-  lowStock?: boolean;
-  search?: string;
+// Error types
+export interface InventoryError {
+  message: string;
+  code?: string;
 }
 
-export interface InventorySort {
-  field: keyof InventoryItem;
-  direction: 'asc' | 'desc';
+// Response types
+export interface InventoryResponse<T> {
+  data: T | null;
+  error: InventoryError | null;
+  isLoading: boolean;
 }

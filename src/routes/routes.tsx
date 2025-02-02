@@ -1,65 +1,61 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
-import { AppLayout } from "@/components/layout/AppLayout";
-import Index from "@/pages/Index";
-import Auth from "@/pages/Auth";
-import Calendar from "@/pages/Calendar";
-import CalendarSettings from "@/pages/Calendar-Settings";
-import Staff from "@/pages/Staff";
-import Customers from "@/pages/Customers";
-import { CustomerDetail } from "@/pages/CustomerDetail";
-import WorkOrders from "@/pages/WorkOrders";
-import ApplicationControl from "@/pages/ApplicationControl";
-import Inventory from "@/pages/Inventory";
+import { lazy } from "react";
+import { Navigate } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
 
-export const router = createBrowserRouter([
+const Auth = lazy(() => import("@/pages/Auth"));
+const Index = lazy(() => import("@/pages/Index"));
+const Calendar = lazy(() => import("@/pages/Calendar"));
+const CalendarSettings = lazy(() => import("@/pages/Calendar-Settings"));
+const Customers = lazy(() => import("@/pages/Customers"));
+const CustomerDetail = lazy(() => import("@/pages/CustomerDetail"));
+const CustomerManagement = lazy(() => import("@/pages/CustomerManagement"));
+const Staff = lazy(() => import("@/pages/Staff"));
+const WorkOrders = lazy(() => import("@/pages/WorkOrders"));
+const ApplicationControl = lazy(() => import("@/pages/ApplicationControl"));
+
+export const routes: RouteObject[] = [
   {
     path: "/",
-    element: (
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
-    ),
-    children: [
-      {
-        index: true,
-        element: <Index />,
-      },
-      {
-        path: "calendar",
-        element: <Calendar />,
-      },
-      {
-        path: "calendar/settings",
-        element: <CalendarSettings />,
-      },
-      {
-        path: "staff",
-        element: <Staff />,
-      },
-      {
-        path: "customers",
-        element: <Customers />,
-      },
-      {
-        path: "customers/:customerId",
-        element: <CustomerDetail />,
-      },
-      {
-        path: "work-orders",
-        element: <WorkOrders />,
-      },
-      {
-        path: "inventory",
-        element: <Inventory />,
-      },
-      {
-        path: "application-control",
-        element: <ApplicationControl />,
-      },
-    ],
+    element: <Navigate to="/dashboard" replace />,
   },
   {
     path: "/auth",
     element: <Auth />,
   },
-]);
+  {
+    path: "/dashboard",
+    element: <Index />,
+  },
+  {
+    path: "/calendar",
+    element: <Calendar />,
+  },
+  {
+    path: "/calendar-settings",
+    element: <CalendarSettings />,
+  },
+  {
+    path: "/customers",
+    element: <Customers />,
+  },
+  {
+    path: "/customers/:id",
+    element: <CustomerDetail />,
+  },
+  {
+    path: "/customer-management",
+    element: <CustomerManagement />,
+  },
+  {
+    path: "/staff",
+    element: <Staff />,
+  },
+  {
+    path: "/work-orders",
+    element: <WorkOrders />,
+  },
+  {
+    path: "/application-control",
+    element: <ApplicationControl />,
+  },
+];

@@ -61,3 +61,29 @@ export interface CategoryFormData {
   description?: string;
   parent_id?: string;
 }
+
+export interface CategoryStats {
+  name: string;
+  totalItems: number;
+  totalValue: number;
+  lowStock: number;
+}
+
+export interface AnalyticsData {
+  categoryStats: CategoryStats[];
+  totalItems: number;
+  totalValue: number;
+  lowStockItems: number;
+  outOfStockItems: number;
+}
+
+export interface InventoryItemWithCategory {
+  id: string;
+  name: string;
+  quantity_in_stock: number | null;
+  unit_cost: number | null;
+  reorder_point: number | null;
+  category: {
+    name: string | null;
+  } | null;
+}

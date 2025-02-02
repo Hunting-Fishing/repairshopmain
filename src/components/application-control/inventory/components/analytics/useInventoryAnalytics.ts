@@ -42,7 +42,9 @@ export function useInventoryAnalytics() {
           lowStockItems++;
         }
 
+        // Safely access the category name from the joined data
         const categoryName = item.inventory_categories?.name || "Uncategorized";
+        
         if (!categoryStats[categoryName]) {
           categoryStats[categoryName] = {
             name: categoryName,

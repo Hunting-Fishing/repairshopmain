@@ -2,19 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Box } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import type { InventorySupplier } from "./types";
 
-export function InventorySuppliers() {
-  const { data: suppliers } = useQuery({
-    queryKey: ['inventory-suppliers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('inventory_suppliers')
-        .select('*')
-        .throwOnError();
-      return data || [];
-    }
-  });
+interface InventorySuppliersProps {
+  suppliers: InventorySupplier[];
+}
 
+export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
   return (
     <Card>
       <CardHeader>

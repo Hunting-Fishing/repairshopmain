@@ -3,6 +3,7 @@ import { useInventoryData } from "./hooks/useInventoryData";
 import { InventoryOverview } from "./InventoryOverview";
 import { InventoryCategories } from "./InventoryCategories";
 import { InventorySuppliers } from "./InventorySuppliers";
+import type { InventoryItem, InventoryCategory, InventorySupplier } from "./types";
 
 export function InventoryTab() {
   const { isLoading, categories, items, suppliers } = useInventoryData();
@@ -29,7 +30,7 @@ export function InventoryTab() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <InventoryOverview items={items} />
+      <InventoryOverview />
       <InventoryCategories categories={categories} />
       <InventorySuppliers suppliers={suppliers} />
     </div>

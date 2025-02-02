@@ -4,9 +4,10 @@ import { AddCategoryDialog } from "./categories/AddCategoryDialog";
 import { CategoryList } from "./categories/CategoryList";
 import { useInventoryCategories } from "./categories/useInventoryCategories";
 import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function InventoryCategories() {
-  const { categories, isLoading, error } = useInventoryCategories();
+  const { categories, isLoading, error, organizationId } = useInventoryCategories();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
 
   const handleSelectCategory = (categoryId: string) => {
@@ -14,7 +15,15 @@ export function InventoryCategories() {
     console.log("Selected category:", categoryId);
   };
 
-  console.log('Current categories:', categories);
+  if (!organizationId) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Organization ID not found. Please ensure you are properly logged in.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Card>
@@ -30,9 +39,15 @@ export function InventoryCategories() {
       </CardHeader>
       <CardContent>
         {error ? (
-          <div className="text-center text-destructive py-4">Error loading categories</div>
+          <div className="text-center text-destructive py-4">
+            Error loading categories. Please try refreshing the page.
+          </div>
         ) : isLoading ? (
           <div className="text-center text-muted-foreground py-4">Loading categories...</div>
+        ) : categories.length === 0 ? (
+          <div className="text-center text-muted-foreground py-4">
+            No categories found. Click the "Add Category" button to create your first category.
+          </div>
         ) : (
           <CategoryList 
             categories={categories} 

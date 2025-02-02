@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
+import { toast } from "@/components/ui/use-toast";
 
 export function useInventoryCategories() {
   const { userProfile } = useOrganizationData();
@@ -8,10 +9,10 @@ export function useInventoryCategories() {
   const { data: categories = [], isLoading, error } = useQuery({
     queryKey: ['inventory-categories', userProfile?.organization_id],
     queryFn: async () => {
-      console.log('Fetching categories for organization:', userProfile?.organization_id);
+      console.log('Organization ID from profile:', userProfile?.organization_id);
       
       if (!userProfile?.organization_id) {
-        console.log('No organization ID found');
+        console.warn('No organization ID found in user profile');
         return [];
       }
       
@@ -19,23 +20,43 @@ export function useInventoryCategories() {
         .from('inventory_categories')
         .select('*')
         .eq('organization_id', userProfile.organization_id)
-        .order('name')
-        .throwOnError();
+        .order('name');
 
       if (error) {
-        console.error('Error fetching categories:', error);
-        return [];
+        console.error('Supabase query error:', error);
+        toast({
+          title: "Error loading categories",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
       }
 
-      console.log('Fetched categories:', data);
+      if (!data || data.length === 0) {
+        console.log('No categories found for organization');
+      } else {
+        console.log(`Found ${data.length} categories:`, data);
+      }
+
       return data || [];
     },
-    enabled: !!userProfile?.organization_id
+    enabled: !!userProfile?.organization_id,
+    retry: 1,
+    staleTime: 30000, // Cache data for 30 seconds
+    onError: (error: Error) => {
+      console.error('Query error:', error);
+      toast({
+        title: "Error loading categories",
+        description: "Failed to load inventory categories. Please try again.",
+        variant: "destructive",
+      });
+    }
   });
 
-  if (error) {
-    console.error('Query error:', error);
-  }
-
-  return { categories, isLoading, error };
+  return { 
+    categories, 
+    isLoading, 
+    error,
+    organizationId: userProfile?.organization_id 
+  };
 }

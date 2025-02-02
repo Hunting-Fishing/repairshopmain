@@ -4,8 +4,23 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { supabase } from "@/integrations/supabase/client";
 import { AlertTriangle, TrendingUp, Package, DollarSign } from "lucide-react";
 
+interface CategoryStats {
+  name: string;
+  totalItems: number;
+  totalValue: number;
+  lowStock: number;
+}
+
+interface AnalyticsData {
+  categoryStats: CategoryStats[];
+  totalItems: number;
+  totalValue: number;
+  lowStockItems: number;
+  outOfStockItems: number;
+}
+
 export function InventoryAnalytics() {
-  const { data: analyticsData } = useQuery({
+  const { data: analyticsData } = useQuery<AnalyticsData>({
     queryKey: ['inventory-analytics'],
     queryFn: async () => {
       const { data: items, error } = await supabase
@@ -22,7 +37,7 @@ export function InventoryAnalytics() {
 
       if (!items) return null;
 
-      const categoryData = items.reduce((acc, item) => {
+      const categoryData: Record<string, CategoryStats> = items.reduce((acc, item) => {
         const category = item.category?.name || 'Uncategorized';
         if (!acc[category]) {
           acc[category] = {
@@ -38,7 +53,7 @@ export function InventoryAnalytics() {
           acc[category].lowStock++;
         }
         return acc;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, CategoryStats>);
 
       return {
         categoryStats: Object.values(categoryData),

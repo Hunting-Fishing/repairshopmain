@@ -22,6 +22,7 @@ export function useInventoryAnalytics() {
 
       const typedItems = items as unknown as InventoryItemWithCategory[];
 
+      // Group items by category and calculate stats
       const categoryData: Record<string, CategoryStats> = typedItems.reduce((acc, item) => {
         const category = item.category?.name || 'Uncategorized';
         if (!acc[category]) {
@@ -40,19 +41,27 @@ export function useInventoryAnalytics() {
         return acc;
       }, {} as Record<string, CategoryStats>);
 
+      // Calculate total metrics
+      const totalValue = typedItems.reduce((sum, item) => 
+        sum + (item.quantity_in_stock || 0) * (item.unit_cost || 0), 0
+      );
+
+      const lowStockItems = typedItems.filter(item => 
+        item.quantity_in_stock <= (item.reorder_point || 5)
+      ).length;
+
+      const outOfStockItems = typedItems.filter(item => 
+        item.quantity_in_stock === 0
+      ).length;
+
       return {
         categoryStats: Object.values(categoryData),
         totalItems: typedItems.length,
-        totalValue: typedItems.reduce((sum, item) => 
-          sum + (item.quantity_in_stock || 0) * (item.unit_cost || 0), 0
-        ),
-        lowStockItems: typedItems.filter(item => 
-          item.quantity_in_stock <= (item.reorder_point || 5)
-        ).length,
-        outOfStockItems: typedItems.filter(item => 
-          item.quantity_in_stock === 0
-        ).length
+        totalValue,
+        lowStockItems,
+        outOfStockItems
       };
-    }
+    },
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 }

@@ -3,47 +3,31 @@ import { List } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "sonner";
-import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
-import { CategoryForm } from "./components/CategoryForm";
-import { CategoryList } from "./components/CategoryList";
-import { useCategories } from "./hooks/useCategories";
-import type { CategoryFormData } from "./types";
+import { Form } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { useInventoryData } from "./hooks/useInventoryData";
+import type { InventoryCategory, CategoryFormData } from "./types";
 
-export function InventoryCategories() {
+interface InventoryCategoriesProps {
+  categories: InventoryCategory[];
+}
+
+export function InventoryCategories({ categories }: InventoryCategoriesProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
-  const { userProfile } = useOrganizationData();
-  
-  const {
-    categories,
-    isLoading,
-    error,
-    addCategory,
-    isAddingCategory
-  } = useCategories(userProfile?.organization_id);
+  const { addCategory } = useInventoryData();
+  const form = useForm<CategoryFormData>();
 
-  const handleAddCategory = async (data: CategoryFormData) => {
+  const onSubmit = async (data: CategoryFormData) => {
     try {
       await addCategory(data);
       setIsDialogOpen(false);
-      toast.success("Category added successfully");
+      form.reset();
     } catch (error) {
-      console.error('Error in handleAddCategory:', error);
-      toast.error("Failed to add category. Please try again.");
+      console.error("Error in onSubmit:", error);
     }
   };
-
-  if (!userProfile?.organization_id) {
-    return (
-      <Alert variant="destructive">
-        <AlertDescription>
-          Organization ID not found. Please ensure you are properly logged in.
-        </AlertDescription>
-      </Alert>
-    );
-  }
 
   return (
     <Card>
@@ -53,43 +37,61 @@ export function InventoryCategories() {
             <List className="h-5 w-5" />
             <CardTitle>Categories</CardTitle>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)}>
-              Add Category
-            </Button>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Category</DialogTitle>
-              </DialogHeader>
-              <CategoryForm 
-                onSubmit={handleAddCategory} 
-                isLoading={isAddingCategory} 
-              />
-            </DialogContent>
-          </Dialog>
+          <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)}>
+            Add Category
+          </Button>
         </div>
         <CardDescription>Inventory category management</CardDescription>
       </CardHeader>
       <CardContent>
-        {error ? (
-          <div className="text-center text-destructive py-4">
-            Error loading categories. Please try refreshing the page.
-          </div>
-        ) : isLoading ? (
-          <div className="text-center text-muted-foreground py-4">
-            Loading categories...
-          </div>
-        ) : categories.length === 0 ? (
-          <div className="text-center text-muted-foreground py-4">
-            No categories found. Click the "Add Category" button to create your first category.
-          </div>
-        ) : (
-          <CategoryList
-            categories={categories}
-            selectedCategoryId={selectedCategoryId}
-            onSelectCategory={setSelectedCategoryId}
-          />
-        )}
+        <div className="space-y-4">
+          {categories.map((category) => (
+            <Card key={category.id} className="p-4">
+              <h3 className="font-semibold">{category.name}</h3>
+              {category.description && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {category.description}
+                </p>
+              )}
+            </Card>
+          ))}
+        </div>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Category</DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium">
+                    Name
+                  </label>
+                  <Input
+                    id="name"
+                    {...form.register("name", { required: true })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="description" className="text-sm font-medium">
+                    Description
+                  </label>
+                  <Textarea
+                    id="description"
+                    {...form.register("description")}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit">Create Category</Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   );

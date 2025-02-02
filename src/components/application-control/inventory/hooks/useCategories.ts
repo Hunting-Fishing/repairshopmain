@@ -6,71 +6,43 @@ import type { InventoryCategory, CategoryFormData } from "../types";
 export function useCategories(organizationId?: string) {
   const queryClient = useQueryClient();
 
-  const { 
-    data: categories = [], 
-    isLoading, 
-    error 
-  } = useQuery({
-    queryKey: ['inventory-categories', organizationId],
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["inventory-categories", organizationId],
     queryFn: async () => {
-      if (!organizationId) {
-        throw new Error('No organization ID provided');
-      }
-      
       const { data, error } = await supabase
-        .from('inventory_categories')
-        .select('*')
-        .eq('organization_id', organizationId)
-        .order('name');
+        .from("inventory_categories")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .order("name");
 
-      if (error) {
-        console.error('Error fetching categories:', error);
-        throw new Error(error.message);
-      }
-
+      if (error) throw error;
       return data as InventoryCategory[];
     },
-    enabled: !!organizationId
+    enabled: !!organizationId,
   });
 
   const { mutateAsync: addCategory, isPending: isAddingCategory } = useMutation({
-    mutationFn: async (input: CategoryFormData) => {
-      if (!organizationId) {
-        throw new Error("No organization ID found");
-      }
+    mutationFn: async (data: CategoryFormData) => {
+      const { error } = await supabase
+        .from("inventory_categories")
+        .insert([{ ...data, organization_id: organizationId }]);
 
-      const categoryData = {
-        ...input,
-        organization_id: organizationId
-      };
-
-      const { data, error } = await supabase
-        .from('inventory_categories')
-        .insert([categoryData])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error adding category:', error);
-        throw new Error(error.message);
-      }
-
-      return data;
+      if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['inventory-categories'] });
-      toast.success('Category added successfully');
+      queryClient.invalidateQueries({ queryKey: ["inventory-categories"] });
+      toast.success("Category added successfully");
     },
-    onError: (error: Error) => {
-      toast.error(`Failed to add category: ${error.message}`);
-    }
+    onError: (error) => {
+      console.error("Error adding category:", error);
+      toast.error("Failed to add category");
+    },
   });
 
   return {
     categories,
-    isLoading,
-    error,
+    isLoading: categoriesLoading,
     addCategory,
-    isAddingCategory
+    isAddingCategory,
   };
 }

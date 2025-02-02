@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAddCategory } from "./useAddCategory";
+import { toast } from "sonner";
 
 interface CategoryFormProps {
   onSuccess: () => void;
@@ -12,13 +13,24 @@ interface CategoryFormProps {
 export function CategoryForm({ onSuccess }: CategoryFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const { addCategory } = useAddCategory();
+  const { addCategory, isLoading } = useAddCategory();
 
   const handleSubmit = async () => {
-    await addCategory({ name, description });
-    setName("");
-    setDescription("");
-    onSuccess();
+    if (!name.trim()) {
+      toast.error("Please enter a category name");
+      return;
+    }
+
+    try {
+      await addCategory({ name, description });
+      toast.success("Category added successfully");
+      setName("");
+      setDescription("");
+      onSuccess();
+    } catch (error) {
+      console.error('Error adding category:', error);
+      toast.error("Failed to add category. Please try again.");
+    }
   };
 
   return (
@@ -41,8 +53,12 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
           placeholder="Category description"
         />
       </div>
-      <Button onClick={handleSubmit} className="w-full">
-        Add Category
+      <Button 
+        onClick={handleSubmit} 
+        className="w-full"
+        disabled={isLoading}
+      >
+        {isLoading ? "Adding..." : "Add Category"}
       </Button>
     </div>
   );

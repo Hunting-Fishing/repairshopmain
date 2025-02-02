@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 export function useInventoryCategories() {
   const { userProfile } = useOrganizationData();
@@ -46,11 +46,7 @@ export function useInventoryCategories() {
   // Handle error with a side effect
   if (error) {
     console.error('Query error:', error);
-    toast({
-      title: "Error loading categories",
-      description: "Failed to load inventory categories. Please try again.",
-      variant: "destructive",
-    });
+    toast.error("Failed to load inventory categories. Please try again.");
   }
 
   return { 

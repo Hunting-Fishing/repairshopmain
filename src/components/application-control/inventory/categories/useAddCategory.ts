@@ -11,7 +11,7 @@ export function useAddCategory() {
   const queryClient = useQueryClient();
   const { userProfile } = useOrganizationData();
 
-  const { mutateAsync: addCategory, isLoading } = useMutation({
+  const { mutateAsync: addCategory, isPending } = useMutation({
     mutationFn: async (input: CategoryInput) => {
       if (!userProfile?.organization_id) {
         throw new Error("No organization ID found");
@@ -46,5 +46,5 @@ export function useAddCategory() {
     }
   });
 
-  return { addCategory, isLoading };
+  return { addCategory, isLoading: isPending };
 }

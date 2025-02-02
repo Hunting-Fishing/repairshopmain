@@ -5,10 +5,15 @@ import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 export function useInventoryCategories() {
   const { userProfile } = useOrganizationData();
 
-  const { data: categories = [], isLoading } = useQuery({
+  const { data: categories = [], isLoading, error } = useQuery({
     queryKey: ['inventory-categories', userProfile?.organization_id],
     queryFn: async () => {
-      if (!userProfile?.organization_id) return [];
+      console.log('Fetching categories for organization:', userProfile?.organization_id);
+      
+      if (!userProfile?.organization_id) {
+        console.log('No organization ID found');
+        return [];
+      }
       
       const { data, error } = await supabase
         .from('inventory_categories')
@@ -22,10 +27,15 @@ export function useInventoryCategories() {
         return [];
       }
 
+      console.log('Fetched categories:', data);
       return data || [];
     },
     enabled: !!userProfile?.organization_id
   });
 
-  return { categories, isLoading };
+  if (error) {
+    console.error('Query error:', error);
+  }
+
+  return { categories, isLoading, error };
 }

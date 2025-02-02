@@ -14,22 +14,20 @@ export function useAddCategory() {
   const { mutateAsync: addCategory, isPending } = useMutation({
     mutationFn: async (input: CategoryInput) => {
       if (!userProfile?.organization_id) {
+        console.error('No organization ID found when adding category');
         throw new Error("No organization ID found");
       }
 
-      console.log('Adding category:', {
+      const categoryData = {
         ...input,
         organization_id: userProfile.organization_id
-      });
+      };
+
+      console.log('Adding category with data:', categoryData);
 
       const { data, error } = await supabase
         .from('inventory_categories')
-        .insert([
-          {
-            ...input,
-            organization_id: userProfile.organization_id
-          }
-        ])
+        .insert([categoryData])
         .select()
         .single();
 
@@ -42,7 +40,11 @@ export function useAddCategory() {
       return data;
     },
     onSuccess: () => {
+      console.log('Invalidating categories query cache');
       queryClient.invalidateQueries({ queryKey: ['inventory-categories'] });
+    },
+    onError: (error) => {
+      console.error('Mutation error:', error);
     }
   });
 

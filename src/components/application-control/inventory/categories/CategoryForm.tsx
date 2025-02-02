@@ -22,6 +22,7 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
     }
 
     try {
+      console.log('Submitting category:', { name, description });
       await addCategory({ name, description });
       toast.success("Category added successfully");
       setName("");

@@ -9,7 +9,7 @@ export function useInventoryCategories() {
   const { data: categories = [], isLoading, error } = useQuery({
     queryKey: ['inventory-categories', userProfile?.organization_id],
     queryFn: async () => {
-      console.log('Fetching categories for organization:', userProfile?.organization_id);
+      console.log('Fetching categories - Organization ID:', userProfile?.organization_id);
       
       if (!userProfile?.organization_id) {
         console.warn('No organization ID found in user profile');
@@ -27,7 +27,11 @@ export function useInventoryCategories() {
         throw error;
       }
 
-      console.log('Categories fetched:', data);
+      console.log('Categories query response:', {
+        count: data?.length || 0,
+        data: data || []
+      });
+      
       return data || [];
     },
     enabled: !!userProfile?.organization_id,

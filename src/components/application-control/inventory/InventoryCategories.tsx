@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CategoryForm } from "./components/CategoryForm";
 import { CategoryList } from "./components/CategoryList";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useInventoryData } from "./hooks/useInventoryData";
 import type { InventoryCategory } from "./types";
 

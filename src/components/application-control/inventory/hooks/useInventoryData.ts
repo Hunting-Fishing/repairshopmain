@@ -65,7 +65,7 @@ export function useInventoryData() {
   });
 
   // Add Category
-  const { mutateAsync: addCategory } = useMutation({
+  const { mutateAsync: addCategory, isPending: isAddingCategory } = useMutation({
     mutationFn: async (data: CategoryFormData) => {
       const { error } = await supabase
         .from("inventory_categories")
@@ -84,7 +84,7 @@ export function useInventoryData() {
   });
 
   // Add Item
-  const { mutateAsync: addItem } = useMutation({
+  const { mutateAsync: addItem, isPending: isAddingItem } = useMutation({
     mutationFn: async (data: InventoryItemFormData) => {
       const { error } = await supabase
         .from("inventory_items")
@@ -108,6 +108,8 @@ export function useInventoryData() {
     suppliers,
     isLoading: categoriesLoading || itemsLoading || suppliersLoading,
     addCategory,
+    isAddingCategory,
     addItem,
+    isAddingItem,
   };
 }

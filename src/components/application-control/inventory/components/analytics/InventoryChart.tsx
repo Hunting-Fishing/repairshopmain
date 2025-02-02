@@ -1,114 +1,73 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { CategoryStats } from "../../types";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import type { CategoryStats } from "../../types";
 
 interface InventoryChartProps {
   data: CategoryStats[];
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="rounded-lg border bg-background p-4 shadow-md">
-        <p className="font-medium mb-2">{label}</p>
-        {payload.map((entry: any, index: number) => (
-          <div key={index} className="flex items-center justify-between gap-4 text-sm">
-            <span style={{ color: entry.color }}>{entry.name}:</span>
-            <span className="font-medium">{entry.value}</span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
-
-const CustomLegend = ({ payload }: any) => {
-  return (
-    <div className="flex justify-center gap-6 pt-4">
-      {payload.map((entry: any, index: number) => (
-        <div key={index} className="flex items-center gap-2">
-          <div 
-            className="h-3 w-3 rounded-full" 
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-sm text-muted-foreground">{entry.value}</span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
 export function InventoryChart({ data }: InventoryChartProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Inventory by Category</CardTitle>
-        <CardDescription>Distribution of items and value across categories</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[450px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart 
-              data={data} 
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-              barGap={8}
-            >
-              <CartesianGrid 
-                strokeDasharray="3 3" 
-                className="stroke-muted/30"
-                vertical={false}
-              />
-              <XAxis 
-                dataKey="name" 
-                className="text-xs"
-                tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
-                tickLine={false}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-              />
-              <YAxis 
-                yAxisId="left" 
-                orientation="left" 
-                stroke="hsl(var(--primary))"
-                tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
-                tickLine={false}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-                tickFormatter={(value) => `${value}`}
-              />
-              <YAxis 
-                yAxisId="right" 
-                orientation="right" 
-                stroke="hsl(var(--destructive))"
-                tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
-                tickLine={false}
-                axisLine={{ stroke: 'hsl(var(--border))' }}
-                tickFormatter={(value) => `${value}`}
-              />
-              <Tooltip 
-                content={<CustomTooltip />}
-                cursor={{ fill: 'hsl(var(--muted))', opacity: 0.1 }}
-              />
-              <Legend content={<CustomLegend />} />
-              <Bar 
-                yAxisId="left" 
-                dataKey="totalItems" 
-                fill="hsl(var(--primary))" 
-                name="Total Items"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={50}
-              />
-              <Bar 
-                yAxisId="right" 
-                dataKey="lowStock" 
-                fill="hsl(var(--destructive))" 
-                name="Low Stock"
-                radius={[4, 4, 0, 0]}
-                maxBarSize={50}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
+    <ResponsiveContainer width="100%" height={400}>
+      <BarChart data={data}>
+        <XAxis
+          dataKey="name"
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+        />
+        <YAxis
+          stroke="#888888"
+          fontSize={12}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => `$${value}`}
+        />
+        <Tooltip
+          content={({ active, payload }) => {
+            if (!active || !payload) return null;
+            const data = payload[0].payload as CategoryStats;
+            return (
+              <div className="rounded-lg border bg-background p-2 shadow-sm">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex flex-col">
+                    <span className="text-[0.70rem] uppercase text-muted-foreground">
+                      Category
+                    </span>
+                    <span className="font-bold">{data.name}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[0.70rem] uppercase text-muted-foreground">
+                      Value
+                    </span>
+                    <span className="font-bold">
+                      ${data.totalValue.toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[0.70rem] uppercase text-muted-foreground">
+                      Items
+                    </span>
+                    <span className="font-bold">{data.totalItems}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[0.70rem] uppercase text-muted-foreground">
+                      Low Stock
+                    </span>
+                    <span className="font-bold">{data.lowStock}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          }}
+        />
+        <Bar
+          dataKey="totalValue"
+          fill="currentColor"
+          radius={[4, 4, 0, 0]}
+          className="fill-primary"
+        />
+      </BarChart>
+    </ResponsiveContainer>
   );
 }

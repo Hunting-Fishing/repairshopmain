@@ -1,67 +1,71 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { InventoryItemWithCategory, AnalyticsData, CategoryStats } from "../../types";
+import type { AnalyticsData, CategoryStats } from "../../types";
 
 export function useInventoryAnalytics() {
-  return useQuery<AnalyticsData>({
-    queryKey: ['inventory-analytics'],
-    queryFn: async () => {
-      const { data: items, error } = await supabase
-        .from('inventory_items')
+  return useQuery({
+    queryKey: ["inventory-analytics"],
+    queryFn: async (): Promise<AnalyticsData> => {
+      const { data: items, error: itemsError } = await supabase
+        .from("inventory_items")
         .select(`
           id,
-          name,
           quantity_in_stock,
           unit_cost,
           reorder_point,
-          category:category_id(name)
-        `)
-        .throwOnError();
+          category_id,
+          inventory_categories (
+            name
+          )
+        `);
 
-      if (!items) return null;
+      if (itemsError) throw itemsError;
 
-      const typedItems = items as unknown as InventoryItemWithCategory[];
+      // Calculate analytics data
+      const categoryStats: { [key: string]: CategoryStats } = {};
+      let totalItems = 0;
+      let totalValue = 0;
+      let lowStockItems = 0;
+      let outOfStockItems = 0;
 
-      // Group items by category and calculate stats
-      const categoryData: Record<string, CategoryStats> = typedItems.reduce((acc, item) => {
-        const category = item.category?.name || 'Uncategorized';
-        if (!acc[category]) {
-          acc[category] = {
-            name: category,
+      items.forEach((item) => {
+        totalItems++;
+        
+        const quantity = item.quantity_in_stock || 0;
+        const cost = item.unit_cost || 0;
+        const value = quantity * cost;
+        totalValue += value;
+
+        if (quantity === 0) {
+          outOfStockItems++;
+        } else if (quantity <= (item.reorder_point || 0)) {
+          lowStockItems++;
+        }
+
+        const categoryName = item.inventory_categories?.name || "Uncategorized";
+        if (!categoryStats[categoryName]) {
+          categoryStats[categoryName] = {
+            name: categoryName,
             totalItems: 0,
             totalValue: 0,
             lowStock: 0
           };
         }
-        acc[category].totalItems++;
-        acc[category].totalValue += (item.quantity_in_stock || 0) * (item.unit_cost || 0);
-        if (item.quantity_in_stock <= (item.reorder_point || 5)) {
-          acc[category].lowStock++;
+
+        categoryStats[categoryName].totalItems++;
+        categoryStats[categoryName].totalValue += value;
+        if (quantity <= (item.reorder_point || 0)) {
+          categoryStats[categoryName].lowStock++;
         }
-        return acc;
-      }, {} as Record<string, CategoryStats>);
-
-      // Calculate total metrics
-      const totalValue = typedItems.reduce((sum, item) => 
-        sum + (item.quantity_in_stock || 0) * (item.unit_cost || 0), 0
-      );
-
-      const lowStockItems = typedItems.filter(item => 
-        item.quantity_in_stock <= (item.reorder_point || 5)
-      ).length;
-
-      const outOfStockItems = typedItems.filter(item => 
-        item.quantity_in_stock === 0
-      ).length;
+      });
 
       return {
-        categoryStats: Object.values(categoryData),
-        totalItems: typedItems.length,
+        categoryStats: Object.values(categoryStats),
+        totalItems,
         totalValue,
         lowStockItems,
         outOfStockItems
       };
-    },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    }
   });
 }

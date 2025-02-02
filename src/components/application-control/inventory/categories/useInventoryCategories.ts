@@ -9,7 +9,7 @@ export function useInventoryCategories() {
   const { data: categories = [], isLoading, error } = useQuery({
     queryKey: ['inventory-categories', userProfile?.organization_id],
     queryFn: async () => {
-      console.log('Organization ID from profile:', userProfile?.organization_id);
+      console.log('Fetching categories for organization:', userProfile?.organization_id);
       
       if (!userProfile?.organization_id) {
         console.warn('No organization ID found in user profile');
@@ -23,21 +23,14 @@ export function useInventoryCategories() {
         .order('name');
 
       if (error) {
-        console.error('Supabase query error:', error);
+        console.error('Error fetching categories:', error);
         throw error;
       }
 
-      if (!data || data.length === 0) {
-        console.log('No categories found for organization');
-      } else {
-        console.log(`Found ${data.length} categories:`, data);
-      }
-
+      console.log('Categories fetched:', data);
       return data || [];
     },
     enabled: !!userProfile?.organization_id,
-    retry: 1,
-    staleTime: 30000, // Cache data for 30 seconds
     meta: {
       errorMessage: "Failed to load inventory categories"
     }
@@ -46,7 +39,7 @@ export function useInventoryCategories() {
   // Handle error with a side effect
   if (error) {
     console.error('Query error:', error);
-    toast.error("Failed to load inventory categories. Please try again.");
+    toast.error("Failed to load inventory categories");
   }
 
   return { 

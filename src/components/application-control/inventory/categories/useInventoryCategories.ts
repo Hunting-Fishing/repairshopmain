@@ -24,11 +24,6 @@ export function useInventoryCategories() {
 
       if (error) {
         console.error('Supabase query error:', error);
-        toast({
-          title: "Error loading categories",
-          description: error.message,
-          variant: "destructive",
-        });
         throw error;
       }
 
@@ -43,15 +38,20 @@ export function useInventoryCategories() {
     enabled: !!userProfile?.organization_id,
     retry: 1,
     staleTime: 30000, // Cache data for 30 seconds
-    onError: (error: Error) => {
-      console.error('Query error:', error);
-      toast({
-        title: "Error loading categories",
-        description: "Failed to load inventory categories. Please try again.",
-        variant: "destructive",
-      });
+    meta: {
+      errorMessage: "Failed to load inventory categories"
     }
   });
+
+  // Handle error with a side effect
+  if (error) {
+    console.error('Query error:', error);
+    toast({
+      title: "Error loading categories",
+      description: "Failed to load inventory categories. Please try again.",
+      variant: "destructive",
+    });
+  }
 
   return { 
     categories, 

@@ -1,88 +1,62 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
+import { useInventoryCategories } from "./useInventoryCategories";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
+import { PlusCircle } from "lucide-react";
+import AddCategoryDialog from "./AddCategoryDialog";
+import { useState } from "react";
+import { toast } from "sonner";
 
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-}
+export default function CategoryList() {
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { categories, isLoading, error } = useInventoryCategories();
 
-interface CategoryListProps {
-  categories: Category[];
-  selectedCategoryId?: string;
-  onSelectCategory?: (categoryId: string) => void;
-}
+  if (error) {
+    toast.error("Failed to load categories");
+    return <div>Error loading categories</div>;
+  }
 
-export function CategoryList({ 
-  categories, 
-  selectedCategoryId,
-  onSelectCategory 
-}: CategoryListProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Ensure smooth handling of resize observations
-    const resizeObserver = new ResizeObserver((entries) => {
-      // Use requestAnimationFrame to avoid resize loops
-      window.requestAnimationFrame(() => {
-        if (scrollRef.current) {
-          scrollRef.current.style.height = `${entries[0]?.contentRect.height || 300}px`;
-        }
-      });
-    });
-
-    if (scrollRef.current) {
-      resizeObserver.observe(scrollRef.current);
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
-
-  if (!categories || categories.length === 0) {
-    return (
-      <div className="text-center text-muted-foreground py-4">
-        No categories yet. Add your first category!
-      </div>
-    );
+  if (isLoading) {
+    return <div>Loading categories...</div>;
   }
 
   return (
-    <ScrollArea 
-      ref={scrollRef}
-      className="h-[300px] pr-4"
-      style={{ minHeight: "300px" }}
-    >
-      <div className="space-y-4">
-        {categories.map((category) => (
-          <div key={category.id}>
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full justify-between hover:bg-muted transition-colors",
-                selectedCategoryId === category.id && "bg-muted"
-              )}
-              onClick={() => onSelectCategory?.(category.id)}
-            >
-              <div className="space-y-1 text-left">
-                <h4 className="text-sm font-medium leading-none">{category.name}</h4>
-                {category.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">{category.description}</p>
-                )}
-              </div>
-              {selectedCategoryId === category.id && (
-                <Check className="h-4 w-4 text-primary" />
-              )}
-            </Button>
-            <Separator className="mt-2" />
-          </div>
-        ))}
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold tracking-tight">Categories</h2>
+        <Button onClick={() => setIsAddDialogOpen(true)}>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Add Category
+        </Button>
       </div>
-    </ScrollArea>
+
+      <ScrollArea className="h-[400px] w-full rounded-md border">
+        <div className="p-4 grid gap-4">
+          {categories.length === 0 ? (
+            <Card className="p-4 text-center text-muted-foreground">
+              No categories found. Click "Add Category" to create one.
+            </Card>
+          ) : (
+            categories.map((category) => (
+              <Card key={category.id} className="p-4 hover:bg-accent transition-colors">
+                <div className="space-y-2">
+                  <h3 className="font-semibold">{category.name}</h3>
+                  {category.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {category.description}
+                    </p>
+                  )}
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+      </ScrollArea>
+
+      <AddCategoryDialog
+        open={isAddDialogOpen}
+        onOpenChange={setIsAddDialogOpen}
+      />
+    </div>
   );
 }

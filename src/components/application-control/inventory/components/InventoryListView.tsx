@@ -1,6 +1,8 @@
 import { InventoryCard } from "./InventoryCard";
 import { InventorySort } from "./InventorySort";
 import { InventoryPagination } from "./InventoryPagination";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { InventoryItem } from "../types";
 
 interface InventoryListViewProps {
@@ -40,13 +42,19 @@ export function InventoryListView({
   );
 
   if (error) return (
-    <div className="text-center text-red-500 py-8">
-      Error loading inventory: {error.message}
-    </div>
+    <Alert variant="destructive">
+      <AlertCircle className="h-4 w-4" />
+      <AlertTitle>Error</AlertTitle>
+      <AlertDescription>
+        Failed to load inventory items: {error.message}
+      </AlertDescription>
+    </Alert>
   );
 
   if (!items?.length) return (
-    <div className="text-center py-8">No items found</div>
+    <div className="text-center py-8 text-muted-foreground">
+      No items found. Try adjusting your search or filters.
+    </div>
   );
 
   return (

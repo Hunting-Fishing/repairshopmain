@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useInventoryQuery } from "./hooks/useInventoryQuery";
 import { useInventorySubscription } from "./hooks/useInventorySubscription";
 import { InventoryListView } from "./components/InventoryListView";
+import { toast } from "sonner";
 
 interface InventoryListProps {
   searchQuery: string;
@@ -41,6 +42,13 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    if (error) {
+      toast.error("Failed to load inventory items. Please try again.");
+    }
+  };
+
   return (
     <InventoryListView
       items={itemsData?.items || []}
@@ -51,7 +59,7 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
       sortField={sortField}
       sortOrder={sortOrder}
       onSort={handleSort}
-      onPageChange={setCurrentPage}
+      onPageChange={handlePageChange}
     />
   );
 }

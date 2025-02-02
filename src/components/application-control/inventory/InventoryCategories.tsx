@@ -6,15 +6,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useForm } from "react-hook-form";
 import { useInventoryData } from "./hooks/useInventoryData";
 import type { InventoryCategory, CategoryFormData } from "./types";
 
 interface InventoryCategoriesProps {
   categories: InventoryCategory[];
+  isLoading?: boolean;
+  error?: Error | null;
 }
 
-export function InventoryCategories({ categories }: InventoryCategoriesProps) {
+export function InventoryCategories({ categories, isLoading, error }: InventoryCategoriesProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { addCategory } = useInventoryData();
   const form = useForm<CategoryFormData>();
@@ -28,6 +32,34 @@ export function InventoryCategories({ categories }: InventoryCategoriesProps) {
       console.error("Error in onSubmit:", error);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-4 w-64" />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-20 w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Failed to load categories: {error.message}
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Card>
@@ -55,6 +87,11 @@ export function InventoryCategories({ categories }: InventoryCategoriesProps) {
               )}
             </Card>
           ))}
+          {categories.length === 0 && (
+            <p className="text-center text-muted-foreground py-4">
+              No categories found. Add your first category to get started.
+            </p>
+          )}
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

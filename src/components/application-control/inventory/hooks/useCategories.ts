@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { InventoryCategory, CategoryFormData } from "../types";
+import { toast } from "sonner";
+import type { InventoryCategory, CategoryFormData } from "../types";
 
 export function useCategories(organizationId?: string) {
   const queryClient = useQueryClient();
@@ -13,8 +14,7 @@ export function useCategories(organizationId?: string) {
     queryKey: ['inventory-categories', organizationId],
     queryFn: async () => {
       if (!organizationId) {
-        console.warn('No organization ID found');
-        return [];
+        throw new Error('No organization ID provided');
       }
       
       const { data, error } = await supabase
@@ -25,7 +25,7 @@ export function useCategories(organizationId?: string) {
 
       if (error) {
         console.error('Error fetching categories:', error);
-        throw error;
+        throw new Error(error.message);
       }
 
       return data as InventoryCategory[];
@@ -52,13 +52,17 @@ export function useCategories(organizationId?: string) {
 
       if (error) {
         console.error('Error adding category:', error);
-        throw error;
+        throw new Error(error.message);
       }
 
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['inventory-categories'] });
+      toast.success('Category added successfully');
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to add category: ${error.message}`);
     }
   });
 

@@ -4,6 +4,7 @@ import { StatsCards } from "@/components/dashboard/StatsCards";
 import { CalendarSection } from "@/components/dashboard/CalendarSection";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { useCalendarBookings } from "@/hooks/useCalendarBookings";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 interface TimeSlot {
   start: Date;
@@ -16,7 +17,7 @@ export function DashboardLayout() {
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
 
-  const { data: bookings, isLoading } = useCalendarBookings(selectedDate);
+  const { data: bookings, isLoading, error } = useCalendarBookings(selectedDate);
 
   const handleTimeSlotClick = (start: Date, end: Date) => {
     setSelectedTimeSlot({ start, end });
@@ -28,33 +29,39 @@ export function DashboardLayout() {
     setSelectedTimeSlot(null);
   };
 
+  if (error) {
+    throw error; // This will be caught by the ErrorBoundary
+  }
+
   return (
-    <div className="space-y-6">
-      <DashboardHeader
-        title="Dashboard"
-        description="Overview of your repair shop's performance"
-      />
+    <ErrorBoundary>
+      <div className="space-y-6">
+        <DashboardHeader
+          title="Dashboard"
+          description="Overview of your repair shop's performance"
+        />
 
-      <StatsCards />
+        <StatsCards />
 
-      <div className="grid gap-4">
-        <CalendarSection
-          selectedDate={selectedDate}
-          view={view}
-          bookings={bookings || []}
-          isLoading={isLoading}
-          onDateChange={(date) => date && setSelectedDate(date)}
-          onViewChange={setView}
-          onTimeSlotClick={handleTimeSlotClick}
+        <div className="grid gap-4">
+          <CalendarSection
+            selectedDate={selectedDate}
+            view={view}
+            bookings={bookings || []}
+            isLoading={isLoading}
+            onDateChange={(date) => date && setSelectedDate(date)}
+            onViewChange={setView}
+            onTimeSlotClick={handleTimeSlotClick}
+          />
+        </div>
+
+        <BookingDialog
+          open={isBookingDialogOpen}
+          onOpenChange={setIsBookingDialogOpen}
+          selectedTimeSlot={selectedTimeSlot}
+          onBookingCreated={handleBookingCreated}
         />
       </div>
-
-      <BookingDialog
-        open={isBookingDialogOpen}
-        onOpenChange={setIsBookingDialogOpen}
-        selectedTimeSlot={selectedTimeSlot}
-        onBookingCreated={handleBookingCreated}
-      />
-    </div>
+    </ErrorBoundary>
   );
 }

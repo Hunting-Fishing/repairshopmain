@@ -19,13 +19,63 @@ interface Category {
   description?: string;
 }
 
+interface CategoryFormProps {
+  onSubmit: (name: string, description?: string) => Promise<void>;
+  isLoading: boolean;
+}
+
+function CategoryForm({ onSubmit, isLoading }: CategoryFormProps) {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+
+  const handleSubmit = async () => {
+    if (!name.trim()) {
+      toast.error("Please enter a category name");
+      return;
+    }
+
+    await onSubmit(name, description);
+    setName("");
+    setDescription("");
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="name">Name</Label>
+        <Input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Category name"
+        />
+      </div>
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Category description"
+        />
+      </div>
+      <Button 
+        onClick={handleSubmit} 
+        className="w-full"
+        disabled={isLoading}
+      >
+        {isLoading ? "Adding..." : "Add Category"}
+      </Button>
+    </div>
+  );
+}
+
 export function InventoryCategories() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
   const { userProfile } = useOrganizationData();
   const queryClient = useQueryClient();
 
-  // Query for fetching categories
   const { data: categories = [], isLoading, error } = useQuery({
     queryKey: ['inventory-categories', userProfile?.organization_id],
     queryFn: async () => {
@@ -50,7 +100,6 @@ export function InventoryCategories() {
     enabled: !!userProfile?.organization_id
   });
 
-  // Mutation for adding categories
   const { mutateAsync: addCategory, isPending: isAddingCategory } = useMutation({
     mutationFn: async (input: { name: string; description?: string }) => {
       if (!userProfile?.organization_id) {
@@ -168,56 +217,5 @@ export function InventoryCategories() {
         )}
       </CardContent>
     </Card>
-  );
-}
-
-interface CategoryFormProps {
-  onSubmit: (name: string, description?: string) => Promise<void>;
-  isLoading: boolean;
-}
-
-function CategoryForm({ onSubmit, isLoading }: CategoryFormProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-
-  const handleSubmit = async () => {
-    if (!name.trim()) {
-      toast.error("Please enter a category name");
-      return;
-    }
-
-    await onSubmit(name, description);
-    setName("");
-    setDescription("");
-  };
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Category name"
-        />
-      </div>
-      <div>
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Category description"
-        />
-      </div>
-      <Button 
-        onClick={handleSubmit} 
-        className="w-full"
-        disabled={isLoading}
-      >
-        {isLoading ? "Adding..." : "Add Category"}
-      </Button>
-    </div>
   );
 }

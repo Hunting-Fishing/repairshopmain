@@ -19,6 +19,17 @@ interface AnalyticsData {
   outOfStockItems: number;
 }
 
+interface InventoryItemWithCategory {
+  id: string;
+  name: string;
+  quantity_in_stock: number | null;
+  unit_cost: number | null;
+  reorder_point: number | null;
+  category: {
+    name: string | null;
+  } | null;
+}
+
 export function InventoryAnalytics() {
   const { data: analyticsData } = useQuery<AnalyticsData>({
     queryKey: ['inventory-analytics'],
@@ -37,7 +48,7 @@ export function InventoryAnalytics() {
 
       if (!items) return null;
 
-      const categoryData: Record<string, CategoryStats> = items.reduce((acc, item) => {
+      const categoryData: Record<string, CategoryStats> = (items as InventoryItemWithCategory[]).reduce((acc, item) => {
         const category = item.category?.name || 'Uncategorized';
         if (!acc[category]) {
           acc[category] = {

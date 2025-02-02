@@ -1,9 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Category } from "../types";
+import { InventoryCategory } from "../types";
 
 interface CategoryListProps {
-  categories: Category[];
+  categories: InventoryCategory[];
   selectedCategoryId?: string;
   onSelectCategory: (categoryId: string) => void;
 }

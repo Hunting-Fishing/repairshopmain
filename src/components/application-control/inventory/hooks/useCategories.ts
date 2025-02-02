@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Category, CategoryFormData } from "../types";
+import { InventoryCategory, CategoryFormData } from "../types";
 
 export function useCategories(organizationId?: string) {
   const queryClient = useQueryClient();
@@ -28,7 +28,7 @@ export function useCategories(organizationId?: string) {
         throw error;
       }
 
-      return data as Category[];
+      return data as InventoryCategory[];
     },
     enabled: !!organizationId
   });

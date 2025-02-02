@@ -186,12 +186,14 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
       {totalPages > 1 && (
         <Pagination className="mt-4">
           <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              />
-            </PaginationItem>
+            {currentPage > 1 && (
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+            )}
             {[...Array(totalPages)].map((_, i) => (
               <PaginationItem key={i + 1}>
                 <PaginationLink
@@ -202,12 +204,14 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
                 </PaginationLink>
               </PaginationItem>
             ))}
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-              />
-            </PaginationItem>
+            {currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
+                />
+              </PaginationItem>
+            )}
           </PaginationContent>
         </Pagination>
       )}

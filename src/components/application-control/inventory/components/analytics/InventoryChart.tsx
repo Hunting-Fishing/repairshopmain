@@ -25,8 +25,11 @@ export function InventoryChart({ data }: InventoryChartProps) {
         />
         <Tooltip
           content={({ active, payload }) => {
-            if (!active || !payload) return null;
-            const data = payload[0].payload as CategoryStats;
+            if (!active || !payload || payload.length === 0) return null;
+            
+            const data = payload[0]?.payload as CategoryStats;
+            if (!data) return null;
+
             return (
               <div className="rounded-lg border bg-background p-2 shadow-sm">
                 <div className="grid grid-cols-2 gap-2">

@@ -48,7 +48,10 @@ export function InventoryAnalytics() {
 
       if (!items) return null;
 
-      const categoryData: Record<string, CategoryStats> = (items as InventoryItemWithCategory[]).reduce((acc, item) => {
+      // Type assertion after verifying the structure matches
+      const typedItems = items as unknown as InventoryItemWithCategory[];
+
+      const categoryData: Record<string, CategoryStats> = typedItems.reduce((acc, item) => {
         const category = item.category?.name || 'Uncategorized';
         if (!acc[category]) {
           acc[category] = {
@@ -68,14 +71,14 @@ export function InventoryAnalytics() {
 
       return {
         categoryStats: Object.values(categoryData),
-        totalItems: items.length,
-        totalValue: items.reduce((sum, item) => 
+        totalItems: typedItems.length,
+        totalValue: typedItems.reduce((sum, item) => 
           sum + (item.quantity_in_stock || 0) * (item.unit_cost || 0), 0
         ),
-        lowStockItems: items.filter(item => 
+        lowStockItems: typedItems.filter(item => 
           item.quantity_in_stock <= (item.reorder_point || 5)
         ).length,
-        outOfStockItems: items.filter(item => 
+        outOfStockItems: typedItems.filter(item => 
           item.quantity_in_stock === 0
         ).length
       };

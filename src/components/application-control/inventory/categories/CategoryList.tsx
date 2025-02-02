@@ -3,11 +3,11 @@ import { useInventoryCategories } from "./useInventoryCategories";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { PlusCircle } from "lucide-react";
-import AddCategoryDialog from "./AddCategoryDialog";
+import { AddCategoryDialog } from "./AddCategoryDialog";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function CategoryList() {
+export function CategoryList() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const { categories, isLoading, error } = useInventoryCategories();
 

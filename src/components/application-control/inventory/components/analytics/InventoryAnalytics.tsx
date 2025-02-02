@@ -4,7 +4,21 @@ import { InventoryChart } from "./InventoryChart";
 import { useInventoryAnalytics } from "./useInventoryAnalytics";
 
 export function InventoryAnalytics() {
-  const { data: analyticsData } = useInventoryAnalytics();
+  const { data: analyticsData, isLoading } = useInventoryAnalytics();
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[...Array(4)].map((_, i) => (
+          <MetricsCard
+            key={i}
+            title="Loading..."
+            value="..."
+          />
+        ))}
+      </div>
+    );
+  }
 
   if (!analyticsData) return null;
 

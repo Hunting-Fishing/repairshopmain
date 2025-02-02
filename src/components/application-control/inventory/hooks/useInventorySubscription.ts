@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { QueryObserverResult, RefetchOptions, RefetchQueryFilters } from '@tanstack/react-query';
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 
 export function useInventorySubscription(
-  refetch: <TPageData>(options?: (RefetchOptions & RefetchQueryFilters<TPageData>) | undefined) => Promise<QueryObserverResult>
+  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult>
 ) {
   useEffect(() => {
     const channel = supabase

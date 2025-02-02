@@ -40,6 +40,27 @@ export interface InventorySort {
   direction: 'asc' | 'desc';
 }
 
+export interface CategoryStats {
+  name: string;
+  totalItems: number;
+  totalValue: number;
+  lowStock: number;
+}
+
+export interface AnalyticsData {
+  categoryStats: CategoryStats[];
+  totalItems: number;
+  totalValue: number;
+  lowStockItems: number;
+  outOfStockItems: number;
+}
+
+export interface InventoryItemWithCategory extends InventoryItem {
+  category?: {
+    name: string | null;
+  } | null;
+}
+
 // Error and Response types
 export interface InventoryError {
   message: string;

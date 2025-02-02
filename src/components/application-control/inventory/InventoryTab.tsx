@@ -4,7 +4,6 @@ import { InventoryOverview } from "./InventoryOverview";
 import { InventoryCategories } from "./InventoryCategories";
 import { InventorySuppliers } from "./InventorySuppliers";
 import { InventoryAnalytics } from "./components/InventoryAnalytics";
-import type { InventoryItem, InventoryCategory, InventorySupplier } from "./types";
 
 export function InventoryTab() {
   const { isLoading, categories, items, suppliers } = useInventoryData();

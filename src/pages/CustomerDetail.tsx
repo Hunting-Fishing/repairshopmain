@@ -1,17 +1,26 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CustomerForm } from "@/components/customers/CustomerForm";
-import { Suspense } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CustomerDetail() {
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleSuccess = () => {
-    navigate("/customers"); // Navigate back to customers list after success
+    toast({
+      title: "Success",
+      description: "Customer details have been saved.",
+    });
+    navigate("/customers");
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <CustomerForm onSuccess={handleSuccess} />
-    </Suspense>
+    <div className="container mx-auto py-6">
+      <CustomerForm 
+        customerId={id} 
+        onSuccess={handleSuccess}
+      />
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { AlertTriangle, TrendingUp, Package, DollarSign } from "lucide-react";
 import { MetricsCard } from "./MetricsCard";
 import { InventoryChart } from "./InventoryChart";
-import { useInventoryAnalytics } from "./analytics/useInventoryAnalytics";
+import { useInventoryAnalytics } from "./useInventoryAnalytics";
 
 export function InventoryAnalytics() {
   const { data: analyticsData } = useInventoryAnalytics();

@@ -3,6 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useRef } from "react";
 
 interface Category {
   id: string;
@@ -21,6 +22,28 @@ export function CategoryList({
   selectedCategoryId,
   onSelectCategory 
 }: CategoryListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Ensure smooth handling of resize observations
+    const resizeObserver = new ResizeObserver((entries) => {
+      // Use requestAnimationFrame to avoid resize loops
+      window.requestAnimationFrame(() => {
+        if (scrollRef.current) {
+          scrollRef.current.style.height = `${entries[0]?.contentRect.height || 300}px`;
+        }
+      });
+    });
+
+    if (scrollRef.current) {
+      resizeObserver.observe(scrollRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   if (!categories || categories.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-4">
@@ -30,7 +53,11 @@ export function CategoryList({
   }
 
   return (
-    <ScrollArea className="h-[300px] pr-4">
+    <ScrollArea 
+      ref={scrollRef}
+      className="h-[300px] pr-4"
+      style={{ minHeight: "300px" }}
+    >
       <div className="space-y-4">
         {categories.map((category) => (
           <div key={category.id}>

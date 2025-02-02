@@ -18,7 +18,8 @@ export default function CustomerDetail() {
   return (
     <div className="container mx-auto py-6">
       <CustomerForm 
-        customerId={id} 
+        mode={id ? "edit" : "create"}
+        initialData={id ? { id } : undefined}
         onSuccess={handleSuccess}
       />
     </div>

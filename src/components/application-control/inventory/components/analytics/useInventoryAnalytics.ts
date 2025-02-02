@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { InventoryItemWithCategory, AnalyticsData } from "../types";
+import type { InventoryItemWithCategory, AnalyticsData, CategoryStats } from "../../types";
 
 export function useInventoryAnalytics() {
   return useQuery<AnalyticsData>({

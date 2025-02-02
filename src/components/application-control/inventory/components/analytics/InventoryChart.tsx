@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { CategoryStats } from "../types";
+import { CategoryStats } from "../../types";
 
 interface InventoryChartProps {
   data: CategoryStats[];

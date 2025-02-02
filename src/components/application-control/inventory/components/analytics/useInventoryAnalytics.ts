@@ -7,6 +7,7 @@ interface InventoryItemWithCategory {
   quantity_in_stock: number | null;
   unit_cost: number | null;
   reorder_point: number | null;
+  category_id: string | null;
   inventory_categories: {
     name: string | null;
   } | null;
@@ -38,7 +39,7 @@ export function useInventoryAnalytics() {
       let lowStockItems = 0;
       let outOfStockItems = 0;
 
-      (items as InventoryItemWithCategory[]).forEach((item) => {
+      (items as unknown as InventoryItemWithCategory[]).forEach((item) => {
         totalItems++;
         
         const quantity = item.quantity_in_stock || 0;

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { InventoryCard } from "./components/InventoryCard";
 import { InventorySort } from "./components/InventorySort";
 import { InventoryPagination } from "./components/InventoryPagination";
+import { toast } from "sonner";
 
 interface InventoryListProps {
   searchQuery: string;
@@ -23,7 +24,7 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const itemsPerPage = 9;
 
-  const { data: itemsData, isLoading, error } = useQuery({
+  const { data: itemsData, isLoading, error, refetch } = useQuery({
     queryKey: ['inventory-items', searchQuery, filters, currentPage, sortField, sortOrder],
     queryFn: async () => {
       let query = supabase
@@ -58,6 +59,36 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
       return { items: data, total: count || 0 };
     }
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('inventory-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'inventory_items'
+        },
+        async (payload) => {
+          // Show toast notification based on the event
+          if (payload.eventType === 'INSERT') {
+            toast.success('New inventory item added');
+          } else if (payload.eventType === 'UPDATE') {
+            toast.info('Inventory item updated');
+          } else if (payload.eventType === 'DELETE') {
+            toast.warning('Inventory item removed');
+          }
+          // Refetch the data to update the UI
+          await refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {

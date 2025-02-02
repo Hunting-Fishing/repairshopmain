@@ -7,17 +7,21 @@ import { AddCategoryDialog } from "./AddCategoryDialog";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function CategoryList() {
+interface CategoryListProps {
+  categories: Array<{
+    id: string;
+    name: string;
+    description?: string;
+  }>;
+  selectedCategoryId?: string;
+  onSelectCategory: (categoryId: string) => void;
+}
+
+export function CategoryList({ categories, selectedCategoryId, onSelectCategory }: CategoryListProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { categories, isLoading, error } = useInventoryCategories();
 
-  if (error) {
-    toast.error("Failed to load categories");
-    return <div>Error loading categories</div>;
-  }
-
-  if (isLoading) {
-    return <div>Loading categories...</div>;
+  if (!categories) {
+    return <div>No categories available</div>;
   }
 
   return (
@@ -38,7 +42,13 @@ export function CategoryList() {
             </Card>
           ) : (
             categories.map((category) => (
-              <Card key={category.id} className="p-4 hover:bg-accent transition-colors">
+              <Card 
+                key={category.id} 
+                className={`p-4 hover:bg-accent transition-colors cursor-pointer ${
+                  selectedCategoryId === category.id ? 'bg-accent' : ''
+                }`}
+                onClick={() => onSelectCategory(category.id)}
+              >
                 <div className="space-y-2">
                   <h3 className="font-semibold">{category.name}</h3>
                   {category.description && (
@@ -54,7 +64,7 @@ export function CategoryList() {
       </ScrollArea>
 
       <AddCategoryDialog
-        open={isAddDialogOpen}
+        isOpen={isAddDialogOpen}
         onOpenChange={setIsAddDialogOpen}
       />
     </div>

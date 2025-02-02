@@ -4,11 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CategoryForm } from "./CategoryForm";
 
-export function AddCategoryDialog() {
-  const [isOpen, setIsOpen] = useState(false);
+interface AddCategoryDialogProps {
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function AddCategoryDialog({ isOpen, onOpenChange }: AddCategoryDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  const isControlled = isOpen !== undefined && onOpenChange !== undefined;
+  const open = isControlled ? isOpen : internalOpen;
+  const setOpen = isControlled ? onOpenChange : setInternalOpen;
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Plus className="h-4 w-4 mr-2" />
@@ -19,7 +28,7 @@ export function AddCategoryDialog() {
         <DialogHeader>
           <DialogTitle>Add New Category</DialogTitle>
         </DialogHeader>
-        <CategoryForm onSuccess={() => setIsOpen(false)} />
+        <CategoryForm onSuccess={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   );

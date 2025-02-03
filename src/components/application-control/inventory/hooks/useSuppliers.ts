@@ -19,17 +19,22 @@ export function useSuppliers(organizationId?: string) {
         .from("inventory_suppliers")
         .select("*")
         .eq("organization_id", organizationId)
-        .order("name");
+        .order("name")
+        .throwOnError();
 
       if (error) {
         console.error("useSuppliers - Supabase error:", error);
         throw error;
       }
 
-      console.log("useSuppliers - Fetched suppliers:", data?.length, "suppliers");
+      console.log("useSuppliers - Fetched suppliers:", data);
       return data as InventorySupplier[];
     },
     enabled: !!organizationId,
+    // Force a refresh of the data
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    staleTime: 0
   });
 
   return {

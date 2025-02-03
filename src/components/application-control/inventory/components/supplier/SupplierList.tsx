@@ -1,7 +1,8 @@
 import { SupplierCard } from "./SupplierCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Globe, Search } from "lucide-react";
+import { Loader2, Globe, Search, ArrowUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import type { InventorySupplier } from "../../types";
 
@@ -12,6 +13,7 @@ interface SupplierListProps {
 
 export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const groupedSuppliers = useMemo(() => {
     if (!suppliers) return {};
@@ -22,7 +24,12 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
       supplier.notes?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    return filtered.reduce((acc, supplier) => {
+    const sorted = filtered.sort((a, b) => {
+      const comparison = a.name.localeCompare(b.name);
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+
+    return sorted.reduce((acc, supplier) => {
       const country = supplier.address?.toLowerCase().includes('canada') 
         ? 'Canada' 
         : supplier.address?.toLowerCase().includes('usa') || supplier.address?.toLowerCase().includes('united states')
@@ -35,7 +42,7 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
       acc[country].push(supplier);
       return acc;
     }, {} as Record<string, InventorySupplier[]>);
-  }, [suppliers, searchQuery]);
+  }, [suppliers, searchQuery, sortOrder]);
 
   if (isLoading) {
     return (
@@ -58,16 +65,36 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
     );
   }
 
+  const totalSuppliers = Object.values(groupedSuppliers).reduce(
+    (total, suppliers) => total + suppliers.length,
+    0
+  );
+
   return (
     <div className="space-y-6">
-      <div className="relative">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search suppliers..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search suppliers..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSortOrder(order => order === 'asc' ? 'desc' : 'asc')}
+          className="flex items-center gap-2"
+        >
+          <ArrowUpDown className="h-4 w-4" />
+          Sort {sortOrder === 'asc' ? 'A-Z' : 'Z-A'}
+        </Button>
+      </div>
+
+      <div className="text-sm text-muted-foreground">
+        Viewing {totalSuppliers} suppliers
       </div>
 
       {Object.entries(groupedSuppliers).map(([region, regionSuppliers]) => (

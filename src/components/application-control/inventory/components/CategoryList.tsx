@@ -20,6 +20,10 @@ export function CategoryList({
   isLoading,
   error 
 }: CategoryListProps) {
+  console.log("CategoryList - Rendering with categories:", categories);
+  console.log("CategoryList - Loading state:", isLoading);
+  console.log("CategoryList - Selected category:", selectedCategoryId);
+
   if (isLoading) {
     return (
       <div className="space-y-2">
@@ -44,24 +48,27 @@ export function CategoryList({
   return (
     <ScrollArea className="h-[400px]">
       <div className="space-y-2">
-        {categories.map((category) => (
-          <Card 
-            key={category.id}
-            className={`p-4 hover:bg-accent transition-colors cursor-pointer ${
-              selectedCategoryId === category.id ? 'bg-accent' : ''
-            }`}
-            onClick={() => onSelectCategory(category.id)}
-          >
-            <div className="space-y-1">
-              <h3 className="font-semibold">{category.name}</h3>
-              {category.description && (
-                <p className="text-sm text-muted-foreground">
-                  {category.description}
-                </p>
-              )}
-            </div>
-          </Card>
-        ))}
+        {categories.map((category) => {
+          console.log("CategoryList - Rendering category:", category);
+          return (
+            <Card 
+              key={category.id}
+              className={`p-4 hover:bg-accent transition-colors cursor-pointer ${
+                selectedCategoryId === category.id ? 'bg-accent' : ''
+              }`}
+              onClick={() => onSelectCategory(category.id)}
+            >
+              <div className="space-y-1">
+                <h3 className="font-semibold">{category.name}</h3>
+                {category.description && (
+                  <p className="text-sm text-muted-foreground">
+                    {category.description}
+                  </p>
+                )}
+              </div>
+            </Card>
+          );
+        })}
         {categories.length === 0 && (
           <p className="text-center text-muted-foreground py-4">
             No categories found. Click "Add Category" to create one.

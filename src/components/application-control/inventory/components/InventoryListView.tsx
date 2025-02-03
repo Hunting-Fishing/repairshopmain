@@ -3,6 +3,7 @@ import { InventorySort } from "./InventorySort";
 import { InventoryPagination } from "./InventoryPagination";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { InventoryItem } from "../types";
 
 interface InventoryListViewProps {
@@ -31,15 +32,22 @@ export function InventoryListView({
   onSort,
   onPageChange,
 }: InventoryListViewProps) {
-  if (isLoading) return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {[...Array(6)].map((_, i) => (
-        <div key={i} className="animate-pulse">
-          <div className="h-[200px] bg-gray-100 rounded-lg" />
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-end">
+          <Skeleton className="h-10 w-32" />
         </div>
-      ))}
-    </div>
-  );
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="space-y-4">
+              <Skeleton className="h-[280px] w-full rounded-lg" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (error) return (
     <Alert variant="destructive">

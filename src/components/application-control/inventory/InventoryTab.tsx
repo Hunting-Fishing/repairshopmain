@@ -4,16 +4,27 @@ import { InventoryOverview } from "./InventoryOverview";
 import { InventoryCategories } from "./InventoryCategories";
 import { InventorySuppliers } from "./InventorySuppliers";
 import { InventoryAnalytics } from "./components/InventoryAnalytics";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function InventoryTab() {
   const { isLoading, categories, items, suppliers } = useInventoryData();
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <div className="h-[400px] rounded-lg border bg-card text-card-foreground shadow-sm animate-pulse" />
-        <div className="h-[400px] rounded-lg border bg-card text-card-foreground shadow-sm animate-pulse" />
-        <div className="h-[400px] rounded-lg border bg-card text-card-foreground shadow-sm animate-pulse" />
+      <div className="space-y-6">
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-[120px] w-full rounded-lg" />
+            ))}
+          </div>
+          <Skeleton className="h-[300px] w-full rounded-lg" />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-[400px] rounded-lg" />
+          ))}
+        </div>
       </div>
     );
   }

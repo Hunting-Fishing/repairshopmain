@@ -9,14 +9,14 @@ interface InventorySuppliersProps {
 }
 
 export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
-  console.log("InventorySuppliers - suppliers:", suppliers); // Debug log
+  console.log("InventorySuppliers - Rendering with suppliers:", suppliers);
 
   if (!Array.isArray(suppliers)) {
     console.error("InventorySuppliers - suppliers is not an array:", suppliers);
     return (
       <Card>
         <CardContent className="p-6 text-center text-muted-foreground">
-          Error loading suppliers. Please try again.
+          Error loading suppliers data. Please try refreshing the page.
         </CardContent>
       </Card>
     );
@@ -88,7 +88,11 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
       ) : (
         <Card>
           <CardContent className="p-6 text-center text-muted-foreground">
-            No suppliers found. Add your first supplier to get started.
+            {suppliers.length === 0 ? (
+              "No suppliers found. Add your first supplier to get started."
+            ) : (
+              "Loading suppliers..."
+            )}
           </CardContent>
         </Card>
       )}

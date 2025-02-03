@@ -7,8 +7,10 @@ export function useInventoryData() {
   const { userProfile } = useOrganizationData();
   const organizationId = userProfile?.organization_id;
 
-  console.log("useInventoryData - organizationId:", organizationId);
-  console.log("useInventoryData - userProfile:", userProfile);
+  console.log("useInventoryData - Starting hook with:", {
+    userProfile,
+    organizationId
+  });
 
   const { 
     categories, 
@@ -31,9 +33,15 @@ export function useInventoryData() {
     error: suppliersError 
   } = useSuppliers(organizationId);
 
-  console.log("useInventoryData - suppliers:", suppliers);
-  console.log("useInventoryData - suppliersError:", suppliersError);
-  console.log("useInventoryData - isLoading:", categoriesLoading || itemsLoading || suppliersLoading);
+  console.log("useInventoryData - Hook state:", {
+    categories: categories?.length,
+    items: items?.length,
+    suppliers: suppliers?.length,
+    isLoading: categoriesLoading || itemsLoading || suppliersLoading,
+    categoriesError,
+    suppliersError,
+    organizationId
+  });
 
   return {
     categories,

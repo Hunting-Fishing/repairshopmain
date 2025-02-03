@@ -9,6 +9,9 @@ interface SupplierListProps {
 }
 
 export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
+  console.log("SupplierList - Number of suppliers:", suppliers?.length);
+  console.log("SupplierList - Loading state:", isLoading);
+
   if (isLoading) {
     return (
       <Card>

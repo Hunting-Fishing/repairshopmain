@@ -1,6 +1,7 @@
 import { Building2 } from "lucide-react";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierList } from "./components/supplier/SupplierList";
+import { useSuppliers } from "./hooks/useSuppliers";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -8,10 +9,16 @@ interface InventorySuppliersProps {
 }
 
 export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
-  console.log("InventorySuppliers - Number of suppliers:", suppliers?.length);
+  const { suppliers: hookSuppliers, isLoading, error } = useSuppliers();
+  
+  console.log("InventorySuppliers - Props suppliers:", suppliers?.length);
+  console.log("InventorySuppliers - Hook suppliers:", hookSuppliers?.length);
 
-  if (!Array.isArray(suppliers)) {
-    console.error("InventorySuppliers - suppliers is not an array:", suppliers);
+  // Use hook suppliers if available, fallback to props
+  const displaySuppliers = hookSuppliers || suppliers;
+
+  if (!Array.isArray(displaySuppliers)) {
+    console.error("InventorySuppliers - suppliers is not an array:", displaySuppliers);
     return null;
   }
 
@@ -31,8 +38,8 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
       </div>
 
       <SupplierList 
-        suppliers={suppliers} 
-        isLoading={false} 
+        suppliers={displaySuppliers} 
+        isLoading={isLoading} 
       />
     </div>
   );

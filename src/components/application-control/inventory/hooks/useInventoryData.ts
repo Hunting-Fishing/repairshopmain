@@ -27,11 +27,12 @@ export function useInventoryData() {
 
   const { 
     suppliers, 
-    isLoading: suppliersLoading 
+    isLoading: suppliersLoading,
+    error: suppliersError 
   } = useSuppliers(organizationId);
 
-  console.log("useInventoryData - categories:", categories);
-  console.log("useInventoryData - categoriesError:", categoriesError);
+  console.log("useInventoryData - suppliers:", suppliers);
+  console.log("useInventoryData - suppliersError:", suppliersError);
   console.log("useInventoryData - isLoading:", categoriesLoading || itemsLoading || suppliersLoading);
 
   return {
@@ -39,7 +40,7 @@ export function useInventoryData() {
     items,
     suppliers,
     isLoading: categoriesLoading || itemsLoading || suppliersLoading,
-    error: categoriesError,
+    error: categoriesError || suppliersError,
     addCategory,
     isAddingCategory,
     addItem,

@@ -12,7 +12,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ListTree, Users, Settings, List, History } from "lucide-react";
 
 export function InventoryTab() {
-  const { isLoading, categories, items, suppliers } = useInventoryData();
+  const { isLoading, categories, items, suppliers, error } = useInventoryData();
+
+  console.log("InventoryTab - Loading:", isLoading);
+  console.log("InventoryTab - Suppliers:", suppliers);
+  console.log("InventoryTab - Error:", error);
 
   if (isLoading) {
     return (

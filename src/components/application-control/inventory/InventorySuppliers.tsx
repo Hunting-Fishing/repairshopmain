@@ -12,6 +12,17 @@ interface InventorySuppliersProps {
 export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
   console.log("InventorySuppliers - suppliers:", suppliers); // Debug log
 
+  if (!Array.isArray(suppliers)) {
+    console.error("InventorySuppliers - suppliers is not an array:", suppliers);
+    return (
+      <Card>
+        <CardContent className="p-6 text-center text-muted-foreground">
+          Error loading suppliers. Please try again.
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">

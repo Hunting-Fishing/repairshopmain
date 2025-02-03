@@ -6,6 +6,9 @@ import type { InventoryCategory, CategoryFormData } from "../types";
 export function useCategories(organizationId?: string) {
   const queryClient = useQueryClient();
 
+  // Add console.log to debug
+  console.log("Fetching categories for organization:", organizationId);
+
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["inventory-categories", organizationId],
     queryFn: async () => {
@@ -15,7 +18,13 @@ export function useCategories(organizationId?: string) {
         .eq("organization_id", organizationId)
         .order("name");
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching categories:", error);
+        throw error;
+      }
+      
+      // Add console.log to debug
+      console.log("Fetched categories:", data);
       return data as InventoryCategory[];
     },
     enabled: !!organizationId,

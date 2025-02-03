@@ -20,6 +20,9 @@ export function InventoryCategories({ categories, isLoading, error }: InventoryC
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>();
   const { addCategory, isAddingCategory } = useInventoryData();
 
+  // Add console.log to debug
+  console.log("InventoryCategories received categories:", categories);
+
   const handleAddCategory = async (data: { name: string; description?: string }) => {
     try {
       await addCategory(data);

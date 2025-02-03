@@ -24,7 +24,7 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
           </Badge>
         </div>
         {supplier.contact_person && (
-          <CardDescription>Contact: {supplier.contact_person}</CardDescription>
+          <CardDescription>{supplier.contact_person}</CardDescription>
         )}
       </CardHeader>
       <CardContent className="space-y-2">

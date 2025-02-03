@@ -4,6 +4,8 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { queryKeys } from "./useQueryKeys";
 import type { Booking } from "@/types/calendar";
+import { useEffect } from "react";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 export function useCalendarBookings(selectedDate: Date) {
   const queryClient = useQueryClient();
@@ -31,7 +33,7 @@ export function useCalendarBookings(selectedDate: Date) {
       return data as Booking[];
     },
     staleTime: 30 * 1000, // Consider data fresh for 30 seconds
-    cacheTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 
   // Set up real-time subscription for booking updates
@@ -45,7 +47,7 @@ export function useCalendarBookings(selectedDate: Date) {
           schema: 'public',
           table: 'bookings'
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Booking>) => {
           // Invalidate the specific day's query when bookings change
           const date = payload.new?.start_time 
             ? format(new Date(payload.new.start_time), "yyyy-MM-dd")

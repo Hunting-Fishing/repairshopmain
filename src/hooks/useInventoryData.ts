@@ -2,7 +2,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { queryKeys } from "./useQueryKeys";
 import { toast } from "sonner";
+import { useEffect } from "react";
 import type { InventoryItem, InventoryCategory, InventorySupplier } from "@/components/application-control/inventory/types";
+import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 export function useInventoryData(organizationId?: string) {
   const queryClient = useQueryClient();
@@ -27,7 +29,7 @@ export function useInventoryData(organizationId?: string) {
     },
     enabled: !!organizationId,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
   });
 
   const {
@@ -54,7 +56,7 @@ export function useInventoryData(organizationId?: string) {
     },
     enabled: !!organizationId,
     staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
-    cacheTime: 15 * 60 * 1000, // Keep in cache for 15 minutes
+    gcTime: 15 * 60 * 1000, // Keep in cache for 15 minutes
   });
 
   const {
@@ -77,7 +79,7 @@ export function useInventoryData(organizationId?: string) {
     },
     enabled: !!organizationId,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
   });
 
   // Set up real-time subscription for inventory updates
@@ -93,7 +95,7 @@ export function useInventoryData(organizationId?: string) {
           schema: 'public',
           table: 'inventory_items'
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<InventoryItem>) => {
           // Invalidate queries when data changes
           queryClient.invalidateQueries({ queryKey: queryKeys.inventory.all });
           toast.info("Inventory updated");

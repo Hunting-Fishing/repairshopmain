@@ -2,6 +2,9 @@ import { Box, ArrowUpRight, MapPin, Phone, Mail, RefreshCw, FileText, Truck, Pac
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SupplierFeatures } from "./supplier-card/SupplierFeatures";
+import { SupplierStats } from "./supplier-card/SupplierStats";
+import { SupplierContact } from "./supplier-card/SupplierContact";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierCardProps {
@@ -14,13 +17,6 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
     : supplier.address?.toLowerCase().includes('usa') || supplier.address?.toLowerCase().includes('united states')
       ? 'USA' 
       : 'International';
-
-  const features = [
-    { icon: <RefreshCw className="h-4 w-4" />, label: "INVENTORY SYNC" },
-    { icon: <FileText className="h-4 w-4" />, label: "PRODUCT DATA UPLOAD" },
-    { icon: <Truck className="h-4 w-4" />, label: "ORDER ROUTING" },
-    { icon: <Package className="h-4 w-4" />, label: "SHIPMENT TRACKING" },
-  ];
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-200 overflow-hidden w-full">
@@ -48,59 +44,16 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
               </Button>
             </div>
 
-            <div className="flex flex-wrap gap-3 mb-4">
-              {features.map((feature, index) => (
-                <Badge 
-                  key={index}
-                  variant="outline" 
-                  className="bg-primary/5 hover:bg-primary/10 cursor-pointer transition-colors"
-                >
-                  {feature.icon}
-                  <span className="ml-1 text-xs">{feature.label}</span>
-                </Badge>
-              ))}
-            </div>
+            <SupplierFeatures />
 
-            <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t">
-              <div>
-                <div className="text-sm font-medium">Products</div>
-                <div className="mt-1 text-2xl font-bold">
-                  {Math.floor(Math.random() * 100000)}
-                </div>
-                <div className="text-xs text-muted-foreground">Total Products</div>
-              </div>
-              <div>
-                <div className="text-sm font-medium">With UPC</div>
-                <div className="mt-1 text-2xl font-bold">
-                  {Math.floor(Math.random() * 50000)}
-                </div>
-                <div className="text-xs text-muted-foreground">Products w/ UPC</div>
-              </div>
-            </div>
+            <SupplierStats />
 
             <div className="mt-4 pt-4 border-t">
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline" className="bg-primary/5">
                   {country}
                 </Badge>
-                {supplier.email && (
-                  <Badge variant="outline" className="bg-primary/5">
-                    <Mail className="h-3 w-3 mr-1" />
-                    {supplier.email}
-                  </Badge>
-                )}
-                {supplier.phone && (
-                  <Badge variant="outline" className="bg-primary/5">
-                    <Phone className="h-3 w-3 mr-1" />
-                    {supplier.phone}
-                  </Badge>
-                )}
-                {supplier.address && (
-                  <Badge variant="outline" className="bg-primary/5">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    {supplier.address}
-                  </Badge>
-                )}
+                <SupplierContact supplier={supplier} />
               </div>
             </div>
           </div>

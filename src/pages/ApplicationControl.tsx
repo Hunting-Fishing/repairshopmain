@@ -44,15 +44,7 @@ export default function ApplicationControl() {
         </TabsContent>
 
         <TabsContent value="inventory">
-          <Card>
-            <CardHeader>
-              <CardTitle>Inventory Management</CardTitle>
-              <CardDescription>Configure and manage your inventory system</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <InventoryTab />
-            </CardContent>
-          </Card>
+          <InventoryTab />
         </TabsContent>
 
         <TabsContent value="integrations">

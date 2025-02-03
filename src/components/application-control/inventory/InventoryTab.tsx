@@ -1,9 +1,11 @@
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInventoryData } from "./hooks/useInventoryData";
 import { InventoryOverview } from "./InventoryOverview";
 import { InventoryCategories } from "./InventoryCategories";
 import { InventorySuppliers } from "./InventorySuppliers";
 import { InventoryAnalytics } from "./components/analytics/InventoryAnalytics";
+import { InventorySettings } from "./components/settings/InventorySettings";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function InventoryTab() {
@@ -19,11 +21,6 @@ export function InventoryTab() {
             ))}
           </div>
           <Skeleton className="h-[300px] w-full rounded-lg" />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
-            <Skeleton key={i} className="h-[400px] rounded-lg" />
-          ))}
         </div>
       </div>
     );
@@ -42,11 +39,25 @@ export function InventoryTab() {
   return (
     <div className="space-y-6">
       <InventoryAnalytics />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <InventoryOverview />
-        <InventoryCategories categories={categories} />
-        <InventorySuppliers suppliers={suppliers} />
-      </div>
+      <Tabs defaultValue="categories" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="categories">
+          <InventoryCategories categories={categories} />
+        </TabsContent>
+        
+        <TabsContent value="suppliers">
+          <InventorySuppliers suppliers={suppliers} />
+        </TabsContent>
+        
+        <TabsContent value="settings">
+          <InventorySettings />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

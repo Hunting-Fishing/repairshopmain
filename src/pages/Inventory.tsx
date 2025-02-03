@@ -4,8 +4,6 @@ import { Input } from "@/components/ui/input";
 import { InventoryList } from "@/components/application-control/inventory/InventoryList";
 import { InventoryFilters } from "@/components/application-control/inventory/InventoryFilters";
 import { InventoryOverview } from "@/components/application-control/inventory/InventoryOverview";
-import { InventoryCategories } from "@/components/application-control/inventory/InventoryCategories";
-import { InventorySuppliers } from "@/components/application-control/inventory/InventorySuppliers";
 import { useInventoryData } from "@/components/application-control/inventory/hooks/useInventoryData";
 
 export default function Inventory() {
@@ -16,9 +14,8 @@ export default function Inventory() {
     needsReorder: false,
   });
 
-  const { categories, suppliers, isLoading, error } = useInventoryData();
+  const { isLoading, error } = useInventoryData();
   
-  console.log("Inventory Page - categories:", categories);
   console.log("Inventory Page - isLoading:", isLoading);
   console.log("Inventory Page - error:", error);
 
@@ -42,22 +39,13 @@ export default function Inventory() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Inventory Management</h1>
             <p className="text-muted-foreground">
-              Manage your inventory, track stock levels, and handle suppliers
+              Manage your inventory and track stock levels
             </p>
           </div>
         </div>
       </div>
 
       <InventoryOverview />
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <InventoryCategories 
-          categories={categories || []} 
-          isLoading={isLoading}
-          error={error}
-        />
-        <InventorySuppliers suppliers={suppliers || []} />
-      </div>
 
       <div className="flex gap-4 items-center">
         <div className="relative flex-1">

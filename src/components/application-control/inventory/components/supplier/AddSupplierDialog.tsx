@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useSupabase } from "@/hooks/useSupabase";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface AddSupplierFormData {
@@ -31,7 +31,6 @@ interface AddSupplierFormData {
 
 export function AddSupplierDialog() {
   const [open, setOpen] = useState(false);
-  const { supabase, organizationId } = useSupabase();
   
   const form = useForm<AddSupplierFormData>({
     defaultValues: {
@@ -45,17 +44,36 @@ export function AddSupplierDialog() {
 
   const onSubmit = async (data: AddSupplierFormData) => {
     try {
+      console.log("Submitting supplier data:", data);
+      
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching organization ID:", profileError);
+        throw profileError;
+      }
+
+      if (!profileData?.organization_id) {
+        throw new Error("No organization ID found");
+      }
+
       const { error } = await supabase
         .from("inventory_suppliers")
         .insert([
           {
             ...data,
-            organization_id: organizationId,
+            organization_id: profileData.organization_id,
             status: "active",
           },
         ]);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error adding supplier:", error);
+        throw error;
+      }
 
       toast.success("Supplier added successfully");
       setOpen(false);

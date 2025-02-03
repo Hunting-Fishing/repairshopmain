@@ -1,8 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Globe } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { SupplierCard } from "./SupplierCard";
-import { SupplierListHeader } from "./supplier-list/SupplierListHeader";
-import { SupplierListGroup } from "./supplier-list/SupplierListGroup";
 import { useSupplierList } from "./hooks/useSupplierList";
 import type { InventorySupplier } from "../../types";
 
@@ -33,22 +31,16 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <SupplierListHeader 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-        totalSuppliers={totalSuppliers}
-      />
+    <div className="space-y-8">
+      <div className="text-sm text-muted-foreground">
+        Showing {totalSuppliers} suppliers
+      </div>
       
-      {Object.entries(groupedSuppliers).map(([region, regionSuppliers]) => (
-        <SupplierListGroup 
-          key={region} 
-          region={region} 
-          suppliers={regionSuppliers} 
-        />
-      ))}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {Object.values(groupedSuppliers).flat().map((supplier) => (
+          <SupplierCard key={supplier.id} supplier={supplier} />
+        ))}
+      </div>
     </div>
   );
 }

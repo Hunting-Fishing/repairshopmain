@@ -1,8 +1,9 @@
-import { Building2 } from "lucide-react";
+import { Building2, Search } from "lucide-react";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierList } from "./components/supplier/SupplierList";
 import { useSuppliers } from "./hooks/useSuppliers";
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
+import { Input } from "@/components/ui/input";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -26,8 +27,8 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-8">
         <div>
           <div className="flex items-center gap-2">
             <Building2 className="h-5 w-5 text-muted-foreground" />
@@ -38,6 +39,14 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
           </p>
         </div>
         <AddSupplierDialog />
+      </div>
+
+      <div className="relative w-full max-w-2xl mx-auto mb-8">
+        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Input 
+          placeholder="Search suppliers by name..." 
+          className="pl-10 h-12 text-lg bg-white"
+        />
       </div>
 
       <SupplierList 

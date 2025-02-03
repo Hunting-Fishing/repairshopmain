@@ -1,8 +1,6 @@
-import { Box } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { SupplierHeader } from "./supplier-card/SupplierHeader";
-import { SupplierContact } from "./supplier-card/SupplierContact";
-import { SupplierActions } from "./supplier-card/SupplierActions";
+import { Box, ArrowUpRight } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierCardProps {
@@ -17,23 +15,52 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
       : 'International';
 
   return (
-    <Card className={`transition-all duration-200 ${getRegionColor(country)}`}>
-      <CardHeader className="pb-4">
-        <SupplierHeader supplier={supplier} country={country} />
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <SupplierContact supplier={supplier} />
-        <SupplierActions supplier={supplier} />
+    <Card className="hover:shadow-lg transition-all duration-200">
+      <CardContent className="p-6">
+        <div className="flex items-start gap-4">
+          <div className="w-16 h-16 bg-blue-50 rounded-lg border border-blue-100 flex items-center justify-center flex-shrink-0">
+            <Box className="h-8 w-8 text-blue-500" />
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h3 className="text-lg font-semibold truncate">{supplier.name}</h3>
+                {supplier.contact_person && (
+                  <p className="text-sm text-muted-foreground">{supplier.contact_person}</p>
+                )}
+              </div>
+              <Badge 
+                variant={supplier.status === 'active' ? 'default' : 'secondary'}
+                className="capitalize flex-shrink-0"
+              >
+                {supplier.status}
+              </Badge>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Location</p>
+                <p className="text-sm">{country}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Contact</p>
+                <p className="text-sm">{supplier.phone || 'N/A'}</p>
+              </div>
+            </div>
+
+            <div className="mt-4 flex items-center gap-2">
+              <Badge variant="outline" className="bg-blue-50">
+                Inventory Sync
+              </Badge>
+              <Badge variant="outline" className="bg-blue-50">
+                Order Routing
+              </Badge>
+              <ArrowUpRight className="h-4 w-4 text-muted-foreground ml-auto" />
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
-}
-
-function getRegionColor(country: string) {
-  const colors = {
-    Canada: 'bg-red-50 hover:bg-red-100 border-red-200',
-    USA: 'bg-blue-50 hover:bg-blue-100 border-blue-200',
-    International: 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-  };
-  return colors[country as keyof typeof colors];
 }

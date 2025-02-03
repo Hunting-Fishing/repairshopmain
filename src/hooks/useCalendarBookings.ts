@@ -48,15 +48,19 @@ export function useCalendarBookings(selectedDate: Date) {
           table: 'bookings'
         },
         (payload: RealtimePostgresChangesPayload<Booking>) => {
-          // Invalidate the specific day's query when bookings change
-          const date = payload.new?.start_time 
-            ? format(new Date(payload.new.start_time), "yyyy-MM-dd")
-            : format(selectedDate, "yyyy-MM-dd");
-            
-          queryClient.invalidateQueries({ 
-            queryKey: queryKeys.bookings.byDate(date)
-          });
-          toast.info("Bookings updated");
+          // Ensure payload.new exists before accessing it
+          if (payload.new && 'start_time' in payload.new) {
+            const date = format(new Date(payload.new.start_time), "yyyy-MM-dd");
+            queryClient.invalidateQueries({ 
+              queryKey: queryKeys.bookings.byDate(date)
+            });
+            toast.info("Bookings updated");
+          } else {
+            // If no new data, invalidate the current selected date
+            queryClient.invalidateQueries({ 
+              queryKey: queryKeys.bookings.byDate(format(selectedDate, "yyyy-MM-dd"))
+            });
+          }
         }
       )
       .subscribe();

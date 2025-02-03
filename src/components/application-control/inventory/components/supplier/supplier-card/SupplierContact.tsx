@@ -1,4 +1,5 @@
 import { Mail, Phone, MapPin } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { InventorySupplier } from "../../../types";
 
 interface SupplierContactProps {
@@ -7,29 +8,27 @@ interface SupplierContactProps {
 
 export function SupplierContact({ supplier }: SupplierContactProps) {
   return (
-    <div className="space-y-2">
-      {supplier.email && (
-        <div className="flex items-center gap-2 text-sm">
-          <Mail className="h-4 w-4 text-muted-foreground" />
-          <a href={`mailto:${supplier.email}`} className="hover:underline">
-            {supplier.email}
-          </a>
-        </div>
-      )}
-      {supplier.phone && (
-        <div className="flex items-center gap-2 text-sm">
-          <Phone className="h-4 w-4 text-muted-foreground" />
-          <a href={`tel:${supplier.phone}`} className="hover:underline">
-            {supplier.phone}
-          </a>
-        </div>
-      )}
-      {supplier.address && (
-        <div className="flex items-center gap-2 text-sm">
-          <MapPin className="h-4 w-4 text-muted-foreground" />
-          <span>{supplier.address}</span>
-        </div>
-      )}
+    <div className="mt-4 pt-4 border-t">
+      <div className="flex flex-wrap gap-2">
+        {supplier.email && (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <Mail className="h-4 w-4" />
+            <span>{supplier.email}</span>
+          </Badge>
+        )}
+        {supplier.phone && (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <Phone className="h-4 w-4" />
+            <span>{supplier.phone}</span>
+          </Badge>
+        )}
+        {supplier.address && (
+          <Badge variant="outline" className="flex items-center gap-1">
+            <MapPin className="h-4 w-4" />
+            <span>{supplier.address}</span>
+          </Badge>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,16 +1,16 @@
 import { RefreshCw, FileText, Truck, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export function SupplierFeatures() {
-  const features = [
-    { icon: <RefreshCw className="h-4 w-4" />, label: "INVENTORY SYNC" },
-    { icon: <FileText className="h-4 w-4" />, label: "PRODUCT DATA UPLOAD" },
-    { icon: <Truck className="h-4 w-4" />, label: "ORDER ROUTING" },
-    { icon: <Package className="h-4 w-4" />, label: "SHIPMENT TRACKING" },
-  ];
+const features = [
+  { icon: <RefreshCw className="h-4 w-4" />, label: "INVENTORY SYNC" },
+  { icon: <FileText className="h-4 w-4" />, label: "PRODUCT DATA" },
+  { icon: <Truck className="h-4 w-4" />, label: "ORDER ROUTING" },
+  { icon: <Package className="h-4 w-4" />, label: "TRACKING" },
+];
 
+export function SupplierFeatures() {
   return (
-    <div className="flex flex-wrap gap-3 mb-4">
+    <div className="flex flex-wrap gap-2 mb-4">
       {features.map((feature, index) => (
         <Badge 
           key={index}

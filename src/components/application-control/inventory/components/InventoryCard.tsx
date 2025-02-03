@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AlertTriangle } from "lucide-react";
 import type { InventoryItem } from "../types";
 
@@ -8,11 +9,21 @@ interface InventoryCardProps {
     category?: { name: string } | null;
     supplier?: { name: string } | null;
   };
+  selected?: boolean;
+  onSelect?: (selected: boolean) => void;
 }
 
-export function InventoryCard({ item }: InventoryCardProps) {
+export function InventoryCard({ item, selected = false, onSelect }: InventoryCardProps) {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="hover:shadow-md transition-shadow relative">
+      {onSelect && (
+        <div className="absolute top-4 right-4 z-10">
+          <Checkbox
+            checked={selected}
+            onCheckedChange={onSelect}
+          />
+        </div>
+      )}
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{item.name}</CardTitle>

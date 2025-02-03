@@ -4,6 +4,7 @@ import { InventoryPagination } from "./InventoryPagination";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef, useEffect } from "react";
 import type { InventoryItem } from "../types";
@@ -19,6 +20,9 @@ interface InventoryListViewProps {
   currentPage: number;
   sortField: 'name' | 'quantity_in_stock' | 'unit_cost';
   sortOrder: 'asc' | 'desc';
+  selectedItems: string[];
+  onSelectItem: (itemId: string, selected: boolean) => void;
+  onSelectAll: (selected: boolean) => void;
   onSort: (field: 'name' | 'quantity_in_stock' | 'unit_cost') => void;
   onPageChange: (page: number) => void;
 }
@@ -31,6 +35,9 @@ export function InventoryListView({
   currentPage,
   sortField,
   sortOrder,
+  selectedItems,
+  onSelectItem,
+  onSelectAll,
   onSort,
   onPageChange,
 }: InventoryListViewProps) {
@@ -39,12 +46,11 @@ export function InventoryListView({
   const rowVirtualizer = useVirtualizer({
     count: items.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 320, // Estimated height of each card
+    estimateSize: () => 320,
     overscan: 5,
   });
 
   useEffect(() => {
-    // Reset virtualization when items change
     rowVirtualizer.measure();
   }, [items, rowVirtualizer]);
 
@@ -81,9 +87,22 @@ export function InventoryListView({
     </div>
   );
 
+  const allSelected = items.length > 0 && selectedItems.length === items.length;
+  const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <Checkbox
+            checked={allSelected}
+            indeterminate={someSelected}
+            onCheckedChange={onSelectAll}
+          />
+          <span className="text-sm text-muted-foreground">
+            {selectedItems.length} selected
+          </span>
+        </div>
         <InventorySort
           sortField={sortField}
           sortOrder={sortOrder}
@@ -103,17 +122,24 @@ export function InventoryListView({
           }}
         >
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 absolute top-0 left-0 w-full">
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => (
-              <div
-                key={virtualRow.key}
-                data-index={virtualRow.index}
-                style={{
-                  transform: `translateY(${virtualRow.start}px)`,
-                }}
-              >
-                <InventoryCard item={items[virtualRow.index]} />
-              </div>
-            ))}
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const item = items[virtualRow.index];
+              return (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  style={{
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <InventoryCard
+                    item={item}
+                    selected={selectedItems.includes(item.id)}
+                    onSelect={(selected) => onSelectItem(item.id, selected)}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

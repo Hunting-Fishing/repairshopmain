@@ -3,7 +3,7 @@ import { useInventoryData } from "./hooks/useInventoryData";
 import { InventoryOverview } from "./InventoryOverview";
 import { InventoryCategories } from "./InventoryCategories";
 import { InventorySuppliers } from "./InventorySuppliers";
-import { InventoryAnalytics } from "./components/InventoryAnalytics";
+import { InventoryAnalytics } from "./components/analytics/InventoryAnalytics";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function InventoryTab() {

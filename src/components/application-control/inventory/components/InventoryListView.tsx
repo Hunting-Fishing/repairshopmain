@@ -4,6 +4,8 @@ import { InventoryPagination } from "./InventoryPagination";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useRef, useEffect } from "react";
 import type { InventoryItem } from "../types";
 
 interface InventoryListViewProps {
@@ -32,6 +34,20 @@ export function InventoryListView({
   onSort,
   onPageChange,
 }: InventoryListViewProps) {
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const rowVirtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 320, // Estimated height of each card
+    overscan: 5,
+  });
+
+  useEffect(() => {
+    // Reset virtualization when items change
+    rowVirtualizer.measure();
+  }, [items, rowVirtualizer]);
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -75,10 +91,31 @@ export function InventoryListView({
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {items.map((item) => (
-          <InventoryCard key={item.id} item={item} />
-        ))}
+      <div 
+        ref={parentRef} 
+        className="h-[800px] overflow-auto"
+      >
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative',
+          }}
+        >
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 absolute top-0 left-0 w-full">
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => (
+              <div
+                key={virtualRow.key}
+                data-index={virtualRow.index}
+                style={{
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                <InventoryCard item={items[virtualRow.index]} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <InventoryPagination

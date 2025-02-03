@@ -1,4 +1,4 @@
-import { Box, ArrowUpRight, MapPin, Phone, Mail, RefreshCw, FileText, Truck, Package } from "lucide-react";
+import { Box, ArrowUpRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,6 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
             </div>
 
             <SupplierFeatures />
-
             <SupplierStats />
 
             <div className="mt-4 pt-4 border-t">

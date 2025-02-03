@@ -35,8 +35,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log("AuthProvider - Initializing");
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("AuthProvider - Initial session:", session);
       setSession(session);
       setUser(session?.user ?? null);
     });
@@ -45,22 +48,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("AuthProvider - Auth state changed:", { event: _event, session });
       setSession(session);
       setUser(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("AuthProvider - Cleaning up subscription");
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("AuthProvider - Signing in:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+      console.log("AuthProvider - Sign in successful");
     } catch (error: any) {
+      console.error("AuthProvider - Sign in error:", error);
       toast({
         title: "Error signing in",
         description: error.message,
@@ -116,6 +126,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw error;
     }
   };
+
+  console.log("AuthProvider - Current state:", { session, user });
 
   return (
     <AuthContext.Provider value={{ session, user, signIn, signUp, signOut }}>

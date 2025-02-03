@@ -11,6 +11,7 @@ interface SupplierListProps {
 export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   console.log("SupplierList - Number of suppliers:", suppliers?.length);
   console.log("SupplierList - Loading state:", isLoading);
+  console.log("SupplierList - Suppliers data:", suppliers);
 
   if (isLoading) {
     return (
@@ -34,7 +35,7 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {suppliers.map((supplier) => (
         <SupplierCard key={supplier.id} supplier={supplier} />
       ))}

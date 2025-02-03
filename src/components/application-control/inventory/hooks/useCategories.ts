@@ -7,7 +7,7 @@ export function useCategories(organizationId?: string) {
   const queryClient = useQueryClient();
 
   // Add console.log to debug
-  console.log("Fetching categories for organization:", organizationId);
+  console.log("useCategories - Fetching categories for organization:", organizationId);
 
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["inventory-categories", organizationId],
@@ -24,7 +24,7 @@ export function useCategories(organizationId?: string) {
       }
       
       // Add console.log to debug
-      console.log("Fetched categories:", data);
+      console.log("useCategories - Fetched categories:", data);
       return data as InventoryCategory[];
     },
     enabled: !!organizationId,
@@ -32,6 +32,7 @@ export function useCategories(organizationId?: string) {
 
   const { mutateAsync: addCategory, isPending: isAddingCategory } = useMutation({
     mutationFn: async (data: CategoryFormData) => {
+      console.log("Adding category with data:", data, "for organization:", organizationId);
       const { error } = await supabase
         .from("inventory_categories")
         .insert([{ ...data, organization_id: organizationId }]);

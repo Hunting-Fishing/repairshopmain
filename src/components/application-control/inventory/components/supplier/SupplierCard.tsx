@@ -1,11 +1,12 @@
-import { Box, ArrowUpRight } from "lucide-react";
+import { Box } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { SupplierHeader } from "./supplier-card/SupplierHeader";
 import { SupplierFeatures } from "./supplier-card/SupplierFeatures";
 import { SupplierStats } from "./supplier-card/SupplierStats";
 import { SupplierContact } from "./supplier-card/SupplierContact";
-import { SupplierHeader } from "./supplier-card/SupplierHeader";
+import { SupplierFinancials } from "./supplier-details/SupplierFinancials";
+import { SupplierDocuments } from "./supplier-details/SupplierDocuments";
+import { SupplierTransactions } from "./supplier-details/SupplierTransactions";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierCardProps {
@@ -13,12 +14,6 @@ interface SupplierCardProps {
 }
 
 export function SupplierCard({ supplier }: SupplierCardProps) {
-  const country = supplier.address?.toLowerCase().includes('canada') 
-    ? 'Canada' 
-    : supplier.address?.toLowerCase().includes('usa') || supplier.address?.toLowerCase().includes('united states')
-      ? 'USA' 
-      : 'International';
-
   return (
     <Card className="group hover:shadow-lg transition-all duration-200 overflow-hidden w-full">
       <CardContent className="p-6">
@@ -28,10 +23,15 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
           </div>
           
           <div className="flex-1 min-w-0">
-            <SupplierHeader supplier={supplier} country={country} />
+            <SupplierHeader supplier={supplier} />
             <SupplierFeatures />
             <SupplierStats />
             <SupplierContact supplier={supplier} />
+            <SupplierFinancials supplier={supplier} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <SupplierDocuments supplier={supplier} />
+              <SupplierTransactions supplier={supplier} />
+            </div>
           </div>
         </div>
       </CardContent>

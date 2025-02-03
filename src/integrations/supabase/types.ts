@@ -701,39 +701,63 @@ export type Database = {
           address: string | null
           contact_person: string | null
           created_at: string | null
+          credit_limit: number | null
+          currency: string | null
           email: string | null
           id: string
+          last_payment_date: string | null
           name: string
           notes: string | null
           organization_id: string | null
+          payment_method: string | null
+          payment_status: string | null
+          payment_terms: Json | null
           phone: string | null
           status: string | null
+          tax_id: string | null
+          total_spent: number | null
           updated_at: string | null
         }
         Insert: {
           address?: string | null
           contact_person?: string | null
           created_at?: string | null
+          credit_limit?: number | null
+          currency?: string | null
           email?: string | null
           id?: string
+          last_payment_date?: string | null
           name: string
           notes?: string | null
           organization_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payment_terms?: Json | null
           phone?: string | null
           status?: string | null
+          tax_id?: string | null
+          total_spent?: number | null
           updated_at?: string | null
         }
         Update: {
           address?: string | null
           contact_person?: string | null
           created_at?: string | null
+          credit_limit?: number | null
+          currency?: string | null
           email?: string | null
           id?: string
+          last_payment_date?: string | null
           name?: string
           notes?: string | null
           organization_id?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          payment_terms?: Json | null
           phone?: string | null
           status?: string | null
+          tax_id?: string | null
+          total_spent?: number | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1268,6 +1292,198 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_documents: {
+        Row: {
+          document_type: string
+          file_name: string
+          file_url: string
+          id: string
+          notes: string | null
+          organization_id: string | null
+          status: string | null
+          supplier_id: string | null
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          document_type: string
+          file_name: string
+          file_url: string
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          status?: string | null
+          supplier_id?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          document_type?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          status?: string | null
+          supplier_id?: string | null
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_documents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_documents_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_history: {
+        Row: {
+          change_type: string
+          changed_at: string | null
+          changed_by: string | null
+          field_name: string
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+          organization_id: string | null
+          supplier_id: string | null
+        }
+        Insert: {
+          change_type: string
+          changed_at?: string | null
+          changed_by?: string | null
+          field_name: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          organization_id?: string | null
+          supplier_id?: string | null
+        }
+        Update: {
+          change_type?: string
+          changed_at?: string | null
+          changed_by?: string | null
+          field_name?: string
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          organization_id?: string | null
+          supplier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_history_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          created_by: string | null
+          currency: string | null
+          id: string
+          notes: string | null
+          organization_id: string | null
+          payment_method: string | null
+          reference_number: string | null
+          status: string | null
+          supplier_id: string | null
+          transaction_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          payment_method?: string | null
+          reference_number?: string | null
+          status?: string | null
+          supplier_id?: string | null
+          transaction_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          created_by?: string | null
+          currency?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          payment_method?: string | null
+          reference_number?: string | null
+          status?: string | null
+          supplier_id?: string | null
+          transaction_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_transactions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_transactions_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
             referencedColumns: ["id"]
           },
         ]

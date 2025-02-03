@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { Plus, Box, Mail, Phone, MapPin, Building2 } from "lucide-react";
+import { Box, Mail, Phone, MapPin, Building2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -35,10 +34,7 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
             Manage your inventory suppliers and their contact information
           </p>
         </div>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Add Supplier
-        </Button>
+        <AddSupplierDialog />
       </div>
 
       {suppliers && suppliers.length > 0 ? (

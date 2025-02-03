@@ -5,10 +5,9 @@ import type { InventorySupplier } from "../../../types";
 
 interface SupplierHeaderProps {
   supplier: InventorySupplier;
-  country: string;
 }
 
-export function SupplierHeader({ supplier, country }: SupplierHeaderProps) {
+export function SupplierHeader({ supplier }: SupplierHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-2 mb-4">
       <div>

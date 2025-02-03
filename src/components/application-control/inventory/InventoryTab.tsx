@@ -7,6 +7,7 @@ import { InventorySuppliers } from "./InventorySuppliers";
 import { InventoryAnalytics } from "./components/analytics/InventoryAnalytics";
 import { InventorySettings } from "./components/settings/InventorySettings";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Package, ListTree, Users, Settings } from "lucide-react";
 
 export function InventoryTab() {
   const { isLoading, categories, items, suppliers } = useInventoryData();
@@ -40,21 +41,34 @@ export function InventoryTab() {
     <div className="space-y-6">
       <InventoryAnalytics />
       <Tabs defaultValue="categories" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="suppliers">Suppliers</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsTrigger value="categories" className="flex items-center gap-2">
+            <ListTree className="h-4 w-4" />
+            Categories
+          </TabsTrigger>
+          <TabsTrigger value="suppliers" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Suppliers
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Settings
+          </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="categories">
-          <InventoryCategories categories={categories} />
+        <TabsContent value="categories" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <InventoryCategories categories={categories} />
+          </div>
         </TabsContent>
         
-        <TabsContent value="suppliers">
-          <InventorySuppliers suppliers={suppliers} />
+        <TabsContent value="suppliers" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <InventorySuppliers suppliers={suppliers} />
+          </div>
         </TabsContent>
         
-        <TabsContent value="settings">
+        <TabsContent value="settings" className="space-y-4">
           <InventorySettings />
         </TabsContent>
       </Tabs>

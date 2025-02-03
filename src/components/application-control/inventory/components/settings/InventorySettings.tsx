@@ -2,18 +2,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Settings2, Bell, BarChart3, Package } from "lucide-react";
 
 export function InventorySettings() {
   return (
     <div className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>Inventory Reports</CardTitle>
-          <CardDescription>Configure automatic inventory reports and notifications</CardDescription>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <CardTitle>Inventory Reports</CardTitle>
+              <CardDescription>Configure automatic inventory reports and notifications</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between space-x-2">
-            <Label htmlFor="low-stock-alerts">Low Stock Alerts</Label>
+            <Label htmlFor="low-stock-alerts" className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-muted-foreground" />
+              Low Stock Alerts
+            </Label>
             <Switch id="low-stock-alerts" />
           </div>
           <div className="flex items-center justify-between space-x-2">
@@ -29,8 +38,13 @@ export function InventorySettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Default Values</CardTitle>
-          <CardDescription>Set default values for inventory items</CardDescription>
+          <div className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <CardTitle>Default Values</CardTitle>
+              <CardDescription>Set default values for inventory items</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2">
@@ -46,8 +60,13 @@ export function InventorySettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Notifications</CardTitle>
-          <CardDescription>Configure who receives inventory notifications</CardDescription>
+          <div className="flex items-center gap-2">
+            <Settings2 className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <CardTitle>Notifications</CardTitle>
+              <CardDescription>Configure who receives inventory notifications</CardDescription>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between space-x-2">

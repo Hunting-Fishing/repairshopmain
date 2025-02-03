@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Box, Mail, Phone, MapPin } from "lucide-react";
+import { Plus, Box, Mail, Phone, MapPin, Building2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,13 +14,16 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Suppliers</h2>
+          <div className="flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-2xl font-bold tracking-tight">Suppliers</h2>
+          </div>
           <p className="text-muted-foreground">
             Manage your inventory suppliers and their contact information
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button className="flex items-center gap-2">
+          <Plus className="h-4 w-4" />
           Add Supplier
         </Button>
       </div>
@@ -29,13 +32,18 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
         {suppliers?.map(supplier => (
           <Card key={supplier.id} className="hover:shadow-md transition-shadow">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Box className="h-5 w-5" />
-                {supplier.name}
-                <Badge variant={supplier.status === 'active' ? 'default' : 'secondary'} className="ml-auto">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Box className="h-5 w-5 text-muted-foreground" />
+                  <CardTitle>{supplier.name}</CardTitle>
+                </div>
+                <Badge 
+                  variant={supplier.status === 'active' ? 'default' : 'secondary'}
+                  className="capitalize"
+                >
                   {supplier.status}
                 </Badge>
-              </CardTitle>
+              </div>
               {supplier.contact_person && (
                 <CardDescription>Contact: {supplier.contact_person}</CardDescription>
               )}
@@ -44,19 +52,23 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
               {supplier.email && (
                 <div className="flex items-center gap-2 text-sm">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  {supplier.email}
+                  <a href={`mailto:${supplier.email}`} className="hover:underline">
+                    {supplier.email}
+                  </a>
                 </div>
               )}
               {supplier.phone && (
                 <div className="flex items-center gap-2 text-sm">
                   <Phone className="h-4 w-4 text-muted-foreground" />
-                  {supplier.phone}
+                  <a href={`tel:${supplier.phone}`} className="hover:underline">
+                    {supplier.phone}
+                  </a>
                 </div>
               )}
               {supplier.address && (
                 <div className="flex items-center gap-2 text-sm">
                   <MapPin className="h-4 w-4 text-muted-foreground" />
-                  {supplier.address}
+                  <span>{supplier.address}</span>
                 </div>
               )}
             </CardContent>

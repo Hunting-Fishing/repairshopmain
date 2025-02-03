@@ -7,6 +7,10 @@ export function useInventoryData() {
   const { userProfile } = useOrganizationData();
   const organizationId = userProfile?.organization_id;
 
+  // Add console.log to debug organization ID
+  console.log("useInventoryData - organizationId:", organizationId);
+  console.log("useInventoryData - userProfile:", userProfile);
+
   const { 
     categories, 
     isLoading: categoriesLoading, 
@@ -25,6 +29,10 @@ export function useInventoryData() {
     suppliers, 
     isLoading: suppliersLoading 
   } = useSuppliers(organizationId);
+
+  // Add console.log to debug fetched data
+  console.log("useInventoryData - categories:", categories);
+  console.log("useInventoryData - isLoading:", categoriesLoading || itemsLoading || suppliersLoading);
 
   return {
     categories,

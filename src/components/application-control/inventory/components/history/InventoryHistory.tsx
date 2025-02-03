@@ -1,17 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { HistoryTableRow } from "./HistoryTableRow";
 
 interface InventoryHistoryEntry {
   id: string;
@@ -51,37 +49,6 @@ export function InventoryHistory() {
     },
   });
 
-  const getChangeDescription = (entry: InventoryHistoryEntry) => {
-    switch (entry.change_type) {
-      case "create":
-        return "Item Added";
-      case "update":
-        if (entry.quantity_change) {
-          return entry.quantity_change > 0
-            ? `Quantity Increased by ${entry.quantity_change}`
-            : `Quantity Decreased by ${Math.abs(entry.quantity_change)}`;
-        }
-        return "Details Updated";
-      case "delete":
-        return "Item Removed";
-      default:
-        return entry.change_type;
-    }
-  };
-
-  const getBadgeVariant = (changeType: string): "default" | "destructive" | "secondary" | "outline" => {
-    switch (changeType) {
-      case "create":
-        return "secondary";
-      case "update":
-        return "default";
-      case "delete":
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -110,23 +77,7 @@ export function InventoryHistory() {
           </TableHeader>
           <TableBody>
             {history?.map((entry) => (
-              <TableRow key={entry.id}>
-                <TableCell>
-                  {format(new Date(entry.created_at), "MMM d, yyyy HH:mm")}
-                </TableCell>
-                <TableCell>{entry.inventory_items?.name || "Unknown Item"}</TableCell>
-                <TableCell>
-                  <Badge variant={getBadgeVariant(entry.change_type)}>
-                    {getChangeDescription(entry)}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {entry.profiles
-                    ? `${entry.profiles.first_name} ${entry.profiles.last_name}`
-                    : "System"}
-                </TableCell>
-                <TableCell>{entry.notes || "-"}</TableCell>
-              </TableRow>
+              <HistoryTableRow key={entry.id} entry={entry} />
             ))}
           </TableBody>
         </Table>

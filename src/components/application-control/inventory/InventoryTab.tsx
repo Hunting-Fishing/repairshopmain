@@ -9,7 +9,7 @@ import { InventorySettings } from "./components/settings/InventorySettings";
 import { InventoryList } from "./components/inventory-list/InventoryList";
 import { InventoryHistory } from "./components/history/InventoryHistory";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ListTree, Users, Settings, List, History } from "lucide-react";
+import { ListTree, Users, Settings, List, History, BarChart3 } from "lucide-react";
 
 export function InventoryTab() {
   const { isLoading, categories, items, suppliers, error } = useInventoryData();
@@ -44,13 +44,17 @@ export function InventoryTab() {
   }
 
   return (
-    <div>
+    <div className="space-y-8">
       <InventoryAnalytics />
-      <Tabs defaultValue="inventory" className="mt-8">
-        <TabsList className="w-full grid grid-cols-5 lg:w-[750px]">
+      <Tabs defaultValue="overview" className="mt-8">
+        <TabsList className="w-full grid grid-cols-6 lg:w-[900px]">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Overview
+          </TabsTrigger>
           <TabsTrigger value="inventory" className="flex items-center gap-2">
             <List className="h-4 w-4" />
-            Inventory List
+            Inventory
           </TabsTrigger>
           <TabsTrigger value="categories" className="flex items-center gap-2">
             <ListTree className="h-4 w-4" />
@@ -70,6 +74,10 @@ export function InventoryTab() {
           </TabsTrigger>
         </TabsList>
         
+        <TabsContent value="overview" className="mt-4">
+          <InventoryOverview />
+        </TabsContent>
+
         <TabsContent value="inventory" className="mt-4">
           <InventoryList items={items} />
         </TabsContent>

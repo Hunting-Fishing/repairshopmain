@@ -5,7 +5,7 @@ import type { InventorySupplier } from "../types";
 export function useSuppliers(organizationId?: string) {
   console.log("useSuppliers - Starting hook with organizationId:", organizationId);
 
-  const { data: suppliers, isLoading: suppliersLoading, error } = useQuery({
+  const { data: suppliers, isLoading, error } = useQuery({
     queryKey: ["inventory-suppliers", organizationId],
     queryFn: async () => {
       if (!organizationId) {
@@ -32,16 +32,9 @@ export function useSuppliers(organizationId?: string) {
     enabled: !!organizationId,
   });
 
-  console.log("useSuppliers - Final hook state:", {
-    suppliers,
-    isLoading: suppliersLoading,
-    error,
-    organizationId
-  });
-
   return {
     suppliers,
-    isLoading: suppliersLoading,
+    isLoading,
     error: error as Error | null,
   };
 }

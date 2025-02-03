@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { InventoryList } from "@/components/application-control/inventory/InventoryList";
 import { InventoryFilters } from "@/components/application-control/inventory/InventoryFilters";
 import { InventoryOverview } from "@/components/application-control/inventory/InventoryOverview";
-import { InventoryTab } from "@/components/application-control/inventory/InventoryTab";
+import { InventoryCategories } from "@/components/application-control/inventory/InventoryCategories";
+import { InventorySuppliers } from "@/components/application-control/inventory/InventorySuppliers";
+import { useInventoryData } from "@/components/application-control/inventory/hooks/useInventoryData";
 
 export default function Inventory() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,6 +15,8 @@ export default function Inventory() {
     outOfStock: false,
     needsReorder: false,
   });
+
+  const { categories, suppliers } = useInventoryData();
 
   const handleFilterChange = (newFilters: {
     lowStock?: boolean;
@@ -41,6 +45,11 @@ export default function Inventory() {
       </div>
 
       <InventoryOverview />
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <InventoryCategories categories={categories || []} />
+        <InventorySuppliers suppliers={suppliers || []} />
+      </div>
 
       <div className="flex gap-4 items-center">
         <div className="relative flex-1">

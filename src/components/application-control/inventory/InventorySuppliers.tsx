@@ -10,12 +10,12 @@ interface InventorySuppliersProps {
 }
 
 export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
-  const { organization } = useOrganizationData();
-  const { suppliers: hookSuppliers, isLoading, error } = useSuppliers(organization?.id);
+  const { userProfile } = useOrganizationData();
+  const { suppliers: hookSuppliers, isLoading, error } = useSuppliers(userProfile?.organization_id);
   
   console.log("InventorySuppliers - Props suppliers:", suppliers?.length);
   console.log("InventorySuppliers - Hook suppliers:", hookSuppliers?.length);
-  console.log("InventorySuppliers - Organization ID:", organization?.id);
+  console.log("InventorySuppliers - Organization ID:", userProfile?.organization_id);
 
   // Use hook suppliers if available, fallback to props
   const displaySuppliers = hookSuppliers || suppliers;

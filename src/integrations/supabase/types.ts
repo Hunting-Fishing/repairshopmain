@@ -705,7 +705,7 @@ export type Database = {
           id: string
           name: string
           notes: string | null
-          organization_id: string
+          organization_id: string | null
           phone: string | null
           status: string | null
           updated_at: string | null
@@ -718,7 +718,7 @@ export type Database = {
           id?: string
           name: string
           notes?: string | null
-          organization_id: string
+          organization_id?: string | null
           phone?: string | null
           status?: string | null
           updated_at?: string | null
@@ -731,7 +731,7 @@ export type Database = {
           id?: string
           name?: string
           notes?: string | null
-          organization_id?: string
+          organization_id?: string | null
           phone?: string | null
           status?: string | null
           updated_at?: string | null

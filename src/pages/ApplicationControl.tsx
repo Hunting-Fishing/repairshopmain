@@ -27,41 +27,21 @@ export default function ApplicationControl() {
         </CardHeader>
       </Card>
       
-      <Card className="mt-6">
+      <Card>
         <CardContent className="p-6">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="inline-flex h-10 items-center justify-center space-x-2 rounded-md bg-muted p-1">
-              <TabsTrigger 
-                value="overview"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/50"
-              >
-                Overview
-              </TabsTrigger>
-              <TabsTrigger 
-                value="shops"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/50"
-              >
-                Shops
-              </TabsTrigger>
-              <TabsTrigger 
-                value="inventory"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/50"
-              >
-                Inventory
-              </TabsTrigger>
-              <TabsTrigger 
-                value="integrations"
-                className="inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/50"
-              >
-                Integrations
-              </TabsTrigger>
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="shops">Shops</TabsTrigger>
+              <TabsTrigger value="inventory">Inventory</TabsTrigger>
+              <TabsTrigger value="integrations">Integrations</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="overview" className="mt-6 space-y-4">
+            <TabsContent value="overview">
               <OverviewTab />
             </TabsContent>
             
-            <TabsContent value="shops" className="mt-6 space-y-4">
+            <TabsContent value="shops">
               <Card>
                 <CardHeader>
                   <CardTitle>Shop Management</CardTitle>
@@ -73,11 +53,11 @@ export default function ApplicationControl() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="inventory" className="mt-6 space-y-4">
+            <TabsContent value="inventory">
               <InventoryTab />
             </TabsContent>
 
-            <TabsContent value="integrations" className="mt-6 space-y-4">
+            <TabsContent value="integrations">
               <Card>
                 <CardHeader>
                   <CardTitle>Integrations</CardTitle>

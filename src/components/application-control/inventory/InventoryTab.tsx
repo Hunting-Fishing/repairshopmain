@@ -71,15 +71,11 @@ export function InventoryTab() {
             </TabsContent>
             
             <TabsContent value="categories" className="mt-0">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <InventoryCategories categories={categories} />
-              </div>
+              <InventoryCategories categories={categories} />
             </TabsContent>
             
             <TabsContent value="suppliers" className="mt-0">
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <InventorySuppliers suppliers={suppliers} />
-              </div>
+              <InventorySuppliers suppliers={suppliers} />
             </TabsContent>
             
             <TabsContent value="settings" className="mt-0">

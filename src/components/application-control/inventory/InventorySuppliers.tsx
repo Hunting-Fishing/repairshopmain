@@ -2,6 +2,7 @@ import { Building2 } from "lucide-react";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierList } from "./components/supplier/SupplierList";
 import { useSuppliers } from "./hooks/useSuppliers";
+import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -9,10 +10,12 @@ interface InventorySuppliersProps {
 }
 
 export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
-  const { suppliers: hookSuppliers, isLoading, error } = useSuppliers();
+  const { organization } = useOrganizationData();
+  const { suppliers: hookSuppliers, isLoading, error } = useSuppliers(organization?.id);
   
   console.log("InventorySuppliers - Props suppliers:", suppliers?.length);
   console.log("InventorySuppliers - Hook suppliers:", hookSuppliers?.length);
+  console.log("InventorySuppliers - Organization ID:", organization?.id);
 
   // Use hook suppliers if available, fallback to props
   const displaySuppliers = hookSuppliers || suppliers;

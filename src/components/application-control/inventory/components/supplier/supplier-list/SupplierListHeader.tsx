@@ -32,7 +32,7 @@ export function SupplierListHeader({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setSortOrder(order => order === 'asc' ? 'desc' : 'asc')}
+          onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
           className="flex items-center gap-2"
         >
           <ArrowUpDown className="h-4 w-4" />

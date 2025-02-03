@@ -6,12 +6,11 @@ import type { InventoryCategory, CategoryFormData } from "../types";
 export function useCategories(organizationId?: string) {
   const queryClient = useQueryClient();
 
-  // Add console.log to debug
-  console.log("useCategories - Fetching categories for organization:", organizationId);
-
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["inventory-categories", organizationId],
     queryFn: async () => {
+      console.log("useCategories - Starting fetch for organization:", organizationId);
+      
       const { data, error } = await supabase
         .from("inventory_categories")
         .select("*")
@@ -19,12 +18,11 @@ export function useCategories(organizationId?: string) {
         .order("name");
 
       if (error) {
-        console.error("Error fetching categories:", error);
+        console.error("useCategories - Error fetching categories:", error);
         throw error;
       }
       
-      // Add console.log to debug
-      console.log("useCategories - Fetched categories:", data);
+      console.log("useCategories - Raw data from Supabase:", data);
       return data as InventoryCategory[];
     },
     enabled: !!organizationId,
@@ -32,7 +30,7 @@ export function useCategories(organizationId?: string) {
 
   const { mutateAsync: addCategory, isPending: isAddingCategory } = useMutation({
     mutationFn: async (data: CategoryFormData) => {
-      console.log("Adding category with data:", data, "for organization:", organizationId);
+      console.log("useCategories - Adding new category:", data);
       const { error } = await supabase
         .from("inventory_categories")
         .insert([{ ...data, organization_id: organizationId }]);

@@ -69,16 +69,16 @@ export function InventoryHistory() {
     }
   };
 
-  const getBadgeVariant = (changeType: string) => {
+  const getBadgeVariant = (changeType: string): "default" | "destructive" | "secondary" | "outline" => {
     switch (changeType) {
       case "create":
-        return "success";
+        return "secondary";
       case "update":
         return "default";
       case "delete":
         return "destructive";
       default:
-        return "secondary";
+        return "outline";
     }
   };
 

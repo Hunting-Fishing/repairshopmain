@@ -20,9 +20,8 @@ export function CategoryList({
   isLoading,
   error 
 }: CategoryListProps) {
-  console.log("CategoryList - Rendering with categories:", categories);
-  console.log("CategoryList - Loading state:", isLoading);
-  console.log("CategoryList - Selected category:", selectedCategoryId);
+  console.log("CategoryList - Categories received:", categories);
+  console.log("CategoryList - Selected category ID:", selectedCategoryId);
 
   if (isLoading) {
     return (
@@ -45,12 +44,23 @@ export function CategoryList({
     );
   }
 
+  if (!Array.isArray(categories)) {
+    console.error("Categories is not an array:", categories);
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Invalid categories data received
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <ScrollArea className="h-[400px]">
       <div className="space-y-2">
-        {categories.map((category) => {
-          console.log("CategoryList - Rendering category:", category);
-          return (
+        {categories.length > 0 ? (
+          categories.map((category) => (
             <Card 
               key={category.id}
               className={`p-4 hover:bg-accent transition-colors cursor-pointer ${
@@ -67,9 +77,8 @@ export function CategoryList({
                 )}
               </div>
             </Card>
-          );
-        })}
-        {categories.length === 0 && (
+          ))
+        ) : (
           <p className="text-center text-muted-foreground py-4">
             No categories found. Click "Add Category" to create one.
           </p>

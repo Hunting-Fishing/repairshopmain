@@ -1,9 +1,10 @@
-import { Building2, Search } from "lucide-react";
+import { Building2, Search, Plus, Filter } from "lucide-react";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierList } from "./components/supplier/SupplierList";
 import { useSuppliers } from "./hooks/useSuppliers";
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -28,24 +29,30 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center">
         <div>
           <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-muted-foreground" />
+            <Building2 className="h-6 w-6 text-primary" />
             <h2 className="text-2xl font-bold tracking-tight">Suppliers</h2>
           </div>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mt-1">
             Manage your inventory suppliers and their contact information
           </p>
         </div>
-        <AddSupplierDialog />
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm">
+            <Filter className="h-4 w-4 mr-2" />
+            Filter
+          </Button>
+          <AddSupplierDialog />
+        </div>
       </div>
 
-      <div className="relative w-full max-w-2xl mx-auto mb-8">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input 
-          placeholder="Search suppliers by name..." 
-          className="pl-10 h-12 text-lg bg-white"
+          placeholder="Search suppliers by name, location, or contact person..." 
+          className="pl-10 h-10"
         />
       </div>
 

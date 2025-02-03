@@ -21,22 +21,29 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
 
   if (isLoading) {
     return (
+      <div className="w-full h-48 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (suppliers.length === 0) {
+    return (
       <Card>
-        <CardContent className="p-6 flex items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-muted-foreground">Loading suppliers...</span>
+        <CardContent className="p-6 text-center text-muted-foreground">
+          No suppliers found. Add your first supplier to get started.
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="text-sm text-muted-foreground">
-        Showing {totalSuppliers} suppliers
+        Showing {totalSuppliers} supplier{totalSuppliers !== 1 ? 's' : ''}
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Object.values(groupedSuppliers).flat().map((supplier) => (
           <SupplierCard key={supplier.id} supplier={supplier} />
         ))}

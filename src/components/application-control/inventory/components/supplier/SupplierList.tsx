@@ -38,16 +38,10 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-sm text-muted-foreground">
-        Showing {totalSuppliers} supplier{totalSuppliers !== 1 ? 's' : ''}
-      </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {Object.values(groupedSuppliers).flat().map((supplier) => (
-          <SupplierCard key={supplier.id} supplier={supplier} />
-        ))}
-      </div>
+    <div className="grid gap-6 md:grid-cols-2">
+      {Object.values(groupedSuppliers).flat().map((supplier) => (
+        <SupplierCard key={supplier.id} supplier={supplier} />
+      ))}
     </div>
   );
 }

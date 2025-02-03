@@ -26,7 +26,7 @@ export function useSuppliers(organizationId?: string) {
         throw error;
       }
 
-      console.log("useSuppliers - Fetched suppliers:", data);
+      console.log("useSuppliers - Fetched suppliers:", data?.length, "suppliers");
       return data as InventorySupplier[];
     },
     enabled: !!organizationId,

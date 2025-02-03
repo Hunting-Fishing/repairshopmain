@@ -8,7 +8,6 @@ interface InventorySuppliersProps {
 }
 
 export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
-  console.log("InventorySuppliers - Raw suppliers data:", suppliers);
   console.log("InventorySuppliers - Number of suppliers:", suppliers?.length);
 
   if (!Array.isArray(suppliers)) {

@@ -1,5 +1,6 @@
 import { SupplierCard } from "./SupplierCard";
 import { Card, CardContent } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierListProps {
@@ -11,8 +12,9 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="p-6 text-center text-muted-foreground">
-          Loading suppliers...
+        <CardContent className="p-6 flex items-center justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-muted-foreground">Loading suppliers...</span>
         </CardContent>
       </Card>
     );

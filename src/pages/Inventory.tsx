@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { InventoryList } from "@/components/application-control/inventory/InventoryList";
 import { InventoryFilters } from "@/components/application-control/inventory/InventoryFilters";
+import { InventoryOverview } from "@/components/application-control/inventory/InventoryOverview";
+import { InventoryTab } from "@/components/application-control/inventory/InventoryTab";
 
 export default function Inventory() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,6 +39,8 @@ export default function Inventory() {
           </div>
         </div>
       </div>
+
+      <InventoryOverview />
 
       <div className="flex gap-4 items-center">
         <div className="relative flex-1">

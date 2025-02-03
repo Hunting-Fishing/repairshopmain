@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { CategoryForm } from "./components/CategoryForm";
 import { CategoryList } from "./components/CategoryList";
 import { useInventoryData } from "./hooks/useInventoryData";
+import { toast } from "sonner";
 import type { InventoryCategory } from "./types";
 
 interface InventoryCategoriesProps {
@@ -23,13 +24,15 @@ export function InventoryCategories({ categories, isLoading, error }: InventoryC
     try {
       await addCategory(data);
       setIsDialogOpen(false);
+      toast.success("Category added successfully");
     } catch (error) {
       console.error("Error adding category:", error);
+      toast.error("Failed to add category");
     }
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

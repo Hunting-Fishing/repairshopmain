@@ -64,7 +64,7 @@ export function CategoryList({
         ))}
         {categories.length === 0 && (
           <p className="text-center text-muted-foreground py-4">
-            No categories found
+            No categories found. Click "Add Category" to create one.
           </p>
         )}
       </div>

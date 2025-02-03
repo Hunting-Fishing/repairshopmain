@@ -38,7 +38,7 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="space-y-4">
       {Object.values(groupedSuppliers).flat().map((supplier) => (
         <SupplierCard key={supplier.id} supplier={supplier} />
       ))}

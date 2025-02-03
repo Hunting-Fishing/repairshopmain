@@ -23,7 +23,7 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
   ];
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 overflow-hidden">
+    <Card className="group hover:shadow-lg transition-all duration-200 overflow-hidden w-full">
       <CardContent className="p-6">
         <div className="flex items-start gap-6">
           <div className="w-16 h-16 bg-primary/5 rounded-lg flex items-center justify-center flex-shrink-0">

@@ -16,7 +16,11 @@ export default function Inventory() {
     needsReorder: false,
   });
 
-  const { categories, suppliers } = useInventoryData();
+  const { categories, suppliers, isLoading, error } = useInventoryData();
+  
+  console.log("Inventory Page - categories:", categories);
+  console.log("Inventory Page - isLoading:", isLoading);
+  console.log("Inventory Page - error:", error);
 
   const handleFilterChange = (newFilters: {
     lowStock?: boolean;
@@ -47,7 +51,11 @@ export default function Inventory() {
       <InventoryOverview />
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <InventoryCategories categories={categories || []} />
+        <InventoryCategories 
+          categories={categories || []} 
+          isLoading={isLoading}
+          error={error}
+        />
         <InventorySuppliers suppliers={suppliers || []} />
       </div>
 

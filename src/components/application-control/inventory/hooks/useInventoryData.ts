@@ -7,13 +7,13 @@ export function useInventoryData() {
   const { userProfile } = useOrganizationData();
   const organizationId = userProfile?.organization_id;
 
-  // Add console.log to debug organization ID
   console.log("useInventoryData - organizationId:", organizationId);
   console.log("useInventoryData - userProfile:", userProfile);
 
   const { 
     categories, 
     isLoading: categoriesLoading, 
+    error: categoriesError,
     addCategory,
     isAddingCategory 
   } = useCategories(organizationId);
@@ -30,8 +30,8 @@ export function useInventoryData() {
     isLoading: suppliersLoading 
   } = useSuppliers(organizationId);
 
-  // Add console.log to debug fetched data
   console.log("useInventoryData - categories:", categories);
+  console.log("useInventoryData - categoriesError:", categoriesError);
   console.log("useInventoryData - isLoading:", categoriesLoading || itemsLoading || suppliersLoading);
 
   return {
@@ -39,6 +39,7 @@ export function useInventoryData() {
     items,
     suppliers,
     isLoading: categoriesLoading || itemsLoading || suppliersLoading,
+    error: categoriesError,
     addCategory,
     isAddingCategory,
     addItem,

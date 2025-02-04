@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StaffDetailsForm } from "./StaffDetailsForm";
-import { SkillAssessment } from "../skills/SkillAssessment";
+import { SkillAssessmentDashboard } from "../skills/SkillAssessmentDashboard";
 import { useStaffMemberDetails } from "@/hooks/staff/useStaffMemberDetails";
 
 interface StaffDetailsDialogProps {
@@ -29,7 +29,7 @@ export function StaffDetailsDialog({
             {staffMember && <StaffDetailsForm staffMember={staffMember} onClose={() => onOpenChange(false)} />}
           </TabsContent>
           <TabsContent value="skills">
-            <SkillAssessment profileId={staffMemberId} />
+            <SkillAssessmentDashboard profileId={staffMemberId} />
           </TabsContent>
         </Tabs>
       </DialogContent>

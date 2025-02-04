@@ -28,43 +28,41 @@ export default function Staff() {
   });
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="mb-6">
+    <div className="container mx-auto py-8 space-y-8">
+      <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Staff Management</h1>
         <p className="text-muted-foreground">
-          Manage your staff members, roles, and settings
+          Manage your staff members, roles, and settings efficiently
         </p>
       </div>
       
-      <Tabs defaultValue="staff" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="staff" className="flex items-center gap-2">
+      <Tabs defaultValue="staff" className="space-y-6">
+        <TabsList className="bg-muted/50 p-1">
+          <TabsTrigger value="staff" className="flex items-center gap-2 data-[state=active]:bg-background">
             <Users className="h-4 w-4" />
             Staff Members
           </TabsTrigger>
-          <TabsTrigger value="roles" className="flex items-center gap-2">
+          <TabsTrigger value="roles" className="flex items-center gap-2 data-[state=active]:bg-background">
             <Shield className="h-4 w-4" />
             Roles
           </TabsTrigger>
-          <TabsTrigger value="settings" className="flex items-center gap-2">
+          <TabsTrigger value="settings" className="flex items-center gap-2 data-[state=active]:bg-background">
             <Settings2 className="h-4 w-4" />
             Settings
           </TabsTrigger>
-          <TabsTrigger value="time-off" className="flex items-center gap-2">
+          <TabsTrigger value="time-off" className="flex items-center gap-2 data-[state=active]:bg-background">
             <Calendar className="h-4 w-4" />
             Time Off
           </TabsTrigger>
-          <TabsTrigger value="performance" className="flex items-center gap-2">
+          <TabsTrigger value="performance" className="flex items-center gap-2 data-[state=active]:bg-background">
             <LineChart className="h-4 w-4" />
             Performance
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="staff">
-          <div className="space-y-4">
-            <AddStaffMember />
-            <StaffList />
-          </div>
+        <TabsContent value="staff" className="space-y-6">
+          <AddStaffMember />
+          <StaffList />
         </TabsContent>
 
         <TabsContent value="roles">

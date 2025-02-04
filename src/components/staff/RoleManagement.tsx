@@ -97,7 +97,7 @@ export function RoleManagement() {
 
   if (isLoadingStaff) {
     return (
-      <Card>
+      <Card className="bg-card">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             Staff Roles
@@ -114,14 +114,14 @@ export function RoleManagement() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="bg-card">
+      <CardHeader className="border-b">
         <CardTitle className="flex items-center justify-between">
           Staff Roles
           <CustomRoleDialog />
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <div className="space-y-6">
           <RoleDistributionTable 
             staffMembers={staffMembers || []} 

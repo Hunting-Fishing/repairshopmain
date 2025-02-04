@@ -18,10 +18,10 @@ export function AddStaffMember() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="bg-card">
+      <CardHeader className="space-y-1">
         <CardTitle className="flex items-center gap-2">
-          <UserPlus className="h-5 w-5" />
+          <UserPlus className="h-5 w-5 text-primary" />
           Add Staff Member
         </CardTitle>
         <CardDescription>

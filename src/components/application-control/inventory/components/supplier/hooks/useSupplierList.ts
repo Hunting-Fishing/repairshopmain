@@ -64,23 +64,25 @@ export function useSupplierList(suppliers: InventorySupplier[]) {
     }
   };
 
-  // Calculate aggregated analytics
-  const analytics: SupplierAnalyticsData | null = useMemo(() => {
-    if (!suppliers.length) return null;
-
-    return {
-      total_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
-      orders_count: suppliers.length,
-      on_time_delivery_rate: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / suppliers.length,
-      quality_rating: suppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / suppliers.length,
-      orders_fulfilled: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
-      average_delivery_time: 0,
-      payment_timeliness_score: 0,
-      inventory_value: 0,
-      return_rate: 0,
-      average_lead_time: 0
-    };
-  }, [suppliers]);
+  const analytics: SupplierAnalyticsData = {
+    total_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+    orders_count: suppliers.length,
+    on_time_delivery_rate: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / suppliers.length,
+    quality_rating: suppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / suppliers.length,
+    orders_fulfilled: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
+    average_delivery_time: 0,
+    payment_timeliness_score: 0,
+    inventory_value: 0,
+    return_rate: 0,
+    average_lead_time: 0,
+    daily_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 30, 0),
+    weekly_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 4, 0),
+    monthly_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+    rebates_amount: 0,
+    discounts_amount: 0,
+    bill_out_total: 0,
+    profit_margin: 0
+  };
 
   return {
     filteredSuppliers,

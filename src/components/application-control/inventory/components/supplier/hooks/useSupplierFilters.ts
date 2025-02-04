@@ -42,34 +42,25 @@ export function useSupplierFilters(suppliers: InventorySupplier[]) {
       });
   }, [suppliers, searchQuery, filterStatus, sortField, sortDirection]);
 
-  // Calculate analytics data
-  const analytics: SupplierAnalyticsData = useMemo(() => {
-    if (!suppliers.length) return {
-      total_spend: 0,
-      orders_count: 0,
-      on_time_delivery_rate: 0,
-      quality_rating: 0,
-      orders_fulfilled: 0,
-      average_delivery_time: 0,
-      payment_timeliness_score: 0,
-      inventory_value: 0,
-      return_rate: 0,
-      average_lead_time: 0
-    };
-
-    return {
-      total_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
-      orders_count: suppliers.length,
-      on_time_delivery_rate: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / suppliers.length,
-      quality_rating: suppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / suppliers.length,
-      orders_fulfilled: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
-      average_delivery_time: 0,
-      payment_timeliness_score: 0,
-      inventory_value: 0,
-      return_rate: 0,
-      average_lead_time: 0
-    };
-  }, [suppliers]);
+  const analytics: SupplierAnalyticsData = {
+    total_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+    orders_count: suppliers.length,
+    on_time_delivery_rate: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / suppliers.length,
+    quality_rating: suppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / suppliers.length,
+    orders_fulfilled: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
+    average_delivery_time: 0,
+    payment_timeliness_score: 0,
+    inventory_value: 0,
+    return_rate: 0,
+    average_lead_time: 0,
+    daily_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 30, 0),
+    weekly_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 4, 0),
+    monthly_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+    rebates_amount: 0,
+    discounts_amount: 0,
+    bill_out_total: 0,
+    profit_margin: 0
+  };
 
   return {
     searchQuery,

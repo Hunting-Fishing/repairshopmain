@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SupplierCard } from "./SupplierCard";
 import { useSupplierList } from "./hooks/useSupplierList";
 import { InventoryPagination } from "../InventoryPagination";
@@ -23,6 +24,9 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
     itemsPerPage,
     paginatedSuppliers,
     totalPages,
+    sortField,
+    sortDirection,
+    handleSort,
   } = useSupplierList(suppliers);
 
   if (isLoading) {
@@ -45,8 +49,8 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
 
   return (
     <div className="space-y-6">
-      <div className="relative">
-        <div className="relative rounded-lg border border-input bg-white">
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input 
             placeholder="Search Suppliers By Name..." 
@@ -54,6 +58,32 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleSort('name')}
+            className="whitespace-nowrap"
+          >
+            Name
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+            {sortField === 'name' && (
+              <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleSort('rating')}
+            className="whitespace-nowrap"
+          >
+            Rating
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+            {sortField === 'rating' && (
+              <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+            )}
+          </Button>
         </div>
       </div>
       

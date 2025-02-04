@@ -7,6 +7,15 @@ export function useSupplierFilters(suppliers: InventorySupplier[]) {
   const [sortField, setSortField] = useState<keyof InventorySupplier>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
+  const handleSort = (field: keyof InventorySupplier) => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
   const filteredSuppliers = useMemo(() => {
     return suppliers
       .filter(supplier => {
@@ -42,6 +51,7 @@ export function useSupplierFilters(suppliers: InventorySupplier[]) {
     setSortField,
     sortDirection,
     setSortDirection,
-    filteredSuppliers
+    filteredSuppliers,
+    handleSort
   };
 }

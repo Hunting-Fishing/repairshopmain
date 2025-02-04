@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { SupplierList } from "../SupplierList";
 import { SupplierListHeader } from "./SupplierListHeader";
 import { SupplierMetrics } from "./SupplierMetrics";

@@ -3,14 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useFormContext } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-interface Skill {
-  id: string;
-  name: string;
-  category?: {
-    name: string;
-  } | null;
-}
+import type { Skill } from "../types";
 
 interface SkillFormFieldsProps {
   skills?: Skill[];
@@ -34,7 +27,15 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
         .order('name');
       
       if (error) throw error;
-      return data as Skill[];
+
+      // Transform the data to match our Skill type
+      const transformedData = data.map(skill => ({
+        id: skill.id,
+        name: skill.name,
+        category: skill.category?.[0] || { name: 'Uncategorized' }
+      }));
+
+      return transformedData as Skill[];
     },
     enabled: !propSkills, // Only fetch if skills aren't provided as props
   });

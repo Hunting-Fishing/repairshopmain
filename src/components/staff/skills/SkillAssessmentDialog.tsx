@@ -12,6 +12,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useQuery } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 
+interface Skill {
+  id: string;
+  name: string;
+  category: {
+    name: string;
+  } | null;
+}
+
 const formSchema = z.object({
   skillId: z.string().min(1, "Skill is required"),
   proficiencyLevel: z.string().transform((val) => parseInt(val, 10)),
@@ -30,7 +38,7 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
 
-  const { data: skills } = useQuery({
+  const { data: skills } = useQuery<Skill[]>({
     queryKey: ['skills-for-assessment'],
     queryFn: async () => {
       const { data, error } = await supabase

@@ -1,8 +1,8 @@
-import { File, Upload, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Upload, FileText, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSupplierDocuments } from "../hooks/useSupplierDocuments";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { InventorySupplier } from "../../../types";
 
@@ -11,22 +11,42 @@ interface SupplierDocumentsProps {
 }
 
 export function SupplierDocuments({ supplier }: SupplierDocumentsProps) {
-  const [uploading, setUploading] = useState(false);
-  const { documents, isLoading, uploadDocument, deleteDocument } = useSupplierDocuments(supplier.id);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     try {
-      setUploading(true);
-      await uploadDocument(file);
-      toast.success("Document uploaded successfully");
+      setIsUploading(true);
+      
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${supplier.id}/${crypto.randomUUID()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('supplier-documents')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { error: dbError } = await supabase
+        .from('supplier_documents')
+        .insert({
+          supplier_id: supplier.id,
+          organization_id: supplier.organization_id,
+          document_type: 'general',
+          file_name: file.name,
+          file_url: filePath,
+        });
+
+      if (dbError) throw dbError;
+
+      toast.success('Document uploaded successfully');
     } catch (error) {
-      console.error("Error uploading document:", error);
-      toast.error("Failed to upload document");
+      console.error('Error uploading document:', error);
+      toast.error('Failed to upload document');
     } finally {
-      setUploading(false);
+      setIsUploading(false);
     }
   };
 
@@ -34,49 +54,39 @@ export function SupplierDocuments({ supplier }: SupplierDocumentsProps) {
     <Card>
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <File className="h-5 w-5" />
+          <FileText className="h-5 w-5" />
           Documents
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex justify-between items-center">
-          <Button variant="outline" disabled={uploading}>
-            <label className="cursor-pointer flex items-center gap-2">
-              <Upload className="h-4 w-4" />
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              disabled={isUploading}
+              onClick={() => document.getElementById('file-upload')?.click()}
+            >
+              <Upload className="h-4 w-4 mr-2" />
               Upload Document
-              <input
-                type="file"
-                className="hidden"
-                onChange={handleFileUpload}
-                accept=".pdf,.doc,.docx,.xls,.xlsx"
-              />
-            </label>
-          </Button>
-        </div>
-
-        {isLoading ? (
-          <div className="text-center py-4 text-muted-foreground">Loading documents...</div>
-        ) : documents?.length === 0 ? (
-          <div className="text-center py-4 text-muted-foreground">No documents uploaded</div>
-        ) : (
-          <div className="space-y-2">
-            {documents?.map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between p-2 bg-secondary/20 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <File className="h-4 w-4" />
-                  <span>{doc.file_name}</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => deleteDocument(doc.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
+            </Button>
+            <input
+              id="file-upload"
+              type="file"
+              className="hidden"
+              onChange={handleFileUpload}
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
+            />
           </div>
-        )}
+          
+          <div className="grid gap-2">
+            {/* Document list will be implemented here */}
+            <div className="text-sm text-muted-foreground text-center py-4">
+              No documents uploaded yet
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

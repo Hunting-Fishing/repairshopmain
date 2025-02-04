@@ -7,6 +7,7 @@ import { SupplierContact } from "./supplier-card/SupplierContact";
 import { SupplierFinancials } from "./supplier-details/SupplierFinancials";
 import { SupplierDocuments } from "./supplier-details/SupplierDocuments";
 import { SupplierTransactions } from "./supplier-details/SupplierTransactions";
+import { SupplierCommunications } from "./supplier-details/SupplierCommunications";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierCardProps {
@@ -30,6 +31,7 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
             <SupplierFinancials supplier={supplier} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SupplierDocuments supplier={supplier} />
+              <SupplierCommunications supplier={supplier} />
               <SupplierTransactions supplier={supplier} />
             </div>
           </div>

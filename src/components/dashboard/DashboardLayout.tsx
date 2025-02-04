@@ -1,22 +1,17 @@
 import { useState } from "react";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
-import { StatsCards } from "@/components/dashboard/StatsCards";
-import { CalendarSection } from "@/components/dashboard/CalendarSection";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { useCalendarBookings } from "@/hooks/useCalendarBookings";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2, LayoutGrid, Calendar as CalendarIcon, List } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@/components/ui/tabs";
+import { useCalendarBookings } from "@/hooks/useCalendarBookings";
+import { DashboardHeader } from "./DashboardHeader";
+import { CalendarView } from "./views/CalendarView";
+import { GridView } from "./views/GridView";
+import { ListView } from "./views/ListView";
 
 interface TimeSlot {
   start: Date;
   end: Date;
 }
-
-type ViewMode = "calendar" | "grid" | "list";
 
 export function DashboardLayout() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -24,7 +19,7 @@ export function DashboardLayout() {
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("calendar");
+  const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
 
   const { data: bookings, isLoading, error } = useCalendarBookings(selectedDate);
 
@@ -49,100 +44,28 @@ export function DashboardLayout() {
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in">
-        <div className="flex items-center justify-between">
-          <DashboardHeader
-            title="Dashboard"
-            description="Overview of your repair shop's performance"
-          />
-          <div className="flex gap-2">
-            <Tabs 
-              value={viewMode} 
-              onValueChange={(value) => setViewMode(value as ViewMode)}
-              className="hidden md:block"
-            >
-              <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-                <TabsTrigger value="calendar" className="flex items-center gap-2">
-                  <CalendarIcon className="h-4 w-4" />
-                  Calendar
-                </TabsTrigger>
-                <TabsTrigger value="grid" className="flex items-center gap-2">
-                  <LayoutGrid className="h-4 w-4" />
-                  Grid
-                </TabsTrigger>
-                <TabsTrigger value="list" className="flex items-center gap-2">
-                  <List className="h-4 w-4" />
-                  List
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
-        </div>
+        <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
 
         <TabsContent value="calendar" className="mt-0">
-          <div className={cn(
-            "grid gap-6",
-            isCalendarExpanded ? "" : "grid-cols-1 lg:grid-cols-2"
-          )}>
-            {!isCalendarExpanded && (
-              <Card className="p-6 space-y-6">
-                <StatsCards />
-              </Card>
-            )}
-
-            <div className={cn(
-              "transition-all duration-300",
-              isCalendarExpanded ? "col-span-full" : ""
-            )}>
-              <div className="flex justify-end mb-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={toggleCalendarSize}
-                  className="flex items-center gap-2"
-                >
-                  {isCalendarExpanded ? (
-                    <>
-                      <Minimize2 className="h-4 w-4" />
-                      Compact View
-                    </>
-                  ) : (
-                    <>
-                      <Maximize2 className="h-4 w-4" />
-                      Expand Calendar
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              <CalendarSection
-                selectedDate={selectedDate}
-                view={view}
-                bookings={bookings || []}
-                isLoading={isLoading}
-                onDateChange={(date) => date && setSelectedDate(date)}
-                onViewChange={setView}
-                onTimeSlotClick={handleTimeSlotClick}
-              />
-            </div>
-          </div>
+          <CalendarView
+            selectedDate={selectedDate}
+            view={view}
+            bookings={bookings || []}
+            isLoading={isLoading}
+            isCalendarExpanded={isCalendarExpanded}
+            onDateChange={(date) => date && setSelectedDate(date)}
+            onViewChange={setView}
+            onTimeSlotClick={handleTimeSlotClick}
+            toggleCalendarSize={toggleCalendarSize}
+          />
         </TabsContent>
 
         <TabsContent value="grid" className="mt-0">
-          <div className="grid gap-6">
-            <Card className="p-6">
-              <StatsCards />
-            </Card>
-            {/* Add grid view of appointments/tasks here */}
-          </div>
+          <GridView />
         </TabsContent>
 
         <TabsContent value="list" className="mt-0">
-          <div className="space-y-6">
-            <Card className="p-6">
-              <StatsCards />
-            </Card>
-            {/* Add list view of appointments/tasks here */}
-          </div>
+          <ListView />
         </TabsContent>
 
         <BookingDialog

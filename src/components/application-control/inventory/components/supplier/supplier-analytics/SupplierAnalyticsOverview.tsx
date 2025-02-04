@@ -29,42 +29,66 @@ export function SupplierAnalyticsOverview({ analytics }: SupplierAnalyticsOvervi
           value={`$${analytics.total_spend.toLocaleString()}`}
           icon={DollarSign}
           description="Total amount spent"
-          trend={analytics.total_spend > 10000 ? "up" : "neutral"}
+          trend={{
+            value: 15,
+            isPositive: analytics.total_spend > 10000,
+            timeFrame: "last month"
+          }}
         />
         <AnalyticsCard
           title="Order Fulfillment"
           value={`${(analytics.orders_fulfilled / analytics.orders_count * 100).toFixed(1)}%`}
           icon={Package}
           description={`${analytics.orders_fulfilled} of ${analytics.orders_count} orders`}
-          trend={analytics.orders_fulfilled / analytics.orders_count > 0.9 ? "up" : "down"}
+          trend={{
+            value: 5,
+            isPositive: analytics.orders_fulfilled / analytics.orders_count > 0.9,
+            timeFrame: "last month"
+          }}
         />
         <AnalyticsCard
           title="Quality Score"
           value={analytics.quality_rating.toFixed(1)}
           icon={Star}
           description="Average quality rating"
-          trend={analytics.quality_rating > 4 ? "up" : "neutral"}
+          trend={{
+            value: 8,
+            isPositive: analytics.quality_rating > 4,
+            timeFrame: "last month"
+          }}
         />
         <AnalyticsCard
           title="On-Time Delivery"
           value={`${analytics.on_time_delivery_rate}%`}
           icon={Clock}
           description="Delivery success rate"
-          trend={analytics.on_time_delivery_rate > 95 ? "up" : "down"}
+          trend={{
+            value: 3,
+            isPositive: analytics.on_time_delivery_rate > 95,
+            timeFrame: "last month"
+          }}
         />
         <AnalyticsCard
           title="Lead Time"
           value={`${analytics.average_lead_time} days`}
           icon={TrendingUp}
           description="Average order to delivery"
-          trend={analytics.average_lead_time < 7 ? "up" : "down"}
+          trend={{
+            value: 12,
+            isPositive: analytics.average_lead_time < 7,
+            timeFrame: "last month"
+          }}
         />
         <AnalyticsCard
           title="Return Rate"
           value={`${analytics.return_rate}%`}
           icon={AlertTriangle}
           description="Products returned"
-          trend={analytics.return_rate < 5 ? "up" : "down"}
+          trend={{
+            value: 2,
+            isPositive: analytics.return_rate < 5,
+            timeFrame: "last month"
+          }}
         />
       </div>
 

@@ -1,14 +1,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AnalyticsCardProps {
   title: string;
   value: string | number;
   icon: LucideIcon;
   description?: string;
+  trend?: {
+    value: number;
+    isPositive: boolean;
+    timeFrame?: string;
+  };
 }
 
-export function AnalyticsCard({ title, value, icon: Icon, description }: AnalyticsCardProps) {
+export function AnalyticsCard({ title, value, icon: Icon, description, trend }: AnalyticsCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -19,6 +25,21 @@ export function AnalyticsCard({ title, value, icon: Icon, description }: Analyti
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
+        {trend && (
+          <div className="flex items-center gap-2 mt-2">
+            <span className={cn(
+              "text-xs",
+              trend.isPositive ? "text-green-500" : "text-red-500"
+            )}>
+              {trend.isPositive ? "+" : "-"}{trend.value}%
+            </span>
+            {trend.timeFrame && (
+              <span className="text-xs text-muted-foreground">
+                vs {trend.timeFrame}
+              </span>
+            )}
+          </div>
+        )}
         {description && (
           <p className="text-xs text-muted-foreground mt-1">
             {description}

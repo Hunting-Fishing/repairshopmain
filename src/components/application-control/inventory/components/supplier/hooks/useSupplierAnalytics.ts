@@ -11,10 +11,17 @@ export function useSupplierAnalytics(supplierId: string) {
         .eq("supplier_id", supplierId)
         .order("date", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data;
+      
+      // Return default values if no analytics exist
+      return data || {
+        orders_fulfilled: 0,
+        on_time_delivery_rate: 0,
+        quality_rating: 0,
+        payment_timeliness_score: 0
+      };
     },
   });
 

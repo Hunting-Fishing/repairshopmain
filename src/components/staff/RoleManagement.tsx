@@ -1,99 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CustomRoleDialog } from "./role-management/CustomRoleDialog";
 import { RoleDistributionTable } from "./role-management/RoleDistributionTable";
 import { StaffList } from "./role-management/StaffList";
-import type { StaffMember, CustomRole } from "./role-management/types";
+import { useStaffMembers } from "./role-management/hooks/useStaffMembers";
+import { useCustomRoles } from "./role-management/hooks/useCustomRoles";
+import { useRoleUpdate } from "./role-management/hooks/useRoleUpdate";
 
 export function RoleManagement() {
   const [editingId, setEditingId] = useState<string | null>(null);
-  const queryClient = useQueryClient();
-
-  const { data: staffMembers, isLoading: isLoadingStaff } = useQuery({
-    queryKey: ["staff-members"],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No session found");
-
-      // Get user's profile first
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("organization_id")
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      // Then get all profiles in that organization
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name, role, custom_role_id")
-        .eq('organization_id', profileData.organization_id)
-        .order("role");
-      
-      if (error) throw error;
-      return data as StaffMember[];
-    },
-  });
-
-  const { data: customRoles } = useQuery({
-    queryKey: ["custom-roles"],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No session found");
-
-      // Get user's profile first
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("organization_id")
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      const { data, error } = await supabase
-        .from("custom_roles")
-        .select("*")
-        .eq('organization_id', profileData.organization_id);
-      
-      if (error) throw error;
-      return data as CustomRole[];
-    },
-  });
-
-  const updateRole = useMutation({
-    mutationFn: async ({ 
-      userId, 
-      newRole, 
-      customRoleId 
-    }: { 
-      userId: string; 
-      newRole: StaffMember["role"]; 
-      customRoleId?: string 
-    }) => {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ 
-          role: newRole,
-          custom_role_id: customRoleId 
-        })
-        .eq("id", userId);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["staff-members"] });
-      toast.success("Role updated successfully");
-      setEditingId(null);
-    },
-    onError: (error) => {
-      toast.error("Failed to update role");
-      console.error("Error updating role:", error);
-    },
-  });
+  const { data: staffMembers, isLoading: isLoadingStaff } = useStaffMembers();
+  const { data: customRoles } = useCustomRoles();
+  const updateRole = useRoleUpdate();
 
   if (isLoadingStaff) {
     return (
@@ -135,6 +53,7 @@ export function RoleManagement() {
             onCancelEdit={() => setEditingId(null)}
             onRoleChange={(userId, newRole, customRoleId) => {
               updateRole.mutate({ userId, newRole, customRoleId });
+              setEditingId(null);
             }}
           />
         </div>

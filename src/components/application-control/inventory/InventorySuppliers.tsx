@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
-  suppliers: InventorySupplier[];
+  suppliers?: InventorySupplier[];
 }
 
-export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
+export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) {
   const { userProfile } = useOrganizationData();
   const { suppliers: hookSuppliers, isLoading, error } = useSuppliers(userProfile?.organization_id);
   
@@ -24,7 +24,7 @@ export function InventorySuppliers({ suppliers }: InventorySuppliersProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 p-6">
       <div className="flex justify-between items-center">
         <div>
           <div className="flex items-center gap-2">

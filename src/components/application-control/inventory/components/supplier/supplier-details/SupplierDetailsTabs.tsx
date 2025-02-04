@@ -1,6 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, MessageSquare, DollarSign, Settings } from "lucide-react";
-import { SupplierAnalytics } from "./SupplierAnalytics";
+import { MessageSquare, DollarSign, Settings } from "lucide-react";
 import { SupplierTransactions } from "./SupplierTransactions";
 import { SupplierCommunications } from "./SupplierCommunications";
 import { SupplierFinancials } from "./SupplierFinancials";

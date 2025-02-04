@@ -1,6 +1,5 @@
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import { useSuppliers } from "./hooks/useSuppliers";
-import { SupplierListContainer } from "./components/supplier/supplier-list/SupplierListContainer";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierDetailsDialog } from "./components/supplier/supplier-details/SupplierDetailsDialog";
 import { SupplierErrorBoundary } from "./components/supplier/SupplierErrorBoundary";
@@ -9,7 +8,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, ListFilter } from "lucide-react";
-import { AnalyticsOverview } from "./components/supplier/analytics/AnalyticsOverview";
+import { SupplierListView } from "./components/supplier/supplier-list/SupplierListView";
+import { AnalyticsTabContent } from "./components/supplier/analytics/AnalyticsTabContent";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -106,7 +106,7 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
         </TabsList>
 
         <TabsContent value="list" className="space-y-4">
-          <SupplierListContainer 
+          <SupplierListView 
             suppliers={displaySuppliers}
             isLoading={isLoading}
             onSupplierClick={setSelectedSupplier}
@@ -114,7 +114,7 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
         </TabsContent>
 
         <TabsContent value="reports" className="space-y-4">
-          <AnalyticsOverview analytics={analytics} />
+          <AnalyticsTabContent analytics={analytics} />
         </TabsContent>
       </Tabs>
 

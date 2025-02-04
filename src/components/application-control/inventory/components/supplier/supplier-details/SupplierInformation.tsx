@@ -4,14 +4,30 @@ import { Mail, Phone, MapPin, User, Building, CreditCard, Calendar } from "lucid
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { InventorySupplier } from "../../../types";
-import { formatDate } from "@/lib/utils";
 
 interface SupplierInformationProps {
   supplier: InventorySupplier;
 }
+
+const CURRENCIES = [
+  { code: "USD", name: "US Dollar" },
+  { code: "EUR", name: "Euro" },
+  { code: "GBP", name: "British Pound" },
+  { code: "CAD", name: "Canadian Dollar" },
+  { code: "AUD", name: "Australian Dollar" },
+  { code: "JPY", name: "Japanese Yen" },
+  { code: "CNY", name: "Chinese Yuan" },
+] as const;
 
 export function SupplierInformation({ supplier }: SupplierInformationProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -196,11 +212,21 @@ export function SupplierInformation({ supplier }: SupplierInformationProps) {
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Currency:</span>
                   {isEditing ? (
-                    <Input
+                    <Select
                       value={editedSupplier.currency || 'USD'}
-                      onChange={(e) => handleInputChange('currency', e.target.value)}
-                      className="w-32"
-                    />
+                      onValueChange={(value) => handleInputChange('currency', value)}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CURRENCIES.map((currency) => (
+                          <SelectItem key={currency.code} value={currency.code}>
+                            {currency.code} - {currency.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <span className="text-sm">{supplier.currency || 'USD'}</span>
                   )}

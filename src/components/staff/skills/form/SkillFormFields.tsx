@@ -10,8 +10,11 @@ interface SkillFormFieldsProps {
 export function SkillFormFields({ skills }: SkillFormFieldsProps) {
   const form = useFormContext();
 
-  // Group skills by category
-  const groupedSkills = skills?.reduce((acc, skill) => {
+  // Create a Map to ensure unique skills by ID
+  const uniqueSkills = new Map(skills?.map(skill => [skill.id, skill]));
+  
+  // Group unique skills by category
+  const groupedSkills = Array.from(uniqueSkills.values()).reduce((acc, skill) => {
     const categoryName = skill.category?.name || 'Uncategorized';
     if (!acc[categoryName]) {
       acc[categoryName] = [];
@@ -21,7 +24,7 @@ export function SkillFormFields({ skills }: SkillFormFieldsProps) {
   }, {} as Record<string, Skill[]>);
 
   // Sort categories alphabetically
-  const sortedCategories = Object.keys(groupedSkills || {}).sort();
+  const sortedCategories = Object.keys(groupedSkills).sort();
 
   return (
     <>
@@ -43,7 +46,7 @@ export function SkillFormFields({ skills }: SkillFormFieldsProps) {
                     <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
                       {category}
                     </div>
-                    {groupedSkills?.[category]
+                    {groupedSkills[category]
                       .sort((a, b) => a.name.localeCompare(b.name))
                       .map((skill) => (
                         <SelectItem key={skill.id} value={skill.id}>

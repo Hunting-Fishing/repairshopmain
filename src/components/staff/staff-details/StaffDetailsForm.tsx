@@ -51,7 +51,18 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
   });
 
   const onSubmit = async (values: StaffDetailsFormValues) => {
-    await updateStaffMember({ id: staffMember.id, ...values });
+    // Ensure first_name and last_name are not empty strings
+    const submitData = {
+      id: staffMember.id,
+      first_name: values.first_name || staffMember.first_name || "",
+      last_name: values.last_name || staffMember.last_name || "",
+      phone_number: values.phone_number,
+      notes: values.notes,
+      emergency_contact: values.emergency_contact,
+      skills: values.skills,
+    };
+
+    await updateStaffMember(submitData);
     onClose();
   };
 

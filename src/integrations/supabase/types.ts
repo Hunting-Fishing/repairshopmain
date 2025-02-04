@@ -704,7 +704,9 @@ export type Database = {
           credit_limit: number | null
           currency: string | null
           email: string | null
+          fulfillment_rate: number | null
           id: string
+          last_order_date: string | null
           last_payment_date: string | null
           name: string
           notes: string | null
@@ -713,6 +715,9 @@ export type Database = {
           payment_status: string | null
           payment_terms: Json | null
           phone: string | null
+          preferred_communication_method: string | null
+          rating: number | null
+          reliability_score: number | null
           status: string | null
           tax_id: string | null
           total_spent: number | null
@@ -725,7 +730,9 @@ export type Database = {
           credit_limit?: number | null
           currency?: string | null
           email?: string | null
+          fulfillment_rate?: number | null
           id?: string
+          last_order_date?: string | null
           last_payment_date?: string | null
           name: string
           notes?: string | null
@@ -734,6 +741,9 @@ export type Database = {
           payment_status?: string | null
           payment_terms?: Json | null
           phone?: string | null
+          preferred_communication_method?: string | null
+          rating?: number | null
+          reliability_score?: number | null
           status?: string | null
           tax_id?: string | null
           total_spent?: number | null
@@ -746,7 +756,9 @@ export type Database = {
           credit_limit?: number | null
           currency?: string | null
           email?: string | null
+          fulfillment_rate?: number | null
           id?: string
+          last_order_date?: string | null
           last_payment_date?: string | null
           name?: string
           notes?: string | null
@@ -755,6 +767,9 @@ export type Database = {
           payment_status?: string | null
           payment_terms?: Json | null
           phone?: string | null
+          preferred_communication_method?: string | null
+          rating?: number | null
+          reliability_score?: number | null
           status?: string | null
           tax_id?: string | null
           total_spent?: number | null
@@ -1292,6 +1307,118 @@ export type Database = {
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_analytics: {
+        Row: {
+          created_at: string | null
+          date: string
+          id: string
+          on_time_delivery_rate: number | null
+          orders_count: number | null
+          organization_id: string | null
+          quality_rating: number | null
+          supplier_id: string | null
+          total_spend: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          id?: string
+          on_time_delivery_rate?: number | null
+          orders_count?: number | null
+          organization_id?: string | null
+          quality_rating?: number | null
+          supplier_id?: string | null
+          total_spend?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          id?: string
+          on_time_delivery_rate?: number | null
+          orders_count?: number | null
+          organization_id?: string | null
+          quality_rating?: number | null
+          supplier_id?: string | null
+          total_spend?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_analytics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_analytics_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_communications: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          message_content: string
+          message_type: string
+          organization_id: string | null
+          read_at: string | null
+          status: string | null
+          supplier_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          message_content: string
+          message_type: string
+          organization_id?: string | null
+          read_at?: string | null
+          status?: string | null
+          supplier_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          message_content?: string
+          message_type?: string
+          organization_id?: string | null
+          read_at?: string | null
+          status?: string | null
+          supplier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_communications_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_communications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_communications_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
             referencedColumns: ["id"]
           },
         ]

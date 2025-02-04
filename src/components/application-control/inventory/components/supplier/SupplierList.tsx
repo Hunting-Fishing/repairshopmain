@@ -11,10 +11,6 @@ interface SupplierListProps {
 
 export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   const { 
-    searchQuery, 
-    setSearchQuery, 
-    sortOrder, 
-    setSortOrder, 
     groupedSuppliers, 
     totalSuppliers 
   } = useSupplierList(suppliers);
@@ -38,9 +34,21 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   }
 
   return (
-    <div className="space-y-4">
-      {Object.values(groupedSuppliers).flat().map((supplier) => (
-        <SupplierCard key={supplier.id} supplier={supplier} />
+    <div className="space-y-8">
+      {Object.entries(groupedSuppliers).map(([region, regionSuppliers]) => (
+        <div key={region} className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <span>{region}</span>
+            <span className="text-sm text-muted-foreground">
+              ({regionSuppliers.length} suppliers)
+            </span>
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {regionSuppliers.map((supplier) => (
+              <SupplierCard key={supplier.id} supplier={supplier} />
+            ))}
+          </div>
+        </div>
       ))}
     </div>
   );

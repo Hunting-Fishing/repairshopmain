@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useCalendarBookings } from "@/hooks/useCalendarBookings";
 import { DashboardHeader } from "./DashboardHeader";
 import { CalendarView } from "./views/CalendarView";
@@ -46,27 +46,29 @@ export function DashboardLayout() {
       <div className="space-y-6 animate-fade-in">
         <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
 
-        <TabsContent value="calendar" className="mt-0">
-          <CalendarView
-            selectedDate={selectedDate}
-            view={view}
-            bookings={bookings || []}
-            isLoading={isLoading}
-            isCalendarExpanded={isCalendarExpanded}
-            onDateChange={(date) => date && setSelectedDate(date)}
-            onViewChange={setView}
-            onTimeSlotClick={handleTimeSlotClick}
-            toggleCalendarSize={toggleCalendarSize}
-          />
-        </TabsContent>
+        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}>
+          <TabsContent value="calendar" className="mt-0">
+            <CalendarView
+              selectedDate={selectedDate}
+              view={view}
+              bookings={bookings || []}
+              isLoading={isLoading}
+              isCalendarExpanded={isCalendarExpanded}
+              onDateChange={(date) => date && setSelectedDate(date)}
+              onViewChange={setView}
+              onTimeSlotClick={handleTimeSlotClick}
+              toggleCalendarSize={toggleCalendarSize}
+            />
+          </TabsContent>
 
-        <TabsContent value="grid" className="mt-0">
-          <GridView />
-        </TabsContent>
+          <TabsContent value="grid" className="mt-0">
+            <GridView />
+          </TabsContent>
 
-        <TabsContent value="list" className="mt-0">
-          <ListView />
-        </TabsContent>
+          <TabsContent value="list" className="mt-0">
+            <ListView />
+          </TabsContent>
+        </Tabs>
 
         <BookingDialog
           open={isBookingDialogOpen}

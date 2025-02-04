@@ -9,10 +9,16 @@ interface SupplierCardProps {
 }
 
 export function SupplierCard({ supplier, onClick }: SupplierCardProps) {
+  const handleClick = () => {
+    if (onClick) {
+      onClick(supplier);
+    }
+  };
+
   return (
     <Card 
       className="p-6 space-y-4 hover:shadow-md transition-shadow cursor-pointer group"
-      onClick={() => onClick?.(supplier)}
+      onClick={handleClick}
     >
       <div className="flex justify-between items-start">
         <div>

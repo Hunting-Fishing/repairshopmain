@@ -20,7 +20,11 @@ export function useSupplierAnalytics(supplierId: string) {
         orders_fulfilled: 0,
         on_time_delivery_rate: 0,
         quality_rating: 0,
-        payment_timeliness_score: 0
+        payment_timeliness_score: 0,
+        total_spend: 0,
+        orders_count: 0,
+        average_delivery_time: 0,
+        date: new Date().toISOString()
       };
     },
   });

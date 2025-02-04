@@ -10,6 +10,7 @@ import { AnalyticsTabContent } from "./components/supplier/analytics/AnalyticsTa
 import { SupplierHeader } from "./components/supplier/supplier-list/SupplierHeader";
 import { SupplierLoading } from "./components/supplier/supplier-list/SupplierLoading";
 import { SupplierError } from "./components/supplier/supplier-list/SupplierError";
+import { useSupplierAnalytics } from "./hooks/useSupplierAnalytics";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -30,44 +31,7 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
     return <SupplierErrorBoundary error={new Error("Invalid suppliers data")} />;
   }
 
-  const analytics = {
-    total_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
-    orders_count: displaySuppliers.length,
-    on_time_delivery_rate: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / displaySuppliers.length,
-    quality_rating: displaySuppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / displaySuppliers.length,
-    orders_fulfilled: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
-    average_delivery_time: 0,
-    payment_timeliness_score: 0,
-    inventory_value: 0,
-    return_rate: 0,
-    average_lead_time: 0,
-    daily_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 30, 0),
-    weekly_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 4, 0),
-    monthly_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
-    rebates_amount: 0,
-    discounts_amount: 0,
-    bill_out_total: 0,
-    profit_margin: 0,
-    order_value_trend: [],
-    delivery_time_trend: [],
-    defect_rate: 0,
-    negotiated_savings: 0,
-    early_payment_discounts: 0,
-    volume_discounts: 0,
-    seasonal_spend_pattern: {
-      Q1: 0,
-      Q2: 0,
-      Q3: 0,
-      Q4: 0
-    },
-    payment_terms_compliance: 0,
-    supplier_diversity_status: null,
-    sustainability_score: 0,
-    cost_savings_initiatives: [],
-    supply_chain_risk_score: 0,
-    market_price_variance: 0,
-    contract_compliance_rate: 0
-  };
+  const analytics = useSupplierAnalytics(displaySuppliers);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">

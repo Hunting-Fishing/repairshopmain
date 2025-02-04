@@ -1,0 +1,42 @@
+import type { InventorySupplier, SupplierAnalyticsData } from "../types";
+
+export function useSupplierAnalytics(suppliers: InventorySupplier[]): SupplierAnalyticsData {
+  return {
+    total_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+    orders_count: suppliers.length,
+    on_time_delivery_rate: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / suppliers.length,
+    quality_rating: suppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / suppliers.length,
+    orders_fulfilled: suppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
+    average_delivery_time: 0,
+    payment_timeliness_score: 0,
+    inventory_value: 0,
+    return_rate: 0,
+    average_lead_time: 0,
+    daily_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 30, 0),
+    weekly_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 4, 0),
+    monthly_spend: suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+    rebates_amount: 0,
+    discounts_amount: 0,
+    bill_out_total: 0,
+    profit_margin: 0,
+    order_value_trend: [],
+    delivery_time_trend: [],
+    defect_rate: 0,
+    negotiated_savings: 0,
+    early_payment_discounts: 0,
+    volume_discounts: 0,
+    seasonal_spend_pattern: {
+      Q1: 0,
+      Q2: 0,
+      Q3: 0,
+      Q4: 0
+    },
+    payment_terms_compliance: 0,
+    supplier_diversity_status: null,
+    sustainability_score: 0,
+    cost_savings_initiatives: [],
+    supply_chain_risk_score: 0,
+    market_price_variance: 0,
+    contract_compliance_rate: 0
+  };
+}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SupplierCard } from "./SupplierCard";
 import { useSupplierList } from "./hooks/useSupplierList";
 import { InventoryPagination } from "../InventoryPagination";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierListProps {
@@ -31,8 +32,40 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
 
   if (isLoading) {
     return (
-      <div className="w-full h-48 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <div className="relative flex-1">
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-24" />
+            <Skeleton className="h-10 w-24" />
+          </div>
+        </div>
+        
+        <div className="grid gap-4">
+          {[...Array(3)].map((_, index) => (
+            <Card key={index} className="relative">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <Skeleton className="h-6 w-48" />
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                    <Skeleton className="h-8 w-24" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }

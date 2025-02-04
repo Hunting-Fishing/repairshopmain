@@ -2,7 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SupplierCard } from "./SupplierCard";
-import { InventoryPagination } from "../InventoryPagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { InventorySupplier } from "../../types";
@@ -54,36 +53,34 @@ export function SupplierList({
     );
   }
 
+  const sortableFields: Array<{ field: keyof InventorySupplier; label: string }> = [
+    { field: 'name', label: 'Name' },
+    { field: 'rating', label: 'Rating' },
+    { field: 'total_spent', label: 'Total Spent' },
+    { field: 'fulfillment_rate', label: 'Fulfillment Rate' }
+  ];
+
   return (
     <div className="space-y-4">
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onSort('name')}
-          className="whitespace-nowrap"
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-          {sortField === 'name' && (
-            <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-          )}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onSort('rating')}
-          className="whitespace-nowrap"
-        >
-          Rating
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-          {sortField === 'rating' && (
-            <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-          )}
-        </Button>
+      <div className="flex gap-2 flex-wrap">
+        {sortableFields.map(({ field, label }) => (
+          <Button
+            key={field}
+            variant="outline"
+            size="sm"
+            onClick={() => onSort(field)}
+            className="whitespace-nowrap"
+          >
+            {label}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+            {sortField === field && (
+              <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+            )}
+          </Button>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {suppliers.map((supplier) => (
           <SupplierCard 
             key={supplier.id} 

@@ -1,4 +1,4 @@
-import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package } from "lucide-react";
+import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package, Truck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ControlPanel } from "./ControlPanel";
 import { SystemStatus } from "./SystemStatus";
@@ -48,6 +48,12 @@ export function OverviewTab() {
       description: "Manage inventory items, categories, and suppliers",
       icon: Package,
       action: () => navigate("/inventory"),
+    },
+    {
+      title: "Supplier Management",
+      description: "Manage suppliers, documents, and transactions",
+      icon: Truck,
+      action: () => navigate("/inventory?tab=suppliers"),
     }
   ];
 

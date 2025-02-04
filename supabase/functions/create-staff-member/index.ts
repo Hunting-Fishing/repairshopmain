@@ -39,10 +39,17 @@ serve(async (req) => {
       )
     }
 
-    // First check if user already exists
-    const { data: existingUser } = await supabaseClient.auth.admin.getUserByEmail(email)
-    
     let authData;
+
+    // Check if user exists using listUsers and filtering
+    const { data: users, error: getUserError } = await supabaseClient.auth.admin.listUsers()
+    const existingUser = users?.users.find(user => user.email === email)
+    
+    if (getUserError) {
+      console.error('Error checking for existing user:', getUserError)
+      throw getUserError
+    }
+
     if (existingUser) {
       authData = { user: existingUser }
       console.log('User already exists:', existingUser.id)

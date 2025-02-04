@@ -6,6 +6,7 @@ import { SupplierList } from "../../supplier/SupplierList";
 import { SupplierHeader } from "./SupplierHeader";
 import { SupplierActions } from "./SupplierActions";
 import { SupplierMetrics } from "./SupplierMetrics";
+import { useSupplierFilters } from "../hooks/useSupplierFilters";
 import type { InventorySupplier } from "../../../types";
 
 interface SupplierListContainerProps {
@@ -14,42 +15,17 @@ interface SupplierListContainerProps {
 }
 
 export function SupplierListContainer({ suppliers, isLoading }: SupplierListContainerProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const [sortField, setSortField] = useState<keyof InventorySupplier>("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
-  const filteredSuppliers = suppliers
-    .filter(supplier => {
-      const matchesSearch = supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        supplier.contact_person?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        supplier.email?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      if (filterStatus && supplier.status !== filterStatus) {
-        return false;
-      }
-      
-      return matchesSearch;
-    })
-    .sort((a, b) => {
-      const aValue = a[sortField];
-      const bValue = b[sortField];
-      const direction = sortDirection === "asc" ? 1 : -1;
-      
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return direction * aValue.localeCompare(bValue);
-      }
-      return 0;
-    });
-
-  const handleSort = (field: keyof InventorySupplier) => {
-    if (field === sortField) {
-      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
+  const {
+    searchQuery,
+    setSearchQuery,
+    filterStatus,
+    setFilterStatus,
+    sortField,
+    setSortField,
+    sortDirection,
+    setSortDirection,
+    filteredSuppliers
+  } = useSupplierFilters(suppliers);
 
   const activeSuppliers = suppliers.filter(s => s.status === "active").length;
   const totalSpent = suppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0);
@@ -61,7 +37,7 @@ export function SupplierListContainer({ suppliers, isLoading }: SupplierListCont
         <SupplierHeader />
         <SupplierActions 
           onFilterChange={setFilterStatus}
-          onSortChange={handleSort}
+          onSortChange={setSortField}
         />
       </div>
 

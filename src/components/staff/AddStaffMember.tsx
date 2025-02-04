@@ -1,12 +1,12 @@
 import { UserPlus } from "lucide-react";
-import { toast } from "sonner";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { AddStaffMemberForm } from "./add-staff-member/AddStaffMemberForm";
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 
@@ -18,22 +18,25 @@ export function AddStaffMember() {
   }
 
   return (
-    <Card className="bg-card">
-      <CardHeader className="space-y-1">
-        <CardTitle className="flex items-center gap-2">
-          <UserPlus className="h-5 w-5 text-primary" />
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="w-full sm:w-auto">
+          <UserPlus className="mr-2 h-4 w-4" />
           Add Staff Member
-        </CardTitle>
-        <CardDescription>
-          Add a new staff member to your organization. Custom roles can be managed in the Roles tab.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <UserPlus className="h-5 w-5 text-primary" />
+            Add Staff Member
+          </DialogTitle>
+        </DialogHeader>
         <AddStaffMemberForm 
           organizationId={userProfile.organization_id} 
           customRoles={customRoles} 
         />
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

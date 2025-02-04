@@ -1,21 +1,13 @@
-import { Building2, Search, Plus, Filter, ArrowUpDown, Download, Upload } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
-import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { SupplierList } from "./components/supplier/SupplierList";
+import { SupplierHeader } from "./components/supplier/supplier-list/SupplierHeader";
+import { SupplierActions } from "./components/supplier/supplier-list/SupplierActions";
+import { SupplierMetrics } from "./components/supplier/supplier-list/SupplierMetrics";
 import { useSuppliers } from "./hooks/useSuppliers";
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -71,92 +63,23 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
 
   const activeSuppliers = displaySuppliers.filter(s => s.status === "active").length;
   const totalSpent = displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0);
+  const averageScore = displaySuppliers.reduce((sum, s) => sum + (s.reliability_score || 0), 0) / displaySuppliers.length || 0;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
       <div className="flex justify-between items-center">
-        <div>
-          <div className="flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-primary" />
-            <h2 className="text-2xl font-bold tracking-tight">Suppliers</h2>
-          </div>
-          <p className="text-muted-foreground mt-1">
-            Browse and manage your inventory suppliers
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => setFilterStatus(null)}>
-                  All
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus("active")}>
-                  Active
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setFilterStatus("inactive")}>
-                  Inactive
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <ArrowUpDown className="h-4 w-4 mr-2" />
-                Sort
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem onClick={() => handleSort("name")}>
-                  Name
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort("total_spent")}>
-                  Total Spent
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort("reliability_score")}>
-                  Reliability Score
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-          <AddSupplierDialog />
-        </div>
+        <SupplierHeader />
+        <SupplierActions 
+          onFilterChange={setFilterStatus}
+          onSortChange={handleSort}
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-card rounded-lg p-4 shadow-sm">
-          <h3 className="font-medium text-muted-foreground">Active Suppliers</h3>
-          <p className="text-2xl font-bold">{activeSuppliers}</p>
-        </div>
-        <div className="bg-card rounded-lg p-4 shadow-sm">
-          <h3 className="font-medium text-muted-foreground">Total Spent</h3>
-          <p className="text-2xl font-bold">${totalSpent.toLocaleString()}</p>
-        </div>
-        <div className="bg-card rounded-lg p-4 shadow-sm">
-          <h3 className="font-medium text-muted-foreground">Average Score</h3>
-          <p className="text-2xl font-bold">
-            {(displaySuppliers.reduce((sum, s) => sum + (s.reliability_score || 0), 0) / displaySuppliers.length || 0).toFixed(1)}
-          </p>
-        </div>
-      </div>
+      <SupplierMetrics 
+        activeSuppliers={activeSuppliers}
+        totalSpent={totalSpent}
+        averageScore={averageScore}
+      />
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

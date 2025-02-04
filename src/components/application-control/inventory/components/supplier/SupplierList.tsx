@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Search, Loader2 } from "lucide-react";
 import { SupplierCard } from "./SupplierCard";
 import { useSupplierList } from "./hooks/useSupplierList";
-import { SupplierListHeader } from "./supplier-list/SupplierListHeader";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierListProps {
@@ -12,14 +12,10 @@ interface SupplierListProps {
 
 export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   const { 
-    groupedSuppliers,
+    filteredSuppliers,
     totalSuppliers,
     searchQuery,
     setSearchQuery,
-    sortOrder,
-    setSortOrder,
-    filterStatus,
-    setFilterStatus
   } = useSupplierList(suppliers);
 
   if (isLoading) {
@@ -41,32 +37,28 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   }
 
   return (
-    <div className="space-y-8">
-      <SupplierListHeader 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        sortOrder={sortOrder}
-        setSortOrder={setSortOrder}
-        totalSuppliers={totalSuppliers}
-        filterStatus={filterStatus}
-        setFilterStatus={setFilterStatus}
-      />
+    <div className="space-y-6">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input 
+          placeholder="Search Suppliers By Name..." 
+          className="pl-10 h-12"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
       
-      {Object.entries(groupedSuppliers).map(([region, regionSuppliers]) => (
-        <div key={region} className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <span>{region}</span>
-            <span className="text-sm text-muted-foreground">
-              ({regionSuppliers.length} suppliers)
-            </span>
-          </h3>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {regionSuppliers.map((supplier) => (
-              <SupplierCard key={supplier.id} supplier={supplier} />
-            ))}
-          </div>
+      <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+        <div>
+          Viewing {filteredSuppliers.length} of {totalSuppliers} suppliers
         </div>
-      ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {filteredSuppliers.map((supplier) => (
+          <SupplierCard key={supplier.id} supplier={supplier} />
+        ))}
+      </div>
     </div>
   );
 }

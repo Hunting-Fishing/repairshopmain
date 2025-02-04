@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
 import { SupplierCard } from "./SupplierCard";
 import { useSupplierList } from "./hooks/useSupplierList";
+import { InventoryPagination } from "../InventoryPagination";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierListProps {
@@ -17,6 +18,11 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
     totalSuppliers,
     searchQuery,
     setSearchQuery,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    paginatedSuppliers,
+    totalPages,
   } = useSupplierList(suppliers);
 
   if (isLoading) {
@@ -53,12 +59,12 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
       
       <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
         <div>
-          Viewing {filteredSuppliers.length} of {totalSuppliers} suppliers
+          Viewing {paginatedSuppliers.length} of {totalSuppliers} suppliers
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {filteredSuppliers.map((supplier) => (
+        {paginatedSuppliers.map((supplier) => (
           <SupplierCard 
             key={supplier.id} 
             supplier={supplier}
@@ -66,6 +72,12 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
           />
         ))}
       </div>
+
+      <InventoryPagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }

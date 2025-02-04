@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
@@ -16,7 +16,7 @@ import { InventorySuppliers } from "@/components/application-control/inventory/I
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: <AppLayout><Outlet /></AppLayout>,
     children: [
       {
         index: true,
@@ -60,7 +60,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "inventory/suppliers",
-        element: <InventorySuppliers suppliers={[]} />,
+        element: <InventorySuppliers />,
       },
     ],
   },

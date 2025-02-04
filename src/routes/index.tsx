@@ -6,12 +6,12 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 export default function AppRoutes() {
-  const element = useRoutes(routes);
+  const element = useRoutes(router.routes);
 
   return (
     <ErrorBoundary>
       <Suspense fallback={<LoadingSpinner />}>
-        <AppLayout>{element}</AppLayout>
+        {element}
       </Suspense>
     </ErrorBoundary>
   );

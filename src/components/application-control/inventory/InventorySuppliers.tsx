@@ -1,6 +1,7 @@
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import { useSuppliers } from "./hooks/useSuppliers";
-import { SupplierListContainer } from "./components/supplier/supplier-list/SupplierListContainer";
+import { SupplierList } from "./components/supplier/SupplierList";
+import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -23,9 +24,14 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
   }
 
   return (
-    <SupplierListContainer 
-      suppliers={displaySuppliers}
-      isLoading={isLoading}
-    />
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <AddSupplierDialog />
+      </div>
+      <SupplierList 
+        suppliers={displaySuppliers}
+        isLoading={isLoading}
+      />
+    </div>
   );
 }

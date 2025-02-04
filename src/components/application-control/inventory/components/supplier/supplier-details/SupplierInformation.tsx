@@ -60,7 +60,7 @@ export function SupplierInformation({ supplier }: SupplierInformationProps) {
                   </div>
                 )}
                 <div className="flex items-center gap-2">
-                  <Badge variant={supplier.status === 'active' ? "success" : "destructive"}>
+                  <Badge variant={supplier.status === 'active' ? "default" : "destructive"}>
                     {supplier.status}
                   </Badge>
                 </div>

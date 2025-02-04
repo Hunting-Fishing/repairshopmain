@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -5,9 +6,10 @@ import { technicianSettingsFormSchema, type TechnicianSettingsFormValues } from 
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
+import { UseFormReturn } from "react-hook-form";
 
 interface TechnicianFormWrapperProps {
-  children: React.ReactNode;
+  children: (form: UseFormReturn<TechnicianSettingsFormValues>) => React.ReactNode;
 }
 
 export function TechnicianFormWrapper({ children }: TechnicianFormWrapperProps) {
@@ -74,7 +76,7 @@ export function TechnicianFormWrapper({ children }: TechnicianFormWrapperProps) 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {typeof children === 'function' ? children(form) : children}
+        {children(form)}
       </form>
     </Form>
   );

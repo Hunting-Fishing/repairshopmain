@@ -1,6 +1,6 @@
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import { useSuppliers } from "./hooks/useSuppliers";
-import { SupplierList } from "./components/supplier/SupplierList";
+import { SupplierListContainer } from "./components/supplier/supplier-list/SupplierListContainer";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierDetailsDialog } from "./components/supplier/supplier-details/SupplierDetailsDialog";
 import { SupplierErrorBoundary } from "./components/supplier/SupplierErrorBoundary";
@@ -77,7 +77,7 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
         <AddSupplierDialog />
       </div>
       
-      <SupplierList 
+      <SupplierListContainer 
         suppliers={displaySuppliers}
         isLoading={isLoading}
         onSupplierClick={setSelectedSupplier}

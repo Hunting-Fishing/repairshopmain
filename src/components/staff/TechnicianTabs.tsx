@@ -1,0 +1,40 @@
+import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RoleManagement } from "./RoleManagement";
+import { TechnicianSettings } from "./TechnicianSettings";
+import { TechnicianSpecialties } from "./TechnicianSpecialties";
+import { TrainingRecords } from "./training/TrainingRecords";
+import { AssignmentRules } from "./assignment-rules/AssignmentRules";
+
+export function TechnicianTabs() {
+  return (
+    <>
+      <TabsList className="grid w-full grid-cols-5 mb-8">
+        <TabsTrigger value="roles">Roles</TabsTrigger>
+        <TabsTrigger value="settings">Settings</TabsTrigger>
+        <TabsTrigger value="specialties">Specialties</TabsTrigger>
+        <TabsTrigger value="training">Training</TabsTrigger>
+        <TabsTrigger value="assignment-rules">Assignment Rules</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="roles">
+        <RoleManagement />
+      </TabsContent>
+
+      <TabsContent value="settings">
+        <TechnicianSettings />
+      </TabsContent>
+
+      <TabsContent value="specialties">
+        <TechnicianSpecialties />
+      </TabsContent>
+
+      <TabsContent value="training">
+        <TrainingRecords />
+      </TabsContent>
+
+      <TabsContent value="assignment-rules">
+        <AssignmentRules />
+      </TabsContent>
+    </>
+  );
+}

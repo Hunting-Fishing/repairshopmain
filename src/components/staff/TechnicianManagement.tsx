@@ -25,6 +25,13 @@ export function TechnicianManagement() {
       technicianScheduleConflictHandling: "warn",
       enableTechnicianColors: false,
       technicianViewMode: "individual",
+      maxDailyBookings: 8,
+      preferredWorkTypes: [],
+      autoAssignmentPreferences: {
+        considerSpecialties: true,
+        considerWorkload: true,
+        considerLocation: false,
+      },
     },
   });
 

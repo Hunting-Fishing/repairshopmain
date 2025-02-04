@@ -1859,6 +1859,57 @@ export type Database = {
           },
         ]
       }
+      technician_availability: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          is_available: boolean
+          organization_id: string
+          reason: string | null
+          technician_id: string
+          time_slots: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          is_available?: boolean
+          organization_id: string
+          reason?: string | null
+          technician_id: string
+          time_slots?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          is_available?: boolean
+          organization_id?: string
+          reason?: string | null
+          technician_id?: string
+          time_slots?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technician_availability_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technician_availability_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       technician_specialties: {
         Row: {
           created_at: string
@@ -2010,11 +2061,79 @@ export type Database = {
           },
         ]
       }
+      work_order_assignment_rules: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          criteria: Json
+          id: string
+          is_active: boolean
+          name: string
+          organization_id: string
+          priority: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          criteria?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          organization_id: string
+          priority?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          criteria?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          organization_id?: string
+          priority?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_order_assignment_rules_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_assignment_rules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_order_assignment_rules_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      auto_assign_technician: {
+        Args: {
+          booking_id: string
+          required_specialties?: string[]
+        }
+        Returns: string
+      }
       check_organization_membership: {
         Args: {
           user_id: string

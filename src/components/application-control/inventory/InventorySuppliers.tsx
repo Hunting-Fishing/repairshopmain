@@ -41,9 +41,9 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
     inventory_value: 0,
     return_rate: 0,
     average_lead_time: 0,
-    daily_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 30, 0), // Estimated daily
-    weekly_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 4, 0), // Estimated weekly
-    monthly_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0), // Current month
+    daily_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 30, 0),
+    weekly_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0) / 4, 0),
+    monthly_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
     rebates_amount: 0,
     discounts_amount: 0,
     bill_out_total: 0,

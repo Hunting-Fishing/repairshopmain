@@ -4,8 +4,14 @@ import { TechnicianSettings } from "./TechnicianSettings";
 import { TechnicianSpecialties } from "./TechnicianSpecialties";
 import { TrainingRecords } from "./training/TrainingRecords";
 import { AssignmentRules } from "./assignment-rules/AssignmentRules";
+import { UseFormReturn } from "react-hook-form";
+import { TechnicianSettingsFormValues } from "./types";
 
-export function TechnicianTabs() {
+interface TechnicianTabsProps {
+  form: UseFormReturn<TechnicianSettingsFormValues>;
+}
+
+export function TechnicianTabs({ form }: TechnicianTabsProps) {
   return (
     <>
       <TabsList className="grid w-full grid-cols-5 mb-8">
@@ -21,7 +27,7 @@ export function TechnicianTabs() {
       </TabsContent>
 
       <TabsContent value="settings">
-        <TechnicianSettings />
+        <TechnicianSettings form={form} />
       </TabsContent>
 
       <TabsContent value="specialties">

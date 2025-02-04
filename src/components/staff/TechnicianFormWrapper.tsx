@@ -74,7 +74,7 @@ export function TechnicianFormWrapper({ children }: TechnicianFormWrapperProps) 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {children}
+        {typeof children === 'function' ? children(form) : children}
       </form>
     </Form>
   );

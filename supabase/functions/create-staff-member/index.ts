@@ -39,26 +39,38 @@ serve(async (req) => {
       )
     }
 
-    // Generate a random password if none provided
-    const finalPassword = password || Math.random().toString(36).slice(-8)
+    // First check if user already exists
+    const { data: existingUser } = await supabaseClient.auth.admin.getUserByEmail(email)
+    
+    let authData;
+    if (existingUser) {
+      authData = { user: existingUser }
+      console.log('User already exists:', existingUser.id)
+    } else {
+      // Generate a random password if none provided
+      const finalPassword = password || Math.random().toString(36).slice(-8)
 
-    // Create the user
-    const { data: authData, error: createUserError } = await supabaseClient.auth.admin.createUser({
-      email,
-      password: finalPassword,
-      email_confirm: true,
-      user_metadata: userData
-    })
+      // Create the user
+      const { data: newAuthData, error: createUserError } = await supabaseClient.auth.admin.createUser({
+        email,
+        password: finalPassword,
+        email_confirm: true,
+        user_metadata: userData
+      })
 
-    if (createUserError) {
-      console.error('Error creating user:', createUserError)
-      throw createUserError
+      if (createUserError) {
+        console.error('Error creating user:', createUserError)
+        throw createUserError
+      }
+
+      authData = newAuthData
+      console.log('New user created:', authData.user.id)
     }
 
-    // Create profile
+    // Upsert profile
     const { error: profileError } = await supabaseClient
       .from('profiles')
-      .insert({
+      .upsert({
         id: authData.user.id,
         organization_id: organizationId,
         first_name: userData.firstName,
@@ -70,31 +82,37 @@ serve(async (req) => {
         notes: userData.notes,
         schedule: userData.schedule,
         status: 'active'
+      }, { 
+        onConflict: 'id',
+        ignoreDuplicates: false 
       })
 
     if (profileError) {
-      console.error('Error creating profile:', profileError)
+      console.error('Error upserting profile:', profileError)
       throw profileError
     }
 
-    // Add organization membership
+    // Upsert organization membership
     const { error: membershipError } = await supabaseClient
       .from('organization_members')
-      .insert({
+      .upsert({
         organization_id: organizationId,
         user_id: authData.user.id,
         status: 'active'
+      }, {
+        onConflict: 'user_id,organization_id',
+        ignoreDuplicates: false
       })
 
     if (membershipError) {
-      console.error('Error creating organization membership:', membershipError)
+      console.error('Error upserting organization membership:', membershipError)
       throw membershipError
     }
 
     return new Response(
       JSON.stringify({ 
         user: authData.user,
-        password: finalPassword 
+        password: !existingUser ? password : undefined 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

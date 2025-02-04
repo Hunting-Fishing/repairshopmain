@@ -60,6 +60,7 @@ export function SupplierList({ suppliers, isLoading, onSupplierClick }: Supplier
       <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
         <div>
           Viewing {paginatedSuppliers.length} of {totalSuppliers} suppliers
+          {searchQuery && ` (filtered from ${filteredSuppliers.length} results)`}
         </div>
       </div>
 

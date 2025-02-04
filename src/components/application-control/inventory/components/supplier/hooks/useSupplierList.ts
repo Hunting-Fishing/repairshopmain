@@ -1,18 +1,35 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import type { InventorySupplier } from "../../../types";
 
 export function useSupplierList(suppliers: InventorySupplier[]) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Debounced search handler
+  const debouncedSearch = useDebouncedCallback((value: string) => {
+    setDebouncedSearchTerm(value);
+    setCurrentPage(1); // Reset to first page on search
+  }, 300);
+
+  // Update both the immediate and debounced search terms
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    debouncedSearch(value);
+  }, [debouncedSearch]);
+
   const filteredSuppliers = useMemo(() => {
-    return suppliers.filter(supplier => 
-      supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      supplier.contact_person?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      supplier.email?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [suppliers, searchQuery]);
+    return suppliers.filter(supplier => {
+      const searchTerm = debouncedSearchTerm.toLowerCase();
+      return (
+        supplier.name.toLowerCase().includes(searchTerm) ||
+        supplier.contact_person?.toLowerCase().includes(searchTerm) ||
+        supplier.email?.toLowerCase().includes(searchTerm)
+      );
+    });
+  }, [suppliers, debouncedSearchTerm]);
 
   const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
   
@@ -21,16 +38,11 @@ export function useSupplierList(suppliers: InventorySupplier[]) {
     return filteredSuppliers.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredSuppliers, currentPage, itemsPerPage]);
 
-  // Reset to first page when search query changes
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
-
   return {
     filteredSuppliers,
     totalSuppliers: suppliers.length,
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: handleSearchChange,
     currentPage,
     setCurrentPage,
     itemsPerPage,

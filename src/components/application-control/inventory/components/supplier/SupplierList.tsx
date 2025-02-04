@@ -8,9 +8,10 @@ import type { InventorySupplier } from "../../types";
 interface SupplierListProps {
   suppliers: InventorySupplier[];
   isLoading: boolean;
+  onSupplierClick?: (supplier: InventorySupplier) => void;
 }
 
-export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
+export function SupplierList({ suppliers, isLoading, onSupplierClick }: SupplierListProps) {
   const { 
     filteredSuppliers,
     totalSuppliers,
@@ -58,7 +59,11 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
 
       <div className="grid grid-cols-1 gap-4">
         {filteredSuppliers.map((supplier) => (
-          <SupplierCard key={supplier.id} supplier={supplier} />
+          <SupplierCard 
+            key={supplier.id} 
+            supplier={supplier}
+            onClick={onSupplierClick}
+          />
         ))}
       </div>
     </div>

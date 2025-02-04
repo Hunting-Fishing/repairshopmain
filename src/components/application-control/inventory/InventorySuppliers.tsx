@@ -2,6 +2,8 @@ import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import { useSuppliers } from "./hooks/useSuppliers";
 import { SupplierList } from "./components/supplier/SupplierList";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
+import { SupplierDetailsDialog } from "./components/supplier/SupplierDetailsDialog";
+import { useState } from "react";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -10,6 +12,8 @@ interface InventorySuppliersProps {
 
 export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) {
   const { userProfile } = useOrganizationData();
+  const [selectedSupplier, setSelectedSupplier] = useState<InventorySupplier | null>(null);
+  
   const { 
     suppliers: hookSuppliers, 
     isLoading, 
@@ -26,13 +30,28 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Suppliers</h1>
+        <div>
+          <h1 className="text-2xl font-semibold">Suppliers</h1>
+          <p className="text-muted-foreground">
+            Manage your supplier relationships and inventory sources
+          </p>
+        </div>
         <AddSupplierDialog />
       </div>
+      
       <SupplierList 
         suppliers={displaySuppliers}
         isLoading={isLoading}
+        onSupplierClick={setSelectedSupplier}
       />
+
+      {selectedSupplier && (
+        <SupplierDetailsDialog
+          supplier={selectedSupplier}
+          open={!!selectedSupplier}
+          onOpenChange={() => setSelectedSupplier(null)}
+        />
+      )}
     </div>
   );
 }

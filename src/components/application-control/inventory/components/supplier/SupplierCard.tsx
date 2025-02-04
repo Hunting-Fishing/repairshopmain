@@ -1,4 +1,4 @@
-import { Box, ExternalLink, RefreshCw, FileText, Truck } from "lucide-react";
+import { Box, ExternalLink, RefreshCw, FileText, Truck, Globe } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,18 +6,22 @@ import type { InventorySupplier } from "../../types";
 
 interface SupplierCardProps {
   supplier: InventorySupplier;
+  onClick?: (supplier: InventorySupplier) => void;
 }
 
-export function SupplierCard({ supplier }: SupplierCardProps) {
+export function SupplierCard({ supplier, onClick }: SupplierCardProps) {
   const features = [
     { label: "INVENTORY SYNC", icon: <RefreshCw className="h-3 w-3" /> },
-    { label: "PRODUCT DATA UPLOAD", icon: <FileText className="h-3 w-3" /> },
+    { label: "PRODUCT DATA", icon: <FileText className="h-3 w-3" /> },
     { label: "ORDER ROUTING", icon: <Truck className="h-3 w-3" /> },
-    { label: "SHIPMENT TRACKING", icon: <Box className="h-3 w-3" /> },
+    { label: "TRACKING", icon: <Globe className="h-3 w-3" /> },
   ];
 
   return (
-    <Card className="group bg-white hover:shadow-lg transition-all duration-200">
+    <Card 
+      className="group bg-white hover:shadow-lg transition-all duration-200 cursor-pointer"
+      onClick={() => onClick?.(supplier)}
+    >
       <CardContent className="p-6">
         <div className="flex items-start gap-6">
           <div className="w-24 h-24 bg-primary/5 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -47,7 +51,7 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
                 <Badge 
                   key={index}
                   variant="outline" 
-                  className="bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-0 cursor-pointer"
+                  className="bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-0"
                 >
                   {feature.icon}
                   <span className="ml-1">{feature.label}</span>

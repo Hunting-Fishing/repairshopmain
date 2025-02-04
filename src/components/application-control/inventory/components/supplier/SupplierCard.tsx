@@ -22,13 +22,13 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
             <Box className="h-8 w-8 text-primary" />
           </div>
           
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 space-y-6">
             <SupplierHeader supplier={supplier} />
             <SupplierFeatures />
             <SupplierStats />
             <SupplierContact supplier={supplier} />
             <SupplierFinancials supplier={supplier} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SupplierDocuments supplier={supplier} />
               <SupplierTransactions supplier={supplier} />
             </div>

@@ -8,23 +8,23 @@ interface SupplierContactProps {
 
 export function SupplierContact({ supplier }: SupplierContactProps) {
   return (
-    <div className="mt-4 pt-4 border-t">
+    <div className="pt-4 border-t">
       <div className="flex flex-wrap gap-2">
         {supplier.email && (
-          <Badge variant="outline" className="flex items-center gap-1">
-            <Mail className="h-4 w-4" />
+          <Badge variant="outline" className="flex items-center gap-1 hover:bg-primary/5 cursor-pointer transition-colors">
+            <Mail className="h-3 w-3" />
             <span>{supplier.email}</span>
           </Badge>
         )}
         {supplier.phone && (
-          <Badge variant="outline" className="flex items-center gap-1">
-            <Phone className="h-4 w-4" />
+          <Badge variant="outline" className="flex items-center gap-1 hover:bg-primary/5 cursor-pointer transition-colors">
+            <Phone className="h-3 w-3" />
             <span>{supplier.phone}</span>
           </Badge>
         )}
         {supplier.address && (
-          <Badge variant="outline" className="flex items-center gap-1">
-            <MapPin className="h-4 w-4" />
+          <Badge variant="outline" className="flex items-center gap-1 hover:bg-primary/5 cursor-pointer transition-colors">
+            <MapPin className="h-3 w-3" />
             <span>{supplier.address}</span>
           </Badge>
         )}

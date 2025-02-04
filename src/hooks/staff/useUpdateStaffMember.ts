@@ -4,17 +4,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-interface UpdateStaffMemberData {
+export interface UpdateStaffMemberData {
   id: string;
   first_name: string;
   last_name: string;
-  phone_number?: string;
-  notes?: string;
+  phone_number?: string | null;
+  notes?: string | null;
   emergency_contact?: {
     name?: string;
     phone?: string;
     relationship?: string;
-  };
+  } | null;
   skills?: string[];
 }
 

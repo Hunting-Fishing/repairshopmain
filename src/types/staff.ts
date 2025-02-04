@@ -1,5 +1,7 @@
+
 export type StaffMember = {
   id: string;
+  organization_id: string;
   first_name: string | null;
   last_name: string | null;
   email: string;
@@ -10,6 +12,21 @@ export type StaffMember = {
   custom_roles: {
     name: string | null;
   } | null;
+  notes?: string | null;
+  emergency_contact?: {
+    name?: string;
+    phone?: string;
+    relationship?: string;
+  } | null;
+  preferred_working_hours?: {
+    [key: string]: string;
+  } | null;
+  skills?: string[];
+  certifications?: Array<{
+    name: string;
+    date: string;
+    expiry?: string;
+  }>;
 };
 
 export type UserProfile = {

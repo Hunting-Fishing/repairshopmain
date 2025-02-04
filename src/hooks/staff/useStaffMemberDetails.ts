@@ -9,10 +9,11 @@ export function useStaffMemberDetails(staffId: string | null) {
     queryFn: async () => {
       if (!staffId) throw new Error("Staff ID is required");
 
-      const { data: profiles } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
         .select(`
           id,
+          organization_id,
           first_name,
           last_name,
           role,
@@ -33,17 +34,17 @@ export function useStaffMemberDetails(staffId: string | null) {
 
       const { data: emailData } = await supabase
         .rpc('get_organization_user_emails', {
-          org_id: profiles?.organization_id
+          org_id: profile?.organization_id
         });
 
-      if (!profiles || !emailData) {
+      if (!profile || !emailData) {
         throw new Error("Staff member not found");
       }
 
       const staffMember = {
-        ...profiles,
-        email: emailData.find(e => e.user_id === profiles.id)?.email || '',
-        custom_roles: profiles.custom_roles ? { name: profiles.custom_roles[0]?.name || null } : null
+        ...profile,
+        email: emailData.find(e => e.user_id === profile.id)?.email || '',
+        custom_roles: profile.custom_roles ? { name: profile.custom_roles[0]?.name || null } : null
       };
 
       return staffMember as StaffMember;

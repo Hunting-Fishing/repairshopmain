@@ -121,7 +121,7 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
                     <SelectContent>
                       {skills?.map((skill) => (
                         <SelectItem key={skill.id} value={skill.id}>
-                          {skill.name} ({skill.category?.name})
+                          {skill.name} {skill.category && `(${skill.category.name})`}
                         </SelectItem>
                       ))}
                     </SelectContent>

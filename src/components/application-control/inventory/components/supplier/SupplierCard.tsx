@@ -8,6 +8,8 @@ import { SupplierFinancials } from "./supplier-details/SupplierFinancials";
 import { SupplierDocuments } from "./supplier-details/SupplierDocuments";
 import { SupplierTransactions } from "./supplier-details/SupplierTransactions";
 import { SupplierCommunications } from "./supplier-details/SupplierCommunications";
+import { SupplierAnalytics } from "./supplier-details/SupplierAnalytics";
+import { SupplierAutomation } from "./supplier-details/SupplierAutomation";
 import type { InventorySupplier } from "../../types";
 
 interface SupplierCardProps {
@@ -28,7 +30,9 @@ export function SupplierCard({ supplier }: SupplierCardProps) {
             <SupplierFeatures />
             <SupplierStats />
             <SupplierContact supplier={supplier} />
+            <SupplierAnalytics supplierId={supplier.id} />
             <SupplierFinancials supplier={supplier} />
+            <SupplierAutomation supplierId={supplier.id} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <SupplierDocuments supplier={supplier} />
               <SupplierCommunications supplier={supplier} />

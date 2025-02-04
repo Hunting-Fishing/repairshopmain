@@ -1313,36 +1313,45 @@ export type Database = {
       }
       supplier_analytics: {
         Row: {
+          average_delivery_time: number | null
           created_at: string | null
           date: string
           id: string
           on_time_delivery_rate: number | null
           orders_count: number | null
+          orders_fulfilled: number | null
           organization_id: string | null
+          payment_timeliness_score: number | null
           quality_rating: number | null
           supplier_id: string | null
           total_spend: number | null
           updated_at: string | null
         }
         Insert: {
+          average_delivery_time?: number | null
           created_at?: string | null
           date: string
           id?: string
           on_time_delivery_rate?: number | null
           orders_count?: number | null
+          orders_fulfilled?: number | null
           organization_id?: string | null
+          payment_timeliness_score?: number | null
           quality_rating?: number | null
           supplier_id?: string | null
           total_spend?: number | null
           updated_at?: string | null
         }
         Update: {
+          average_delivery_time?: number | null
           created_at?: string | null
           date?: string
           id?: string
           on_time_delivery_rate?: number | null
           orders_count?: number | null
+          orders_fulfilled?: number | null
           organization_id?: string | null
+          payment_timeliness_score?: number | null
           quality_rating?: number | null
           supplier_id?: string | null
           total_spend?: number | null
@@ -1358,6 +1367,57 @@ export type Database = {
           },
           {
             foreignKeyName: "supplier_analytics_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_automation_settings: {
+        Row: {
+          contract_reminder_days: number | null
+          created_at: string | null
+          id: string
+          notification_preferences: Json | null
+          organization_id: string | null
+          payment_reminder_days: number | null
+          reorder_threshold: number | null
+          supplier_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          contract_reminder_days?: number | null
+          created_at?: string | null
+          id?: string
+          notification_preferences?: Json | null
+          organization_id?: string | null
+          payment_reminder_days?: number | null
+          reorder_threshold?: number | null
+          supplier_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          contract_reminder_days?: number | null
+          created_at?: string | null
+          id?: string
+          notification_preferences?: Json | null
+          organization_id?: string | null
+          payment_reminder_days?: number | null
+          reorder_threshold?: number | null
+          supplier_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_automation_settings_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_automation_settings_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "inventory_suppliers"

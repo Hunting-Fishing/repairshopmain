@@ -45,7 +45,7 @@ export function OverviewTab() {
     },
     {
       title: "Inventory Management",
-      description: "Manage inventory items, categories, and suppliers",
+      description: "Manage inventory items and categories",
       icon: Package,
       action: () => navigate("/inventory"),
     },
@@ -53,7 +53,7 @@ export function OverviewTab() {
       title: "Supplier Management",
       description: "Manage suppliers, documents, and transactions",
       icon: Truck,
-      action: () => navigate("/inventory?tab=suppliers"),
+      action: () => navigate("/inventory/suppliers"),
     }
   ];
 

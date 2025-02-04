@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SupplierAnalyticsOverview } from "../supplier-analytics/SupplierAnalyticsOverview";
 import { useSupplierAnalytics } from "../hooks/useSupplierAnalytics";
 import type { InventorySupplier } from "../../../types";
 import { BarChart3, TrendingUp, Clock } from "lucide-react";
@@ -18,15 +17,6 @@ export function SupplierReports({ supplier }: SupplierReportsProps) {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Performance Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <SupplierAnalyticsOverview analytics={analytics} />
-        </CardContent>
-      </Card>
-
       <Tabs defaultValue="performance" className="w-full">
         <TabsList>
           <TabsTrigger value="performance" className="flex items-center gap-2">
@@ -46,7 +36,6 @@ export function SupplierReports({ supplier }: SupplierReportsProps) {
         <TabsContent value="performance" className="mt-4">
           <Card>
             <CardContent className="pt-6">
-              {/* Performance metrics content */}
               <div className="text-sm text-muted-foreground">
                 Detailed performance metrics will be displayed here
               </div>
@@ -57,7 +46,6 @@ export function SupplierReports({ supplier }: SupplierReportsProps) {
         <TabsContent value="trends" className="mt-4">
           <Card>
             <CardContent className="pt-6">
-              {/* Historical trends content */}
               <div className="text-sm text-muted-foreground">
                 Historical trend analysis will be displayed here
               </div>
@@ -68,7 +56,6 @@ export function SupplierReports({ supplier }: SupplierReportsProps) {
         <TabsContent value="delivery" className="mt-4">
           <Card>
             <CardContent className="pt-6">
-              {/* Delivery analysis content */}
               <div className="text-sm text-muted-foreground">
                 Delivery performance analysis will be displayed here
               </div>

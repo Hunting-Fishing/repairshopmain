@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -11,51 +12,32 @@ export function useAddStaffMember() {
   const addStaffMember = async (data: StaffMemberFormValues, organizationId: string) => {
     setIsLoading(true);
     try {
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: data.email,
-        password: Math.random().toString(36).slice(-8),
-        email_confirm: true,
+      // Call the Edge Function to create the staff member
+      const { data: response, error } = await supabase.functions.invoke('create-staff-member', {
+        body: {
+          email: data.email,
+          userData: {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            role: data.role,
+            customRoleId: data.customRoleId,
+            phoneNumber: data.phoneNumber,
+            hireDate: data.hireDate,
+            notes: data.notes,
+            schedule: data.schedule
+          },
+          organizationId
+        }
       });
 
-      if (authError) throw authError;
-
-      // Create profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: authData.user.id,
-          organization_id: organizationId,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          role: data.role,
-          custom_role_id: data.role === "custom" ? data.customRoleId : null,
-          phone_number: data.phoneNumber,
-          hire_date: data.hireDate ? data.hireDate.toISOString().split('T')[0] : null,
-          notes: data.notes,
-          schedule: data.schedule,
-          status: 'active',
-        });
-
-      if (profileError) throw profileError;
-
-      // Add organization membership
-      const { error: membershipError } = await supabase
-        .from("organization_members")
-        .insert({
-          organization_id: organizationId,
-          user_id: authData.user.id,
-          status: 'active'
-        });
-
-      if (membershipError) throw membershipError;
+      if (error) throw error;
 
       toast.success("Staff member added successfully");
       queryClient.invalidateQueries({ queryKey: ["staff-members"] });
       return true;
     } catch (error) {
       console.error("Error adding staff member:", error);
-      toast.error("Failed to add staff member");
+      toast.error(error.message || "Failed to add staff member");
       return false;
     } finally {
       setIsLoading(false);

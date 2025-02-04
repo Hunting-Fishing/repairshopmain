@@ -1314,45 +1314,54 @@ export type Database = {
       supplier_analytics: {
         Row: {
           average_delivery_time: number | null
+          average_lead_time: number | null
           created_at: string | null
           date: string
           id: string
+          inventory_value: number | null
           on_time_delivery_rate: number | null
           orders_count: number | null
           orders_fulfilled: number | null
           organization_id: string | null
           payment_timeliness_score: number | null
           quality_rating: number | null
+          return_rate: number | null
           supplier_id: string | null
           total_spend: number | null
           updated_at: string | null
         }
         Insert: {
           average_delivery_time?: number | null
+          average_lead_time?: number | null
           created_at?: string | null
           date: string
           id?: string
+          inventory_value?: number | null
           on_time_delivery_rate?: number | null
           orders_count?: number | null
           orders_fulfilled?: number | null
           organization_id?: string | null
           payment_timeliness_score?: number | null
           quality_rating?: number | null
+          return_rate?: number | null
           supplier_id?: string | null
           total_spend?: number | null
           updated_at?: string | null
         }
         Update: {
           average_delivery_time?: number | null
+          average_lead_time?: number | null
           created_at?: string | null
           date?: string
           id?: string
+          inventory_value?: number | null
           on_time_delivery_rate?: number | null
           orders_count?: number | null
           orders_fulfilled?: number | null
           organization_id?: string | null
           payment_timeliness_score?: number | null
           quality_rating?: number | null
+          return_rate?: number | null
           supplier_id?: string | null
           total_spend?: number | null
           updated_at?: string | null
@@ -1376,34 +1385,46 @@ export type Database = {
       }
       supplier_automation_settings: {
         Row: {
+          auto_payment: boolean | null
+          auto_reorder: boolean | null
           contract_reminder_days: number | null
           created_at: string | null
           id: string
+          min_stock_threshold: number | null
           notification_preferences: Json | null
           organization_id: string | null
           payment_reminder_days: number | null
+          preferred_delivery_days: string[] | null
           reorder_threshold: number | null
           supplier_id: string | null
           updated_at: string | null
         }
         Insert: {
+          auto_payment?: boolean | null
+          auto_reorder?: boolean | null
           contract_reminder_days?: number | null
           created_at?: string | null
           id?: string
+          min_stock_threshold?: number | null
           notification_preferences?: Json | null
           organization_id?: string | null
           payment_reminder_days?: number | null
+          preferred_delivery_days?: string[] | null
           reorder_threshold?: number | null
           supplier_id?: string | null
           updated_at?: string | null
         }
         Update: {
+          auto_payment?: boolean | null
+          auto_reorder?: boolean | null
           contract_reminder_days?: number | null
           created_at?: string | null
           id?: string
+          min_stock_threshold?: number | null
           notification_preferences?: Json | null
           organization_id?: string | null
           payment_reminder_days?: number | null
+          preferred_delivery_days?: string[] | null
           reorder_threshold?: number | null
           supplier_id?: string | null
           updated_at?: string | null
@@ -1427,35 +1448,47 @@ export type Database = {
       }
       supplier_communications: {
         Row: {
+          category: string | null
           created_at: string | null
           created_by: string | null
+          due_date: string | null
           id: string
           message_content: string
           message_type: string
           organization_id: string | null
+          priority: string | null
           read_at: string | null
+          response_required: boolean | null
           status: string | null
           supplier_id: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           created_by?: string | null
+          due_date?: string | null
           id?: string
           message_content: string
           message_type: string
           organization_id?: string | null
+          priority?: string | null
           read_at?: string | null
+          response_required?: boolean | null
           status?: string | null
           supplier_id?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           created_by?: string | null
+          due_date?: string | null
           id?: string
           message_content?: string
           message_type?: string
           organization_id?: string | null
+          priority?: string | null
           read_at?: string | null
+          response_required?: boolean | null
           status?: string | null
           supplier_id?: string | null
         }

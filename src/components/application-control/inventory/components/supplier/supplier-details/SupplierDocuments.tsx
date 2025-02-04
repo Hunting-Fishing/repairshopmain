@@ -1,11 +1,14 @@
 import { useState, useCallback } from "react";
-import { Upload, FileText, Trash2 } from "lucide-react";
+import { Upload, FileText, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useSupplierRealtime } from "../hooks/useSupplierRealtime";
-import type { InventorySupplier } from "../../../types";
+import { supabase } from "@/integrations/supabase/client";
+import type { InventorySupplier, SupplierDocument } from "../../../types";
 
 interface SupplierDocumentsProps {
   supplier: InventorySupplier;
@@ -13,7 +16,8 @@ interface SupplierDocumentsProps {
 
 export function SupplierDocuments({ supplier }: SupplierDocumentsProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const [documents, setDocuments] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<SupplierDocument[]>([]);
+  const [notes, setNotes] = useState("");
 
   const fetchDocuments = useCallback(async () => {
     const { data, error } = await supabase
@@ -49,19 +53,26 @@ export function SupplierDocuments({ supplier }: SupplierDocumentsProps) {
 
       if (uploadError) throw uploadError;
 
+      const { data: { publicUrl } } = supabase.storage
+        .from('supplier-documents')
+        .getPublicUrl(filePath);
+
       const { error: dbError } = await supabase
         .from('supplier_documents')
         .insert({
           supplier_id: supplier.id,
           organization_id: supplier.organization_id,
-          document_type: 'general',
+          document_type: fileExt,
           file_name: file.name,
-          file_url: filePath,
+          file_url: publicUrl,
+          notes: notes.trim() || null,
+          status: 'active'
         });
 
       if (dbError) throw dbError;
 
       toast.success('Document uploaded successfully');
+      setNotes("");
       fetchDocuments();
     } catch (error) {
       console.error('Error uploading document:', error);
@@ -71,20 +82,51 @@ export function SupplierDocuments({ supplier }: SupplierDocumentsProps) {
     }
   };
 
-  const handleDeleteDocument = async (documentId: string) => {
+  const handleDeleteDocument = async (documentId: string, fileUrl: string) => {
     try {
-      const { error } = await supabase
+      // Extract the path from the URL
+      const filePath = fileUrl.split('/').pop();
+      
+      if (filePath) {
+        // Delete from storage
+        const { error: storageError } = await supabase.storage
+          .from('supplier-documents')
+          .remove([filePath]);
+
+        if (storageError) throw storageError;
+      }
+
+      // Delete from database
+      const { error: dbError } = await supabase
         .from('supplier_documents')
         .delete()
         .eq('id', documentId);
 
-      if (error) throw error;
+      if (dbError) throw dbError;
 
       toast.success('Document deleted successfully');
       fetchDocuments();
     } catch (error) {
       console.error('Error deleting document:', error);
       toast.error('Failed to delete document');
+    }
+  };
+
+  const handleDownload = async (fileUrl: string, fileName: string) => {
+    try {
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      toast.error('Failed to download document');
     }
   };
 
@@ -98,24 +140,36 @@ export function SupplierDocuments({ supplier }: SupplierDocumentsProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              disabled={isUploading}
-              onClick={() => document.getElementById('file-upload')?.click()}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Document
-            </Button>
-            <input
-              id="file-upload"
-              type="file"
-              className="hidden"
-              onChange={handleFileUpload}
-              accept=".pdf,.doc,.docx,.xls,.xlsx"
-            />
+          <div className="space-y-4">
+            <div>
+              <Label>Document Notes</Label>
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add notes about this document..."
+                className="mt-1"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                disabled={isUploading}
+                onClick={() => document.getElementById('file-upload')?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Document
+              </Button>
+              <Input
+                id="file-upload"
+                type="file"
+                className="hidden"
+                onChange={handleFileUpload}
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
+              />
+            </div>
           </div>
           
           <div className="grid gap-2">
@@ -123,19 +177,33 @@ export function SupplierDocuments({ supplier }: SupplierDocumentsProps) {
               documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="flex items-center justify-between p-2 bg-muted/50 rounded-lg"
+                  className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
                 >
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    <span className="text-sm">{doc.file_name}</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      <span className="font-medium">{doc.file_name}</span>
+                    </div>
+                    {doc.notes && (
+                      <p className="text-sm text-muted-foreground mt-1">{doc.notes}</p>
+                    )}
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteDocument(doc.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDownload(doc.file_url, doc.file_name)}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteDocument(doc.id, doc.file_url)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
                 </div>
               ))
             ) : (

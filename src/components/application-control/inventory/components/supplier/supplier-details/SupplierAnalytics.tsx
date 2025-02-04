@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSupplierAnalytics } from "../hooks/useSupplierAnalytics";
-import { BarChart3, TrendingUp, Clock, CheckCircle } from "lucide-react";
+import { BarChart3, TrendingUp, Clock, CheckCircle, DollarSign, Package, RefreshCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface SupplierAnalyticsProps {
@@ -13,7 +13,7 @@ export function SupplierAnalytics({ supplierId }: SupplierAnalyticsProps) {
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[...Array(4)].map((_, i) => (
+        {[...Array(8)].map((_, i) => (
           <Skeleton key={i} className="h-[120px] w-full" />
         ))}
       </div>
@@ -39,6 +39,26 @@ export function SupplierAnalytics({ supplierId }: SupplierAnalyticsProps) {
     {
       title: "Payment Score",
       value: (analytics?.payment_timeliness_score || 0).toFixed(1),
+      icon: DollarSign,
+    },
+    {
+      title: "Inventory Value",
+      value: `$${(analytics?.inventory_value || 0).toFixed(2)}`,
+      icon: Package,
+    },
+    {
+      title: "Return Rate",
+      value: `${(analytics?.return_rate || 0).toFixed(1)}%`,
+      icon: RefreshCcw,
+    },
+    {
+      title: "Average Lead Time",
+      value: `${(analytics?.average_lead_time || 0).toFixed(1)} days`,
+      icon: Clock,
+    },
+    {
+      title: "Total Orders",
+      value: analytics?.orders_count || 0,
       icon: BarChart3,
     },
   ];

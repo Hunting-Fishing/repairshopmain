@@ -1,9 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import type { SupplierAutomationSettings } from "../../../types";
 
 export function useSupplierAutomation(supplierId: string) {
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
@@ -16,32 +15,23 @@ export function useSupplierAutomation(supplierId: string) {
         .maybeSingle();
 
       if (error) throw error;
-      return data;
+      return data as SupplierAutomationSettings;
     },
   });
 
   const updateSettings = useMutation({
-    mutationFn: async (newSettings: typeof settings) => {
+    mutationFn: async (newSettings: SupplierAutomationSettings) => {
       const { error } = await supabase
         .from("supplier_automation_settings")
-        .upsert(newSettings);
+        .upsert({
+          supplier_id: supplierId,
+          ...newSettings
+        });
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["supplier-automation", supplierId] });
-      toast({
-        title: "Settings updated",
-        description: "Automation settings have been saved successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to update automation settings.",
-        variant: "destructive",
-      });
-      console.error("Error updating automation settings:", error);
     },
   });
 

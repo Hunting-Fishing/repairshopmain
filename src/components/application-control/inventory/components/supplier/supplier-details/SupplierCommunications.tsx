@@ -1,12 +1,16 @@
 import { useState, useCallback } from "react";
-import { MessageSquare, Send } from "lucide-react";
+import { MessageSquare, Send, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useSupplierRealtime } from "../hooks/useSupplierRealtime";
-import type { InventorySupplier } from "../../../types";
+import { supabase } from "@/integrations/supabase/client";
+import type { InventorySupplier, SupplierMessage } from "../../../types";
 
 interface SupplierCommunicationsProps {
   supplier: InventorySupplier;
@@ -15,7 +19,10 @@ interface SupplierCommunicationsProps {
 export function SupplierCommunications({ supplier }: SupplierCommunicationsProps) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<SupplierMessage[]>([]);
+  const [priority, setPriority] = useState<string>("normal");
+  const [category, setCategory] = useState<string>("general");
+  const [responseRequired, setResponseRequired] = useState(false);
 
   const fetchMessages = useCallback(async () => {
     const { data, error } = await supabase
@@ -48,6 +55,10 @@ export function SupplierCommunications({ supplier }: SupplierCommunicationsProps
           organization_id: supplier.organization_id,
           message_type: 'general',
           message_content: message.trim(),
+          priority,
+          category,
+          response_required: responseRequired,
+          status: 'sent'
         });
 
       if (error) throw error;
@@ -77,6 +88,20 @@ export function SupplierCommunications({ supplier }: SupplierCommunicationsProps
             {messages.length > 0 ? (
               messages.map((msg) => (
                 <div key={msg.id} className="bg-muted/50 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Badge variant={msg.priority === 'high' ? 'destructive' : 'secondary'}>
+                        {msg.priority}
+                      </Badge>
+                      <Badge variant="outline">{msg.category}</Badge>
+                    </div>
+                    {msg.response_required && (
+                      <Badge variant="destructive" className="flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        Response Required
+                      </Badge>
+                    )}
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     {new Date(msg.created_at).toLocaleString()}
                   </p>
@@ -90,20 +115,62 @@ export function SupplierCommunications({ supplier }: SupplierCommunicationsProps
             )}
           </div>
 
-          <div className="flex gap-2">
-            <Textarea
-              placeholder="Type your message..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="min-h-[80px]"
-            />
-            <Button
-              size="icon"
-              onClick={handleSendMessage}
-              disabled={isSending || !message.trim()}
-            >
-              <Send className="h-4 w-4" />
-            </Button>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Priority</Label>
+                <Select value={priority} onValueChange={setPriority}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="order">Order</SelectItem>
+                    <SelectItem value="payment">Payment</SelectItem>
+                    <SelectItem value="support">Support</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="responseRequired"
+                checked={responseRequired}
+                onCheckedChange={setResponseRequired}
+              />
+              <Label htmlFor="responseRequired">Response Required</Label>
+            </div>
+
+            <div className="flex gap-2">
+              <Textarea
+                placeholder="Type your message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                className="min-h-[80px]"
+              />
+              <Button
+                size="icon"
+                onClick={handleSendMessage}
+                disabled={isSending || !message.trim()}
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -1130,6 +1130,64 @@ export type Database = {
           },
         ]
       }
+      staff_certification_reminders: {
+        Row: {
+          certification_id: string | null
+          created_at: string | null
+          id: string
+          organization_id: string | null
+          profile_id: string | null
+          reminder_date: string
+          reminder_type: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          certification_id?: string | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          profile_id?: string | null
+          reminder_date: string
+          reminder_type: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          certification_id?: string | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          profile_id?: string | null
+          reminder_date?: string
+          reminder_type?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_certification_reminders_certification_id_fkey"
+            columns: ["certification_id"]
+            isOneToOne: false
+            referencedRelation: "staff_certifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_certification_reminders_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_certification_reminders_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_certifications: {
         Row: {
           created_at: string | null

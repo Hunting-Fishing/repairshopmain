@@ -2022,6 +2022,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_organization_user_emails: {
+        Args: {
+          org_id: string
+        }
+        Returns: {
+          user_id: string
+          email: string
+        }[]
+      }
       get_user_organization_id: {
         Args: {
           user_uuid: string

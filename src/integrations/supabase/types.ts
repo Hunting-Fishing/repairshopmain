@@ -1050,6 +1050,86 @@ export type Database = {
           },
         ]
       }
+      skill_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_categories_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skills: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skills_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "skill_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skills_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_certifications: {
         Row: {
           created_at: string | null
@@ -1207,6 +1287,74 @@ export type Database = {
           },
         ]
       }
+      staff_skill_assessments: {
+        Row: {
+          assessed_by: string | null
+          assessment_date: string | null
+          created_at: string | null
+          id: string
+          notes: string | null
+          organization_id: string | null
+          proficiency_level: number
+          profile_id: string | null
+          skill_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assessed_by?: string | null
+          assessment_date?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          proficiency_level: number
+          profile_id?: string | null
+          skill_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assessed_by?: string | null
+          assessment_date?: string | null
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          proficiency_level?: number
+          profile_id?: string | null
+          skill_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_skill_assessments_assessed_by_fkey"
+            columns: ["assessed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_skill_assessments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_skill_assessments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_skill_assessments_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_time_off: {
         Row: {
           created_at: string | null
@@ -1328,6 +1476,63 @@ export type Database = {
           },
           {
             foreignKeyName: "staff_training_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_work_history: {
+        Row: {
+          completion_time: string | null
+          created_at: string | null
+          id: string
+          job_type: string
+          notes: string | null
+          organization_id: string | null
+          performance_rating: number | null
+          profile_id: string | null
+          start_time: string | null
+          updated_at: string | null
+          work_order_id: string | null
+        }
+        Insert: {
+          completion_time?: string | null
+          created_at?: string | null
+          id?: string
+          job_type: string
+          notes?: string | null
+          organization_id?: string | null
+          performance_rating?: number | null
+          profile_id?: string | null
+          start_time?: string | null
+          updated_at?: string | null
+          work_order_id?: string | null
+        }
+        Update: {
+          completion_time?: string | null
+          created_at?: string | null
+          id?: string
+          job_type?: string
+          notes?: string | null
+          organization_id?: string | null
+          performance_rating?: number | null
+          profile_id?: string | null
+          start_time?: string | null
+          updated_at?: string | null
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_work_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_work_history_profile_id_fkey"
             columns: ["profile_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1987,6 +2192,89 @@ export type Database = {
           {
             foreignKeyName: "technician_specialty_assignments_technician_id_fkey"
             columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      training_requests: {
+        Row: {
+          approval_date: string | null
+          approval_status: string | null
+          approved_by: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          notes: string | null
+          organization_id: string | null
+          priority: string | null
+          profile_id: string | null
+          requested_by: string | null
+          requested_completion_date: string | null
+          status: string
+          training_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          approval_date?: string | null
+          approval_status?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          priority?: string | null
+          profile_id?: string | null
+          requested_by?: string | null
+          requested_completion_date?: string | null
+          status?: string
+          training_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          approval_date?: string | null
+          approval_status?: string | null
+          approved_by?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          priority?: string | null
+          profile_id?: string | null
+          requested_by?: string | null
+          requested_completion_date?: string | null
+          status?: string
+          training_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "training_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_requests_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "training_requests_requested_by_fkey"
+            columns: ["requested_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

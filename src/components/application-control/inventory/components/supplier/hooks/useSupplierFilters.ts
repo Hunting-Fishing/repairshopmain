@@ -59,7 +59,26 @@ export function useSupplierFilters(suppliers: InventorySupplier[]) {
     rebates_amount: 0,
     discounts_amount: 0,
     bill_out_total: 0,
-    profit_margin: 0
+    profit_margin: 0,
+    order_value_trend: [],
+    delivery_time_trend: [],
+    defect_rate: 0,
+    negotiated_savings: 0,
+    early_payment_discounts: 0,
+    volume_discounts: 0,
+    seasonal_spend_pattern: {
+      Q1: 0,
+      Q2: 0,
+      Q3: 0,
+      Q4: 0
+    },
+    payment_terms_compliance: 0,
+    supplier_diversity_status: null,
+    sustainability_score: 0,
+    cost_savings_initiatives: [],
+    supply_chain_risk_score: 0,
+    market_price_variance: 0,
+    contract_compliance_rate: 0
   };
 
   return {

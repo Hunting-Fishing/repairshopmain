@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, ListFilter } from "lucide-react";
-import { SupplierAnalyticsOverview } from "./components/supplier/supplier-analytics/SupplierAnalyticsOverview";
+import { AnalyticsOverview } from "./components/supplier/analytics/AnalyticsOverview";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -65,6 +65,19 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
     );
   }
 
+  const analytics = {
+    total_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+    orders_count: displaySuppliers.length,
+    on_time_delivery_rate: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / displaySuppliers.length,
+    quality_rating: displaySuppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / displaySuppliers.length,
+    orders_fulfilled: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
+    average_delivery_time: 0,
+    payment_timeliness_score: 0,
+    inventory_value: 0,
+    return_rate: 0,
+    average_lead_time: 0
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -101,18 +114,7 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
         </TabsContent>
 
         <TabsContent value="reports" className="space-y-4">
-          <SupplierAnalyticsOverview analytics={{
-            total_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
-            orders_count: displaySuppliers.length,
-            on_time_delivery_rate: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / displaySuppliers.length,
-            quality_rating: displaySuppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / displaySuppliers.length,
-            orders_fulfilled: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
-            average_delivery_time: 0,
-            payment_timeliness_score: 0,
-            inventory_value: 0,
-            return_rate: 0,
-            average_lead_time: 0
-          }} />
+          <AnalyticsOverview analytics={analytics} />
         </TabsContent>
       </Tabs>
 

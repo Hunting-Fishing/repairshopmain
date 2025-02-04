@@ -1,13 +1,13 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SupplierAnalytics } from "./supplier-details/SupplierAnalytics";
-import { SupplierTransactions } from "./supplier-details/SupplierTransactions";
-import { SupplierDocuments } from "./supplier-details/SupplierDocuments";
-import { SupplierCommunications } from "./supplier-details/SupplierCommunications";
-import { SupplierFinancials } from "./supplier-details/SupplierFinancials";
-import { SupplierAutomation } from "./supplier-details/SupplierAutomation";
-import { SupplierReports } from "./supplier-details/SupplierReports";
-import type { InventorySupplier } from "../../types";
+import { SupplierAnalytics } from "../hooks/useSupplierAnalytics";
+import { SupplierTransactions } from "./SupplierTransactions";
+import { SupplierDocuments } from "./SupplierDocuments";
+import { SupplierCommunications } from "./SupplierCommunications";
+import { SupplierFinancials } from "./SupplierFinancials";
+import { SupplierAutomation } from "./SupplierAutomation";
+import { SupplierReports } from "./SupplierReports";
+import type { InventorySupplier } from "../../../types";
 import { FileText, BarChart3, MessageSquare, Settings, DollarSign, FileArchive, ClipboardList } from "lucide-react";
 
 interface SupplierDetailsDialogProps {

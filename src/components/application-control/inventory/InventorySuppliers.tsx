@@ -5,6 +5,8 @@ import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierDetailsDialog } from "./components/supplier/supplier-details/SupplierDetailsDialog";
 import { SupplierErrorBoundary } from "./components/supplier/SupplierErrorBoundary";
 import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -23,20 +25,53 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
   
   const displaySuppliers = hookSuppliers || suppliers;
 
+  // Early return for loading state
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-2xl font-semibold">Suppliers</h1>
+            <p className="text-muted-foreground">Loading supplier data...</p>
+          </div>
+        </div>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Early return for error state
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load suppliers: {error.message}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   if (!Array.isArray(displaySuppliers)) {
     console.error("InventorySuppliers - suppliers is not an array:", displaySuppliers);
-    return <SupplierErrorBoundary error={new Error("Invalid suppliers data")} />;
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <SupplierErrorBoundary error={new Error("Invalid suppliers data")} />
+      </div>
+    );
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      <SupplierErrorBoundary error={error} />
-      
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-semibold">Suppliers</h1>
           <p className="text-muted-foreground">
-            Manage your supplier relationships and inventory sources
+            {displaySuppliers.length === 0 
+              ? "No suppliers found. Add your first supplier to get started."
+              : `Managing ${displaySuppliers.length} supplier${displaySuppliers.length === 1 ? '' : 's'}`
+            }
           </p>
         </div>
         <AddSupplierDialog />

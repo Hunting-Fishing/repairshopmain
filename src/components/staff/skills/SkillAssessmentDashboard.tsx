@@ -59,9 +59,9 @@ export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboard
         assessment_date: assessment.assessment_date,
         notes: assessment.notes,
         skill: {
-          name: assessment.skill?.name || '',
-          category: assessment.skill?.category ? {
-            name: assessment.skill.category.name
+          name: assessment.skill?.[0]?.name || '',
+          category: assessment.skill?.[0]?.category ? {
+            name: assessment.skill[0].category.name
           } : null
         },
         assessor: assessment.assessor?.[0] ? {

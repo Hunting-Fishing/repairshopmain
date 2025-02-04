@@ -40,9 +40,7 @@ export function useSuppliers(organizationId?: string) {
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!organizationId) return;
-
-    const channel = supabase
+    const channel = organizationId ? supabase
       .channel('supplier-changes')
       .on(
         'postgres_changes',
@@ -58,10 +56,12 @@ export function useSuppliers(organizationId?: string) {
           refetch();
         }
       )
-      .subscribe();
+      .subscribe() : null;
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [organizationId, refetch]);
 

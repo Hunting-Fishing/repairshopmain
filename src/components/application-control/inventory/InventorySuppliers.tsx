@@ -2,7 +2,7 @@ import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import { useSuppliers } from "./hooks/useSuppliers";
 import { SupplierList } from "./components/supplier/SupplierList";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
-import { SupplierDetailsDialog } from "./components/supplier/SupplierDetailsDialog";
+import { SupplierDetailsDialog } from "./components/supplier/supplier-details/SupplierDetailsDialog";
 import { useState } from "react";
 import type { InventorySupplier } from "./types";
 
@@ -28,8 +28,8 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-semibold">Suppliers</h1>
           <p className="text-muted-foreground">

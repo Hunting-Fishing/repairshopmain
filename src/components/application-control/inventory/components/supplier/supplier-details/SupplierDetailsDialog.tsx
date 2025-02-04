@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SupplierAnalytics } from "../hooks/useSupplierAnalytics";
+import { SupplierAnalytics } from "./SupplierAnalytics";
 import { SupplierTransactions } from "./SupplierTransactions";
 import { SupplierDocuments } from "./SupplierDocuments";
 import { SupplierCommunications } from "./SupplierCommunications";

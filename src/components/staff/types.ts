@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { UseFormReturn } from "react-hook-form";
 
 export const technicianSettingsFormSchema = z.object({
   showTechnicianWorkload: z.boolean(),

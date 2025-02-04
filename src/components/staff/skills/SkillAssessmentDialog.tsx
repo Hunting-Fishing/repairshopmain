@@ -51,7 +51,7 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
         .order('name');
       
       if (error) throw error;
-      return data;
+      return data as Skill[];
     }
   });
 

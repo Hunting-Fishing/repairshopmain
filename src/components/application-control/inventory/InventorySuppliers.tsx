@@ -24,8 +24,9 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end">
+    <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-semibold">Suppliers</h1>
         <AddSupplierDialog />
       </div>
       <SupplierList 

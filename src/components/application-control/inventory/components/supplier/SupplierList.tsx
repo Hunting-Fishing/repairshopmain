@@ -39,13 +39,15 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
   return (
     <div className="space-y-6">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input 
-          placeholder="Search Suppliers By Name..." 
-          className="pl-10 h-12"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+        <div className="relative rounded-lg border border-input bg-white">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input 
+            placeholder="Search Suppliers By Name..." 
+            className="pl-10 h-12 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
       
       <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
@@ -54,7 +56,7 @@ export function SupplierList({ suppliers, isLoading }: SupplierListProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {filteredSuppliers.map((supplier) => (
           <SupplierCard key={supplier.id} supplier={supplier} />
         ))}

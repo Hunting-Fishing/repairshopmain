@@ -699,10 +699,12 @@ export type Database = {
       inventory_suppliers: {
         Row: {
           address: string | null
+          average_markup: number | null
           contact_person: string | null
           created_at: string | null
           credit_limit: number | null
           currency: string | null
+          discount_terms: Json | null
           email: string | null
           fulfillment_rate: number | null
           id: string
@@ -711,12 +713,14 @@ export type Database = {
           name: string
           notes: string | null
           organization_id: string | null
+          payment_history: Json | null
           payment_method: string | null
           payment_status: string | null
           payment_terms: Json | null
           phone: string | null
           preferred_communication_method: string | null
           rating: number | null
+          rebate_terms: Json | null
           reliability_score: number | null
           status: string | null
           tax_id: string | null
@@ -725,10 +729,12 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          average_markup?: number | null
           contact_person?: string | null
           created_at?: string | null
           credit_limit?: number | null
           currency?: string | null
+          discount_terms?: Json | null
           email?: string | null
           fulfillment_rate?: number | null
           id?: string
@@ -737,12 +743,14 @@ export type Database = {
           name: string
           notes?: string | null
           organization_id?: string | null
+          payment_history?: Json | null
           payment_method?: string | null
           payment_status?: string | null
           payment_terms?: Json | null
           phone?: string | null
           preferred_communication_method?: string | null
           rating?: number | null
+          rebate_terms?: Json | null
           reliability_score?: number | null
           status?: string | null
           tax_id?: string | null
@@ -751,10 +759,12 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          average_markup?: number | null
           contact_person?: string | null
           created_at?: string | null
           credit_limit?: number | null
           currency?: string | null
+          discount_terms?: Json | null
           email?: string | null
           fulfillment_rate?: number | null
           id?: string
@@ -763,12 +773,14 @@ export type Database = {
           name?: string
           notes?: string | null
           organization_id?: string | null
+          payment_history?: Json | null
           payment_method?: string | null
           payment_status?: string | null
           payment_terms?: Json | null
           phone?: string | null
           preferred_communication_method?: string | null
           rating?: number | null
+          rebate_terms?: Json | null
           reliability_score?: number | null
           status?: string | null
           tax_id?: string | null
@@ -1315,56 +1327,77 @@ export type Database = {
         Row: {
           average_delivery_time: number | null
           average_lead_time: number | null
+          bill_out_total: number | null
           created_at: string | null
+          daily_spend: number | null
           date: string
+          discounts_amount: number | null
           id: string
           inventory_value: number | null
+          monthly_spend: number | null
           on_time_delivery_rate: number | null
           orders_count: number | null
           orders_fulfilled: number | null
           organization_id: string | null
           payment_timeliness_score: number | null
+          profit_margin: number | null
           quality_rating: number | null
+          rebates_amount: number | null
           return_rate: number | null
           supplier_id: string | null
           total_spend: number | null
           updated_at: string | null
+          weekly_spend: number | null
         }
         Insert: {
           average_delivery_time?: number | null
           average_lead_time?: number | null
+          bill_out_total?: number | null
           created_at?: string | null
+          daily_spend?: number | null
           date: string
+          discounts_amount?: number | null
           id?: string
           inventory_value?: number | null
+          monthly_spend?: number | null
           on_time_delivery_rate?: number | null
           orders_count?: number | null
           orders_fulfilled?: number | null
           organization_id?: string | null
           payment_timeliness_score?: number | null
+          profit_margin?: number | null
           quality_rating?: number | null
+          rebates_amount?: number | null
           return_rate?: number | null
           supplier_id?: string | null
           total_spend?: number | null
           updated_at?: string | null
+          weekly_spend?: number | null
         }
         Update: {
           average_delivery_time?: number | null
           average_lead_time?: number | null
+          bill_out_total?: number | null
           created_at?: string | null
+          daily_spend?: number | null
           date?: string
+          discounts_amount?: number | null
           id?: string
           inventory_value?: number | null
+          monthly_spend?: number | null
           on_time_delivery_rate?: number | null
           orders_count?: number | null
           orders_fulfilled?: number | null
           organization_id?: string | null
           payment_timeliness_score?: number | null
+          profit_margin?: number | null
           quality_rating?: number | null
+          rebates_amount?: number | null
           return_rate?: number | null
           supplier_id?: string | null
           total_spend?: number | null
           updated_at?: string | null
+          weekly_spend?: number | null
         }
         Relationships: [
           {
@@ -1509,6 +1542,82 @@ export type Database = {
           },
           {
             foreignKeyName: "supplier_communications_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_detailed_transactions: {
+        Row: {
+          amount: number
+          bill_out_price: number | null
+          cost_price: number | null
+          created_at: string | null
+          created_by: string | null
+          discount_amount: number | null
+          id: string
+          notes: string | null
+          organization_id: string | null
+          payment_date: string | null
+          payment_status: string | null
+          rebate_amount: number | null
+          supplier_id: string | null
+          transaction_date: string | null
+          transaction_type: string
+        }
+        Insert: {
+          amount: number
+          bill_out_price?: number | null
+          cost_price?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          discount_amount?: number | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          payment_date?: string | null
+          payment_status?: string | null
+          rebate_amount?: number | null
+          supplier_id?: string | null
+          transaction_date?: string | null
+          transaction_type: string
+        }
+        Update: {
+          amount?: number
+          bill_out_price?: number | null
+          cost_price?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          discount_amount?: number | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          payment_date?: string | null
+          payment_status?: string | null
+          rebate_amount?: number | null
+          supplier_id?: string | null
+          transaction_date?: string | null
+          transaction_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_detailed_transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_detailed_transactions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_detailed_transactions_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "inventory_suppliers"

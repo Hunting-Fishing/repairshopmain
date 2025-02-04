@@ -6,6 +6,8 @@ export function useSupplierAnalytics(supplierId: string) {
   const { data: analytics, isLoading } = useQuery({
     queryKey: ["supplier-analytics", supplierId],
     queryFn: async () => {
+      console.log("Fetching analytics for supplier:", supplierId);
+      
       const { data, error } = await supabase
         .from("supplier_analytics")
         .select("*")
@@ -14,8 +16,12 @@ export function useSupplierAnalytics(supplierId: string) {
         .limit(1)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching supplier analytics:", error);
+        throw error;
+      }
       
+      console.log("Fetched analytics:", data);
       return data as SupplierAnalyticsData;
     },
   });

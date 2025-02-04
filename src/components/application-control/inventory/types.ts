@@ -6,6 +6,7 @@ export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row
 export type InventorySupplier = Database["public"]["Tables"]["inventory_suppliers"]["Row"];
 
 // Analytics types
+
 export interface SupplierAnalyticsData {
   total_spend: number;
   orders_count: number;
@@ -17,6 +18,13 @@ export interface SupplierAnalyticsData {
   inventory_value: number;
   return_rate: number;
   average_lead_time: number;
+  daily_spend: number;
+  weekly_spend: number;
+  monthly_spend: number;
+  rebates_amount: number;
+  discounts_amount: number;
+  bill_out_total: number;
+  profit_margin: number;
 }
 
 // Automation types

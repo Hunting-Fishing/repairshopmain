@@ -2,26 +2,17 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { StaffContactInfo } from "./StaffContactInfo";
-import { StaffDetailsDialog } from "../staff-details/StaffDetailsDialog";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { StaffMember } from "@/types/staff";
 
 interface StaffTableRowProps {
-  staff: {
-    id: string;
-    first_name: string | null;
-    last_name: string | null;
-    email: string;
-    phone_number: string | null;
-    role: string;
-  };
+  staff: StaffMember;
+  onViewDetails: () => void;
 }
 
-export function StaffTableRow({ staff }: StaffTableRowProps) {
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-
+export function StaffTableRow({ staff, onViewDetails }: StaffTableRowProps) {
   const { data: skillCount } = useQuery({
     queryKey: ['staff-skill-count', staff.id],
     queryFn: async () => {
@@ -41,7 +32,7 @@ export function StaffTableRow({ staff }: StaffTableRowProps) {
         {staff.first_name} {staff.last_name}
       </TableCell>
       <TableCell>
-        <StaffContactInfo email={staff.email} phone={staff.phone_number} />
+        <StaffContactInfo email={staff.email} phoneNumber={staff.phone_number} />
       </TableCell>
       <TableCell>
         <Badge variant="outline">{staff.role}</Badge>
@@ -53,16 +44,11 @@ export function StaffTableRow({ staff }: StaffTableRowProps) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsDetailsOpen(true)}
+          onClick={onViewDetails}
         >
           <Eye className="h-4 w-4" />
         </Button>
       </TableCell>
-      <StaffDetailsDialog
-        open={isDetailsOpen}
-        onOpenChange={setIsDetailsOpen}
-        staffMemberId={staff.id}
-      />
     </TableRow>
   );
 }

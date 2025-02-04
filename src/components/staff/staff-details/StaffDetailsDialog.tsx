@@ -2,6 +2,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StaffDetailsForm } from "./StaffDetailsForm";
 import { SkillAssessment } from "../skills/SkillAssessment";
+import { useStaffMemberDetails } from "@/hooks/staff/useStaffMemberDetails";
 
 interface StaffDetailsDialogProps {
   open: boolean;
@@ -14,6 +15,8 @@ export function StaffDetailsDialog({
   onOpenChange,
   staffMemberId,
 }: StaffDetailsDialogProps) {
+  const { data: staffMember } = useStaffMemberDetails(staffMemberId);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl">
@@ -23,7 +26,7 @@ export function StaffDetailsDialog({
             <TabsTrigger value="skills">Skills</TabsTrigger>
           </TabsList>
           <TabsContent value="details">
-            <StaffDetailsForm staffMemberId={staffMemberId} />
+            {staffMember && <StaffDetailsForm staffMember={staffMember} onClose={() => onOpenChange(false)} />}
           </TabsContent>
           <TabsContent value="skills">
             <SkillAssessment profileId={staffMemberId} />

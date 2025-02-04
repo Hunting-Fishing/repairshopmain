@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
   skillId: z.string().min(1, "Skill is required"),
-  proficiencyLevel: z.string().transform(Number),
+  proficiencyLevel: z.string().transform((val) => parseInt(val, 10)),
   notes: z.string().optional(),
 });
 
@@ -122,7 +122,7 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Proficiency Level</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select proficiency level" />

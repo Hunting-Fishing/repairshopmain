@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Table,
@@ -25,19 +24,21 @@ export function StaffList() {
             {staffMembers?.map((staff) => (
               <StaffTableRow 
                 key={staff.id} 
-                staff={staff} 
-                onSelect={setSelectedStaffId}
+                staff={staff}
+                onViewDetails={() => setSelectedStaffId(staff.id)}
               />
             ))}
           </TableBody>
         </Table>
       </div>
 
-      <StaffDetailsDialog
-        staffId={selectedStaffId}
-        isOpen={!!selectedStaffId}
-        onClose={() => setSelectedStaffId(null)}
-      />
+      {selectedStaffId && (
+        <StaffDetailsDialog
+          staffMemberId={selectedStaffId}
+          open={!!selectedStaffId}
+          onOpenChange={(open) => !open && setSelectedStaffId(null)}
+        />
+      )}
     </>
   );
 }

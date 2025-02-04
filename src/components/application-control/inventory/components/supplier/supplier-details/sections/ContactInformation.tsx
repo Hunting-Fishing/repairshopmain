@@ -1,14 +1,25 @@
 import { Mail, Phone, MapPin, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { LoadingSection } from "./LoadingSection";
 import type { InventorySupplier } from "../../../../types";
 
 interface ContactInformationProps {
   supplier: InventorySupplier;
   isEditing: boolean;
+  isLoading?: boolean;
   onInputChange: (field: keyof InventorySupplier, value: string) => void;
 }
 
-export function ContactInformation({ supplier, isEditing, onInputChange }: ContactInformationProps) {
+export function ContactInformation({ 
+  supplier, 
+  isEditing, 
+  isLoading = false,
+  onInputChange 
+}: ContactInformationProps) {
+  if (isLoading) {
+    return <LoadingSection />;
+  }
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Contact Information</h3>

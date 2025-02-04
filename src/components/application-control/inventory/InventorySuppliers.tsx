@@ -3,6 +3,7 @@ import { useSuppliers } from "./hooks/useSuppliers";
 import { SupplierList } from "./components/supplier/SupplierList";
 import { AddSupplierDialog } from "./components/supplier/AddSupplierDialog";
 import { SupplierDetailsDialog } from "./components/supplier/supplier-details/SupplierDetailsDialog";
+import { SupplierErrorBoundary } from "./components/supplier/SupplierErrorBoundary";
 import { useState } from "react";
 import type { InventorySupplier } from "./types";
 
@@ -24,11 +25,13 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
 
   if (!Array.isArray(displaySuppliers)) {
     console.error("InventorySuppliers - suppliers is not an array:", displaySuppliers);
-    return null;
+    return <SupplierErrorBoundary error={new Error("Invalid suppliers data")} />;
   }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <SupplierErrorBoundary error={error} />
+      
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-semibold">Suppliers</h1>

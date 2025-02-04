@@ -1,15 +1,22 @@
-import { Building2 } from "lucide-react";
+import { AddSupplierDialog } from "../AddSupplierDialog";
 
-export function SupplierHeader() {
+interface SupplierHeaderProps {
+  totalSuppliers: number;
+}
+
+export function SupplierHeader({ totalSuppliers }: SupplierHeaderProps) {
   return (
-    <div>
-      <div className="flex items-center gap-2">
-        <Building2 className="h-6 w-6 text-primary" />
-        <h2 className="text-2xl font-bold tracking-tight">Suppliers</h2>
+    <div className="flex justify-between items-center">
+      <div>
+        <h1 className="text-2xl font-semibold">Suppliers</h1>
+        <p className="text-muted-foreground">
+          {totalSuppliers === 0 
+            ? "No suppliers found. Add your first supplier to get started."
+            : `Managing ${totalSuppliers} supplier${totalSuppliers === 1 ? '' : 's'}`
+          }
+        </p>
       </div>
-      <p className="text-muted-foreground mt-1">
-        Browse and manage your inventory suppliers
-      </p>
+      <AddSupplierDialog />
     </div>
   );
 }

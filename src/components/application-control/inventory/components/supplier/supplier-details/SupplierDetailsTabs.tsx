@@ -5,6 +5,7 @@ import { SupplierDocuments } from "./SupplierDocuments";
 import { SupplierCommunications } from "./SupplierCommunications";
 import { SupplierFinancials } from "./SupplierFinancials";
 import { SupplierAutomation } from "./SupplierAutomation";
+import { SupplierInformation } from "./SupplierInformation";
 import type { InventorySupplier } from "../../../types";
 
 interface SupplierDetailsTabsProps {
@@ -13,8 +14,9 @@ interface SupplierDetailsTabsProps {
 
 export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
   return (
-    <Tabs defaultValue="analytics" className="flex-1 overflow-hidden">
+    <Tabs defaultValue="information" className="flex-1 overflow-hidden">
       <TabsList className="w-full justify-start">
+        <TabsTrigger value="information">Information</TabsTrigger>
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
         <TabsTrigger value="transactions">Transactions</TabsTrigger>
         <TabsTrigger value="documents">Documents</TabsTrigger>
@@ -24,6 +26,10 @@ export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
       </TabsList>
 
       <div className="mt-4 h-full overflow-y-auto pr-4">
+        <TabsContent value="information" className="mt-0">
+          <SupplierInformation supplier={supplier} />
+        </TabsContent>
+
         <TabsContent value="analytics" className="mt-0">
           <SupplierAnalytics supplierId={supplier.id} />
         </TabsContent>

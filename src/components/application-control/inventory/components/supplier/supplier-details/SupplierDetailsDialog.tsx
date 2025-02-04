@@ -1,5 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { SupplierDetailsHeader } from "./SupplierDetailsHeader";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SupplierDetailsTabs } from "./SupplierDetailsTabs";
 import type { InventorySupplier } from "../../../types";
 
@@ -17,7 +16,12 @@ export function SupplierDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-        <SupplierDetailsHeader supplier={supplier} />
+        <DialogHeader>
+          <DialogTitle className="text-2xl">
+            {supplier.name}
+          </DialogTitle>
+        </DialogHeader>
+
         <SupplierDetailsTabs supplier={supplier} />
       </DialogContent>
     </Dialog>

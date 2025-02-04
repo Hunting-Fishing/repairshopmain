@@ -51,7 +51,24 @@ export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboard
         .order('assessment_date', { ascending: false });
 
       if (error) throw error;
-      return data as SkillAssessment[];
+      
+      // Transform the data to match our interface
+      const transformedData = data.map((assessment): SkillAssessment => ({
+        id: assessment.id,
+        proficiency_level: assessment.proficiency_level,
+        assessment_date: assessment.assessment_date,
+        notes: assessment.notes,
+        skill: {
+          name: assessment.skill?.name || '',
+          category: assessment.skill?.category || null
+        },
+        assessor: assessment.assessor ? {
+          first_name: assessment.assessor.first_name,
+          last_name: assessment.assessor.last_name
+        } : undefined
+      }));
+
+      return transformedData;
     },
     enabled: !!profileId
   });

@@ -6,6 +6,7 @@ import { TechnicianSettings } from "./TechnicianSettings";
 import { TechnicianSpecialties } from "./TechnicianSpecialties";
 import { RoleManagement } from "./RoleManagement";
 import { TrainingRecords } from "./training/TrainingRecords";
+import { AssignmentRules } from "./assignment-rules/AssignmentRules";
 import { technicianSettingsFormSchema, type TechnicianSettingsFormValues } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -75,11 +76,12 @@ export function TechnicianManagement() {
   return (
     <div className="max-w-4xl mx-auto">
       <Tabs defaultValue="roles" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-8">
+        <TabsList className="grid w-full grid-cols-5 mb-8">
           <TabsTrigger value="roles">Roles</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="specialties">Specialties</TabsTrigger>
           <TabsTrigger value="training">Training</TabsTrigger>
+          <TabsTrigger value="assignment-rules">Assignment Rules</TabsTrigger>
         </TabsList>
 
         <Form {...form}>
@@ -98,6 +100,10 @@ export function TechnicianManagement() {
 
             <TabsContent value="training">
               <TrainingRecords />
+            </TabsContent>
+
+            <TabsContent value="assignment-rules">
+              <AssignmentRules />
             </TabsContent>
           </form>
         </Form>

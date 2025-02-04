@@ -60,7 +60,9 @@ export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboard
         notes: assessment.notes,
         skill: {
           name: assessment.skill?.name || '',
-          category: assessment.skill?.category || null
+          category: assessment.skill?.category ? {
+            name: assessment.skill.category.name
+          } : null
         },
         assessor: assessment.assessor ? {
           first_name: assessment.assessor.first_name,

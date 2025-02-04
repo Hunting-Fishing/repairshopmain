@@ -2,6 +2,7 @@ import { SupplierList } from "../SupplierList";
 import { SupplierListHeader } from "./SupplierListHeader";
 import { SupplierMetrics } from "./SupplierMetrics";
 import { useSupplierFilters } from "../hooks/useSupplierFilters";
+import { SupplierAnalyticsOverview } from "../supplier-analytics/SupplierAnalyticsOverview";
 import type { InventorySupplier } from "../../../types";
 
 interface SupplierListContainerProps {
@@ -21,7 +22,8 @@ export function SupplierListContainer({
     filteredSuppliers,
     sortField,
     sortDirection,
-    handleSort
+    handleSort,
+    analytics
   } = useSupplierFilters(suppliers);
 
   const activeSuppliers = suppliers.filter(s => s.status === "active").length;
@@ -30,6 +32,8 @@ export function SupplierListContainer({
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 p-6">
+      {analytics && <SupplierAnalyticsOverview analytics={analytics} />}
+      
       <SupplierMetrics 
         activeSuppliers={activeSuppliers}
         totalSpent={totalSpent}

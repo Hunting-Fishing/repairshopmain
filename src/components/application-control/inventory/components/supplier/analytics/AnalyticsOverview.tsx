@@ -17,23 +17,23 @@ export function AnalyticsOverview({ analytics }: AnalyticsOverviewProps) {
     { name: 'Spend', value: timeframe === 'daily' ? analytics.daily_spend : 
                           timeframe === 'weekly' ? analytics.weekly_spend : 
                           analytics.monthly_spend },
-    { name: 'Savings', value: analytics.negotiated_savings + analytics.early_payment_discounts + analytics.volume_discounts },
-    { name: 'Rebates', value: analytics.rebates_amount },
-    { name: 'Discounts', value: analytics.discounts_amount },
+    { name: 'Savings', value: (analytics.negotiated_savings || 0) + (analytics.early_payment_discounts || 0) + (analytics.volume_discounts || 0) },
+    { name: 'Rebates', value: analytics.rebates_amount || 0 },
+    { name: 'Discounts', value: analytics.discounts_amount || 0 },
   ];
 
   const performanceData = [
-    { name: 'Quality', value: analytics.quality_rating },
-    { name: 'Delivery', value: analytics.on_time_delivery_rate },
-    { name: 'Payment', value: analytics.payment_terms_compliance },
-    { name: 'Contract', value: analytics.contract_compliance_rate },
+    { name: 'Quality', value: analytics.quality_rating || 0 },
+    { name: 'Delivery', value: analytics.on_time_delivery_rate || 0 },
+    { name: 'Payment', value: analytics.payment_terms_compliance || 0 },
+    { name: 'Contract', value: analytics.contract_compliance_rate || 0 },
   ];
 
   const seasonalData = [
-    { name: 'Q1', value: analytics.seasonal_spend_pattern.Q1 },
-    { name: 'Q2', value: analytics.seasonal_spend_pattern.Q2 },
-    { name: 'Q3', value: analytics.seasonal_spend_pattern.Q3 },
-    { name: 'Q4', value: analytics.seasonal_spend_pattern.Q4 },
+    { name: 'Q1', value: analytics.seasonal_spend_pattern?.Q1 || 0 },
+    { name: 'Q2', value: analytics.seasonal_spend_pattern?.Q2 || 0 },
+    { name: 'Q3', value: analytics.seasonal_spend_pattern?.Q3 || 0 },
+    { name: 'Q4', value: analytics.seasonal_spend_pattern?.Q4 || 0 },
   ];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
@@ -62,19 +62,19 @@ export function AnalyticsOverview({ analytics }: AnalyticsOverviewProps) {
         />
         <AnalyticsCard
           title="Cost Savings"
-          value={`$${analytics.negotiated_savings.toLocaleString()}`}
+          value={`$${(analytics.negotiated_savings || 0).toLocaleString()}`}
           icon={TrendingUp}
           description="Total negotiated savings"
         />
         <AnalyticsCard
           title="Risk Score"
-          value={analytics.supply_chain_risk_score.toFixed(1)}
+          value={(analytics.supply_chain_risk_score || 0).toFixed(1)}
           icon={AlertTriangle}
           description="Supply chain risk assessment"
         />
         <AnalyticsCard
           title="Sustainability"
-          value={analytics.sustainability_score.toFixed(1)}
+          value={(analytics.sustainability_score || 0).toFixed(1)}
           icon={ChartBar}
           description="Environmental impact score"
         />
@@ -159,19 +159,19 @@ export function AnalyticsOverview({ analytics }: AnalyticsOverviewProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-muted-foreground">Defect Rate</p>
-                <p className="text-2xl font-bold">{analytics.defect_rate}%</p>
+                <p className="text-2xl font-bold">{analytics.defect_rate || 0}%</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Contract Compliance</p>
-                <p className="text-2xl font-bold">{analytics.contract_compliance_rate}%</p>
+                <p className="text-2xl font-bold">{analytics.contract_compliance_rate || 0}%</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Payment Compliance</p>
-                <p className="text-2xl font-bold">{analytics.payment_terms_compliance}%</p>
+                <p className="text-2xl font-bold">{analytics.payment_terms_compliance || 0}%</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Market Price Variance</p>
-                <p className="text-2xl font-bold">{analytics.market_price_variance}%</p>
+                <p className="text-2xl font-bold">{analytics.market_price_variance || 0}%</p>
               </div>
             </div>
           </CardContent>

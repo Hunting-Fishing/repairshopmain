@@ -64,9 +64,9 @@ export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboard
             name: assessment.skill.category.name
           } : null
         },
-        assessor: assessment.assessor ? {
-          first_name: assessment.assessor.first_name,
-          last_name: assessment.assessor.last_name
+        assessor: assessment.assessor?.[0] ? {
+          first_name: assessment.assessor[0].first_name,
+          last_name: assessment.assessor[0].last_name
         } : undefined
       }));
 

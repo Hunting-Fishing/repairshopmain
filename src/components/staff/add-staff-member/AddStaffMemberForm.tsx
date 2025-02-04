@@ -2,7 +2,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { CustomRoleDialog } from "../role-management/CustomRoleDialog";
 import { StaffMemberFormFields } from "./StaffMemberFormFields";
 import { staffMemberSchema, type StaffMemberFormValues } from "./schema";
 import { useAddStaffMember } from "@/hooks/staff/useAddStaffMember";
@@ -39,9 +38,6 @@ export function AddStaffMemberForm({ organizationId, customRoles }: AddStaffMemb
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <StaffMemberFormFields form={form} customRoles={customRoles} />
-        <div className="flex justify-end">
-          <CustomRoleDialog />
-        </div>
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Adding..." : "Add Staff Member"}
         </Button>

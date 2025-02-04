@@ -25,7 +25,7 @@ export function AddStaffMember() {
           Add Staff Member
         </CardTitle>
         <CardDescription>
-          Add a new staff member to your organization
+          Add a new staff member to your organization. Custom roles can be managed in the Roles tab.
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -1,10 +1,12 @@
-
-import { format } from "date-fns";
-import { User, Calendar } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { StaffContactInfo } from "./StaffContactInfo";
 import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
+import { StaffContactInfo } from "./StaffContactInfo";
+import { StaffDetailsDialog } from "../staff-details/StaffDetailsDialog";
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StaffTableRowProps {
   staff: {
@@ -14,51 +16,53 @@ interface StaffTableRowProps {
     email: string;
     phone_number: string | null;
     role: string;
-    hire_date: string | null;
-    status: string | null;
-    custom_roles: {
-      name: string | null;
-    } | null;
   };
-  onSelect: (staffId: string) => void;
 }
 
-export function StaffTableRow({ staff, onSelect }: StaffTableRowProps) {
+export function StaffTableRow({ staff }: StaffTableRowProps) {
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  const { data: skillCount } = useQuery({
+    queryKey: ['staff-skill-count', staff.id],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('staff_skill_assessments')
+        .select('*', { count: 'exact', head: true })
+        .eq('profile_id', staff.id);
+      
+      if (error) throw error;
+      return count || 0;
+    }
+  });
+
   return (
-    <TableRow 
-      key={staff.id} 
-      className="cursor-pointer hover:bg-muted/50"
-      onClick={() => onSelect(staff.id)}
-    >
+    <TableRow>
       <TableCell>
-        <div className="flex items-center gap-2">
-          <User className="h-4 w-4 text-muted-foreground" />
-          <span>
-            {staff.first_name} {staff.last_name}
-          </span>
-        </div>
+        {staff.first_name} {staff.last_name}
       </TableCell>
       <TableCell>
-        <StaffContactInfo email={staff.email} phoneNumber={staff.phone_number} />
+        <StaffContactInfo email={staff.email} phone={staff.phone_number} />
       </TableCell>
       <TableCell>
-        {staff.role === "custom" ? staff.custom_roles?.name : staff.role.replace("_", " ")}
+        <Badge variant="outline">{staff.role}</Badge>
       </TableCell>
       <TableCell>
-        {staff.hire_date && (
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">
-              {format(new Date(staff.hire_date), "PP")}
-            </span>
-          </div>
-        )}
+        <Badge variant="secondary">{skillCount} skills</Badge>
       </TableCell>
-      <TableCell>
-        <Badge variant={staff.status === "active" ? "default" : "secondary"}>
-          {staff.status}
-        </Badge>
+      <TableCell className="text-right">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsDetailsOpen(true)}
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
       </TableCell>
+      <StaffDetailsDialog
+        open={isDetailsOpen}
+        onOpenChange={setIsDetailsOpen}
+        staffMemberId={staff.id}
+      />
     </TableRow>
   );
 }

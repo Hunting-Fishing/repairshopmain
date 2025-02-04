@@ -877,10 +877,12 @@ export type Database = {
       profiles: {
         Row: {
           calendar_settings: Json | null
+          certifications: Json[] | null
           city: string | null
           country: string | null
           created_at: string
           custom_role_id: string | null
+          emergency_contact: Json | null
           first_name: string | null
           hire_date: string | null
           id: string
@@ -891,8 +893,10 @@ export type Database = {
           organization_id: string | null
           phone_number: string | null
           postal_code: string | null
+          preferred_working_hours: Json | null
           role: Database["public"]["Enums"]["user_role"]
           schedule: Json | null
+          skills: string[] | null
           state_province: string | null
           status: string | null
           street_address: string | null
@@ -901,10 +905,12 @@ export type Database = {
         }
         Insert: {
           calendar_settings?: Json | null
+          certifications?: Json[] | null
           city?: string | null
           country?: string | null
           created_at?: string
           custom_role_id?: string | null
+          emergency_contact?: Json | null
           first_name?: string | null
           hire_date?: string | null
           id: string
@@ -915,8 +921,10 @@ export type Database = {
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null
+          preferred_working_hours?: Json | null
           role?: Database["public"]["Enums"]["user_role"]
           schedule?: Json | null
+          skills?: string[] | null
           state_province?: string | null
           status?: string | null
           street_address?: string | null
@@ -925,10 +933,12 @@ export type Database = {
         }
         Update: {
           calendar_settings?: Json | null
+          certifications?: Json[] | null
           city?: string | null
           country?: string | null
           created_at?: string
           custom_role_id?: string | null
+          emergency_contact?: Json | null
           first_name?: string | null
           hire_date?: string | null
           id?: string
@@ -939,8 +949,10 @@ export type Database = {
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null
+          preferred_working_hours?: Json | null
           role?: Database["public"]["Enums"]["user_role"]
           schedule?: Json | null
+          skills?: string[] | null
           state_province?: string | null
           status?: string | null
           street_address?: string | null

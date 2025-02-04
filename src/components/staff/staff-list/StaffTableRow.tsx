@@ -1,8 +1,10 @@
+
 import { format } from "date-fns";
 import { User, Calendar } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { StaffContactInfo } from "./StaffContactInfo";
+import { Button } from "@/components/ui/button";
 
 interface StaffTableRowProps {
   staff: {
@@ -18,11 +20,16 @@ interface StaffTableRowProps {
       name: string | null;
     } | null;
   };
+  onSelect: (staffId: string) => void;
 }
 
-export function StaffTableRow({ staff }: StaffTableRowProps) {
+export function StaffTableRow({ staff, onSelect }: StaffTableRowProps) {
   return (
-    <TableRow key={staff.id}>
+    <TableRow 
+      key={staff.id} 
+      className="cursor-pointer hover:bg-muted/50"
+      onClick={() => onSelect(staff.id)}
+    >
       <TableCell>
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-muted-foreground" />

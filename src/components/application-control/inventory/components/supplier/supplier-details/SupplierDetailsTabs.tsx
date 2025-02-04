@@ -1,13 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, FileText, MessageSquare, DollarSign, Settings } from "lucide-react";
+import { BarChart3, MessageSquare, DollarSign, Settings } from "lucide-react";
 import { SupplierAnalytics } from "./SupplierAnalytics";
 import { SupplierTransactions } from "./SupplierTransactions";
-import { SupplierDocuments } from "./SupplierDocuments";
 import { SupplierCommunications } from "./SupplierCommunications";
 import { SupplierFinancials } from "./SupplierFinancials";
 import { SupplierAutomation } from "./SupplierAutomation";
 import { SupplierInformation } from "./SupplierInformation";
-import { SupplierReports } from "./SupplierReports";
 import type { InventorySupplier } from "../../../types";
 
 interface SupplierDetailsTabsProps {
@@ -16,13 +14,9 @@ interface SupplierDetailsTabsProps {
 
 export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
   return (
-    <Tabs defaultValue="reports" className="flex-1 overflow-hidden">
+    <Tabs defaultValue="information" className="flex-1 overflow-hidden">
       <TabsList className="w-full justify-start">
         <TabsTrigger value="information">Information</TabsTrigger>
-        <TabsTrigger value="reports" className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          Reports
-        </TabsTrigger>
         <TabsTrigger value="analytics" className="flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Analytics
@@ -44,10 +38,6 @@ export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
       <div className="mt-4 h-full overflow-y-auto pr-4">
         <TabsContent value="information" className="mt-0">
           <SupplierInformation supplier={supplier} />
-        </TabsContent>
-
-        <TabsContent value="reports" className="mt-0">
-          <SupplierReports supplier={supplier} />
         </TabsContent>
 
         <TabsContent value="analytics" className="mt-0">

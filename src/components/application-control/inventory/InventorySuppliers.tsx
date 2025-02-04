@@ -7,6 +7,9 @@ import { SupplierErrorBoundary } from "./components/supplier/SupplierErrorBounda
 import { useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileText, ListFilter } from "lucide-react";
+import { SupplierAnalyticsOverview } from "./components/supplier/supplier-analytics/SupplierAnalyticsOverview";
 import type { InventorySupplier } from "./types";
 
 interface InventorySuppliersProps {
@@ -76,12 +79,42 @@ export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) 
         </div>
         <AddSupplierDialog />
       </div>
-      
-      <SupplierListContainer 
-        suppliers={displaySuppliers}
-        isLoading={isLoading}
-        onSupplierClick={setSelectedSupplier}
-      />
+
+      <Tabs defaultValue="list" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="list" className="flex items-center gap-2">
+            <ListFilter className="h-4 w-4" />
+            Supplier List
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Reports & Analytics
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="list" className="space-y-4">
+          <SupplierListContainer 
+            suppliers={displaySuppliers}
+            isLoading={isLoading}
+            onSupplierClick={setSelectedSupplier}
+          />
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-4">
+          <SupplierAnalyticsOverview analytics={{
+            total_spend: displaySuppliers.reduce((sum, s) => sum + (s.total_spent || 0), 0),
+            orders_count: displaySuppliers.length,
+            on_time_delivery_rate: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate || 0), 0) / displaySuppliers.length,
+            quality_rating: displaySuppliers.reduce((sum, s) => sum + (s.rating || 0), 0) / displaySuppliers.length,
+            orders_fulfilled: displaySuppliers.reduce((sum, s) => sum + (s.fulfillment_rate ? 1 : 0), 0),
+            average_delivery_time: 0,
+            payment_timeliness_score: 0,
+            inventory_value: 0,
+            return_rate: 0,
+            average_lead_time: 0
+          }} />
+        </TabsContent>
+      </Tabs>
 
       {selectedSupplier && (
         <SupplierDetailsDialog

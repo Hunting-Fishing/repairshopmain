@@ -3,33 +3,27 @@ import { useDebouncedCallback } from "use-debounce";
 import type { InventorySupplier } from "../../../types";
 
 export function useSupplierList(suppliers: InventorySupplier[]) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
-  // Debounced search handler
-  const debouncedSearch = useDebouncedCallback((value: string) => {
-    setDebouncedSearchTerm(value);
-    setCurrentPage(1); // Reset to first page on search
-  }, 300);
-
-  // Update both the immediate and debounced search terms
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchQuery(value);
-    debouncedSearch(value);
-  }, [debouncedSearch]);
+  // Debounced search implementation
+  const debouncedSearch = useDebouncedCallback(
+    (value: string) => {
+      setSearchQuery(value);
+      setCurrentPage(1);
+    },
+    300
+  );
 
   const filteredSuppliers = useMemo(() => {
-    return suppliers.filter(supplier => {
-      const searchTerm = debouncedSearchTerm.toLowerCase();
-      return (
-        supplier.name.toLowerCase().includes(searchTerm) ||
-        supplier.contact_person?.toLowerCase().includes(searchTerm) ||
-        supplier.email?.toLowerCase().includes(searchTerm)
-      );
-    });
-  }, [suppliers, debouncedSearchTerm]);
+    const searchTerm = searchQuery.toLowerCase();
+    return suppliers.filter(supplier => 
+      supplier.name.toLowerCase().includes(searchTerm) ||
+      supplier.contact_person?.toLowerCase().includes(searchTerm) ||
+      supplier.email?.toLowerCase().includes(searchTerm)
+    );
+  }, [suppliers, searchQuery]);
 
   const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
   
@@ -42,7 +36,7 @@ export function useSupplierList(suppliers: InventorySupplier[]) {
     filteredSuppliers,
     totalSuppliers: suppliers.length,
     searchQuery,
-    setSearchQuery: handleSearchChange,
+    setSearchQuery: debouncedSearch,
     currentPage,
     setCurrentPage,
     itemsPerPage,

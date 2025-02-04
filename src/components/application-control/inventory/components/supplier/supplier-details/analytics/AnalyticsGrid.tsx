@@ -1,6 +1,6 @@
 import { DollarSign, Package, TrendingUp, Clock } from "lucide-react";
 import { AnalyticsCard } from "./AnalyticsCard";
-import type { SupplierAnalyticsData } from "../../../types";
+import type { SupplierAnalyticsData } from "@/components/application-control/inventory/types";
 
 interface AnalyticsGridProps {
   analytics: SupplierAnalyticsData;

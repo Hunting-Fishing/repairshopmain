@@ -1,6 +1,6 @@
 import { FileText, Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { SupplierDocument } from "../../../types";
+import type { SupplierDocument } from "@/components/application-control/inventory/types";
 
 interface DocumentListProps {
   documents: SupplierDocument[];

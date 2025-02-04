@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Legend } from 'recharts';
 import { DollarSign, TrendingUp, Package, Star, Clock, AlertTriangle } from "lucide-react";
 import { AnalyticsCard } from "../supplier-details/analytics/AnalyticsCard";
@@ -94,10 +94,7 @@ export function SupplierAnalyticsOverview({ analytics }: SupplierAnalyticsOvervi
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
-          <CardHeader>
-            <CardTitle>Order Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={orderData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -113,10 +110,7 @@ export function SupplierAnalyticsOverview({ analytics }: SupplierAnalyticsOvervi
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Performance Metrics</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={performanceData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>

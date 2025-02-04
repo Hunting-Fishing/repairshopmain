@@ -17,10 +17,6 @@ export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
     <Tabs defaultValue="information" className="flex-1 overflow-hidden">
       <TabsList className="w-full justify-start">
         <TabsTrigger value="information">Information</TabsTrigger>
-        <TabsTrigger value="analytics" className="flex items-center gap-2">
-          <BarChart3 className="h-4 w-4" />
-          Analytics
-        </TabsTrigger>
         <TabsTrigger value="transactions" className="flex items-center gap-2">
           <DollarSign className="h-4 w-4" />
           Transactions
@@ -38,10 +34,6 @@ export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
       <div className="mt-4 h-full overflow-y-auto pr-4">
         <TabsContent value="information" className="mt-0">
           <SupplierInformation supplier={supplier} />
-        </TabsContent>
-
-        <TabsContent value="analytics" className="mt-0">
-          <SupplierAnalytics supplierId={supplier.id} />
         </TabsContent>
 
         <TabsContent value="transactions" className="mt-0">

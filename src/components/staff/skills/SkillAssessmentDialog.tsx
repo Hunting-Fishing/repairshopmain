@@ -51,7 +51,13 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
         .order('name');
       
       if (error) throw error;
-      return data as Skill[];
+      
+      // Transform the data to match our Skill interface
+      return (data as any[]).map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category ? { name: item.category.name } : null
+      }));
     }
   });
 

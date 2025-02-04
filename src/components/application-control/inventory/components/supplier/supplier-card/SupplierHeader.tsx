@@ -17,7 +17,7 @@ export function SupplierHeader({ supplier }: SupplierHeaderProps) {
             {supplier.status}
           </Badge>
           {supplier.payment_status && (
-            <Badge variant={supplier.payment_status === 'active' ? 'success' : 'destructive'}>
+            <Badge variant={supplier.payment_status === 'active' ? 'default' : 'destructive'}>
               {supplier.payment_status}
             </Badge>
           )}

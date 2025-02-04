@@ -45,7 +45,10 @@ export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboard
             name,
             category:skill_categories(name)
           ),
-          assessor:profiles(first_name, last_name)
+          assessor:profiles!staff_skill_assessments_assessed_by_fkey(
+            first_name,
+            last_name
+          )
         `)
         .eq('profile_id', profileId)
         .order('assessment_date', { ascending: false });

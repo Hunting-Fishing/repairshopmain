@@ -7,6 +7,7 @@ import { SupplierCommunications } from "./SupplierCommunications";
 import { SupplierFinancials } from "./SupplierFinancials";
 import { SupplierAutomation } from "./SupplierAutomation";
 import { SupplierInformation } from "./SupplierInformation";
+import { SupplierReports } from "./SupplierReports";
 import type { InventorySupplier } from "../../../types";
 
 interface SupplierDetailsTabsProps {
@@ -15,9 +16,13 @@ interface SupplierDetailsTabsProps {
 
 export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
   return (
-    <Tabs defaultValue="information" className="flex-1 overflow-hidden">
+    <Tabs defaultValue="reports" className="flex-1 overflow-hidden">
       <TabsList className="w-full justify-start">
         <TabsTrigger value="information">Information</TabsTrigger>
+        <TabsTrigger value="reports" className="flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Reports
+        </TabsTrigger>
         <TabsTrigger value="analytics" className="flex items-center gap-2">
           <BarChart3 className="h-4 w-4" />
           Analytics
@@ -25,10 +30,6 @@ export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
         <TabsTrigger value="transactions" className="flex items-center gap-2">
           <DollarSign className="h-4 w-4" />
           Transactions
-        </TabsTrigger>
-        <TabsTrigger value="documents" className="flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          Documents
         </TabsTrigger>
         <TabsTrigger value="communications" className="flex items-center gap-2">
           <MessageSquare className="h-4 w-4" />
@@ -45,16 +46,16 @@ export function SupplierDetailsTabs({ supplier }: SupplierDetailsTabsProps) {
           <SupplierInformation supplier={supplier} />
         </TabsContent>
 
+        <TabsContent value="reports" className="mt-0">
+          <SupplierReports supplier={supplier} />
+        </TabsContent>
+
         <TabsContent value="analytics" className="mt-0">
           <SupplierAnalytics supplierId={supplier.id} />
         </TabsContent>
 
         <TabsContent value="transactions" className="mt-0">
           <SupplierTransactions supplier={supplier} />
-        </TabsContent>
-
-        <TabsContent value="documents" className="mt-0">
-          <SupplierDocuments supplier={supplier} />
         </TabsContent>
 
         <TabsContent value="communications" className="mt-0">

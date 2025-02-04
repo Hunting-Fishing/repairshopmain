@@ -10,6 +10,8 @@ import { EmergencyContactFields } from "./form-sections/EmergencyContactFields";
 import { NotesField } from "./form-sections/NotesField";
 import { staffDetailsSchema } from "./schema";
 import type { StaffDetailsFormValues } from "./types";
+import { CertificationList } from "../certifications/CertificationList";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface StaffDetailsFormProps {
   staffMember: StaffMember;
@@ -51,22 +53,35 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <PersonalInfoFields form={form} />
-        <ContactFields form={form} />
-        <EmergencyContactFields form={form} />
-        <NotesField form={form} />
-        
-        <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+    <Tabs defaultValue="details" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="details">Details</TabsTrigger>
+        <TabsTrigger value="certifications">Certifications</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="details">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <PersonalInfoFields form={form} />
+            <ContactFields form={form} />
+            <EmergencyContactFields form={form} />
+            <NotesField form={form} />
+            
+            <div className="flex justify-end gap-4">
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Saving..." : "Save Changes"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </TabsContent>
+
+      <TabsContent value="certifications">
+        <CertificationList profileId={staffMember.id} />
+      </TabsContent>
+    </Tabs>
   );
 }

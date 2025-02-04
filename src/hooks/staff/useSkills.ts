@@ -11,14 +11,21 @@ export function useSkills() {
         .select(`
           id,
           name,
-          category:skill_categories (
+          category:skill_categories!inner (
             name
           )
         `);
 
       if (error) throw error;
 
-      return data as Skill[];
+      // Transform the data to match our type
+      const transformedData = data?.map(item => ({
+        id: item.id,
+        name: item.name,
+        category: item.category ? item.category[0] : undefined
+      }));
+
+      return transformedData as Skill[];
     }
   });
 }

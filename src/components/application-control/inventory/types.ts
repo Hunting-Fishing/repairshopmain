@@ -25,6 +25,25 @@ export interface SupplierAnalyticsData {
   discounts_amount: number;
   bill_out_total: number;
   profit_margin: number;
+  order_value_trend: number[];
+  delivery_time_trend: number[];
+  defect_rate: number;
+  negotiated_savings: number;
+  early_payment_discounts: number;
+  volume_discounts: number;
+  seasonal_spend_pattern: {
+    Q1: number;
+    Q2: number;
+    Q3: number;
+    Q4: number;
+  };
+  payment_terms_compliance: number;
+  supplier_diversity_status: string | null;
+  sustainability_score: number;
+  cost_savings_initiatives: any[];
+  supply_chain_risk_score: number;
+  market_price_variance: number;
+  contract_compliance_rate: number;
 }
 
 // Automation types

@@ -1328,75 +1328,117 @@ export type Database = {
           average_delivery_time: number | null
           average_lead_time: number | null
           bill_out_total: number | null
+          contract_compliance_rate: number | null
+          cost_savings_initiatives: Json | null
           created_at: string | null
           daily_spend: number | null
           date: string
+          defect_rate: number | null
+          delivery_time_trend: number[] | null
           discounts_amount: number | null
+          early_payment_discounts: number | null
           id: string
           inventory_value: number | null
+          market_price_variance: number | null
           monthly_spend: number | null
+          negotiated_savings: number | null
           on_time_delivery_rate: number | null
+          order_value_trend: number[] | null
           orders_count: number | null
           orders_fulfilled: number | null
           organization_id: string | null
+          payment_terms_compliance: number | null
           payment_timeliness_score: number | null
           profit_margin: number | null
           quality_rating: number | null
           rebates_amount: number | null
           return_rate: number | null
+          seasonal_spend_pattern: Json | null
+          supplier_diversity_status: string | null
           supplier_id: string | null
+          supply_chain_risk_score: number | null
+          sustainability_score: number | null
           total_spend: number | null
           updated_at: string | null
+          volume_discounts: number | null
           weekly_spend: number | null
         }
         Insert: {
           average_delivery_time?: number | null
           average_lead_time?: number | null
           bill_out_total?: number | null
+          contract_compliance_rate?: number | null
+          cost_savings_initiatives?: Json | null
           created_at?: string | null
           daily_spend?: number | null
           date: string
+          defect_rate?: number | null
+          delivery_time_trend?: number[] | null
           discounts_amount?: number | null
+          early_payment_discounts?: number | null
           id?: string
           inventory_value?: number | null
+          market_price_variance?: number | null
           monthly_spend?: number | null
+          negotiated_savings?: number | null
           on_time_delivery_rate?: number | null
+          order_value_trend?: number[] | null
           orders_count?: number | null
           orders_fulfilled?: number | null
           organization_id?: string | null
+          payment_terms_compliance?: number | null
           payment_timeliness_score?: number | null
           profit_margin?: number | null
           quality_rating?: number | null
           rebates_amount?: number | null
           return_rate?: number | null
+          seasonal_spend_pattern?: Json | null
+          supplier_diversity_status?: string | null
           supplier_id?: string | null
+          supply_chain_risk_score?: number | null
+          sustainability_score?: number | null
           total_spend?: number | null
           updated_at?: string | null
+          volume_discounts?: number | null
           weekly_spend?: number | null
         }
         Update: {
           average_delivery_time?: number | null
           average_lead_time?: number | null
           bill_out_total?: number | null
+          contract_compliance_rate?: number | null
+          cost_savings_initiatives?: Json | null
           created_at?: string | null
           daily_spend?: number | null
           date?: string
+          defect_rate?: number | null
+          delivery_time_trend?: number[] | null
           discounts_amount?: number | null
+          early_payment_discounts?: number | null
           id?: string
           inventory_value?: number | null
+          market_price_variance?: number | null
           monthly_spend?: number | null
+          negotiated_savings?: number | null
           on_time_delivery_rate?: number | null
+          order_value_trend?: number[] | null
           orders_count?: number | null
           orders_fulfilled?: number | null
           organization_id?: string | null
+          payment_terms_compliance?: number | null
           payment_timeliness_score?: number | null
           profit_margin?: number | null
           quality_rating?: number | null
           rebates_amount?: number | null
           return_rate?: number | null
+          seasonal_spend_pattern?: Json | null
+          supplier_diversity_status?: string | null
           supplier_id?: string | null
+          supply_chain_risk_score?: number | null
+          sustainability_score?: number | null
           total_spend?: number | null
           updated_at?: string | null
+          volume_discounts?: number | null
           weekly_spend?: number | null
         }
         Relationships: [

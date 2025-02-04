@@ -39,7 +39,12 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
   const onSubmit = async (values: StaffDetailsFormValues) => {
     await updateStaffMember({
       id: staffMember.id,
-      ...values,
+      first_name: values.first_name,
+      last_name: values.last_name,
+      phone_number: values.phone_number,
+      notes: values.notes,
+      emergency_contact: values.emergency_contact,
+      skills: values.skills,
     });
     onClose();
   };

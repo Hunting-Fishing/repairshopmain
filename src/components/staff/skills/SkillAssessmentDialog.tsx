@@ -1,15 +1,17 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { skillAssessmentSchema } from "./schema";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { SkillFormFields } from "./form/SkillFormFields";
 import { ProficiencyField } from "./form/ProficiencyField";
 import { NotesField } from "./form/NotesField";
+import { useState } from "react";
 
 interface SkillAssessmentDialogProps {
   open: boolean;
@@ -18,7 +20,7 @@ interface SkillAssessmentDialogProps {
 }
 
 export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAssessmentDialogProps) {
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   
   const form = useForm({
@@ -34,6 +36,13 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
     if (!profileId) return;
     
     try {
+      setIsSubmitting(true);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        throw new Error('No authenticated user found');
+      }
+
       const { error } = await supabase
         .from('staff_skill_assessments')
         .insert({
@@ -41,22 +50,20 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
           skill_id: values.skillId,
           proficiency_level: values.proficiencyLevel,
           notes: values.notes,
-          assessed_by: (await supabase.auth.getSession()).data.session?.user.id,
+          assessed_by: session.user.id,
         });
 
       if (error) throw error;
 
-      toast({ title: "Assessment added successfully" });
+      toast.success("Assessment added successfully");
       queryClient.invalidateQueries({ queryKey: ['skill-assessments', profileId] });
       onOpenChange(false);
       form.reset();
     } catch (error) {
       console.error('Error adding skill assessment:', error);
-      toast({ 
-        title: "Error",
-        description: "Failed to add assessment",
-        variant: "destructive"
-      });
+      toast.error('Failed to add assessment');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -71,7 +78,9 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
             <SkillFormFields />
             <ProficiencyField />
             <NotesField />
-            <Button type="submit">Add Assessment</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              Add Assessment
+            </Button>
           </form>
         </Form>
       </DialogContent>

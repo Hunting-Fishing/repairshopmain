@@ -25,7 +25,7 @@ interface AddSkillCategoryDialogProps {
 }
 
 function CategoryForm({ onSubmit, onCancel, isSubmitting }: { 
-  onSubmit: (values: FormValues) => Promise<void>;
+  onSubmit: (values: FormValues) => void;
   onCancel: () => void;
   isSubmitting: boolean;
 }) {
@@ -37,16 +37,9 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
     },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const values = form.getValues();
-    await onSubmit(values);
-    form.reset();
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"

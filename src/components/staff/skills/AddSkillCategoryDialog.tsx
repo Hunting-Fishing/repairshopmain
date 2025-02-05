@@ -12,7 +12,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { z } from "zod";
 
-// Form schema defined in the same file to avoid additional file dependencies
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
@@ -37,14 +36,16 @@ function CategoryForm({ onSubmit, onCancel }: {
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const values = form.getValues();
     await onSubmit(values);
     form.reset();
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -75,7 +76,7 @@ function CategoryForm({ onSubmit, onCancel }: {
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit">
+          <Button type="submit" disabled={isSubmitting}>
             Add Category
           </Button>
         </div>
@@ -91,9 +92,16 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
   const handleSubmit = async (values: FormValues) => {
     try {
       setIsSubmitting(true);
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        throw new Error('No authenticated user found');
+      }
+
       const { data: userProfile } = await supabase
         .from('profiles')
         .select('organization_id')
+        .eq('id', session.user.id)
         .single();
 
       if (!userProfile?.organization_id) {

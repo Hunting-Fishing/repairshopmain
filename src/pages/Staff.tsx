@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Form } from "@/components/ui/form";
 import { RoleManagement } from "@/components/staff/RoleManagement";
@@ -10,6 +11,7 @@ import { AssignmentRules } from "@/components/staff/assignment-rules/AssignmentR
 import { StaffHeader } from "@/components/staff/components/StaffHeader";
 import { StaffTabsList } from "@/components/staff/components/StaffTabsList";
 import { useStaffTabs } from "@/components/staff/hooks/useStaffTabs";
+import { StaffHistoryList } from "@/components/staff/history/StaffHistoryList";
 
 export default function Staff() {
   const form = useStaffTabs();
@@ -41,6 +43,9 @@ export default function Staff() {
         </TabsContent>
         <TabsContent value="performance">
           <PerformanceMetrics />
+        </TabsContent>
+        <TabsContent value="history">
+          <StaffHistoryList />
         </TabsContent>
       </Tabs>
     </div>

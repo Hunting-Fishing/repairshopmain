@@ -1,3 +1,4 @@
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,11 +12,12 @@ import { cn } from "@/lib/utils";
 
 interface VehicleListProps {
   customerId: string;
-  onVehicleSelect?: (vehicle: Vehicle) => void;
+  onVehicleSelect?: (vehicle: Vehicle | null) => void;
 }
 
 export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) => {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
   const [infoType, setInfoType] = useState<'recalls' | 'safety' | 'complaints' | null>(null);
   const queryClient = useQueryClient();
 
@@ -36,6 +38,18 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
     queryClient.invalidateQueries({ queryKey: ["vehicles", customerId] });
   };
 
+  const handleVehicleSelect = (vehicle: Vehicle) => {
+    if (selectedVehicleId === vehicle.id) {
+      setSelectedVehicleId(null);
+      setSelectedVehicle(null);
+      onVehicleSelect?.(null);
+    } else {
+      setSelectedVehicleId(vehicle.id);
+      setSelectedVehicle(vehicle);
+      onVehicleSelect?.(vehicle);
+    }
+  };
+
   if (isLoading) return <div>Loading vehicles...</div>;
 
   if (!vehicles || vehicles.length === 0) {
@@ -51,7 +65,12 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
     <ScrollArea className="h-[300px]">
       <div className="space-y-4">
         {vehicles.map((vehicle) => (
-          <div key={vehicle.id}>
+          <div 
+            key={vehicle.id}
+            className={cn(
+              selectedVehicleId === vehicle.id && "ring-2 ring-primary rounded-lg"
+            )}
+          >
             <VehicleCard
               vehicle={vehicle}
               onInfoRequest={(type) => {
@@ -59,8 +78,8 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
                 setInfoType(type);
               }}
               onVehicleRemoved={handleVehicleRemoved}
-              onVehicleSelect={onVehicleSelect}
-              selectable={!!onVehicleSelect}
+              onVehicleSelect={handleVehicleSelect}
+              selectable={true}
             />
           </div>
         ))}

@@ -6,6 +6,8 @@ import { CustomerCommunications } from "./communications/CustomerCommunications"
 import { CustomerPayments } from "./payments/CustomerPayments";
 import { CustomerInspections } from "./inspections/CustomerInspections";
 import { CustomerForm } from "./CustomerForm";
+import { useState } from "react";
+import { Vehicle } from "./vehicles/types";
 
 interface CustomerTabsProps {
   customerId: string;
@@ -14,6 +16,8 @@ interface CustomerTabsProps {
 }
 
 export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsProps) {
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+
   return (
     <Tabs defaultValue="details" className="w-full">
       <TabsList className="grid w-full grid-cols-6">
@@ -30,11 +34,11 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
       </TabsContent>
 
       <TabsContent value="vehicles">
-        <VehicleList customerId={customerId} />
+        <VehicleList customerId={customerId} onVehicleSelect={setSelectedVehicle} />
       </TabsContent>
 
       <TabsContent value="repair-jobs">
-        <RepairJobsList customerId={customerId} />
+        <RepairJobsList customerId={customerId} vehicleId={selectedVehicle?.id} />
       </TabsContent>
 
       <TabsContent value="communications">

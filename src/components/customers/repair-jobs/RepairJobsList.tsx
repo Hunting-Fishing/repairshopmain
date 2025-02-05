@@ -6,16 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface RepairJobsListProps {
   customerId: string;
+  vehicleId?: string;
 }
 
-export function RepairJobsList({ customerId }: RepairJobsListProps) {
+export function RepairJobsList({ customerId, vehicleId }: RepairJobsListProps) {
   const { data: repairJobs, isLoading } = useQuery({
-    queryKey: ["repair-jobs", customerId],
+    queryKey: ["repair-jobs", customerId, vehicleId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("customer_repair_jobs")
         .select(`
           *,
@@ -24,6 +27,12 @@ export function RepairJobsList({ customerId }: RepairJobsListProps) {
         `)
         .eq("customer_id", customerId)
         .order("created_at", { ascending: false });
+
+      if (vehicleId) {
+        query = query.eq("vehicle_id", vehicleId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data;
@@ -42,6 +51,28 @@ export function RepairJobsList({ customerId }: RepairJobsListProps) {
   };
 
   if (isLoading) return <div>Loading repair jobs...</div>;
+
+  if (!repairJobs || repairJobs.length === 0) {
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">Repair Jobs</h2>
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            New Repair Job
+          </Button>
+        </div>
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {vehicleId 
+              ? "No repair jobs found for this vehicle." 
+              : "No repair jobs found for this customer."}
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

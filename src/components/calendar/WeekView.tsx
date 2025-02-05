@@ -1,3 +1,4 @@
+
 import { startOfWeek, addDays, format, isBefore, isSameDay } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TimeColumn } from "./TimeColumn";
@@ -7,8 +8,8 @@ import { ColorPalette, PAST_APPOINTMENT_COLORS } from "./ColorPalette";
 import { useState, useEffect } from "react";
 
 const WORKING_HOURS = {
-  start: 8, // 8 AM
-  end: 18, // 6 PM
+  start: 8,
+  end: 18,
 };
 
 export function WeekView({
@@ -18,7 +19,7 @@ export function WeekView({
   onTimeSlotClick,
 }: CalendarViewProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedPastColor, setSelectedPastColor] = useState(PAST_APPOINTMENT_COLORS[0]);
+  const [selectedPastColor, setSelectedPastColor] = useState<[string, string]>([PAST_APPOINTMENT_COLORS[0], `${PAST_APPOINTMENT_COLORS[0]}80`]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -52,15 +53,13 @@ export function WeekView({
     );
   }
 
-  const isPastTimeSlot = (time: Date) => {
-    return isBefore(time, currentTime) && isSameDay(time, currentTime);
-  };
-
   return (
     <div className="space-y-4">
       <ColorPalette 
-        selectedColor={selectedPastColor}
+        selectedColors={selectedPastColor}
         onColorSelect={setSelectedPastColor}
+        activeColorIndex={0}
+        onActiveColorChange={() => {}}
       />
       <div className="relative grid grid-cols-8 gap-0.5 overflow-x-auto bg-muted/20">
         <TimeColumn hours={hours} />
@@ -72,7 +71,7 @@ export function WeekView({
             bookings={bookings}
             onTimeSlotClick={onTimeSlotClick}
             currentTime={currentTime}
-            pastColor={selectedPastColor}
+            pastColor={selectedPastColor[0]}
           />
         ))}
       </div>

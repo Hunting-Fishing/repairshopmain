@@ -10,7 +10,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { SkillFormFields } from "./form/SkillFormFields";
 import { ProficiencyField } from "./form/ProficiencyField";
 import { NotesField } from "./form/NotesField";
-import { useSkills } from "@/hooks/staff/useSkills";
 
 interface SkillAssessmentDialogProps {
   open: boolean;
@@ -21,7 +20,6 @@ interface SkillAssessmentDialogProps {
 export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAssessmentDialogProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { data: skills } = useSkills();
   
   const form = useForm({
     resolver: zodResolver(skillAssessmentSchema),
@@ -70,7 +68,7 @@ export function SkillAssessmentDialog({ open, onOpenChange, profileId }: SkillAs
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <SkillFormFields skills={skills} />
+            <SkillFormFields />
             <ProficiencyField />
             <NotesField />
             <Button type="submit">Add Assessment</Button>

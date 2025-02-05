@@ -1,12 +1,15 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormSectionProps } from "../types";
+import { ColorPalette } from "@/components/calendar/ColorPalette";
 
 export function DisplaySettings({ form }: FormSectionProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Display Settings</h3>
+      
       <FormField
         control={form.control}
         name="enableTechnicianColors"
@@ -24,6 +27,64 @@ export function DisplaySettings({ form }: FormSectionProps) {
           </FormItem>
         )}
       />
+
+      {form.watch("enableTechnicianColors") && (
+        <div className="space-y-4 p-4 border rounded-lg">
+          <h4 className="font-medium">Technician Category Colors</h4>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="technicianColors.morningShift"
+              render={({ field }) => (
+                <div className="flex items-center justify-between">
+                  <FormLabel>Morning Shift</FormLabel>
+                  <ColorPalette selectedColor={field.value || "#8B5CF6"} onColorSelect={field.onChange} />
+                </div>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="technicianColors.dayShift"
+              render={({ field }) => (
+                <div className="flex items-center justify-between">
+                  <FormLabel>Day Shift</FormLabel>
+                  <ColorPalette selectedColor={field.value || "#22c55e"} onColorSelect={field.onChange} />
+                </div>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="technicianColors.nightShift"
+              render={({ field }) => (
+                <div className="flex items-center justify-between">
+                  <FormLabel>Night Shift</FormLabel>
+                  <ColorPalette selectedColor={field.value || "#3B82F6"} onColorSelect={field.onChange} />
+                </div>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="technicianColors.foreman"
+              render={({ field }) => (
+                <div className="flex items-center justify-between">
+                  <FormLabel>Foreman</FormLabel>
+                  <ColorPalette selectedColor={field.value || "#F97316"} onColorSelect={field.onChange} />
+                </div>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="technicianColors.apprentice"
+              render={({ field }) => (
+                <div className="flex items-center justify-between">
+                  <FormLabel>Apprentice</FormLabel>
+                  <ColorPalette selectedColor={field.value || "#7C3AED"} onColorSelect={field.onChange} />
+                </div>
+              )}
+            />
+          </div>
+        </div>
+      )}
 
       <FormField
         control={form.control}

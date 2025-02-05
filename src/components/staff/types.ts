@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 import { UseFormReturn } from "react-hook-form";
 
@@ -17,6 +18,13 @@ export const technicianSettingsFormSchema = z.object({
     considerWorkload: z.boolean(),
     considerLocation: z.boolean(),
   }),
+  technicianColors: z.object({
+    morningShift: z.string().optional(),
+    dayShift: z.string().optional(),
+    nightShift: z.string().optional(),
+    foreman: z.string().optional(),
+    apprentice: z.string().optional(),
+  }).optional(),
 });
 
 export type TechnicianSettingsFormValues = z.infer<typeof technicianSettingsFormSchema>;

@@ -3,9 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { SkillAssessmentDialog } from "./SkillAssessmentDialog";
-import { SkillAssessmentCard } from "./components/SkillAssessmentCard";
+import { SkillAssessmentList } from "./components/SkillAssessmentList";
 import { useSkillAssessments } from "./hooks/useSkillAssessments";
-import { getProficiencyColor, getProficiencyLabel } from "./utils/proficiencyUtils";
 
 interface SkillAssessmentDashboardProps {
   profileId?: string;
@@ -25,21 +24,10 @@ export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboard
         </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {assessments?.map((assessment) => (
-            <SkillAssessmentCard
-              key={assessment.id}
-              assessment={assessment}
-              getProficiencyColor={getProficiencyColor}
-              getProficiencyLabel={getProficiencyLabel}
-            />
-          ))}
-          {!isLoading && (!assessments || assessments.length === 0) && (
-            <p className="text-center text-muted-foreground py-4">
-              No skill assessments found
-            </p>
-          )}
-        </div>
+        <SkillAssessmentList 
+          assessments={assessments} 
+          isLoading={isLoading} 
+        />
       </CardContent>
       <SkillAssessmentDialog 
         open={isDialogOpen} 

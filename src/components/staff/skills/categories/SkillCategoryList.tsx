@@ -6,7 +6,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { SkillCategoryCard } from "./SkillCategoryCard";
-import { AddSkillCategoryDialog } from "../dialogs/AddSkillCategoryDialog";
+import { AddSkillCategoryDialog } from "../AddSkillCategoryDialog";
 import type { SkillCategory } from "../types";
 
 export function SkillCategoryList() {

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SkillCategoryList } from "./categories/SkillCategoryList";
-import { SkillAssessmentDashboard } from "./assessment/SkillAssessmentDashboard";
+import { SkillAssessmentDashboard } from "./components/SkillAssessmentDashboard";
 
 export function SkillCategories() {
   return (

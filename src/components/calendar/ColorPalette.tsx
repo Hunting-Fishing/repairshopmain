@@ -7,19 +7,19 @@ interface ColorPaletteProps {
 }
 
 export const PAST_APPOINTMENT_COLORS = [
-  "#8B5CF6", // Vivid Purple (Primary)
-  "#22c55e", // Bright Green
-  "#3B82F6", // Bright Blue
-  "#F97316", // Bright Orange
-  "#7C3AED", // Violet
-  "#D946EF", // Magenta Pink
-  "#0EA5E9", // Ocean Blue
-  "#6E59A5", // Muted Purple
-  "#9b87f5", // Soft Purple
-  "#8E9196", // Neutral Gray
-  "#403E43", // Charcoal Gray
-  "#1EAEDB", // Sky Blue
-  "#33C3F0", // Light Blue
+  "#FF0000", // Bright Red
+  "#00FF00", // Bright Green
+  "#0000FF", // Bright Blue
+  "#FFD700", // Gold
+  "#FF1493", // Deep Pink
+  "#00FFFF", // Cyan
+  "#800080", // Purple
+  "#FFA500", // Orange
+  "#000000", // Black
+  "#808080", // Gray
+  "#8B4513", // Saddle Brown
+  "#4B0082", // Indigo
+  "#006400", // Dark Green
 ];
 
 export function ColorPalette({ selectedColor, onColorSelect }: ColorPaletteProps) {

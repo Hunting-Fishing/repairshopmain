@@ -1050,6 +1050,135 @@ export type Database = {
           },
         ]
       }
+      skill_assessment_history: {
+        Row: {
+          assessment_id: string | null
+          change_type: string
+          changed_by: string | null
+          created_at: string
+          field_name: string | null
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+          organization_id: string | null
+        }
+        Insert: {
+          assessment_id?: string | null
+          change_type: string
+          changed_by?: string | null
+          created_at?: string
+          field_name?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          organization_id?: string | null
+        }
+        Update: {
+          assessment_id?: string | null
+          change_type?: string
+          changed_by?: string | null
+          created_at?: string
+          field_name?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          organization_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_assessment_history_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "skill_assessments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_assessment_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_assessment_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skill_assessments: {
+        Row: {
+          assessed_by: string | null
+          assessment_date: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          organization_id: string | null
+          proficiency_level: number
+          profile_id: string | null
+          skill_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          assessed_by?: string | null
+          assessment_date?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          proficiency_level: number
+          profile_id?: string | null
+          skill_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assessed_by?: string | null
+          assessment_date?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          proficiency_level?: number
+          profile_id?: string | null
+          skill_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skill_assessments_assessed_by_fkey"
+            columns: ["assessed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_assessments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_assessments_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "skill_assessments_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       skill_categories: {
         Row: {
           created_at: string | null

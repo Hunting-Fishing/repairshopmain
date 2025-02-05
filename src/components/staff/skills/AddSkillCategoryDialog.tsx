@@ -37,13 +37,9 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
     },
   });
 
-  const handleSubmit = async (values: FormValues) => {
-    await onSubmit(values);
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -75,7 +71,7 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            Add Category
+            {isSubmitting ? "Adding..." : "Add Category"}
           </Button>
         </div>
       </form>
@@ -100,7 +96,7 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
         .from('profiles')
         .select('organization_id')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
       if (!userProfile?.organization_id) {
         throw new Error('No organization found');

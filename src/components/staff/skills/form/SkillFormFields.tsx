@@ -21,22 +21,16 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
         .select(`
           id,
           name,
-          skills!inner (
+          skills (
             id,
             name,
-            description,
-            category_id
+            description
           )
         `)
         .order('name');
       
       if (error) throw error;
-      
-      // Filter out categories with no skills and ensure skills belong to their category
-      return data?.map(category => ({
-        ...category,
-        skills: category.skills.filter(skill => skill.category_id === category.id)
-      })).filter(category => category.skills.length > 0);
+      return data;
     },
   });
 
@@ -72,7 +66,7 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
                     {category.name}
                   </div>
                   {category.skills
-                    .sort((a, b) => a.name.localeCompare(b.name))
+                    ?.sort((a, b) => a.name.localeCompare(b.name))
                     .map((skill) => (
                       <SelectItem key={skill.id} value={skill.id}>
                         {skill.name}

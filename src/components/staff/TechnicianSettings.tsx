@@ -22,11 +22,16 @@ export function TechnicianSettings({ form }: FormSectionProps) {
       const { error } = await supabase
         .from('profiles')
         .update({
-          technician_settings: values
+          technician_settings: values,
+          updated_at: new Date().toISOString()
         })
-        .eq('id', session.user.id);
+        .eq('id', session.user.id)
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Database error:", error);
+        throw error;
+      }
 
       console.log("Settings saved successfully");
       toast.success("Settings saved automatically");
@@ -36,11 +41,15 @@ export function TechnicianSettings({ form }: FormSectionProps) {
     }
   };
 
-  // Watch for any form changes and auto-save
+  // Add debouncing to prevent too frequent saves
   useEffect(() => {
     const subscription = form.watch((value) => {
       if (Object.keys(value).length > 0) {
-        saveSettings(value);
+        const timeoutId = setTimeout(() => {
+          saveSettings(value);
+        }, 500); // Wait 500ms after last change before saving
+        
+        return () => clearTimeout(timeoutId);
       }
     });
     

@@ -5,13 +5,20 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { SkillAssessmentDialog } from "../SkillAssessmentDialog";
+import { SkillAssessmentCard } from "./SkillAssessmentCard";
 import type { SkillAssessment } from "../types";
+import { toast } from "@/hooks/use-toast";
 
-export function SkillAssessmentDashboard() {
+interface SkillAssessmentDashboardProps {
+  profileId?: string;
+}
+
+export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
-  const { data: assessments, isLoading } = useQuery<SkillAssessment[]>({
-    queryKey: ['skill-assessments'],
+
+  const { data: assessments, isLoading, error } = useQuery({
+    queryKey: ['skill-assessments', profileId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('staff_skill_assessments')
@@ -26,16 +33,23 @@ export function SkillAssessmentDashboard() {
               name
             )
           ),
-          assessor:profiles (
+          assessor:profiles!staff_skill_assessments_assessed_by_fkey (
             first_name,
             last_name
           )
-        `);
-      
-      if (error) throw error;
+        `)
+        .eq('profile_id', profileId);
 
-      // Transform the data to match our SkillAssessment interface
-      return data.map((assessment): SkillAssessment => ({
+      if (error) {
+        toast({
+          title: "Error fetching assessments",
+          description: error.message,
+          variant: "destructive"
+        });
+        throw error;
+      }
+
+      return data?.map((assessment): SkillAssessment => ({
         id: assessment.id,
         proficiency_level: assessment.proficiency_level,
         assessment_date: assessment.assessment_date,
@@ -44,15 +58,25 @@ export function SkillAssessmentDashboard() {
           name: assessment.skill[0].name,
           category: assessment.skill[0].category?.[0] ? {
             name: assessment.skill[0].category[0].name
-          } : null
+          } : undefined
         } : undefined,
         assessor: assessment.assessor?.[0] ? {
           first_name: assessment.assessor[0].first_name,
           last_name: assessment.assessor[0].last_name
         } : undefined
-      }));
+      })) || [];
     }
   });
+
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="py-8">
+          <p className="text-center text-destructive">Error loading assessments</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -70,22 +94,10 @@ export function SkillAssessmentDashboard() {
       <CardContent>
         <div className="space-y-4">
           {assessments?.map((assessment) => (
-            <div key={assessment.id} className="p-4 border rounded-lg">
-              <h3 className="font-medium">
-                {assessment.skill?.name}
-                {assessment.skill?.category?.name && (
-                  <span className="text-muted-foreground ml-2">
-                    ({assessment.skill.category.name})
-                  </span>
-                )}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Proficiency Level: {assessment.proficiency_level}
-              </p>
-              {assessment.notes && (
-                <p className="text-sm mt-2">{assessment.notes}</p>
-              )}
-            </div>
+            <SkillAssessmentCard
+              key={assessment.id}
+              assessment={assessment}
+            />
           ))}
           {!assessments?.length && (
             <p className="text-center text-muted-foreground py-4">
@@ -94,6 +106,11 @@ export function SkillAssessmentDashboard() {
           )}
         </div>
       </CardContent>
+      <SkillAssessmentDialog 
+        open={isDialogOpen} 
+        onOpenChange={setIsDialogOpen}
+        profileId={profileId}
+      />
     </Card>
   );
 }

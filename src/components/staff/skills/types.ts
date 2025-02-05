@@ -1,16 +1,12 @@
-export interface Skill {
-  id: string;
-  name: string;
-  description?: string;
-  category_id?: string;
-}
+import { z } from "zod";
 
-export interface SkillCategory {
-  id: string;
-  name: string;
-  description?: string;
-  skills?: Skill[];
-}
+export const skillAssessmentSchema = z.object({
+  skillId: z.string().min(1, "Skill is required"),
+  proficiencyLevel: z.string().transform((val) => parseInt(val, 10)),
+  notes: z.string().optional(),
+});
+
+export type SkillAssessmentFormValues = z.infer<typeof skillAssessmentSchema>;
 
 export interface SkillAssessment {
   id: string;
@@ -21,7 +17,7 @@ export interface SkillAssessment {
     name: string;
     category?: {
       name: string;
-    } | null;
+    };
   };
   assessor?: {
     first_name: string;

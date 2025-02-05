@@ -11,15 +11,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 interface SettingsChange {
   [key: string]: any;
 }
 
 export function StaffHistoryList() {
-  const { data: history, isLoading } = useQuery({
+  const { data: history, isLoading, refetch } = useQuery({
     queryKey: ["staff-history"],
     queryFn: async () => {
+      console.log("Fetching staff history...");
       const { data, error } = await supabase
         .from("staff_history")
         .select(`
@@ -36,10 +39,40 @@ export function StaffHistoryList() {
         .order("created_at", { ascending: false })
         .limit(100);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching staff history:", error);
+        throw error;
+      }
+      console.log("Staff history data:", data);
       return data;
     },
   });
+
+  useEffect(() => {
+    // Subscribe to changes in the staff_history table
+    const channel = supabase
+      .channel('staff_history_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'staff_history'
+        },
+        (payload) => {
+          console.log('Received real-time update:', payload);
+          refetch();
+          toast.info("Staff history updated");
+        }
+      )
+      .subscribe(status => {
+        console.log('Subscription status:', status);
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   const getSettingsChangeDescription = (oldValue: string, newValue: string) => {
     try {

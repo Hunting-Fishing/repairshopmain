@@ -29,7 +29,10 @@ export function SkillCategories() {
         `)
         .order('name');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching skill categories:', error);
+        throw error;
+      }
       return data as SkillCategory[];
     }
   });

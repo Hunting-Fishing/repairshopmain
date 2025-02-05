@@ -12,54 +12,26 @@ interface SkillFormFieldsProps {
 export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
   const form = useFormContext();
 
-  const { data: fetchedSkills } = useQuery({
-    queryKey: ['skills-with-categories'],
+  const { data: categories } = useQuery({
+    queryKey: ['skill-categories-with-skills'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('skills')
+        .from('skill_categories')
         .select(`
           id,
           name,
-          description,
-          category_id,
-          category:skill_categories (
+          skills (
             id,
-            name
+            name,
+            description
           )
         `)
         .order('name');
       
       if (error) throw error;
-
-      return data.map(skill => ({
-        id: skill.id,
-        name: skill.name,
-        description: skill.description,
-        category: skill.category?.[0] || undefined
-      })) as Skill[];
+      return data;
     },
     enabled: !propSkills,
-  });
-
-  const skills = propSkills || fetchedSkills || [];
-
-  // Group skills by category
-  const groupedSkills = skills.reduce((acc, skill) => {
-    const categoryName = skill.category?.name || 'Uncategorized';
-    if (!acc[categoryName]) {
-      acc[categoryName] = [];
-    }
-    if (!acc[categoryName].find(s => s.id === skill.id)) {
-      acc[categoryName].push(skill);
-    }
-    return acc;
-  }, {} as Record<string, Skill[]>);
-
-  // Sort categories alphabetically, but keep Uncategorized at the end
-  const sortedCategories = Object.keys(groupedSkills).sort((a, b) => {
-    if (a === 'Uncategorized') return 1;
-    if (b === 'Uncategorized') return -1;
-    return a.localeCompare(b);
   });
 
   return (
@@ -76,13 +48,13 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {sortedCategories.map((category) => (
-                <div key={category} className="mb-2">
+              {categories?.map((category) => (
+                <div key={category.id} className="mb-2">
                   <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-                    {category}
+                    {category.name}
                   </div>
-                  {groupedSkills[category]
-                    .sort((a, b) => a.name.localeCompare(b.name))
+                  {category.skills
+                    ?.sort((a, b) => a.name.localeCompare(b.name))
                     .map((skill) => (
                       <SelectItem key={skill.id} value={skill.id}>
                         {skill.name}

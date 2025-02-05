@@ -17,8 +17,10 @@ export function SkillCategoryList() {
     queryKey: ['skill-categories-with-skills'],
     queryFn: async () => {
       try {
-        const { data: session } = await supabase.auth.getSession();
-        if (!session?.user) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const session = sessionData?.session;
+        
+        if (!session?.user?.id) {
           throw new Error('Authentication required');
         }
 
@@ -100,7 +102,7 @@ export function SkillCategoryList() {
           onClick={handleAddClick} 
           size="sm"
           className="relative"
-          disabled={isDialogOpen} // Prevent double-clicks
+          disabled={isDialogOpen}
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Category
@@ -119,7 +121,6 @@ export function SkillCategoryList() {
       <AddSkillCategoryDialog 
         open={isDialogOpen} 
         onOpenChange={(open) => {
-          // Add a small delay when closing to ensure animations complete
           if (!open) {
             setTimeout(() => setIsDialogOpen(false), 100);
           } else {

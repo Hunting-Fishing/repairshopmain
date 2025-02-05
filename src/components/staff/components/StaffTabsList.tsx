@@ -1,5 +1,6 @@
+
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Shield, Settings2, GitBranch, Calendar, LineChart } from "lucide-react";
+import { Users, Shield, Settings2, GitBranch, Calendar, LineChart, History } from "lucide-react";
 
 export function StaffTabsList() {
   return (
@@ -27,6 +28,10 @@ export function StaffTabsList() {
       <TabsTrigger value="performance" className="flex items-center gap-2 data-[state=active]:bg-background">
         <LineChart className="h-4 w-4" />
         Performance
+      </TabsTrigger>
+      <TabsTrigger value="history" className="flex items-center gap-2 data-[state=active]:bg-background">
+        <History className="h-4 w-4" />
+        History
       </TabsTrigger>
     </TabsList>
   );

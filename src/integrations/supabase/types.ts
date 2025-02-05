@@ -1420,6 +1420,73 @@ export type Database = {
           },
         ]
       }
+      staff_history: {
+        Row: {
+          change_type: string
+          changed_by: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          field_name: string | null
+          id: string
+          new_value: string | null
+          notes: string | null
+          old_value: string | null
+          organization_id: string | null
+          profile_id: string | null
+        }
+        Insert: {
+          change_type: string
+          changed_by?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          field_name?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          organization_id?: string | null
+          profile_id?: string | null
+        }
+        Update: {
+          change_type?: string
+          changed_by?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          field_name?: string | null
+          id?: string
+          new_value?: string | null
+          notes?: string | null
+          old_value?: string | null
+          organization_id?: string | null
+          profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_history_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_performance_metrics: {
         Row: {
           created_at: string | null

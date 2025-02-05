@@ -4,8 +4,15 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormSectionProps } from "../types";
 import { ColorPalette } from "@/components/calendar/ColorPalette";
+import { useState } from "react";
 
 export function DisplaySettings({ form }: FormSectionProps) {
+  const [activeColorIndexes, setActiveColorIndexes] = useState<Record<string, 0 | 1>>({});
+
+  const handleColorSelect = (fieldName: string, colors: [string, string]) => {
+    form.setValue(fieldName, colors);
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Display Settings</h3>
@@ -18,7 +25,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
             <div className="space-y-0.5">
               <FormLabel className="text-base">Enable Technician Colors</FormLabel>
               <FormDescription>
-                Assign unique colors to technicians in the calendar
+                Assign unique dual colors to technicians in the calendar
               </FormDescription>
             </div>
             <FormControl>
@@ -34,114 +41,76 @@ export function DisplaySettings({ form }: FormSectionProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Shift Types</h5>
-              <FormField
-                control={form.control}
-                name="technicianColors.morningShift"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Morning Shift</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#8B5CF6"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="technicianColors.dayShift"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Day Shift</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#22c55e"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="technicianColors.nightShift"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Night Shift</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#3B82F6"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
+              {["morningShift", "dayShift", "nightShift"].map((shift) => (
+                <FormField
+                  key={shift}
+                  control={form.control}
+                  name={`technicianColors.${shift}`}
+                  render={({ field }) => (
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="capitalize">
+                        {shift.replace(/([A-Z])/g, ' $1').trim()}
+                      </FormLabel>
+                      <ColorPalette
+                        selectedColors={field.value || ["#000000", "#FFD700"]}
+                        onColorSelect={(colors) => handleColorSelect(`technicianColors.${shift}`, colors)}
+                        activeColorIndex={activeColorIndexes[shift] || 0}
+                        onActiveColorChange={(index) => 
+                          setActiveColorIndexes(prev => ({ ...prev, [shift]: index }))
+                        }
+                      />
+                    </div>
+                  )}
+                />
+              ))}
             </div>
             
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Roles</h5>
-              <FormField
-                control={form.control}
-                name="technicianColors.foreman"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Foreman</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#F97316"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="technicianColors.apprentice"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Apprentice</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#7C3AED"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="technicianColors.certified"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Certified</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#0EA5E9"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
+              {["foreman", "apprentice", "certified"].map((role) => (
+                <FormField
+                  key={role}
+                  control={form.control}
+                  name={`technicianColors.${role}`}
+                  render={({ field }) => (
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="capitalize">{role}</FormLabel>
+                      <ColorPalette
+                        selectedColors={field.value || ["#800000", "#C0C0C0"]}
+                        onColorSelect={(colors) => handleColorSelect(`technicianColors.${role}`, colors)}
+                        activeColorIndex={activeColorIndexes[role] || 0}
+                        onActiveColorChange={(index) => 
+                          setActiveColorIndexes(prev => ({ ...prev, [role]: index }))
+                        }
+                      />
+                    </div>
+                  )}
+                />
+              ))}
             </div>
 
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Specialties</h5>
-              <FormField
-                control={form.control}
-                name="technicianColors.lube"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Lube</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#D946EF"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="technicianColors.tires"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Tires</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#6E59A5"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="technicianColors.diagnostic"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>Diagnostic</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#9b87f5"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="technicianColors.general"
-                render={({ field }) => (
-                  <div className="flex items-center justify-between">
-                    <FormLabel>General</FormLabel>
-                    <ColorPalette selectedColor={field.value || "#8E9196"} onColorSelect={field.onChange} />
-                  </div>
-                )}
-              />
+              {["lube", "tires", "diagnostic", "general"].map((specialty) => (
+                <FormField
+                  key={specialty}
+                  control={form.control}
+                  name={`technicianColors.${specialty}`}
+                  render={({ field }) => (
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="capitalize">{specialty}</FormLabel>
+                      <ColorPalette
+                        selectedColors={field.value || ["#008080", "#FFD700"]}
+                        onColorSelect={(colors) => handleColorSelect(`technicianColors.${specialty}`, colors)}
+                        activeColorIndex={activeColorIndexes[specialty] || 0}
+                        onActiveColorChange={(index) => 
+                          setActiveColorIndexes(prev => ({ ...prev, [specialty]: index }))
+                        }
+                      />
+                    </div>
+                  )}
+                />
+              ))}
             </div>
           </div>
         </div>

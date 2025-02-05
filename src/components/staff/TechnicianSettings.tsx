@@ -5,14 +5,14 @@ import { AutoAssignmentSettings } from "./settings/AutoAssignmentSettings";
 import { SchedulingSettings } from "./settings/SchedulingSettings";
 import { DisplaySettings } from "./settings/DisplaySettings";
 import { TechnicianSpecialties } from "./TechnicianSpecialties";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 export function TechnicianSettings({ form }: FormSectionProps) {
-  const onSubmit = async (values: any) => {
+  const saveSettings = async (values: any) => {
     try {
-      console.log("Submitting settings:", values);
+      console.log("Auto-saving settings:", values);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error("You must be logged in to save settings");
@@ -28,26 +28,34 @@ export function TechnicianSettings({ form }: FormSectionProps) {
 
       if (error) throw error;
 
-      toast.success("Settings saved successfully");
       console.log("Settings saved successfully");
+      toast.success("Settings saved automatically");
     } catch (error) {
       console.error("Error saving settings:", error);
       toast.error("Failed to save settings");
     }
   };
 
+  // Watch for any form changes and auto-save
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (Object.keys(value).length > 0) {
+        saveSettings(value);
+      }
+    });
+    
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   return (
     <div className="space-y-6">
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="space-y-6">
-          <VisibilitySettings form={form} />
-          <AutoAssignmentSettings form={form} />
-          <SchedulingSettings form={form} />
-          <DisplaySettings form={form} />
-          <TechnicianSpecialties />
-        </div>
-        <Button type="submit" className="mt-6">Save Settings</Button>
-      </form>
+      <div className="space-y-6">
+        <VisibilitySettings form={form} />
+        <AutoAssignmentSettings form={form} />
+        <SchedulingSettings form={form} />
+        <DisplaySettings form={form} />
+        <TechnicianSpecialties />
+      </div>
     </div>
   );
 }

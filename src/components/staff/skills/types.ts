@@ -1,9 +1,18 @@
 export interface Skill {
   id: string;
   name: string;
+  description?: string;
   category?: {
     name: string;
   };
+  category_id?: string;
+}
+
+export interface SkillCategory {
+  id: string;
+  name: string;
+  description?: string;
+  skills?: Skill[];
 }
 
 export interface SkillAssessment {

@@ -20,7 +20,10 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
         .select(`
           id,
           name,
+          description,
+          category_id,
           category:skill_categories (
+            id,
             name
           )
         `)
@@ -28,16 +31,14 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
       
       if (error) throw error;
 
-      // Transform the data to match our Skill type
-      const transformedData = data.map(skill => ({
+      return data.map(skill => ({
         id: skill.id,
         name: skill.name,
-        category: skill.category?.[0] || { name: 'Uncategorized' }
-      }));
-
-      return transformedData as Skill[];
+        description: skill.description,
+        category: skill.category?.[0] || undefined
+      })) as Skill[];
     },
-    enabled: !propSkills, // Only fetch if skills aren't provided as props
+    enabled: !propSkills,
   });
 
   const skills = propSkills || fetchedSkills || [];
@@ -48,7 +49,6 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
     if (!acc[categoryName]) {
       acc[categoryName] = [];
     }
-    // Only add if not already present
     if (!acc[categoryName].find(s => s.id === skill.id)) {
       acc[categoryName].push(skill);
     }

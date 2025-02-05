@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AddSkillCategoryDialog } from "./AddSkillCategoryDialog";
 import { SkillCategoryCard } from "./SkillCategoryCard";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import type { SkillCategory } from "./types";
 
 export function SkillCategories() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -16,11 +17,18 @@ export function SkillCategories() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('skill_categories')
-        .select('*')
+        .select(`
+          *,
+          skills (
+            id,
+            name,
+            description
+          )
+        `)
         .order('name');
       
       if (error) throw error;
-      return data;
+      return data as SkillCategory[];
     }
   });
 

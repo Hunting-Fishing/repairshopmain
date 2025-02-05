@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { VehicleList } from "./VehicleList";
 import { AddVehicleForm } from "./AddVehicleForm";
@@ -14,8 +15,10 @@ interface CustomerVehicleDialogProps {
 
 export function CustomerVehicleDialog({ customerId, onClose, onSelect }: CustomerVehicleDialogProps) {
   const [showAddVehicle, setShowAddVehicle] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
     if (customerId) {
       // Create a detailed vehicle info string including all relevant information
       const vehicleInfo = [
@@ -63,6 +66,7 @@ export function CustomerVehicleDialog({ customerId, onClose, onSelect }: Custome
               <VehicleList 
                 customerId={customerId}
                 onVehicleSelect={handleVehicleSelect}
+                selectedVehicle={selectedVehicle}
               />
             )
           )}

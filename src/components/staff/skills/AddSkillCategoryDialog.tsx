@@ -24,9 +24,10 @@ interface AddSkillCategoryDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function CategoryForm({ onSubmit, onCancel }: { 
+function CategoryForm({ onSubmit, onCancel, isSubmitting }: { 
   onSubmit: (values: FormValues) => Promise<void>;
   onCancel: () => void;
+  isSubmitting: boolean;
 }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -138,7 +139,7 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
         <DialogHeader>
           <DialogTitle>Add Skill Category</DialogTitle>
         </DialogHeader>
-        <CategoryForm onSubmit={handleSubmit} onCancel={handleCancel} />
+        <CategoryForm onSubmit={handleSubmit} onCancel={handleCancel} isSubmitting={isSubmitting} />
       </DialogContent>
     </Dialog>
   );

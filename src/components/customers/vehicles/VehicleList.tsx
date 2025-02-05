@@ -13,12 +13,12 @@ import { cn } from "@/lib/utils";
 interface VehicleListProps {
   customerId: string;
   onVehicleSelect?: (vehicle: Vehicle | null) => void;
+  selectedVehicle: Vehicle | null;
 }
 
-export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) => {
-  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
+export const VehicleList = ({ customerId, onVehicleSelect, selectedVehicle }: VehicleListProps) => {
   const [infoType, setInfoType] = useState<'recalls' | 'safety' | 'complaints' | null>(null);
+  const [vehicleForInfo, setVehicleForInfo] = useState<Vehicle | null>(null);
   const queryClient = useQueryClient();
 
   const { data: vehicles, isLoading } = useQuery({
@@ -39,13 +39,9 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
   };
 
   const handleVehicleSelect = (vehicle: Vehicle) => {
-    if (selectedVehicleId === vehicle.id) {
-      setSelectedVehicleId(null);
-      setSelectedVehicle(null);
+    if (selectedVehicle?.id === vehicle.id) {
       onVehicleSelect?.(null);
     } else {
-      setSelectedVehicleId(vehicle.id);
-      setSelectedVehicle(vehicle);
       onVehicleSelect?.(vehicle);
     }
   };
@@ -68,13 +64,13 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
           <div 
             key={vehicle.id}
             className={cn(
-              selectedVehicleId === vehicle.id && "ring-2 ring-primary rounded-lg"
+              selectedVehicle?.id === vehicle.id && "ring-2 ring-primary rounded-lg"
             )}
           >
             <VehicleCard
               vehicle={vehicle}
               onInfoRequest={(type) => {
-                setSelectedVehicle(vehicle);
+                setVehicleForInfo(vehicle);
                 setInfoType(type);
               }}
               onVehicleRemoved={handleVehicleRemoved}
@@ -86,10 +82,10 @@ export const VehicleList = ({ customerId, onVehicleSelect }: VehicleListProps) =
       </div>
 
       <VehicleInfoDialog
-        vehicle={selectedVehicle}
+        vehicle={vehicleForInfo}
         infoType={infoType}
         onClose={() => {
-          setSelectedVehicle(null);
+          setVehicleForInfo(null);
           setInfoType(null);
         }}
       />

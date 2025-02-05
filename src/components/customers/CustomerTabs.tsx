@@ -17,9 +17,18 @@ interface CustomerTabsProps {
 
 export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsProps) {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
+  const [activeTab, setActiveTab] = useState("details");
+
+  const handleVehicleSelect = (vehicle: Vehicle | null) => {
+    setSelectedVehicle(vehicle);
+    // Auto switch to repair jobs tab when a vehicle is selected
+    if (vehicle) {
+      setActiveTab("repair-jobs");
+    }
+  };
 
   return (
-    <Tabs defaultValue="details" className="w-full">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid w-full grid-cols-6">
         <TabsTrigger value="details">Details</TabsTrigger>
         <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
@@ -34,7 +43,7 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
       </TabsContent>
 
       <TabsContent value="vehicles">
-        <VehicleList customerId={customerId} onVehicleSelect={setSelectedVehicle} />
+        <VehicleList customerId={customerId} onVehicleSelect={handleVehicleSelect} selectedVehicle={selectedVehicle} />
       </TabsContent>
 
       <TabsContent value="repair-jobs">

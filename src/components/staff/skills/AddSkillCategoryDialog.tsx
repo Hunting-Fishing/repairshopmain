@@ -42,6 +42,8 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
       await onSubmit(values);
       form.reset();
     } catch (error) {
+      console.error('Form submission error:', error);
+      // Let the error propagate to parent for handling
       throw error;
     }
   };
@@ -84,7 +86,11 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="min-w-[100px]"
+          >
             {isSubmitting ? "Adding..." : "Add Category"}
           </Button>
         </div>
@@ -95,17 +101,19 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
 
 export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const queryClient = useQueryClient();
 
   const handleSubmit = async (values: FormValues) => {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
+    setHasError(false);
     
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
-        throw new Error('No authenticated user found');
+        throw new Error('Authentication required');
       }
 
       const { data: userProfile } = await supabase
@@ -115,37 +123,57 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
         .maybeSingle();
 
       if (!userProfile?.organization_id) {
-        throw new Error('No organization found');
+        throw new Error('Organization not found');
       }
 
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from('skill_categories')
         .insert([{
           ...values,
           organization_id: userProfile.organization_id
         }]);
 
-      if (error) throw error;
+      if (insertError) {
+        throw insertError;
+      }
 
-      // First invalidate the query and wait for it to complete
-      await queryClient.invalidateQueries({ queryKey: ['skill-categories-with-skills'] });
+      // Wait for query invalidation to complete
+      await queryClient.invalidateQueries({ 
+        queryKey: ['skill-categories-with-skills']
+      });
       
-      // Then show success message
       toast.success("Skill category added successfully");
       
-      // Finally close the dialog and reset state
+      // Ensure we're still mounted before updating state
       setIsSubmitting(false);
+      setHasError(false);
       onOpenChange(false);
+      
     } catch (error) {
       console.error('Error adding skill category:', error);
-      toast.error("Failed to add skill category");
+      setHasError(true);
+      
+      if (error instanceof Error) {
+        if (error.message === 'Authentication required') {
+          toast.error("Please sign in to add a skill category");
+        } else if (error.message === 'Organization not found') {
+          toast.error("Organization settings not found");
+        } else {
+          toast.error("Failed to add skill category: " + error.message);
+        }
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+      
       setIsSubmitting(false);
     }
   };
 
-  // Prevent dialog from closing while submitting
   const handleClose = (value: boolean) => {
+    // Only allow closing if not submitting or if explicitly cancelled
     if (!isSubmitting) {
+      // Reset error state when closing
+      setHasError(false);
       onOpenChange(value);
     }
   };
@@ -158,11 +186,17 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
             e.preventDefault();
           }
         }}
+        onPointerDownOutside={(e) => {
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
         onInteractOutside={(e) => {
           if (isSubmitting) {
             e.preventDefault();
           }
         }}
+        className={hasError ? "border-red-500" : ""}
       >
         <DialogHeader>
           <DialogTitle>Add Skill Category</DialogTitle>

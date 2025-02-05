@@ -1,3 +1,4 @@
+
 import { format, isSameDay, isSameMonth } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Booking } from "@/types/calendar";
@@ -33,7 +34,7 @@ export function DayCell({
       isPast={isPast}
       isCurrentTimeSlot={isToday}
       hasBookings={dayBookings.length > 0}
-      pastColor={pastColor}
+      pastColors={[pastColor, `${pastColor}80`]}
       className={cn(
         "min-h-[8rem] p-2 rounded-lg",
         !isSameMonth(day, currentDate) && "bg-muted/50"

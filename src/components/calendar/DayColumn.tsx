@@ -1,3 +1,4 @@
+
 import { format, isSameDay, addHours, isBefore, isAfter } from "date-fns";
 import { BookingCard } from "./BookingCard";
 import { Booking } from "@/types/calendar";
@@ -61,7 +62,7 @@ export function DayColumn({
               isPast={isPastTimeSlot(timeSlotStart)}
               isCurrentTimeSlot={isCurrentTimeSlot(timeSlotStart, timeSlotEnd)}
               hasBookings={slotBookings.length > 0}
-              pastColor={pastColor}
+              pastColors={[pastColor, `${pastColor}80`]}
               onClick={() => onTimeSlotClick(timeSlotStart, timeSlotEnd)}
               className="h-14 border-b border-border px-2"
             >

@@ -6,18 +6,31 @@ import { FormSectionProps } from "../types";
 import { ColorPalette } from "@/components/calendar/ColorPalette";
 import { useState } from "react";
 
+interface TechnicianColor {
+  morningShift: [string, string];
+  dayShift: [string, string];
+  nightShift: [string, string];
+  foreman: [string, string];
+  apprentice: [string, string];
+  certified: [string, string];
+  lube: [string, string];
+  tires: [string, string];
+  diagnostic: [string, string];
+  general: [string, string];
+}
+
 const DEFAULT_COLORS: [string, string] = ["#000000", "#FFD700"];
 
 export function DisplaySettings({ form }: FormSectionProps) {
   const [activeColorIndexes, setActiveColorIndexes] = useState<Record<string, 0 | 1>>({});
 
-  const handleColorSelect = (fieldName: keyof TechnicianSettingsFormValues['technicianColors'], colors: [string, string]) => {
-    form.setValue(`technicianColors.${fieldName}`, colors);
+  const handleColorSelect = (fieldName: keyof TechnicianColor, colors: [string, string]) => {
+    form.setValue(`technicianColors.${fieldName}`, colors, { shouldValidate: true });
   };
 
-  const getColorPair = (fieldName: keyof TechnicianSettingsFormValues['technicianColors']): [string, string] => {
+  const getColorPair = (fieldName: keyof TechnicianColor): [string, string] => {
     const value = form.watch(`technicianColors.${fieldName}`);
-    return Array.isArray(value) ? value : DEFAULT_COLORS;
+    return Array.isArray(value) ? value as [string, string] : DEFAULT_COLORS;
   };
 
   return (

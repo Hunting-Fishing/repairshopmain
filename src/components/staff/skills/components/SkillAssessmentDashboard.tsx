@@ -33,7 +33,24 @@ export function SkillAssessmentDashboard() {
         `);
       
       if (error) throw error;
-      return data as SkillAssessment[];
+
+      // Transform the data to match our SkillAssessment interface
+      return data.map((assessment): SkillAssessment => ({
+        id: assessment.id,
+        proficiency_level: assessment.proficiency_level,
+        assessment_date: assessment.assessment_date,
+        notes: assessment.notes,
+        skill: assessment.skill?.[0] ? {
+          name: assessment.skill[0].name,
+          category: assessment.skill[0].category?.[0] ? {
+            name: assessment.skill[0].category[0].name
+          } : null
+        } : undefined,
+        assessor: assessment.assessor?.[0] ? {
+          first_name: assessment.assessor[0].first_name,
+          last_name: assessment.assessor[0].last_name
+        } : undefined
+      }));
     }
   });
 

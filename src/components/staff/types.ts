@@ -24,6 +24,11 @@ export const technicianSettingsFormSchema = z.object({
     nightShift: z.string().optional(),
     foreman: z.string().optional(),
     apprentice: z.string().optional(),
+    lube: z.string().optional(),
+    tires: z.string().optional(),
+    certified: z.string().optional(),
+    diagnostic: z.string().optional(),
+    general: z.string().optional(),
   }).optional(),
 });
 

@@ -38,9 +38,22 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     try {
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', (await supabase.auth.getSession()).data.session?.user.id)
+        .single();
+
+      if (!userProfile?.organization_id) {
+        throw new Error('No organization found');
+      }
+
       const { error } = await supabase
         .from('skill_categories')
-        .insert([values]);
+        .insert([{
+          ...values,
+          organization_id: userProfile.organization_id
+        }]);
 
       if (error) throw error;
 

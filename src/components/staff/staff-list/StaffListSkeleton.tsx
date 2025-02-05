@@ -17,8 +17,8 @@ export function StaffListSkeleton() {
             <TableHead>Name</TableHead>
             <TableHead>Contact</TableHead>
             <TableHead>Role</TableHead>
-            <TableHead>Hire Date</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Skills</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -39,8 +39,8 @@ export function StaffListSkeleton() {
               <TableCell>
                 <Skeleton className="h-4 w-[120px]" />
               </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-[80px]" />
+              <TableCell className="text-right">
+                <Skeleton className="h-8 w-8 ml-auto" />
               </TableCell>
             </TableRow>
           ))}

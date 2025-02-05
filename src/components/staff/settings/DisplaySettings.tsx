@@ -6,11 +6,20 @@ import { FormSectionProps } from "../types";
 import { ColorPalette } from "@/components/calendar/ColorPalette";
 import { useState } from "react";
 
+const DEFAULT_COLORS: [string, string] = ["#000000", "#FFD700"];
+
 export function DisplaySettings({ form }: FormSectionProps) {
   const [activeColorIndexes, setActiveColorIndexes] = useState<Record<string, 0 | 1>>({});
 
   const handleColorSelect = (fieldName: string, colors: [string, string]) => {
-    form.setValue(`technicianColors.${fieldName}` as any, colors);
+    form.setValue(`technicianColors.${fieldName}` as any, colors, {
+      shouldValidate: true,
+    });
+  };
+
+  const getColorPair = (fieldName: string): [string, string] => {
+    const value = form.watch(`technicianColors.${fieldName}`);
+    return Array.isArray(value) ? value as [string, string] : DEFAULT_COLORS;
   };
 
   return (
@@ -47,7 +56,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
                     {shift.replace(/([A-Z])/g, ' $1').trim()}
                   </FormLabel>
                   <ColorPalette
-                    selectedColors={form.watch(`technicianColors.${shift}`) || ["#000000", "#FFD700"]}
+                    selectedColors={getColorPair(shift)}
                     onColorSelect={(colors) => handleColorSelect(shift, colors)}
                     activeColorIndex={activeColorIndexes[shift] || 0}
                     onActiveColorChange={(index) => 
@@ -64,7 +73,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
                 <div key={role} className="flex items-center justify-between">
                   <FormLabel className="capitalize">{role}</FormLabel>
                   <ColorPalette
-                    selectedColors={form.watch(`technicianColors.${role}`) || ["#800000", "#C0C0C0"]}
+                    selectedColors={getColorPair(role)}
                     onColorSelect={(colors) => handleColorSelect(role, colors)}
                     activeColorIndex={activeColorIndexes[role] || 0}
                     onActiveColorChange={(index) => 
@@ -81,7 +90,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
                 <div key={specialty} className="flex items-center justify-between">
                   <FormLabel className="capitalize">{specialty}</FormLabel>
                   <ColorPalette
-                    selectedColors={form.watch(`technicianColors.${specialty}`) || ["#008080", "#FFD700"]}
+                    selectedColors={getColorPair(specialty)}
                     onColorSelect={(colors) => handleColorSelect(specialty, colors)}
                     activeColorIndex={activeColorIndexes[specialty] || 0}
                     onActiveColorChange={(index) => 

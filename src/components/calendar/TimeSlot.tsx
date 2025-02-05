@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
@@ -5,7 +6,7 @@ interface TimeSlotProps {
   isPast: boolean;
   isCurrentTimeSlot?: boolean;
   hasBookings?: boolean;
-  pastColor: string;
+  pastColors: [string, string];
   onClick?: () => void;
   children?: ReactNode;
   className?: string;
@@ -15,11 +16,13 @@ export function TimeSlot({
   isPast,
   isCurrentTimeSlot,
   hasBookings,
-  pastColor,
+  pastColors,
   onClick,
   children,
   className
 }: TimeSlotProps) {
+  const [primaryColor, secondaryColor] = pastColors;
+  
   return (
     <div
       className={cn(
@@ -29,8 +32,8 @@ export function TimeSlot({
         className
       )}
       style={{
-        backgroundColor: isPast ? `${pastColor}15` : undefined,
-        borderColor: isPast ? pastColor : undefined
+        backgroundColor: isPast ? `${primaryColor}15` : undefined,
+        borderColor: isPast ? secondaryColor : undefined
       }}
       onClick={onClick}
     >

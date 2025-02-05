@@ -1,3 +1,4 @@
+
 import { format } from "date-fns";
 import { BookingCard } from "./BookingCard";
 import { TimeSlotData } from "./utils/timeSlotUtils";
@@ -5,10 +6,12 @@ import { TimeSlotData } from "./utils/timeSlotUtils";
 interface TimeSlotContentProps {
   slot: TimeSlotData;
   isPast: boolean;
-  pastColor: string;
+  pastColors: [string, string];
 }
 
-export function TimeSlotContent({ slot, isPast, pastColor }: TimeSlotContentProps) {
+export function TimeSlotContent({ slot, isPast, pastColors }: TimeSlotContentProps) {
+  const [primaryColor, secondaryColor] = pastColors;
+  
   return (
     <>
       <div className="w-16 text-sm font-medium text-muted-foreground">
@@ -20,7 +23,7 @@ export function TimeSlotContent({ slot, isPast, pastColor }: TimeSlotContentProp
             <BookingCard 
               booking={booking} 
               isPast={isPast}
-              pastColor={pastColor}
+              pastColor={primaryColor}
             />
           </div>
         ))}

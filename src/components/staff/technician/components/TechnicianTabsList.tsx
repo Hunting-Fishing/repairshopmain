@@ -1,5 +1,5 @@
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Tool, Calendar } from "lucide-react";
+import { Settings, Wrench, Calendar } from "lucide-react";
 
 export function TechnicianTabsList() {
   return (
@@ -9,7 +9,7 @@ export function TechnicianTabsList() {
         Settings
       </TabsTrigger>
       <TabsTrigger value="specialties" className="flex items-center gap-2">
-        <Tool className="h-4 w-4" />
+        <Wrench className="h-4 w-4" />
         Specialties
       </TabsTrigger>
       <TabsTrigger value="availability" className="flex items-center gap-2">

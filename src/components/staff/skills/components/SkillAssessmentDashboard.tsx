@@ -5,23 +5,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-
-interface SkillAssessment {
-  id: string;
-  proficiency_level: number;
-  assessment_date: string | null;
-  notes: string | null;
-  skill: {
-    name: string;
-    category: {
-      name: string;
-    } | null;
-  } | null;
-  assessor: {
-    first_name: string;
-    last_name: string;
-  } | null;
-}
+import type { SkillAssessment } from "../types";
 
 export function SkillAssessmentDashboard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);

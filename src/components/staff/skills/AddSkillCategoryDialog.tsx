@@ -40,9 +40,8 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
   const handleSubmit = async (values: FormValues) => {
     try {
       await onSubmit(values);
-      form.reset();
     } catch (error) {
-      // Let the parent component handle the error
+      // Error is handled by parent
       throw error;
     }
   };
@@ -77,7 +76,12 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
           )}
         />
         <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>
@@ -96,9 +100,9 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
   const handleSubmit = async (values: FormValues) => {
     if (isSubmitting) return;
     
+    setIsSubmitting(true);
+    
     try {
-      setIsSubmitting(true);
-      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
         throw new Error('No authenticated user found');
@@ -123,8 +127,10 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
 
       if (error) throw error;
 
-      toast.success("Skill category added successfully");
       await queryClient.invalidateQueries({ queryKey: ['skill-categories-with-skills'] });
+      toast.success("Skill category added successfully");
+      
+      // Only close dialog after successful submission
       onOpenChange(false);
     } catch (error) {
       console.error('Error adding skill category:', error);
@@ -134,21 +140,26 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
     }
   };
 
-  const handleCancel = () => {
+  const handleClose = (value: boolean) => {
     if (!isSubmitting) {
-      onOpenChange(false);
+      onOpenChange(value);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isSubmitting && onOpenChange(value)}>
-      <DialogContent>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent onPointerDownOutside={(e) => {
+        // Prevent closing when submitting
+        if (isSubmitting) {
+          e.preventDefault();
+        }
+      }}>
         <DialogHeader>
           <DialogTitle>Add Skill Category</DialogTitle>
         </DialogHeader>
         <CategoryForm 
           onSubmit={handleSubmit} 
-          onCancel={handleCancel} 
+          onCancel={() => handleClose(false)} 
           isSubmitting={isSubmitting} 
         />
       </DialogContent>

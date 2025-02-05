@@ -12,6 +12,14 @@ export function SkillFormFields() {
   const { data: categories, isLoading } = useQuery({
     queryKey: ['skill-categories-with-skills'],
     queryFn: async () => {
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', (await supabase.auth.getSession()).data.session?.user.id)
+        .single();
+
+      if (!userProfile?.organization_id) throw new Error('No organization found');
+
       const { data, error } = await supabase
         .from('skill_categories')
         .select(`
@@ -19,9 +27,11 @@ export function SkillFormFields() {
           name,
           skills (
             id,
-            name
+            name,
+            description
           )
         `)
+        .eq('organization_id', userProfile.organization_id)
         .order('name');
       
       if (error) throw error;

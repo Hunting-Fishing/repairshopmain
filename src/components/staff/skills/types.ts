@@ -3,15 +3,12 @@ export interface Skill {
   name: string;
   description?: string;
   category_id?: string;
-  category?: {
-    name: string;
-  } | null;
 }
 
 export interface SkillCategory {
   id: string;
   name: string;
-  description?: string | null;
+  description?: string;
   skills?: Skill[];
 }
 

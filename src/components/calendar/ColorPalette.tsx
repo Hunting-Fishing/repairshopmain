@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 
 interface ColorPaletteProps {
@@ -8,17 +9,17 @@ interface ColorPaletteProps {
 export const PAST_APPOINTMENT_COLORS = [
   "#8B5CF6", // Vivid Purple (Primary)
   "#22c55e", // Bright Green
-  "#16a34a", // Forest Green
-  "#15803d", // Deep Green
-  "#eab308", // Golden Yellow
-  "#facc15", // Bright Yellow
-  "#fbbf24", // Warm Yellow
-  "#dc2626", // Bright Red
-  "#ef4444", // Vibrant Red
-  "#b91c1c", // Deep Red
   "#3B82F6", // Bright Blue
   "#F97316", // Bright Orange
   "#7C3AED", // Violet
+  "#D946EF", // Magenta Pink
+  "#0EA5E9", // Ocean Blue
+  "#6E59A5", // Muted Purple
+  "#9b87f5", // Soft Purple
+  "#8E9196", // Neutral Gray
+  "#403E43", // Charcoal Gray
+  "#1EAEDB", // Sky Blue
+  "#33C3F0", // Light Blue
 ];
 
 export function ColorPalette({ selectedColor, onColorSelect }: ColorPaletteProps) {

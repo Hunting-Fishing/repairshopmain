@@ -1,6 +1,12 @@
 
 import { cn } from "@/lib/utils";
 
+export const PAST_APPOINTMENT_COLORS = [
+  "#808080", // Gray
+  "#C0C0C0", // Silver
+  "#D3D3D3", // Light gray
+];
+
 interface ColorPaletteProps {
   selectedColors: [string, string];
   onColorSelect: (colors: [string, string]) => void;

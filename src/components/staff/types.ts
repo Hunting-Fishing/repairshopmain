@@ -2,6 +2,8 @@
 import { z } from "zod";
 import { UseFormReturn } from "react-hook-form";
 
+const colorPairSchema = z.tuple([z.string(), z.string()]);
+
 export const technicianSettingsFormSchema = z.object({
   showTechnicianWorkload: z.boolean(),
   showTechnicianAvailability: z.boolean(),
@@ -19,16 +21,16 @@ export const technicianSettingsFormSchema = z.object({
     considerLocation: z.boolean(),
   }),
   technicianColors: z.object({
-    morningShift: z.array(z.string()).length(2).optional(),
-    dayShift: z.array(z.string()).length(2).optional(),
-    nightShift: z.array(z.string()).length(2).optional(),
-    foreman: z.array(z.string()).length(2).optional(),
-    apprentice: z.array(z.string()).length(2).optional(),
-    lube: z.array(z.string()).length(2).optional(),
-    tires: z.array(z.string()).length(2).optional(),
-    certified: z.array(z.string()).length(2).optional(),
-    diagnostic: z.array(z.string()).length(2).optional(),
-    general: z.array(z.string()).length(2).optional(),
+    morningShift: colorPairSchema.optional(),
+    dayShift: colorPairSchema.optional(),
+    nightShift: colorPairSchema.optional(),
+    foreman: colorPairSchema.optional(),
+    apprentice: colorPairSchema.optional(),
+    lube: colorPairSchema.optional(),
+    tires: colorPairSchema.optional(),
+    certified: colorPairSchema.optional(),
+    diagnostic: colorPairSchema.optional(),
+    general: colorPairSchema.optional(),
   }).optional(),
 });
 

@@ -10,7 +10,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
   const [activeColorIndexes, setActiveColorIndexes] = useState<Record<string, 0 | 1>>({});
 
   const handleColorSelect = (fieldName: string, colors: [string, string]) => {
-    form.setValue(fieldName, colors);
+    form.setValue(`technicianColors.${fieldName}` as any, colors);
   };
 
   return (
@@ -42,74 +42,53 @@ export function DisplaySettings({ form }: FormSectionProps) {
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Shift Types</h5>
               {["morningShift", "dayShift", "nightShift"].map((shift) => (
-                <FormField
-                  key={shift}
-                  control={form.control}
-                  name={`technicianColors.${shift}`}
-                  render={({ field }) => (
-                    <div className="flex items-center justify-between">
-                      <FormLabel className="capitalize">
-                        {shift.replace(/([A-Z])/g, ' $1').trim()}
-                      </FormLabel>
-                      <ColorPalette
-                        selectedColors={field.value || ["#000000", "#FFD700"]}
-                        onColorSelect={(colors) => handleColorSelect(`technicianColors.${shift}`, colors)}
-                        activeColorIndex={activeColorIndexes[shift] || 0}
-                        onActiveColorChange={(index) => 
-                          setActiveColorIndexes(prev => ({ ...prev, [shift]: index }))
-                        }
-                      />
-                    </div>
-                  )}
-                />
+                <div key={shift} className="flex items-center justify-between">
+                  <FormLabel className="capitalize">
+                    {shift.replace(/([A-Z])/g, ' $1').trim()}
+                  </FormLabel>
+                  <ColorPalette
+                    selectedColors={form.watch(`technicianColors.${shift}`) || ["#000000", "#FFD700"]}
+                    onColorSelect={(colors) => handleColorSelect(shift, colors)}
+                    activeColorIndex={activeColorIndexes[shift] || 0}
+                    onActiveColorChange={(index) => 
+                      setActiveColorIndexes(prev => ({ ...prev, [shift]: index }))
+                    }
+                  />
+                </div>
               ))}
             </div>
             
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Roles</h5>
               {["foreman", "apprentice", "certified"].map((role) => (
-                <FormField
-                  key={role}
-                  control={form.control}
-                  name={`technicianColors.${role}`}
-                  render={({ field }) => (
-                    <div className="flex items-center justify-between">
-                      <FormLabel className="capitalize">{role}</FormLabel>
-                      <ColorPalette
-                        selectedColors={field.value || ["#800000", "#C0C0C0"]}
-                        onColorSelect={(colors) => handleColorSelect(`technicianColors.${role}`, colors)}
-                        activeColorIndex={activeColorIndexes[role] || 0}
-                        onActiveColorChange={(index) => 
-                          setActiveColorIndexes(prev => ({ ...prev, [role]: index }))
-                        }
-                      />
-                    </div>
-                  )}
-                />
+                <div key={role} className="flex items-center justify-between">
+                  <FormLabel className="capitalize">{role}</FormLabel>
+                  <ColorPalette
+                    selectedColors={form.watch(`technicianColors.${role}`) || ["#800000", "#C0C0C0"]}
+                    onColorSelect={(colors) => handleColorSelect(role, colors)}
+                    activeColorIndex={activeColorIndexes[role] || 0}
+                    onActiveColorChange={(index) => 
+                      setActiveColorIndexes(prev => ({ ...prev, [role]: index }))
+                    }
+                  />
+                </div>
               ))}
             </div>
 
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Specialties</h5>
               {["lube", "tires", "diagnostic", "general"].map((specialty) => (
-                <FormField
-                  key={specialty}
-                  control={form.control}
-                  name={`technicianColors.${specialty}`}
-                  render={({ field }) => (
-                    <div className="flex items-center justify-between">
-                      <FormLabel className="capitalize">{specialty}</FormLabel>
-                      <ColorPalette
-                        selectedColors={field.value || ["#008080", "#FFD700"]}
-                        onColorSelect={(colors) => handleColorSelect(`technicianColors.${specialty}`, colors)}
-                        activeColorIndex={activeColorIndexes[specialty] || 0}
-                        onActiveColorChange={(index) => 
-                          setActiveColorIndexes(prev => ({ ...prev, [specialty]: index }))
-                        }
-                      />
-                    </div>
-                  )}
-                />
+                <div key={specialty} className="flex items-center justify-between">
+                  <FormLabel className="capitalize">{specialty}</FormLabel>
+                  <ColorPalette
+                    selectedColors={form.watch(`technicianColors.${specialty}`) || ["#008080", "#FFD700"]}
+                    onColorSelect={(colors) => handleColorSelect(specialty, colors)}
+                    activeColorIndex={activeColorIndexes[specialty] || 0}
+                    onActiveColorChange={(index) => 
+                      setActiveColorIndexes(prev => ({ ...prev, [specialty]: index }))
+                    }
+                  />
+                </div>
               ))}
             </div>
           </div>

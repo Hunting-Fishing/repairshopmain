@@ -21,16 +21,22 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
         .select(`
           id,
           name,
-          skills (
+          skills!inner (
             id,
             name,
-            description
+            description,
+            category_id
           )
         `)
         .order('name');
       
       if (error) throw error;
-      return data;
+      
+      // Filter out categories with no skills and ensure skills belong to their category
+      return data?.map(category => ({
+        ...category,
+        skills: category.skills.filter(skill => skill.category_id === category.id)
+      })).filter(category => category.skills.length > 0);
     },
   });
 
@@ -61,20 +67,18 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
             </FormControl>
             <SelectContent>
               {categories.map((category) => (
-                category.skills && category.skills.length > 0 && (
-                  <div key={category.id} className="mb-2">
-                    <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-                      {category.name}
-                    </div>
-                    {category.skills
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((skill) => (
-                        <SelectItem key={skill.id} value={skill.id}>
-                          {skill.name}
-                        </SelectItem>
-                      ))}
+                <div key={category.id} className="mb-2">
+                  <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
+                    {category.name}
                   </div>
-                )
+                  {category.skills
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((skill) => (
+                      <SelectItem key={skill.id} value={skill.id}>
+                        {skill.name}
+                      </SelectItem>
+                    ))}
+                </div>
               ))}
             </SelectContent>
           </Select>

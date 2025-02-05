@@ -20,7 +20,7 @@ export function RepairJobsList({ customerId }: RepairJobsListProps) {
         .select(`
           *,
           vehicle:vehicles(make, model, year),
-          technician:profiles(first_name, last_name)
+          technician:profiles!customer_repair_jobs_assigned_technician_id_fkey(first_name, last_name)
         `)
         .eq("customer_id", customerId)
         .order("created_at", { ascending: false });

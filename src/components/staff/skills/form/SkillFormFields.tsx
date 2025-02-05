@@ -4,13 +4,9 @@ import { useFormContext } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import type { Skill } from "../types";
+import type { SkillCategory } from "../types";
 
-interface SkillFormFieldsProps {
-  skills?: Skill[];
-}
-
-export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
+export function SkillFormFields() {
   const form = useFormContext();
 
   const { data: categories, isLoading } = useQuery({
@@ -23,14 +19,13 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
           name,
           skills (
             id,
-            name,
-            description
+            name
           )
         `)
         .order('name');
       
       if (error) throw error;
-      return data;
+      return data as SkillCategory[];
     },
   });
 
@@ -61,18 +56,20 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
             </FormControl>
             <SelectContent>
               {categories.map((category) => (
-                <div key={category.id} className="mb-2">
-                  <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-                    {category.name}
+                category.skills && category.skills.length > 0 ? (
+                  <div key={category.id} className="mb-2">
+                    <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
+                      {category.name}
+                    </div>
+                    {category.skills
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((skill) => (
+                        <SelectItem key={skill.id} value={skill.id}>
+                          {skill.name}
+                        </SelectItem>
+                      ))}
                   </div>
-                  {category.skills
-                    ?.sort((a, b) => a.name.localeCompare(b.name))
-                    .map((skill) => (
-                      <SelectItem key={skill.id} value={skill.id}>
-                        {skill.name}
-                      </SelectItem>
-                    ))}
-                </div>
+                ) : null
               ))}
             </SelectContent>
           </Select>

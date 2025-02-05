@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -19,13 +20,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-// Props interface
 interface AddSkillCategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-// Form component to keep the main component clean
 function CategoryForm({ onSubmit, onCancel }: { 
   onSubmit: (values: FormValues) => Promise<void>;
   onCancel: () => void;
@@ -38,9 +37,14 @@ function CategoryForm({ onSubmit, onCancel }: {
     },
   });
 
+  const handleSubmit = async (values: FormValues) => {
+    await onSubmit(values);
+    form.reset();
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -80,7 +84,6 @@ function CategoryForm({ onSubmit, onCancel }: {
   );
 }
 
-// Main dialog component
 export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
@@ -91,7 +94,6 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
       const { data: userProfile } = await supabase
         .from('profiles')
         .select('organization_id')
-        .eq('id', (await supabase.auth.getSession()).data.session?.user.id)
         .single();
 
       if (!userProfile?.organization_id) {
@@ -108,7 +110,7 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
       if (error) throw error;
 
       toast.success("Skill category added successfully");
-      queryClient.invalidateQueries({ queryKey: ['skill-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['skill-categories-with-skills'] });
       onOpenChange(false);
     } catch (error) {
       console.error('Error adding skill category:', error);

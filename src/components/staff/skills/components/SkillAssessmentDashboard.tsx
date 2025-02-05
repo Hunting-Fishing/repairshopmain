@@ -49,7 +49,7 @@ export function SkillAssessmentDashboard() {
         `);
       
       if (error) throw error;
-      return data;
+      return data as SkillAssessment[];
     }
   });
 

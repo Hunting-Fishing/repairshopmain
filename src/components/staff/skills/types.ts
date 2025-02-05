@@ -2,16 +2,16 @@ export interface Skill {
   id: string;
   name: string;
   description?: string;
+  category_id?: string;
   category?: {
     name: string;
-  };
-  category_id?: string;
+  } | null;
 }
 
 export interface SkillCategory {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   skills?: Skill[];
 }
 

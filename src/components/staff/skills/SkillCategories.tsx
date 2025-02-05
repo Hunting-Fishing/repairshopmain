@@ -18,7 +18,9 @@ export function SkillCategories() {
       const { data, error } = await supabase
         .from('skill_categories')
         .select(`
-          *,
+          id,
+          name,
+          description,
           skills (
             id,
             name,
@@ -49,7 +51,7 @@ export function SkillCategories() {
         {categories?.map((category) => (
           <SkillCategoryCard key={category.id} category={category} />
         ))}
-        {categories?.length === 0 && (
+        {!categories?.length && (
           <p className="text-muted-foreground col-span-full text-center py-4">
             No skill categories found. Add one to get started.
           </p>

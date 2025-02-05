@@ -5,20 +5,26 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 import { StaffListSkeleton } from "./StaffListSkeleton";
 import { StaffTableHeader } from "./StaffTableHeader";
 import { StaffTableRow } from "./StaffTableRow";
 import { StaffDetailsDialog } from "../staff-details/StaffDetailsDialog";
 import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
+import type { StaffMember } from "@/types/staff";
 
 const ITEMS_PER_PAGE = 10;
+
+type SortField = 'name' | 'role' | 'skills';
+type SortOrder = 'asc' | 'desc';
 
 export function StaffList() {
   const { data: staffMembers, isLoading, error } = useStaffMembers();
   const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   if (error) {
     return (
@@ -30,15 +36,41 @@ export function StaffList() {
 
   if (isLoading) return <StaffListSkeleton />;
 
+  const sortStaff = (staff: StaffMember[]) => {
+    return [...staff].sort((a, b) => {
+      if (sortField === 'name') {
+        const nameA = `${a.first_name} ${a.last_name}`.toLowerCase();
+        const nameB = `${b.first_name} ${b.last_name}`.toLowerCase();
+        return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      }
+      if (sortField === 'role') {
+        return sortOrder === 'asc' 
+          ? a.role.localeCompare(b.role)
+          : b.role.localeCompare(a.role);
+      }
+      return 0;
+    });
+  };
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
   const filteredStaff = staffMembers?.filter(staff => 
     `${staff.first_name} ${staff.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     staff.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     staff.role.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
-  const totalPages = Math.ceil((filteredStaff?.length || 0) / ITEMS_PER_PAGE);
+  const sortedStaff = sortStaff(filteredStaff);
+  const totalPages = Math.ceil(sortedStaff.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedStaff = filteredStaff.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedStaff = sortedStaff.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="space-y-4">
@@ -56,7 +88,7 @@ export function StaffList() {
 
       <div className="rounded-md border">
         <Table>
-          <StaffTableHeader />
+          <StaffTableHeader onSort={handleSort} sortField={sortField} sortOrder={sortOrder} />
           <TableBody>
             {paginatedStaff.map((staff) => (
               <StaffTableRow 
@@ -72,7 +104,7 @@ export function StaffList() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between py-4">
           <div className="text-sm text-muted-foreground">
-            Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, filteredStaff.length)} of {filteredStaff.length} entries
+            Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, sortedStaff.length)} of {sortedStaff.length} entries
           </div>
           <div className="flex items-center gap-2">
             <Button

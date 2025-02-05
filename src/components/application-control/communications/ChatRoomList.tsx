@@ -1,15 +1,14 @@
 
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Plus } from "lucide-react";
 import { useChatRooms } from "@/hooks/chat/useChatRooms";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { CreateChatRoomDialog } from "./CreateChatRoomDialog";
 
 export function ChatRoomList({ selectedRoomId, onSelectRoom }: { 
   selectedRoomId?: string;
@@ -27,10 +26,7 @@ export function ChatRoomList({ selectedRoomId, onSelectRoom }: {
 
   return (
     <div className="space-y-4">
-      <Button className="w-full">
-        <Plus className="h-4 w-4 mr-2" />
-        New Chat Room
-      </Button>
+      <CreateChatRoomDialog />
       
       <ScrollArea className="h-[calc(100vh-300px)]">
         <div className="space-y-2 pr-4">

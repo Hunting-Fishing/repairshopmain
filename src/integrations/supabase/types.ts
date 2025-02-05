@@ -163,6 +163,64 @@ export type Database = {
           },
         ]
       }
+      customer_communications: {
+        Row: {
+          content: string
+          customer_id: string | null
+          id: string
+          metadata: Json | null
+          organization_id: string
+          sent_at: string
+          sent_by: string
+          status: string
+          type: string
+        }
+        Insert: {
+          content: string
+          customer_id?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          sent_at?: string
+          sent_by: string
+          status?: string
+          type: string
+        }
+        Update: {
+          content?: string
+          customer_id?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          sent_at?: string
+          sent_by?: string
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_communications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_communications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_communications_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_history: {
         Row: {
           change_type: string
@@ -210,6 +268,87 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_inspections: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          findings: Json
+          id: string
+          inspection_type: string
+          organization_id: string
+          performed_by: string
+          photos: string[] | null
+          recommendations: Json | null
+          repair_job_id: string | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          findings: Json
+          id?: string
+          inspection_type: string
+          organization_id: string
+          performed_by: string
+          photos?: string[] | null
+          recommendations?: Json | null
+          repair_job_id?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          findings?: Json
+          id?: string
+          inspection_type?: string
+          organization_id?: string
+          performed_by?: string
+          photos?: string[] | null
+          recommendations?: Json | null
+          repair_job_id?: string | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_inspections_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_inspections_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_inspections_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_inspections_repair_job_id_fkey"
+            columns: ["repair_job_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_inspections_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -272,8 +411,186 @@ export type Database = {
           },
         ]
       }
+      customer_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string
+          customer_id: string | null
+          id: string
+          organization_id: string
+          payment_date: string
+          payment_method: string
+          repair_job_id: string | null
+          status: string
+          transaction_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by: string
+          customer_id?: string | null
+          id?: string
+          organization_id: string
+          payment_date: string
+          payment_method: string
+          repair_job_id?: string | null
+          status?: string
+          transaction_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string
+          customer_id?: string | null
+          id?: string
+          organization_id?: string
+          payment_date?: string
+          payment_method?: string
+          repair_job_id?: string | null
+          status?: string
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_payments_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_payments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_payments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_payments_repair_job_id_fkey"
+            columns: ["repair_job_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_repair_jobs: {
+        Row: {
+          actual_amount: number | null
+          approved_amount: number | null
+          approved_at: string | null
+          assigned_technician_id: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          customer_id: string | null
+          description: string
+          id: string
+          job_type: string
+          organization_id: string
+          quoted_amount: number | null
+          quoted_at: string | null
+          status: string
+          updated_at: string
+          updated_by: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          actual_amount?: number | null
+          approved_amount?: number | null
+          approved_at?: string | null
+          assigned_technician_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          customer_id?: string | null
+          description: string
+          id?: string
+          job_type: string
+          organization_id: string
+          quoted_amount?: number | null
+          quoted_at?: string | null
+          status?: string
+          updated_at?: string
+          updated_by: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          actual_amount?: number | null
+          approved_amount?: number | null
+          approved_at?: string | null
+          assigned_technician_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          customer_id?: string | null
+          description?: string
+          id?: string
+          job_type?: string
+          organization_id?: string
+          quoted_amount?: number | null
+          quoted_at?: string | null
+          status?: string
+          updated_at?: string
+          updated_by?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_repair_jobs_assigned_technician_id_fkey"
+            columns: ["assigned_technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_repair_jobs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_repair_jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_repair_jobs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_repair_jobs_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_repair_jobs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
+          auth_id: string | null
           city: string | null
           country: string | null
           created_at: string
@@ -281,6 +598,7 @@ export type Database = {
           email: string | null
           first_name: string
           id: string
+          last_login: string | null
           last_name: string
           lifetime_points: number | null
           loyalty_join_date: string | null
@@ -289,6 +607,7 @@ export type Database = {
           notes: string | null
           organization_id: string
           phone_number: string | null
+          portal_access_enabled: boolean | null
           postal_code: string | null
           state_province: string | null
           street_address: string | null
@@ -301,6 +620,7 @@ export type Database = {
           vehicle_year: string | null
         }
         Insert: {
+          auth_id?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
@@ -308,6 +628,7 @@ export type Database = {
           email?: string | null
           first_name: string
           id?: string
+          last_login?: string | null
           last_name: string
           lifetime_points?: number | null
           loyalty_join_date?: string | null
@@ -316,6 +637,7 @@ export type Database = {
           notes?: string | null
           organization_id: string
           phone_number?: string | null
+          portal_access_enabled?: boolean | null
           postal_code?: string | null
           state_province?: string | null
           street_address?: string | null
@@ -328,6 +650,7 @@ export type Database = {
           vehicle_year?: string | null
         }
         Update: {
+          auth_id?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
@@ -335,6 +658,7 @@ export type Database = {
           email?: string | null
           first_name?: string
           id?: string
+          last_login?: string | null
           last_name?: string
           lifetime_points?: number | null
           loyalty_join_date?: string | null
@@ -343,6 +667,7 @@ export type Database = {
           notes?: string | null
           organization_id?: string
           phone_number?: string | null
+          portal_access_enabled?: boolean | null
           postal_code?: string | null
           state_province?: string | null
           street_address?: string | null

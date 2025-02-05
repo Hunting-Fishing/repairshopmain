@@ -1,10 +1,10 @@
 
 import { useNavigate, useParams } from "react-router-dom";
-import { CustomerForm } from "@/components/customers/CustomerForm";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CustomerTabs } from "@/components/customers/CustomerTabs";
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -49,11 +49,13 @@ export default function CustomerDetail() {
 
   return (
     <div className="container mx-auto py-6">
-      <CustomerForm 
-        mode={id ? "edit" : "create"}
-        initialData={customer || undefined}
-        onSuccess={handleSuccess}
-      />
+      {customer && (
+        <CustomerTabs 
+          customerId={id!} 
+          customer={customer} 
+          onSuccess={handleSuccess}
+        />
+      )}
     </div>
   );
 }

@@ -40,8 +40,8 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
   const handleSubmit = async (values: FormValues) => {
     try {
       await onSubmit(values);
+      form.reset();
     } catch (error) {
-      // Error is handled by parent
       throw error;
     }
   };
@@ -127,19 +127,23 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
 
       if (error) throw error;
 
+      // First invalidate the query and wait for it to complete
       await queryClient.invalidateQueries({ queryKey: ['skill-categories-with-skills'] });
+      
+      // Then show success message
       toast.success("Skill category added successfully");
       
-      // Only close dialog after successful submission
+      // Finally close the dialog and reset state
+      setIsSubmitting(false);
       onOpenChange(false);
     } catch (error) {
       console.error('Error adding skill category:', error);
       toast.error("Failed to add skill category");
-    } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Prevent dialog from closing while submitting
   const handleClose = (value: boolean) => {
     if (!isSubmitting) {
       onOpenChange(value);
@@ -148,12 +152,18 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent onPointerDownOutside={(e) => {
-        // Prevent closing when submitting
-        if (isSubmitting) {
-          e.preventDefault();
-        }
-      }}>
+      <DialogContent
+        onEscapeKeyDown={(e) => {
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+        onInteractOutside={(e) => {
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Add Skill Category</DialogTitle>
         </DialogHeader>

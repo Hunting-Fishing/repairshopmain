@@ -102,7 +102,17 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
 export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const queryClient = useQueryClient();
+
+  // Reset states when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setIsSubmitting(false);
+      setHasError(false);
+      setRetryCount(0);
+    }
+  }, [open]);
 
   const handleSubmit = async (values: FormValues) => {
     if (isSubmitting) return;
@@ -134,6 +144,10 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
         }]);
 
       if (insertError) {
+        // Check for specific database errors
+        if (insertError.code === '23505') { // Unique violation
+          throw new Error('A category with this name already exists');
+        }
         throw insertError;
       }
 
@@ -147,7 +161,10 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
       // Ensure we're still mounted before updating state
       setIsSubmitting(false);
       setHasError(false);
-      onOpenChange(false);
+      setRetryCount(0);
+      
+      // Add a small delay before closing to ensure states are updated
+      setTimeout(() => onOpenChange(false), 100);
       
     } catch (error) {
       console.error('Error adding skill category:', error);
@@ -161,8 +178,15 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
         } else {
           toast.error("Failed to add skill category: " + error.message);
         }
+
+        // Increment retry count for non-auth/org errors
+        if (error.message !== 'Authentication required' && 
+            error.message !== 'Organization not found') {
+          setRetryCount(prev => prev + 1);
+        }
       } else {
         toast.error("An unexpected error occurred");
+        setRetryCount(prev => prev + 1);
       }
       
       setIsSubmitting(false);
@@ -177,6 +201,13 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
       onOpenChange(value);
     }
   };
+
+  // Show warning if multiple retries
+  useEffect(() => {
+    if (retryCount >= 3) {
+      toast.error("Multiple failures detected. Please try again later or contact support.");
+    }
+  }, [retryCount]);
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -196,7 +227,7 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
             e.preventDefault();
           }
         }}
-        className={hasError ? "border-red-500" : ""}
+        className={`transition-all duration-200 ${hasError ? "border-red-500" : ""}`}
       >
         <DialogHeader>
           <DialogTitle>Add Skill Category</DialogTitle>
@@ -206,6 +237,11 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
           onCancel={() => handleClose(false)} 
           isSubmitting={isSubmitting} 
         />
+        {hasError && retryCount >= 2 && (
+          <p className="text-sm text-red-500 mt-2">
+            Having trouble? Try refreshing the page or contact support if the issue persists.
+          </p>
+        )}
       </DialogContent>
     </Dialog>
   );

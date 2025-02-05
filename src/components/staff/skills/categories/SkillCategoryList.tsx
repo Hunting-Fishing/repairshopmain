@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -6,50 +7,101 @@ import { supabase } from "@/integrations/supabase/client";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { SkillCategoryCard } from "./SkillCategoryCard";
 import { AddSkillCategoryDialog } from "../AddSkillCategoryDialog";
+import { toast } from "sonner";
 import type { SkillCategory } from "../types";
 
 export function SkillCategoryList() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { data: categories, isLoading } = useQuery({
+  const { data: categories, isLoading, isError, error } = useQuery({
     queryKey: ['skill-categories-with-skills'],
     queryFn: async () => {
-      const { data: userProfile } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', (await supabase.auth.getSession()).data.session?.user.id)
-        .single();
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.user) {
+          throw new Error('Authentication required');
+        }
 
-      if (!userProfile?.organization_id) throw new Error('No organization found');
+        const { data: userProfile } = await supabase
+          .from('profiles')
+          .select('organization_id')
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-      const { data, error } = await supabase
-        .from('skill_categories')
-        .select(`
-          id,
-          name,
-          description,
-          skills (
+        if (!userProfile?.organization_id) {
+          throw new Error('Organization not found');
+        }
+
+        const { data, error } = await supabase
+          .from('skill_categories')
+          .select(`
             id,
             name,
-            description
-          )
-        `)
-        .eq('organization_id', userProfile.organization_id)
-        .order('name');
-      
-      if (error) throw error;
-      return data as SkillCategory[];
+            description,
+            skills (
+              id,
+              name,
+              description
+            )
+          `)
+          .eq('organization_id', userProfile.organization_id)
+          .order('name');
+        
+        if (error) throw error;
+        return data as SkillCategory[];
+      } catch (error) {
+        console.error('Error fetching skill categories:', error);
+        if (error instanceof Error) {
+          if (error.message === 'Authentication required') {
+            toast.error("Please sign in to view skill categories");
+          } else if (error.message === 'Organization not found') {
+            toast.error("Organization settings not found");
+          } else {
+            toast.error("Failed to load skill categories: " + error.message);
+          }
+        } else {
+          toast.error("An unexpected error occurred while loading categories");
+        }
+        throw error;
+      }
+    },
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    meta: {
+      errorMessage: "Failed to load skill categories"
     }
   });
+
+  const handleAddClick = () => {
+    try {
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error('Error opening dialog:', error);
+      toast.error("Failed to open add category dialog");
+    }
+  };
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
+  if (isError) {
+    return (
+      <div className="text-center py-4 text-red-500">
+        Failed to load skill categories. Please try again later.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Button onClick={() => setIsDialogOpen(true)} size="sm">
+        <Button 
+          onClick={handleAddClick} 
+          size="sm"
+          className="relative"
+          disabled={isDialogOpen} // Prevent double-clicks
+        >
           <Plus className="h-4 w-4 mr-2" />
           Add Category
         </Button>
@@ -64,7 +116,17 @@ export function SkillCategoryList() {
           </p>
         )}
       </div>
-      <AddSkillCategoryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      <AddSkillCategoryDialog 
+        open={isDialogOpen} 
+        onOpenChange={(open) => {
+          // Add a small delay when closing to ensure animations complete
+          if (!open) {
+            setTimeout(() => setIsDialogOpen(false), 100);
+          } else {
+            setIsDialogOpen(open);
+          }
+        }} 
+      />
     </div>
   );
 }

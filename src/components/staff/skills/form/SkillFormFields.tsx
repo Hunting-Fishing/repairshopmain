@@ -35,6 +35,7 @@ export function SkillFormFields() {
         .order('name');
       
       if (error) throw error;
+      console.log('Fetched categories with skills:', data); // Debug log
       return data as SkillCategory[];
     },
   });
@@ -50,6 +51,9 @@ export function SkillFormFields() {
       </div>
     );
   }
+
+  // Debug log to see what categories we're rendering
+  console.log('Rendering categories:', categories);
 
   return (
     <FormField

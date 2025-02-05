@@ -6,6 +6,7 @@ import { ShopList } from "@/components/shops/ShopList";
 import { OverviewTab } from "@/components/application-control/OverviewTab";
 import { IntegrationsTab } from "@/components/application-control/IntegrationsTab";
 import { InventoryTab } from "@/components/application-control/inventory/InventoryTab";
+import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
 
 export default function ApplicationControl() {
   return (
@@ -60,18 +61,7 @@ export default function ApplicationControl() {
             </TabsContent>
 
             <TabsContent value="communications">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Communications</CardTitle>
-                  <CardDescription>Manage chat rooms and communication settings</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {/* We'll implement the chat interface here in the next step */}
-                  <div className="text-muted-foreground">
-                    Chat functionality coming soon...
-                  </div>
-                </CardContent>
-              </Card>
+              <CommunicationsTab />
             </TabsContent>
 
             <TabsContent value="integrations">

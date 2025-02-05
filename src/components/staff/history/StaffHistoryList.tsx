@@ -12,6 +12,10 @@ import {
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+interface SettingsChange {
+  [key: string]: any;
+}
+
 export function StaffHistoryList() {
   const { data: history, isLoading } = useQuery({
     queryKey: ["staff-history"],
@@ -36,6 +40,31 @@ export function StaffHistoryList() {
       return data;
     },
   });
+
+  const getSettingsChangeDescription = (oldValue: string, newValue: string) => {
+    try {
+      const oldSettings: SettingsChange = oldValue ? JSON.parse(oldValue) : {};
+      const newSettings: SettingsChange = newValue ? JSON.parse(newValue) : {};
+      
+      const changes: string[] = [];
+      
+      // Check each setting for changes
+      if (oldSettings.showTechnicianWorkload !== newSettings.showTechnicianWorkload) {
+        changes.push(`Workload visibility ${newSettings.showTechnicianWorkload ? 'enabled' : 'disabled'}`);
+      }
+      if (oldSettings.showTechnicianAvailability !== newSettings.showTechnicianAvailability) {
+        changes.push(`Availability visibility ${newSettings.showTechnicianAvailability ? 'enabled' : 'disabled'}`);
+      }
+      if (oldSettings.showTechnicianStats !== newSettings.showTechnicianStats) {
+        changes.push(`Stats visibility ${newSettings.showTechnicianStats ? 'enabled' : 'disabled'}`);
+      }
+      
+      return changes.length > 0 ? changes.join(', ') : 'Settings were updated';
+    } catch (e) {
+      console.error('Error parsing settings:', e);
+      return 'Settings were updated';
+    }
+  };
 
   if (isLoading) {
     return <div>Loading history...</div>;
@@ -68,9 +97,9 @@ export function StaffHistoryList() {
               <TableCell>
                 {entry.entity_type === 'technician_settings' ? 'Settings Update' : entry.change_type}
               </TableCell>
-              <TableCell className="max-w-md truncate">
+              <TableCell className="max-w-md">
                 {entry.entity_type === 'technician_settings'
-                  ? 'Technician settings were updated'
+                  ? getSettingsChangeDescription(entry.old_value, entry.new_value)
                   : `${entry.field_name || 'Multiple fields'} was updated`}
               </TableCell>
             </TableRow>

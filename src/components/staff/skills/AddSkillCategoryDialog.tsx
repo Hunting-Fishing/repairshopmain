@@ -37,9 +37,19 @@ function CategoryForm({ onSubmit, onCancel, isSubmitting }: {
     },
   });
 
+  const handleSubmit = async (values: FormValues) => {
+    try {
+      await onSubmit(values);
+      form.reset();
+    } catch (error) {
+      // Let the parent component handle the error
+      throw error;
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -84,6 +94,8 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
   const queryClient = useQueryClient();
 
   const handleSubmit = async (values: FormValues) => {
+    if (isSubmitting) return;
+    
     try {
       setIsSubmitting(true);
       
@@ -112,7 +124,7 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
       if (error) throw error;
 
       toast.success("Skill category added successfully");
-      queryClient.invalidateQueries({ queryKey: ['skill-categories-with-skills'] });
+      await queryClient.invalidateQueries({ queryKey: ['skill-categories-with-skills'] });
       onOpenChange(false);
     } catch (error) {
       console.error('Error adding skill category:', error);
@@ -123,16 +135,22 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
   };
 
   const handleCancel = () => {
-    onOpenChange(false);
+    if (!isSubmitting) {
+      onOpenChange(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(value) => !isSubmitting && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Skill Category</DialogTitle>
         </DialogHeader>
-        <CategoryForm onSubmit={handleSubmit} onCancel={handleCancel} isSubmitting={isSubmitting} />
+        <CategoryForm 
+          onSubmit={handleSubmit} 
+          onCancel={handleCancel} 
+          isSubmitting={isSubmitting} 
+        />
       </DialogContent>
     </Dialog>
   );

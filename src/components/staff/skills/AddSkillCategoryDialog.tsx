@@ -36,8 +36,8 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
   });
 
   const onSubmit = async (values: FormValues) => {
-    setIsSubmitting(true);
     try {
+      setIsSubmitting(true);
       const { data: userProfile } = await supabase
         .from('profiles')
         .select('organization_id')
@@ -104,7 +104,14 @@ export function AddSkillCategoryDialog({ open, onOpenChange }: AddSkillCategoryD
               )}
             />
             <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  form.reset();
+                  onOpenChange(false);
+                }}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>

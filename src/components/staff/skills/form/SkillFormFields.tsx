@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useFormContext } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import type { Skill } from "../types";
 
 interface SkillFormFieldsProps {
@@ -12,7 +13,7 @@ interface SkillFormFieldsProps {
 export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
   const form = useFormContext();
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading } = useQuery({
     queryKey: ['skill-categories-with-skills'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -31,8 +32,19 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
       if (error) throw error;
       return data;
     },
-    enabled: !propSkills,
   });
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (!categories?.length) {
+    return (
+      <div className="text-sm text-muted-foreground p-4 text-center">
+        No skills found. Please add some skill categories and skills first.
+      </div>
+    );
+  }
 
   return (
     <FormField
@@ -48,19 +60,21 @@ export function SkillFormFields({ skills: propSkills }: SkillFormFieldsProps) {
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              {categories?.map((category) => (
-                <div key={category.id} className="mb-2">
-                  <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
-                    {category.name}
+              {categories.map((category) => (
+                category.skills && category.skills.length > 0 && (
+                  <div key={category.id} className="mb-2">
+                    <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
+                      {category.name}
+                    </div>
+                    {category.skills
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .map((skill) => (
+                        <SelectItem key={skill.id} value={skill.id}>
+                          {skill.name}
+                        </SelectItem>
+                      ))}
                   </div>
-                  {category.skills
-                    ?.sort((a, b) => a.name.localeCompare(b.name))
-                    .map((skill) => (
-                      <SelectItem key={skill.id} value={skill.id}>
-                        {skill.name}
-                      </SelectItem>
-                    ))}
-                </div>
+                )
               ))}
             </SelectContent>
           </Select>

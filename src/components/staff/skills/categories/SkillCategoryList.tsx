@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -48,15 +47,14 @@ export function SkillCategoryList() {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Skill Categories</CardTitle>
+    <div className="space-y-4">
+      <div className="flex justify-end">
         <Button onClick={() => setIsDialogOpen(true)} size="sm">
           <Plus className="h-4 w-4 mr-2" />
           Add Category
         </Button>
-      </CardHeader>
-      <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {categories?.map((category) => (
           <SkillCategoryCard key={category.id} category={category} />
         ))}
@@ -65,8 +63,8 @@ export function SkillCategoryList() {
             No skill categories found. Add one to get started.
           </p>
         )}
-      </CardContent>
+      </div>
       <AddSkillCategoryDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
-    </Card>
+    </div>
   );
 }

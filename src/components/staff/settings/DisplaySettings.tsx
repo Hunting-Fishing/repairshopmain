@@ -11,15 +11,13 @@ const DEFAULT_COLORS: [string, string] = ["#000000", "#FFD700"];
 export function DisplaySettings({ form }: FormSectionProps) {
   const [activeColorIndexes, setActiveColorIndexes] = useState<Record<string, 0 | 1>>({});
 
-  const handleColorSelect = (fieldName: string, colors: [string, string]) => {
-    form.setValue(`technicianColors.${fieldName}` as any, colors, {
-      shouldValidate: true,
-    });
+  const handleColorSelect = (fieldName: keyof TechnicianSettingsFormValues['technicianColors'], colors: [string, string]) => {
+    form.setValue(`technicianColors.${fieldName}`, colors);
   };
 
-  const getColorPair = (fieldName: string): [string, string] => {
+  const getColorPair = (fieldName: keyof TechnicianSettingsFormValues['technicianColors']): [string, string] => {
     const value = form.watch(`technicianColors.${fieldName}`);
-    return Array.isArray(value) ? value as [string, string] : DEFAULT_COLORS;
+    return Array.isArray(value) ? value : DEFAULT_COLORS;
   };
 
   return (
@@ -50,7 +48,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Shift Types</h5>
-              {["morningShift", "dayShift", "nightShift"].map((shift) => (
+              {(['morningShift', 'dayShift', 'nightShift'] as const).map((shift) => (
                 <div key={shift} className="flex items-center justify-between">
                   <FormLabel className="capitalize">
                     {shift.replace(/([A-Z])/g, ' $1').trim()}
@@ -60,7 +58,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
                     onColorSelect={(colors) => handleColorSelect(shift, colors)}
                     activeColorIndex={activeColorIndexes[shift] || 0}
                     onActiveColorChange={(index) => 
-                      setActiveColorIndexes(prev => ({ ...prev, [shift]: index }))
+                      setActiveColorIndexes(prev => ({ ...prev, [shift]: index as 0 | 1 }))
                     }
                   />
                 </div>
@@ -69,7 +67,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
             
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Roles</h5>
-              {["foreman", "apprentice", "certified"].map((role) => (
+              {(['foreman', 'apprentice', 'certified'] as const).map((role) => (
                 <div key={role} className="flex items-center justify-between">
                   <FormLabel className="capitalize">{role}</FormLabel>
                   <ColorPalette
@@ -77,7 +75,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
                     onColorSelect={(colors) => handleColorSelect(role, colors)}
                     activeColorIndex={activeColorIndexes[role] || 0}
                     onActiveColorChange={(index) => 
-                      setActiveColorIndexes(prev => ({ ...prev, [role]: index }))
+                      setActiveColorIndexes(prev => ({ ...prev, [role]: index as 0 | 1 }))
                     }
                   />
                 </div>
@@ -86,7 +84,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
 
             <div className="space-y-4">
               <h5 className="font-medium text-sm text-muted-foreground">Specialties</h5>
-              {["lube", "tires", "diagnostic", "general"].map((specialty) => (
+              {(['lube', 'tires', 'diagnostic', 'general'] as const).map((specialty) => (
                 <div key={specialty} className="flex items-center justify-between">
                   <FormLabel className="capitalize">{specialty}</FormLabel>
                   <ColorPalette
@@ -94,7 +92,7 @@ export function DisplaySettings({ form }: FormSectionProps) {
                     onColorSelect={(colors) => handleColorSelect(specialty, colors)}
                     activeColorIndex={activeColorIndexes[specialty] || 0}
                     onActiveColorChange={(index) => 
-                      setActiveColorIndexes(prev => ({ ...prev, [specialty]: index }))
+                      setActiveColorIndexes(prev => ({ ...prev, [specialty]: index as 0 | 1 }))
                     }
                   />
                 </div>

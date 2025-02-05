@@ -10,7 +10,7 @@ interface TimeSlotContentProps {
 }
 
 export function TimeSlotContent({ slot, isPast, pastColors }: TimeSlotContentProps) {
-  const [primaryColor, secondaryColor] = pastColors;
+  const [primaryColor] = pastColors;
   
   return (
     <>

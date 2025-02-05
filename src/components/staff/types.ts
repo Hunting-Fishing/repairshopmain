@@ -4,6 +4,21 @@ import { UseFormReturn } from "react-hook-form";
 
 const colorPairSchema = z.tuple([z.string(), z.string()]);
 
+type ColorPair = [string, string];
+
+interface TechnicianColors {
+  morningShift: ColorPair;
+  dayShift: ColorPair;
+  nightShift: ColorPair;
+  foreman: ColorPair;
+  apprentice: ColorPair;
+  certified: ColorPair;
+  lube: ColorPair;
+  tires: ColorPair;
+  diagnostic: ColorPair;
+  general: ColorPair;
+}
+
 export const technicianSettingsFormSchema = z.object({
   showTechnicianWorkload: z.boolean(),
   showTechnicianAvailability: z.boolean(),
@@ -26,12 +41,12 @@ export const technicianSettingsFormSchema = z.object({
     nightShift: colorPairSchema,
     foreman: colorPairSchema,
     apprentice: colorPairSchema,
+    certified: colorPairSchema,
     lube: colorPairSchema,
     tires: colorPairSchema,
-    certified: colorPairSchema,
     diagnostic: colorPairSchema,
     general: colorPairSchema,
-  }).optional(),
+  }),
 });
 
 export type TechnicianSettingsFormValues = z.infer<typeof technicianSettingsFormSchema>;

@@ -9,6 +9,7 @@ import { SkillAssessmentDialog } from "../SkillAssessmentDialog";
 import { SkillAssessmentCard } from "./SkillAssessmentCard";
 import type { SkillAssessment } from "../types";
 import { toast } from "@/hooks/use-toast";
+import { getProficiencyColor, getProficiencyLabel } from "../types";
 
 interface SkillAssessmentDashboardProps {
   profileId?: string;
@@ -97,6 +98,8 @@ export function SkillAssessmentDashboard({ profileId }: SkillAssessmentDashboard
             <SkillAssessmentCard
               key={assessment.id}
               assessment={assessment}
+              getProficiencyColor={getProficiencyColor}
+              getProficiencyLabel={getProficiencyLabel}
             />
           ))}
           {!assessments?.length && (

@@ -1,3 +1,4 @@
+
 import { Settings2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,6 +35,7 @@ export default function ApplicationControl() {
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="shops">Shops</TabsTrigger>
               <TabsTrigger value="inventory">Inventory</TabsTrigger>
+              <TabsTrigger value="communications">Communications</TabsTrigger>
               <TabsTrigger value="integrations">Integrations</TabsTrigger>
             </TabsList>
             
@@ -55,6 +57,21 @@ export default function ApplicationControl() {
 
             <TabsContent value="inventory">
               <InventoryTab />
+            </TabsContent>
+
+            <TabsContent value="communications">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Communications</CardTitle>
+                  <CardDescription>Manage chat rooms and communication settings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {/* We'll implement the chat interface here in the next step */}
+                  <div className="text-muted-foreground">
+                    Chat functionality coming soon...
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="integrations">

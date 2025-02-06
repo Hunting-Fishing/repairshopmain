@@ -1,58 +1,20 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, Eye } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { StorageFileViewer } from "./StorageFileViewer";
+import { BucketsList } from "./components/BucketsList";
+import { FilesList } from "./components/FilesList";
+import { useStorageBuckets } from "./hooks/useStorageBuckets";
 
 export function StorageBucketsTab() {
   const [selectedBucket, setSelectedBucket] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
-
-  const { data: buckets, isLoading, error } = useQuery({
-    queryKey: ['storage-buckets'],
-    queryFn: async () => {
-      try {
-        console.log('Fetching storage buckets...');
-        const { data, error } = await supabase
-          .storage
-          .listBuckets();
-        
-        if (error) {
-          console.error('Error fetching buckets:', error);
-          throw error;
-        }
-        
-        console.log('Raw buckets response:', data);
-        console.log('User session:', await supabase.auth.getSession());
-        return data || [];
-      } catch (err) {
-        console.error('Unexpected error:', err);
-        throw err;
-      }
-    },
-  });
-
-  const { data: files, isLoading: isLoadingFiles } = useQuery({
-    queryKey: ['storage-files', selectedBucket],
-    queryFn: async () => {
-      if (!selectedBucket) return null;
-      
-      const { data, error } = await supabase
-        .storage
-        .from(selectedBucket)
-        .list();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!selectedBucket,
-  });
+  const { error } = useStorageBuckets();
 
   if (error) {
     return (
@@ -85,40 +47,7 @@ export function StorageBucketsTab() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">Loading buckets...</TableCell>
-                  </TableRow>
-                ) : !buckets || buckets.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">
-                      No storage buckets found. This might be due to missing permissions or no buckets exist.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  buckets.map((bucket) => (
-                    <TableRow key={bucket.id}>
-                      <TableCell className="font-medium">{bucket.name}</TableCell>
-                      <TableCell>{new Date(bucket.created_at).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${bucket.public ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {bucket.public ? "Public" : "Private"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setSelectedBucket(bucket.id)}
-                          className="flex items-center gap-2"
-                        >
-                          <Eye className="h-4 w-4" />
-                          View Files
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
+                <BucketsList onSelectBucket={setSelectedBucket} />
               </TableBody>
             </Table>
           </ScrollArea>
@@ -151,35 +80,10 @@ export function StorageBucketsTab() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {isLoadingFiles ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center">Loading files...</TableCell>
-                    </TableRow>
-                  ) : !files || files.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center text-muted-foreground">
-                        No files found in this bucket.
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    files.map((file) => (
-                      <TableRow key={file.name}>
-                        <TableCell>{file.name}</TableCell>
-                        <TableCell>{formatFileSize(file.metadata?.size)}</TableCell>
-                        <TableCell>{new Date(file.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedFile(file.name)}
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                  <FilesList 
+                    bucketId={selectedBucket}
+                    onSelectFile={setSelectedFile}
+                  />
                 </TableBody>
               </Table>
             </ScrollArea>
@@ -196,12 +100,4 @@ export function StorageBucketsTab() {
       )}
     </div>
   );
-}
-
-function formatFileSize(bytes?: number) {
-  if (!bytes) return "N/A";
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  if (bytes === 0) return '0 Byte';
-  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)).toString());
-  return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
 }

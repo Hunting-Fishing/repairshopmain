@@ -23,13 +23,12 @@ export function ChatRoomList({ selectedRoomId, onSelectRoom, filter }: ChatRoomL
 
   const formatRoomName = (room: any) => {
     if (room.room_type === 'direct') {
-      // Find the other participant in the chat (not the current user)
       const otherParticipant = room.participants?.find(
         (p: any) => p.user_id !== user?.id
-      )?.profiles;
+      );
       
-      if (otherParticipant) {
-        return `Chat with ${otherParticipant.first_name} ${otherParticipant.last_name}`;
+      if (otherParticipant?.profiles) {
+        return `Chat with ${otherParticipant.profiles.first_name} ${otherParticipant.profiles.last_name}`;
       }
       
       return room.name || "Direct Message";

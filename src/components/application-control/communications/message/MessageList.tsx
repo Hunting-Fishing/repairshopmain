@@ -25,6 +25,7 @@ export function MessageList({ messages }: MessageListProps) {
         {messages.map((message) => (
           <MessageItem
             key={message.id}
+            id={message.id}
             content={message.content}
             content_type={message.content_type}
             metadata={message.metadata}

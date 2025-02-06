@@ -1,27 +1,10 @@
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { NewWorkOrderDialog } from "@/components/work-orders/NewWorkOrderDialog";
-import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-
-interface WorkOrder {
-  id: string;
-  customer: string;
-  vehicle: string;
-  description: string;
-  status: string;
-  date: string;
-}
+import { WorkOrderTable } from "@/components/work-orders/WorkOrderTable";
+import { WorkOrderHeader } from "@/components/work-orders/WorkOrderHeader";
+import { WorkOrderFilters } from "@/components/work-orders/WorkOrderFilters";
 
 interface DatabaseWorkOrder {
   id: string;
@@ -41,13 +24,21 @@ interface DatabaseWorkOrder {
   } | null;
 }
 
+interface WorkOrder {
+  id: string;
+  customer: string;
+  vehicle: string;
+  description: string;
+  status: string;
+  date: string;
+}
+
 export default function WorkOrders() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  // Function to fetch work orders
   const fetchWorkOrders = async () => {
     try {
       const { data, error } = await supabase
@@ -96,12 +87,10 @@ export default function WorkOrders() {
     }
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchWorkOrders();
   }, [toast]);
 
-  // Real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel('work-orders-changes')
@@ -114,9 +103,8 @@ export default function WorkOrders() {
         },
         (payload) => {
           console.log('Work order change detected:', payload);
-          fetchWorkOrders(); // Refresh the list when changes occur
+          fetchWorkOrders();
           
-          // Show toast notification for new work orders
           if (payload.eventType === 'INSERT') {
             toast({
               title: "New Work Order",
@@ -132,81 +120,12 @@ export default function WorkOrders() {
     };
   }, [toast]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "in-progress":
-        return "bg-blue-100 text-blue-800";
-      case "completed":
-        return "bg-green-100 text-green-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Work Orders</h1>
-          <p className="text-muted-foreground">
-            Manage repair jobs and track progress
-          </p>
-        </div>
-        <NewWorkOrderDialog />
-      </div>
-
+      <WorkOrderHeader />
       <div className="flex flex-col gap-4">
-        <CustomerSearchCommand 
-          onSelect={setSelectedCustomerId}
-          className="max-w-2xl"
-        />
-
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    Loading work orders...
-                  </TableCell>
-                </TableRow>
-              ) : workOrders.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
-                    No work orders found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                workOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">{order.id}</TableCell>
-                    <TableCell>{order.customer}</TableCell>
-                    <TableCell>{order.vehicle}</TableCell>
-                    <TableCell>{order.description}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className={getStatusColor(order.status)}>
-                        {order.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{order.date}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <WorkOrderFilters onCustomerSelect={setSelectedCustomerId} />
+        <WorkOrderTable workOrders={workOrders} isLoading={isLoading} />
       </div>
     </div>
   );

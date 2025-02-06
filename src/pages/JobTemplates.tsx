@@ -5,6 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { parse } from 'papaparse';
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
 
 interface JobTemplate {
   id: string;
@@ -39,7 +47,7 @@ export default function JobTemplates() {
       // Parse CSV
       return new Promise<JobTemplate[]>((resolve, reject) => {
         parse(text, {
-          header: false, // Changed to false since we're handling columns manually
+          header: false,
           complete: (results) => {
             const templates: JobTemplate[] = [];
             const rows = results.data;
@@ -49,27 +57,44 @@ export default function JobTemplates() {
               const row = rows[i] as string[];
               if (!row[0]) continue; // Skip empty rows
 
-              // Column A is MAIN category, Column B (*00) is subcategory
+              // Column A is MAIN category
+              const mainCategory = row[0];
+              
+              // Add main category item
               templates.push({
-                id: i.toString(),
-                name: row[0] || 'Unnamed Template',
-                description: row[1] || null,
+                id: `main-${i}`,
+                name: mainCategory,
+                description: null,
                 category: 'MAIN',
-                subcategory: row[1] || null, // *00 column
-                estimated_hours: 1, // Default to 1 hour if not specified
+                subcategory: null,
+                estimated_hours: 1,
                 parts_required: [],
                 is_active: true
               });
 
-              // Add subcategories (columns *01 to *15) if they exist
+              // Column B (*00) is subcategory
+              if (row[1]) {
+                templates.push({
+                  id: `sub-${i}`,
+                  name: row[1],
+                  description: null,
+                  category: mainCategory,
+                  subcategory: '*00',
+                  estimated_hours: 1,
+                  parts_required: [],
+                  is_active: true
+                });
+              }
+
+              // Add items from columns *01 to *15
               for (let j = 2; j < row.length; j++) {
                 if (row[j]) {
                   templates.push({
                     id: `${i}-${j}`,
                     name: row[j],
                     description: null,
-                    category: row[0], // Parent category
-                    subcategory: row[1], // *00 as subcategory
+                    category: mainCategory,
+                    subcategory: `*${String(j-1).padStart(2, '0')}`,
                     estimated_hours: 1,
                     parts_required: [],
                     is_active: true
@@ -88,6 +113,20 @@ export default function JobTemplates() {
       });
     },
   });
+
+  // Group templates by category and subcategory
+  const groupedTemplates = templates?.reduce((acc, template) => {
+    if (!acc[template.category]) {
+      acc[template.category] = {};
+    }
+    if (template.subcategory) {
+      if (!acc[template.category][template.subcategory]) {
+        acc[template.category][template.subcategory] = [];
+      }
+      acc[template.category][template.subcategory].push(template);
+    }
+    return acc;
+  }, {} as Record<string, Record<string, JobTemplate[]>>);
 
   if (isLoading) {
     return (
@@ -113,40 +152,26 @@ export default function JobTemplates() {
           <CardTitle>Templates Library</CardTitle>
         </CardHeader>
         <CardContent>
-          {templates?.length === 0 ? (
-            <p className="text-muted-foreground">No job templates found.</p>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {templates?.map((template) => (
-                <Card key={template.id}>
-                  <CardHeader>
-                    <CardTitle className="text-lg">{template.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {template.description}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">Category:</span>
-                      <span className="capitalize">{template.category.toLowerCase()}</span>
-                    </div>
-                    {template.subcategory && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium">Subcategory:</span>
-                        <span className="capitalize">{template.subcategory}</span>
-                      </div>
-                    )}
-                    {template.estimated_hours && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium">Estimated Hours:</span>
-                        <span>{template.estimated_hours}</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          <div className="flex flex-wrap gap-4">
+            {groupedTemplates && Object.entries(groupedTemplates).map(([category, subcategories]) => (
+              <DropdownMenu key={category}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-[200px]">
+                    {category} <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-[200px]">
+                  {Object.entries(subcategories).map(([subcategory, items]) => (
+                    items.map((item) => (
+                      <DropdownMenuItem key={item.id}>
+                        {item.name}
+                      </DropdownMenuItem>
+                    ))
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

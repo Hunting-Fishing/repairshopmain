@@ -31,6 +31,7 @@ export function CreateChatRoomDialog() {
   const [enableNotifications, setEnableNotifications] = useState(true);
   const [maxParticipants, setMaxParticipants] = useState<string>("");
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
+  const [workOrderId, setWorkOrderId] = useState<string>("");
   const { toast } = useToast();
   const { data: staffMembers } = useStaffMembers();
 
@@ -39,8 +40,53 @@ export function CreateChatRoomDialog() {
     value: staff.id
   })) || [];
 
+  const validateForm = () => {
+    if (roomType === 'direct' && selectedStaffIds.length !== 1) {
+      toast({
+        title: "Validation Error",
+        description: "Direct messages must have exactly one participant selected",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (roomType === 'work_order' && !workOrderId) {
+      toast({
+        title: "Validation Error",
+        description: "Work order chats must be connected to a work order",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Chat room name is required",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!type) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a category",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -48,6 +94,7 @@ export function CreateChatRoomDialog() {
         description,
         maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
         enableNotifications,
+        workOrderId: roomType === 'work_order' ? workOrderId : null,
       };
 
       // First create the chat room
@@ -59,12 +106,15 @@ export function CreateChatRoomDialog() {
           room_type: roomType,
           category: roomType === 'work_order' ? 'work-order' : 'general',
           is_private: isPrivate,
-          metadata
+          metadata,
+          work_order_id: roomType === 'work_order' ? workOrderId : null
         }])
         .select()
         .single();
 
-      if (roomError) throw roomError;
+      if (roomError) {
+        throw roomError;
+      }
 
       // Then add the selected participants
       if (selectedStaffIds.length > 0 && roomData) {
@@ -77,7 +127,11 @@ export function CreateChatRoomDialog() {
           .from("chat_participants")
           .insert(participantsToInsert);
 
-        if (participantError) throw participantError;
+        if (participantError) {
+          // If this fails, we should clean up the room we just created
+          await supabase.from("chat_rooms").delete().eq("id", roomData.id);
+          throw participantError;
+        }
       }
 
       toast({
@@ -86,12 +140,20 @@ export function CreateChatRoomDialog() {
       });
       setOpen(false);
       resetForm();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create chat room",
-        variant: "destructive",
-      });
+    } catch (error: any) {
+      if (error?.message?.includes('direct chat already exists')) {
+        toast({
+          title: "Error",
+          description: "A direct chat already exists with this user in this category",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to create chat room",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -106,6 +168,7 @@ export function CreateChatRoomDialog() {
     setEnableNotifications(true);
     setMaxParticipants("");
     setSelectedStaffIds([]);
+    setWorkOrderId("");
   };
 
   return (

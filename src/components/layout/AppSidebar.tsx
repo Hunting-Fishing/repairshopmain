@@ -17,14 +17,13 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-const menuItems = [
+const getBaseMenuItems = () => [
   { title: "Dashboard", icon: Home, path: "/" },
   { title: "Customers", icon: Users, path: "/customers" },
   { title: "Work Orders", icon: ClipboardList, path: "/work-orders" },
   { title: "Vehicles", icon: Car, path: "/vehicles" },
   { title: "Inventory", icon: Package, path: "/inventory" },
   { title: "Staff", icon: UserCog, path: "/staff" },
-  { title: "Application Control", icon: Settings2, path: "/application-control" },
 ];
 
 export function AppSidebar() {
@@ -45,6 +44,14 @@ export function AppSidebar() {
       return profile;
     }
   });
+
+  // Get menu items based on user role
+  const menuItems = [
+    ...getBaseMenuItems(),
+    ...(userProfile?.role === 'owner' || userProfile?.role === 'management' 
+      ? [{ title: "Application Control", icon: Settings2, path: "/application-control" }] 
+      : [])
+  ];
 
   useEffect(() => {
     // Subscribe to new messages

@@ -7,8 +7,34 @@ import { OverviewTab } from "@/components/application-control/OverviewTab";
 import { IntegrationsTab } from "@/components/application-control/IntegrationsTab";
 import { InventoryTab } from "@/components/application-control/inventory/InventoryTab";
 import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Navigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function ApplicationControl() {
+  const { data: userProfile } = useQuery({
+    queryKey: ['current-user-profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+        
+      return profile;
+    }
+  });
+
+  // Additional component-level protection
+  if (userProfile && !['owner', 'management'].includes(userProfile.role)) {
+    toast.error("You don't have permission to access this page");
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <div className="space-y-4">
       <Card className="border-none shadow-none bg-transparent">

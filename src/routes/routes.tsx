@@ -15,6 +15,7 @@ import Inventory from "@/pages/Inventory";
 import { InventorySuppliers } from "@/components/application-control/inventory/InventorySuppliers";
 import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
 import { SetPassword } from "@/pages/SetPassword";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -55,11 +56,17 @@ export const router = createBrowserRouter([
       },
       {
         path: "application-control",
-        element: <ApplicationControl />,
-      },
-      {
-        path: "application-control/communications",
-        element: <CommunicationsTab />,
+        element: <ProtectedRoute allowedRoles={['owner', 'management']} />,
+        children: [
+          {
+            index: true,
+            element: <ApplicationControl />,
+          },
+          {
+            path: "communications",
+            element: <CommunicationsTab />,
+          },
+        ],
       },
       {
         path: "inventory",

@@ -11,7 +11,7 @@ import { Vehicle } from "./types";
 import { cn } from "@/lib/utils";
 
 interface VehicleListProps {
-  customerId: string;
+  customerId?: string;
   onVehicleSelect?: (vehicle: Vehicle | null) => void;
   selectedVehicle: Vehicle | null;
 }
@@ -24,10 +24,13 @@ export const VehicleList = ({ customerId, onVehicleSelect, selectedVehicle }: Ve
   const { data: vehicles, isLoading } = useQuery({
     queryKey: ["vehicles", customerId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("vehicles")
-        .select("*")
-        .eq("customer_id", customerId);
+      let query = supabase.from("vehicles").select("*");
+      
+      if (customerId) {
+        query = query.eq("customer_id", customerId);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       return data as Vehicle[];
@@ -52,7 +55,9 @@ export const VehicleList = ({ customerId, onVehicleSelect, selectedVehicle }: Ve
     return (
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>No vehicles found for this customer.</AlertDescription>
+        <AlertDescription>
+          {customerId ? "No vehicles found for this customer." : "No vehicles found."}
+        </AlertDescription>
       </Alert>
     );
   }

@@ -17,6 +17,7 @@ import { CommunicationsTab } from "@/components/application-control/communicatio
 import { SetPassword } from "@/pages/SetPassword";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { ShopList } from "@/components/shops/ShopList";
+import { VehicleList } from "@/components/customers/vehicles/VehicleList";
 
 export const router = createBrowserRouter([
   {
@@ -52,17 +53,24 @@ export const router = createBrowserRouter([
         element: <Staff />,
       },
       {
+        path: "vehicles",
+        element: <VehicleList />,
+      },
+      {
         path: "work-orders",
         element: <WorkOrders />,
       },
-      // Redirect /shops to /application-control/shops
       {
         path: "shops",
         element: <Navigate to="/application-control/shops" replace />,
       },
       {
+        path: "communications",
+        element: <CommunicationsTab />,
+      },
+      {
         path: "application-control",
-        element: <ProtectedRoute allowedRoles={['owner', 'management']} />,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']} />,
         children: [
           {
             index: true,

@@ -47,56 +47,89 @@ export default function WorkOrders() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    async function fetchWorkOrders() {
-      try {
-        const { data, error } = await supabase
-          .from('customer_repair_jobs')
-          .select(`
-            id,
-            description,
-            status,
-            created_at,
-            customer_id,
-            vehicle_id,
-            customers:customer_id (
-              first_name,
-              last_name
-            ),
-            vehicles:vehicle_id (
-              make,
-              model,
-              year
-            )
-          `)
-          .order('created_at', { ascending: false })
-          .returns<DatabaseWorkOrder[]>();
+  // Function to fetch work orders
+  const fetchWorkOrders = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('customer_repair_jobs')
+        .select(`
+          id,
+          description,
+          status,
+          created_at,
+          customer_id,
+          vehicle_id,
+          customers:customer_id (
+            first_name,
+            last_name
+          ),
+          vehicles:vehicle_id (
+            make,
+            model,
+            year
+          )
+        `)
+        .order('created_at', { ascending: false })
+        .returns<DatabaseWorkOrder[]>();
 
-        if (error) throw error;
+      if (error) throw error;
 
-        const formattedOrders = data.map(order => ({
-          id: order.id,
-          customer: order.customers ? `${order.customers.first_name} ${order.customers.last_name}` : 'N/A',
-          vehicle: order.vehicles ? `${order.vehicles.year} ${order.vehicles.make} ${order.vehicles.model}` : 'N/A',
-          description: order.description,
-          status: order.status,
-          date: new Date(order.created_at).toISOString().split('T')[0]
-        }));
+      const formattedOrders = data.map(order => ({
+        id: order.id,
+        customer: order.customers ? `${order.customers.first_name} ${order.customers.last_name}` : 'N/A',
+        vehicle: order.vehicles ? `${order.vehicles.year} ${order.vehicles.make} ${order.vehicles.model}` : 'N/A',
+        description: order.description,
+        status: order.status,
+        date: new Date(order.created_at).toISOString().split('T')[0]
+      }));
 
-        setWorkOrders(formattedOrders);
-      } catch (error) {
-        console.error('Error fetching work orders:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load work orders",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
+      setWorkOrders(formattedOrders);
+    } catch (error) {
+      console.error('Error fetching work orders:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load work orders",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  // Initial fetch
+  useEffect(() => {
     fetchWorkOrders();
+  }, [toast]);
+
+  // Real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('work-orders-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'customer_repair_jobs'
+        },
+        (payload) => {
+          console.log('Work order change detected:', payload);
+          fetchWorkOrders(); // Refresh the list when changes occur
+          
+          // Show toast notification for new work orders
+          if (payload.eventType === 'INSERT') {
+            toast({
+              title: "New Work Order",
+              description: "A new work order has been created",
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [toast]);
 
   const getStatusColor = (status: string) => {

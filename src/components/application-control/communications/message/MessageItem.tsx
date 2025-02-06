@@ -5,9 +5,27 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
+  DropdownMenuSeparator,
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Download, Eye, Share2, FileIcon } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { 
+  MoreVertical, 
+  Download, 
+  Eye, 
+  Share2, 
+  FileIcon, 
+  Forward,
+  Save,
+  Send,
+  UserCircle2,
+  MessageSquare,
+  Users 
+} from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MessageItemProps {
   content: string;
@@ -21,23 +39,99 @@ interface MessageItemProps {
     last_name?: string;
   };
   created_at: string;
+  id: string;
 }
 
-export function MessageItem({ content, content_type, metadata, sender, created_at }: MessageItemProps) {
+export function MessageItem({ id, content, content_type, metadata, sender, created_at }: MessageItemProps) {
+  const [isForwardDialogOpen, setIsForwardDialogOpen] = useState(false);
+  const [workOrderId, setWorkOrderId] = useState("");
+  const { toast } = useToast();
+
   const handleDownload = async () => {
     if (metadata?.url) {
       const link = document.createElement('a');
       link.href = metadata.url;
-      link.download = content; // Use original filename
+      link.download = content;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      toast({
+        title: "Success",
+        description: "File downloaded successfully",
+      });
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (metadata?.url) {
-      navigator.clipboard.writeText(metadata.url);
+      await navigator.clipboard.writeText(metadata.url);
+      toast({
+        title: "Success",
+        description: "Link copied to clipboard",
+      });
+    }
+  };
+
+  const handleSaveToWorkOrder = async () => {
+    if (!workOrderId.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a work order number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("work_order_attachments")
+        .insert({
+          work_order_id: workOrderId,
+          file_url: metadata?.url,
+          file_name: content,
+          original_message_id: id,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `File saved to work order #${workOrderId}`,
+      });
+      setWorkOrderId("");
+      setIsForwardDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save to work order",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveToCustomerFile = async () => {
+    try {
+      const { error } = await supabase
+        .from("customer_attachments")
+        .insert({
+          file_url: metadata?.url,
+          file_name: content,
+          original_message_id: id,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "File saved to customer records",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save to customer records",
+        variant: "destructive",
+      });
     }
   };
 
@@ -75,6 +169,57 @@ export function MessageItem({ content, content_type, metadata, sender, created_a
                       <Share2 className="mr-2 h-4 w-4" />
                       Copy Link
                     </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <Dialog open={isForwardDialogOpen} onOpenChange={setIsForwardDialogOpen}>
+                      <DialogTrigger asChild>
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                          <Forward className="mr-2 h-4 w-4" />
+                          Forward
+                        </DropdownMenuItem>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Forward File</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 mt-4">
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Send to Work Order</h4>
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="Enter Work Order #"
+                                value={workOrderId}
+                                onChange={(e) => setWorkOrderId(e.target.value)}
+                              />
+                              <Button onClick={handleSaveToWorkOrder}>
+                                <Send className="h-4 w-4 mr-2" />
+                                Send
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Forward to:</h4>
+                            <div className="space-y-2">
+                              <Button variant="outline" className="w-full justify-start" onClick={handleSaveToCustomerFile}>
+                                <UserCircle2 className="mr-2 h-4 w-4" />
+                                Customer File
+                              </Button>
+                              <Button variant="outline" className="w-full justify-start">
+                                <MessageSquare className="mr-2 h-4 w-4" />
+                                Other Chat
+                              </Button>
+                              <Button variant="outline" className="w-full justify-start">
+                                <Users className="mr-2 h-4 w-4" />
+                                Group
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                    <DropdownMenuItem onClick={handleSaveToCustomerFile}>
+                      <Save className="mr-2 h-4 w-4" />
+                      Save to Customer File
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
@@ -94,7 +239,7 @@ export function MessageItem({ content, content_type, metadata, sender, created_a
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => window.open(metadata?.url, '_blank')}>
                     <Eye className="mr-2 h-4 w-4" />
                     View
@@ -106,6 +251,57 @@ export function MessageItem({ content, content_type, metadata, sender, created_a
                   <DropdownMenuItem onClick={handleShare}>
                     <Share2 className="mr-2 h-4 w-4" />
                     Copy Link
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                        <Forward className="mr-2 h-4 w-4" />
+                        Forward
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Forward File</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 mt-4">
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Send to Work Order</h4>
+                          <div className="flex gap-2">
+                            <Input
+                              placeholder="Enter Work Order #"
+                              value={workOrderId}
+                              onChange={(e) => setWorkOrderId(e.target.value)}
+                            />
+                            <Button onClick={handleSaveToWorkOrder}>
+                              <Send className="h-4 w-4 mr-2" />
+                              Send
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">Forward to:</h4>
+                          <div className="space-y-2">
+                            <Button variant="outline" className="w-full justify-start" onClick={handleSaveToCustomerFile}>
+                              <UserCircle2 className="mr-2 h-4 w-4" />
+                              Customer File
+                            </Button>
+                            <Button variant="outline" className="w-full justify-start">
+                              <MessageSquare className="mr-2 h-4 w-4" />
+                              Other Chat
+                            </Button>
+                            <Button variant="outline" className="w-full justify-start">
+                              <Users className="mr-2 h-4 w-4" />
+                              Group
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <DropdownMenuItem onClick={handleSaveToCustomerFile}>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save to Customer File
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

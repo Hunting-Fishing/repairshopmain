@@ -29,7 +29,6 @@ export default function JobTemplates() {
   const { data: templates, isLoading } = useQuery({
     queryKey: ['job-templates-csv'],
     queryFn: async () => {
-      // First get the CSV file from storage
       const { data: fileData, error: fileError } = await supabase
         .storage
         .from('RTDATA')
@@ -41,68 +40,57 @@ export default function JobTemplates() {
         throw fileError;
       }
 
-      // Convert the blob to text
       const text = await fileData.text();
       
-      // Parse CSV
-      return new Promise<JobTemplate[]>((resolve, reject) => {
+      return new Promise<Record<string, string[]>>((resolve, reject) => {
         parse(text, {
           header: false,
           complete: (results) => {
-            const templates: JobTemplate[] = [];
+            const columns: Record<string, string[]> = {
+              'MAIN': [],
+              '*00': [],
+              '*01': [],
+              '*02': [],
+              '*03': [],
+              '*04': [],
+              '*05': [],
+              '*06': [],
+              '*07': [],
+              '*08': [],
+              '*09': [],
+              '*10': [],
+              '*11': [],
+              '*12': [],
+              '*13': [],
+              '*14': [],
+              '*15': []
+            };
+
+            // Start from row 2 (index 1) and go up to row 50 or end of data
             const rows = results.data;
+            const maxRow = Math.min(50, rows.length);
 
-            // Skip header row if present
-            for (let i = 1; i < rows.length; i++) {
+            for (let i = 1; i < maxRow; i++) {
               const row = rows[i] as string[];
-              if (!row[0]) continue; // Skip empty rows
+              if (!row) continue;
 
-              // Column A is MAIN category
-              const mainCategory = row[0];
-              
-              // Add main category item
-              templates.push({
-                id: `main-${i}`,
-                name: mainCategory,
-                description: null,
-                category: 'MAIN',
-                subcategory: null,
-                estimated_hours: 1,
-                parts_required: [],
-                is_active: true
-              });
-
-              // Column B (*00) is subcategory
-              if (row[1]) {
-                templates.push({
-                  id: `sub-${i}`,
-                  name: row[1],
-                  description: null,
-                  category: mainCategory,
-                  subcategory: '*00',
-                  estimated_hours: 1,
-                  parts_required: [],
-                  is_active: true
-                });
-              }
-
-              // Add items from columns *01 to *15
-              for (let j = 2; j < row.length; j++) {
-                if (row[j]) {
-                  templates.push({
-                    id: `${i}-${j}`,
-                    name: row[j],
-                    description: null,
-                    category: mainCategory,
-                    subcategory: `*${String(j-1).padStart(2, '0')}`,
-                    estimated_hours: 1,
-                    parts_required: [],
-                    is_active: true
-                  });
+              // Process each column
+              row.forEach((value, colIndex) => {
+                if (value && value.trim()) {
+                  if (colIndex === 0) {
+                    columns['MAIN'].push(value.trim());
+                  } else if (colIndex === 1) {
+                    columns['*00'].push(value.trim());
+                  } else if (colIndex >= 2 && colIndex <= 16) {
+                    // Columns C through Q map to *01 through *15
+                    const key = `*${String(colIndex - 1).padStart(2, '0')}`;
+                    columns[key].push(value.trim());
+                  }
                 }
-              }
+              });
             }
-            resolve(templates);
+            
+            resolve(columns);
           },
           error: (error) => {
             console.error('CSV parsing error:', error);
@@ -113,20 +101,6 @@ export default function JobTemplates() {
       });
     },
   });
-
-  // Group templates by category and subcategory
-  const groupedTemplates = templates?.reduce((acc, template) => {
-    if (!acc[template.category]) {
-      acc[template.category] = {};
-    }
-    if (template.subcategory) {
-      if (!acc[template.category][template.subcategory]) {
-        acc[template.category][template.subcategory] = [];
-      }
-      acc[template.category][template.subcategory].push(template);
-    }
-    return acc;
-  }, {} as Record<string, Record<string, JobTemplate[]>>);
 
   if (isLoading) {
     return (
@@ -153,20 +127,18 @@ export default function JobTemplates() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-4">
-            {groupedTemplates && Object.entries(groupedTemplates).map(([category, subcategories]) => (
+            {templates && Object.entries(templates).map(([category, items]) => (
               <DropdownMenu key={category}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-[200px]">
                     {category} <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[200px]">
-                  {Object.entries(subcategories).map(([subcategory, items]) => (
-                    items.map((item) => (
-                      <DropdownMenuItem key={item.id}>
-                        {item.name}
-                      </DropdownMenuItem>
-                    ))
+                <DropdownMenuContent align="start" className="w-[200px] max-h-[300px] overflow-y-auto">
+                  {items.map((item, index) => (
+                    <DropdownMenuItem key={`${category}-${index}`}>
+                      {item}
+                    </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -11,6 +11,7 @@ interface JobTemplate {
   name: string;
   description: string | null;
   category: string;
+  subcategory: string | null;
   estimated_hours: number | null;
   parts_required: any[];
   is_active: boolean;
@@ -38,17 +39,44 @@ export default function JobTemplates() {
       // Parse CSV
       return new Promise<JobTemplate[]>((resolve, reject) => {
         parse(text, {
-          header: true,
+          header: false, // Changed to false since we're handling columns manually
           complete: (results) => {
-            const templates = results.data.map((row: any, index) => ({
-              id: index.toString(), // Generate an ID since CSV might not have one
-              name: row.name || row.Name || 'Unnamed Template',
-              description: row.description || row.Description || null,
-              category: (row.category || row.Category || 'maintenance').toLowerCase(),
-              estimated_hours: parseFloat(row.estimated_hours || row.EstimatedHours) || null,
-              parts_required: [], // We could parse this from CSV if available
-              is_active: true
-            }));
+            const templates: JobTemplate[] = [];
+            const rows = results.data;
+
+            // Skip header row if present
+            for (let i = 1; i < rows.length; i++) {
+              const row = rows[i] as string[];
+              if (!row[0]) continue; // Skip empty rows
+
+              // Column A is MAIN category, Column B (*00) is subcategory
+              templates.push({
+                id: i.toString(),
+                name: row[0] || 'Unnamed Template',
+                description: row[1] || null,
+                category: 'MAIN',
+                subcategory: row[1] || null, // *00 column
+                estimated_hours: 1, // Default to 1 hour if not specified
+                parts_required: [],
+                is_active: true
+              });
+
+              // Add subcategories (columns *01 to *15) if they exist
+              for (let j = 2; j < row.length; j++) {
+                if (row[j]) {
+                  templates.push({
+                    id: `${i}-${j}`,
+                    name: row[j],
+                    description: null,
+                    category: row[0], // Parent category
+                    subcategory: row[1], // *00 as subcategory
+                    estimated_hours: 1,
+                    parts_required: [],
+                    is_active: true
+                  });
+                }
+              }
+            }
             resolve(templates);
           },
           error: (error) => {
@@ -95,11 +123,19 @@ export default function JobTemplates() {
                     <CardTitle className="text-lg">{template.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground mb-2">{template.description}</p>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {template.description}
+                    </p>
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-medium">Category:</span>
                       <span className="capitalize">{template.category.toLowerCase()}</span>
                     </div>
+                    {template.subcategory && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-medium">Subcategory:</span>
+                        <span className="capitalize">{template.subcategory}</span>
+                      </div>
+                    )}
                     {template.estimated_hours && (
                       <div className="flex items-center gap-2 text-sm">
                         <span className="font-medium">Estimated Hours:</span>

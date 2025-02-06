@@ -86,14 +86,16 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
         return;
       }
 
-      const { error } = await supabase.from("chat_messages").insert([
-        {
-          room_id: roomId,
-          content: newMessage,
-          content_type: "text",
-          sender_id: user.id,
-        },
-      ]);
+      const { error } = await supabase
+        .from("chat_messages")
+        .insert([
+          {
+            room_id: roomId,
+            sender_id: user.id,
+            content: newMessage,
+            content_type: "text",
+          },
+        ]);
 
       if (error) throw error;
       setNewMessage("");
@@ -135,15 +137,19 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
         .from('chat-attachments')
         .getPublicUrl(filePath);
 
-      await supabase.from("chat_messages").insert([
-        {
-          room_id: roomId,
-          content: file.name,
-          content_type: "file",
-          metadata: { url: publicUrl, type: file.type },
-          sender_id: user.id,
-        },
-      ]);
+      const { error: messageError } = await supabase
+        .from("chat_messages")
+        .insert([
+          {
+            room_id: roomId,
+            sender_id: user.id,
+            content: file.name,
+            content_type: "file",
+            metadata: { url: publicUrl, type: file.type },
+          },
+        ]);
+
+      if (messageError) throw messageError;
 
     } catch (error) {
       toast({

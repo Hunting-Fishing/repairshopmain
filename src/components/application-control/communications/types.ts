@@ -2,6 +2,7 @@
 export interface Message {
   id: string;
   content: string;
+  content_type?: string;
   sender_id: string;
   created_at: string;
   metadata: any;

@@ -10,10 +10,8 @@ export function TablesList() {
     queryKey: ['database-tables'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('information_schema.tables')
-        .select('*')
-        .eq('table_schema', 'public');
-      
+        .rpc('get_tables');
+
       if (error) throw error;
       return data;
     },
@@ -44,7 +42,7 @@ export function TablesList() {
                 <TableRow key={table.table_name}>
                   <TableCell>{table.table_name}</TableCell>
                   <TableCell>{table.table_type}</TableCell>
-                  <TableCell>{table.self_referencing_column_name || 'N/A'}</TableCell>
+                  <TableCell>{table.size || 'N/A'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

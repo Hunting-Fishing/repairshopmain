@@ -12,6 +12,7 @@ import Staff from "@/pages/Staff";
 import WorkOrders from "@/pages/WorkOrders";
 import ApplicationControl from "@/pages/ApplicationControl";
 import Inventory from "@/pages/Inventory";
+import JobTemplates from "@/pages/JobTemplates";
 import { InventorySuppliers } from "@/components/application-control/inventory/InventorySuppliers";
 import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
 import { SetPassword } from "@/pages/SetPassword";
@@ -59,6 +60,10 @@ export const router = createBrowserRouter([
       {
         path: "work-orders",
         element: <WorkOrders />,
+      },
+      {
+        path: "job-templates",
+        element: <JobTemplates />,
       },
       {
         path: "shops",

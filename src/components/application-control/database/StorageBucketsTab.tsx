@@ -19,6 +19,9 @@ export function StorageBucketsTab() {
         console.error('Error fetching buckets:', error);
         throw error;
       }
+      
+      // Add console log to debug the response
+      console.log('Buckets fetched:', data);
       return data;
     },
   });
@@ -29,7 +32,7 @@ export function StorageBucketsTab() {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
-          Failed to load storage buckets. Please try again later.
+          Failed to load storage buckets. Error: {error.message}
         </AlertDescription>
       </Alert>
     );
@@ -57,13 +60,13 @@ export function StorageBucketsTab() {
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">Loading buckets...</TableCell>
                 </TableRow>
-              ) : buckets?.length === 0 ? (
+              ) : !buckets || buckets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground">
                     No storage buckets found
                   </TableCell>
                 </TableRow>
-              ) : buckets?.map((bucket) => (
+              ) : buckets.map((bucket) => (
                 <TableRow key={bucket.id}>
                   <TableCell className="font-medium">{bucket.name}</TableCell>
                   <TableCell>{new Date(bucket.created_at).toLocaleDateString()}</TableCell>

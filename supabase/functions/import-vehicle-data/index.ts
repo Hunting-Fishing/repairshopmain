@@ -16,6 +16,12 @@ serve(async (req) => {
   }
 
   try {
+    // Verify the JWT token
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      throw new Error('No authorization header')
+    }
+
     console.log('Received request to import vehicle data')
     const { vehicleData, organizationId } = await req.json()
     
@@ -30,20 +36,19 @@ serve(async (req) => {
       throw new Error('Vehicle data must be an array')
     }
 
-    // Create Supabase client
-    const supabaseClient = createClient(
+    // Create Supabase client with service role key for database operations
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
     // Process and insert data in batches
-    const batchSize = 50 // Further reduced batch size
+    const batchSize = 50
     const batches = []
     const errors = []
     
     for (let i = 0; i < vehicleData.length; i += batchSize) {
       const batch = vehicleData.slice(i, i + batchSize).map(item => {
-        // Validate and clean data
         if (!item.year || !item.make || !item.model) {
           console.warn('Invalid item found:', item)
           return null
@@ -55,7 +60,7 @@ serve(async (req) => {
           model: item.model?.trim(),
           organization_id: organizationId
         }
-      }).filter(item => item !== null) // Remove invalid items
+      }).filter(item => item !== null)
       
       if (batch.length > 0) {
         batches.push(batch)
@@ -70,7 +75,7 @@ serve(async (req) => {
       console.log(`Inserting batch ${i + 1} of ${batches.length} (${batch.length} records)`)
       
       try {
-        const { error } = await supabaseClient
+        const { error } = await supabaseAdmin
           .from('vehicle_models_reference')
           .upsert(batch, { 
             onConflict: 'year,make,model',

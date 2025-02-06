@@ -3,13 +3,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Upload, AlertCircle } from "lucide-react";
+import { Upload, AlertCircle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
 export function VehicleDataTab() {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isLoadingBucketData, setIsLoadingBucketData] = useState(false);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -19,6 +20,45 @@ export function VehicleDataTab() {
         return;
       }
       setSelectedFile(file);
+    }
+  };
+
+  const loadFromBucket = async () => {
+    setIsLoadingBucketData(true);
+    try {
+      const { data, error } = await supabase
+        .storage
+        .from('RTE MAIN')
+        .download('Other/all-vehicles-model.json');
+      
+      if (error) throw error;
+
+      const jsonData = await data.text();
+      const vehicleData = JSON.parse(jsonData);
+      
+      const { data: profile } = await supabase.auth.getUser();
+      const { data: userData } = await supabase
+        .from("profiles")
+        .select("organization_id")
+        .eq("id", profile.user?.id)
+        .single();
+
+      const { error: importError } = await supabase.functions.invoke('import-vehicle-data', {
+        body: { 
+          vehicleData,
+          organizationId: userData.organization_id
+        }
+      });
+
+      if (importError) throw importError;
+
+      toast.success("Vehicle data imported successfully from bucket");
+
+    } catch (error) {
+      console.error('Error loading from bucket:', error);
+      toast.error("Failed to load vehicle data from bucket");
+    } finally {
+      setIsLoadingBucketData(false);
     }
   };
 
@@ -92,11 +132,11 @@ export function VehicleDataTab() {
             type="file"
             accept=".json"
             onChange={handleFileSelect}
-            disabled={isUploading}
+            disabled={isUploading || isLoadingBucketData}
           />
           <Button
             onClick={handleUpload}
-            disabled={!selectedFile || isUploading}
+            disabled={!selectedFile || isUploading || isLoadingBucketData}
             className="min-w-[100px]"
           >
             {isUploading ? (
@@ -105,6 +145,24 @@ export function VehicleDataTab() {
               <>
                 <Upload className="h-4 w-4 mr-2" />
                 Import
+              </>
+            )}
+          </Button>
+        </div>
+        
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={loadFromBucket}
+            disabled={isLoadingBucketData || isUploading}
+            variant="secondary"
+            className="min-w-[200px]"
+          >
+            {isLoadingBucketData ? (
+              "Loading from bucket..."
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                Load from Bucket
               </>
             )}
           </Button>

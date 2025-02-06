@@ -1,4 +1,3 @@
-
 project_id = "agtjuxiysmzhmpnbuzmc"
-[functions.create-staff-member]
+[functions.import-vehicle-data]
 verify_jwt = true

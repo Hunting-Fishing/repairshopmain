@@ -16,15 +16,15 @@ export function ParticipantsSection({
   setSelectedStaffIds,
   maxParticipants,
   setMaxParticipants,
-  staffOptions,
+  staffOptions = [], // Provide default empty array
 }: ParticipantsSectionProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Select Participants</Label>
         <MultiSelect
-          options={staffOptions}
-          selected={selectedStaffIds}
+          options={staffOptions || []} // Ensure we always pass an array
+          selected={selectedStaffIds || []} // Ensure we always pass an array
           onChange={setSelectedStaffIds}
           className="w-full"
         />

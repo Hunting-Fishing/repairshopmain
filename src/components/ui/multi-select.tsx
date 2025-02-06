@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
@@ -16,29 +17,29 @@ interface MultiSelectProps {
 }
 
 export function MultiSelect({
-  options,
-  selected,
+  options = [], // Provide default empty array
+  selected = [], // Provide default empty array
   onChange,
   className,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleUnselect = (item: string) => {
-    onChange(selected.filter((i) => i !== item));
+    onChange((selected || []).filter((i) => i !== item));
   };
 
   const handleSelect = (item: string) => {
-    if (selected.includes(item)) {
+    if ((selected || []).includes(item)) {
       handleUnselect(item);
     } else {
-      onChange([...selected, item]);
+      onChange([...(selected || []), item]);
     }
   };
 
   return (
     <Command className={className}>
       <div className="flex flex-wrap gap-1 border rounded-md p-1">
-        {selected.map((item) => (
+        {(selected || []).map((item) => (
           <Badge key={item} variant="secondary" className="rounded-sm">
             {options.find((option) => option.value === item)?.label}
             <button

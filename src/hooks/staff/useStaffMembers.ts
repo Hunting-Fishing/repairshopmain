@@ -1,7 +1,7 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { StaffMember } from "@/types/staff";
-import type { ProfileWithCustomRole } from "@/types/profile";
 
 export function useStaffMembers() {
   const { data: session } = useQuery({
@@ -61,5 +61,6 @@ export function useStaffMembers() {
       })) as StaffMember[];
     },
     enabled: !!session?.user.id,
+    initialData: [], // Provide initial empty array
   });
 }

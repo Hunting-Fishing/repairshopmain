@@ -49,16 +49,10 @@ export function AppSidebar() {
       
       return data;
     },
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes (formerly cacheTime)
   });
-
-  // Get menu items based on user role
-  const menuItems = [
-    ...getBaseMenuItems(),
-    ...(profile?.role === 'owner' || profile?.role === 'management' 
-      ? [{ title: "Application Control", icon: Settings2, path: "/application-control" }] 
-      : [])
-  ];
 
   useEffect(() => {
     // Subscribe to new messages
@@ -88,6 +82,14 @@ export function AppSidebar() {
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
   };
+
+  // Get menu items based on user role
+  const menuItems = [
+    ...getBaseMenuItems(),
+    ...(profile?.role === 'owner' || profile?.role === 'management' 
+      ? [{ title: "Application Control", icon: Settings2, path: "/application-control" }] 
+      : [])
+  ];
 
   return (
     <Sidebar>

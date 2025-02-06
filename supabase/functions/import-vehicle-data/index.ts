@@ -32,14 +32,15 @@ serve(async (req) => {
     )
 
     // Process and insert data in batches
-    const batchSize = 1000
+    const batchSize = 100 // Reduced batch size for better error handling
     const batches = []
+    const errors = []
     
     for (let i = 0; i < vehicleData.length; i += batchSize) {
       const batch = vehicleData.slice(i, i + batchSize).map(item => ({
         year: parseInt(item.year),
-        make: item.make,
-        model: item.model,
+        make: item.make?.trim(),
+        model: item.model?.trim(),
         organization_id: organizationId
       }))
       
@@ -49,16 +50,25 @@ serve(async (req) => {
     console.log(`Processing ${batches.length} batches of vehicle data`)
 
     // Insert batches sequentially
-    for (const batch of batches) {
-      console.log('Inserting batch of', batch.length, 'records')
+    for (let i = 0; i < batches.length; i++) {
+      const batch = batches[i]
+      console.log(`Inserting batch ${i + 1} of ${batches.length} (${batch.length} records)`)
+      
       const { error } = await supabaseClient
         .from('vehicle_models_reference')
-        .upsert(batch, { onConflict: 'year,make,model' })
+        .upsert(batch, { 
+          onConflict: 'year,make,model',
+          ignoreDuplicates: true // Ignore rather than update duplicates
+        })
 
       if (error) {
-        console.error('Error inserting batch:', error)
-        throw error
+        console.error(`Error inserting batch ${i + 1}:`, error)
+        errors.push(`Batch ${i + 1}: ${error.message}`)
       }
+    }
+
+    if (errors.length > 0) {
+      throw new Error(`Some batches failed to import: ${errors.join('; ')}`)
     }
 
     console.log('Successfully imported all vehicle data')

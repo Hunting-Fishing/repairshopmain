@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -9,42 +10,86 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { NewWorkOrderDialog } from "@/components/work-orders/NewWorkOrderDialog";
 import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
-const workOrders = [
-  {
-    id: "WO-2024-001",
-    customer: "John Smith",
-    vehicle: "2019 Toyota Camry",
-    description: "Oil Change + Tire Rotation",
-    status: "completed",
-    date: "2024-02-15",
-  },
-  {
-    id: "WO-2024-002",
-    customer: "Jane Doe",
-    vehicle: "2020 Honda CR-V",
-    description: "Brake Pad Replacement",
-    status: "in-progress",
-    date: "2024-02-16",
-  },
-];
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "pending":
-      return "bg-yellow-100 text-yellow-800";
-    case "in-progress":
-      return "bg-blue-100 text-blue-800";
-    case "completed":
-      return "bg-green-100 text-green-800";
-    default:
-      return "bg-gray-100 text-gray-800";
-  }
-};
+interface WorkOrder {
+  id: string;
+  customer: string;
+  vehicle: string;
+  description: string;
+  status: string;
+  date: string;
+}
 
 export default function WorkOrders() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    async function fetchWorkOrders() {
+      try {
+        const { data, error } = await supabase
+          .from('customer_repair_jobs')
+          .select(`
+            id,
+            description,
+            status,
+            created_at,
+            customers (
+              first_name,
+              last_name
+            ),
+            vehicles (
+              make,
+              model,
+              year
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        const formattedOrders = data.map(order => ({
+          id: order.id,
+          customer: `${order.customers?.first_name} ${order.customers?.last_name}`,
+          vehicle: order.vehicles ? `${order.vehicles.year} ${order.vehicles.make} ${order.vehicles.model}` : 'N/A',
+          description: order.description,
+          status: order.status,
+          date: new Date(order.created_at).toISOString().split('T')[0]
+        }));
+
+        setWorkOrders(formattedOrders);
+      } catch (error) {
+        console.error('Error fetching work orders:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load work orders",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchWorkOrders();
+  }, [toast]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "in-progress":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -77,20 +122,34 @@ export default function WorkOrders() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {workOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">{order.id}</TableCell>
-                  <TableCell>{order.customer}</TableCell>
-                  <TableCell>{order.vehicle}</TableCell>
-                  <TableCell>{order.description}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className={getStatusColor(order.status)}>
-                      {order.status}
-                    </Badge>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    Loading work orders...
                   </TableCell>
-                  <TableCell>{order.date}</TableCell>
                 </TableRow>
-              ))}
+              ) : workOrders.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    No work orders found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                workOrders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell className="font-medium">{order.id}</TableCell>
+                    <TableCell>{order.customer}</TableCell>
+                    <TableCell>{order.vehicle}</TableCell>
+                    <TableCell>{order.description}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className={getStatusColor(order.status)}>
+                        {order.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{order.date}</TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </div>

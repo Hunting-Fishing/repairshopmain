@@ -1,5 +1,5 @@
 
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
@@ -54,6 +54,11 @@ export const router = createBrowserRouter([
       {
         path: "work-orders",
         element: <WorkOrders />,
+      },
+      // Redirect /shops to /application-control/shops
+      {
+        path: "shops",
+        element: <Navigate to="/application-control/shops" replace />,
       },
       {
         path: "application-control",

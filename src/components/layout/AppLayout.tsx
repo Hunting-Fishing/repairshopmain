@@ -20,13 +20,28 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     navigate("/auth");
   };
 
+  // Format role for display
+  const formatRole = (role: string) => {
+    return role.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
+  const userMetadata = session.user?.user_metadata;
+  const firstName = userMetadata?.firstName || '';
+  const lastName = userMetadata?.lastName || '';
+  const role = userMetadata?.role || '';
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         <main className="flex-1 overflow-y-auto">
           <div className="container py-6">
-            <div className="flex justify-end mb-4">
+            <div className="flex justify-between items-center mb-4">
+              <div className="text-sm text-muted-foreground">
+                Welcome! {firstName} {lastName} : {formatRole(role)}
+              </div>
               <Button variant="ghost" onClick={handleSignOut}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Sign Out

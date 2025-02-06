@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TablesList } from "./TablesList";
-import { StorageBuckets } from "./StorageBuckets";
+import { StorageBucketsTab } from "./StorageBucketsTab";
 import { DatabaseIcon } from "lucide-react";
 
 export function DatabaseTab() {
@@ -39,7 +39,7 @@ export function DatabaseTab() {
             </TabsContent>
 
             <TabsContent value="buckets">
-              <StorageBuckets />
+              <StorageBucketsTab />
             </TabsContent>
           </Tabs>
         </CardContent>

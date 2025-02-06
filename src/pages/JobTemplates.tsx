@@ -77,14 +77,58 @@ export default function JobTemplates() {
               // Process each column
               row.forEach((value, colIndex) => {
                 if (value && value.trim()) {
-                  if (colIndex === 0) {
-                    columns['MAIN'].push(value.trim());
-                  } else if (colIndex === 1) {
-                    columns['*00'].push(value.trim());
-                  } else if (colIndex >= 2 && colIndex <= 16) {
-                    // Columns C through Q map to *01 through *15
-                    const key = `*${String(colIndex - 1).padStart(2, '0')}`;
-                    columns[key].push(value.trim());
+                  switch (colIndex) {
+                    case 0:
+                      columns['MAIN'].push(value.trim());
+                      break;
+                    case 1:
+                      columns['*00'].push(value.trim());
+                      break;
+                    case 2:
+                      columns['*01'].push(value.trim());
+                      break;
+                    case 3:
+                      columns['*02'].push(value.trim());
+                      break;
+                    case 4:
+                      columns['*03'].push(value.trim());
+                      break;
+                    case 5:
+                      columns['*04'].push(value.trim());
+                      break;
+                    case 6:
+                      columns['*05'].push(value.trim());
+                      break;
+                    case 7:
+                      columns['*06'].push(value.trim());
+                      break;
+                    case 8:
+                      columns['*07'].push(value.trim());
+                      break;
+                    case 9:
+                      columns['*08'].push(value.trim());
+                      break;
+                    case 10:
+                      columns['*09'].push(value.trim());
+                      break;
+                    case 11:
+                      columns['*10'].push(value.trim());
+                      break;
+                    case 12:
+                      columns['*11'].push(value.trim());
+                      break;
+                    case 13:
+                      columns['*12'].push(value.trim());
+                      break;
+                    case 14:
+                      columns['*13'].push(value.trim());
+                      break;
+                    case 15:
+                      columns['*14'].push(value.trim());
+                      break;
+                    case 16:
+                      columns['*15'].push(value.trim());
+                      break;
                   }
                 }
               });
@@ -126,11 +170,11 @@ export default function JobTemplates() {
           <CardTitle>Templates Library</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {templates && Object.entries(templates).map(([category, items]) => (
               <DropdownMenu key={category}>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-[200px]">
+                  <Button variant="outline" className="w-full">
                     {category} <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>

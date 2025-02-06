@@ -76,11 +76,22 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
     if (!newMessage.trim()) return;
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to send messages",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase.from("chat_messages").insert([
         {
           room_id: roomId,
           content: newMessage,
           content_type: "text",
+          sender_id: user.id,
         },
       ]);
 
@@ -100,6 +111,16 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
     if (!file) return;
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to upload files",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${roomId}/${fileName}`;
@@ -119,7 +140,8 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
           room_id: roomId,
           content: file.name,
           content_type: "file",
-          metadata: { url: publicUrl, type: file.type }
+          metadata: { url: publicUrl, type: file.type },
+          sender_id: user.id,
         },
       ]);
 

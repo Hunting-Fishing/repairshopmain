@@ -1,8 +1,8 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StorageBuckets } from "./StorageBuckets";
 import { TablesList } from "./TablesList";
+import { StorageBucketsTab } from "./StorageBucketsTab";
 import { DatabaseIcon } from "lucide-react";
 
 export function DatabaseTab() {
@@ -28,18 +28,18 @@ export function DatabaseTab() {
 
       <Card>
         <CardContent className="p-6">
-          <Tabs defaultValue="storage" className="space-y-4">
+          <Tabs defaultValue="tables" className="space-y-4">
             <TabsList>
-              <TabsTrigger value="storage">Storage Buckets</TabsTrigger>
               <TabsTrigger value="tables">Database Tables</TabsTrigger>
+              <TabsTrigger value="buckets">Storage Buckets</TabsTrigger>
             </TabsList>
-
-            <TabsContent value="storage">
-              <StorageBuckets />
-            </TabsContent>
 
             <TabsContent value="tables">
               <TablesList />
+            </TabsContent>
+
+            <TabsContent value="buckets">
+              <StorageBucketsTab />
             </TabsContent>
           </Tabs>
         </CardContent>

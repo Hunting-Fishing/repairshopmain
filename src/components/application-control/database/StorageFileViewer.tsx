@@ -14,7 +14,7 @@ interface StorageFileViewerProps {
 }
 
 export function StorageFileViewer({ bucketName, fileName, onClose }: StorageFileViewerProps) {
-  const { data: url } = useFileUrl(bucketName, fileName);
+  const { data: url, isLoading } = useFileUrl(bucketName, fileName);
   const fileType = getFileType(fileName);
 
   return (
@@ -26,7 +26,9 @@ export function StorageFileViewer({ bucketName, fileName, onClose }: StorageFile
         </Button>
       </CardHeader>
       <CardContent>
-        {url && (
+        {isLoading ? (
+          <div className="flex justify-center py-4">Loading...</div>
+        ) : url ? (
           <>
             {fileType === 'image' && (
               <ImagePreview url={url} fileName={fileName} />
@@ -42,6 +44,10 @@ export function StorageFileViewer({ bucketName, fileName, onClose }: StorageFile
               </div>
             )}
           </>
+        ) : (
+          <div className="text-center text-muted-foreground py-4">
+            Unable to load file preview
+          </div>
         )}
       </CardContent>
     </Card>

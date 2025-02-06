@@ -31,8 +31,9 @@ export function AppSidebar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
 
+  // Profile query with proper caching configuration
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['current-user-profile'],
+    queryKey: ['current-user-profile', user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
       
@@ -51,11 +52,11 @@ export function AppSidebar() {
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes (formerly cacheTime)
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
   });
 
+  // Real-time chat subscription
   useEffect(() => {
-    // Subscribe to new messages
     const channel = supabase
       .channel('chat_messages')
       .on(
@@ -65,8 +66,10 @@ export function AppSidebar() {
           schema: 'public',
           table: 'chat_messages',
         },
-        () => {
-          setUnreadCount(prev => prev + 1);
+        (payload) => {
+          if (payload.new && payload.new.sender_id !== user?.id) {
+            setUnreadCount(prev => prev + 1);
+          }
         }
       )
       .subscribe();
@@ -74,16 +77,16 @@ export function AppSidebar() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [user?.id]);
 
   // Format the role for display
   const formatRole = (role: string) => {
-    return role.split('_').map(word => 
+    return role?.split('_').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
   };
 
-  // Get menu items based on user role
+  // Get menu items based on user role - moved after profile query
   const menuItems = [
     ...getBaseMenuItems(),
     ...(profile?.role === 'owner' || profile?.role === 'management' 

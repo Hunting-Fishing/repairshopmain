@@ -14,6 +14,7 @@ import ApplicationControl from "@/pages/ApplicationControl";
 import Inventory from "@/pages/Inventory";
 import { InventorySuppliers } from "@/components/application-control/inventory/InventorySuppliers";
 import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
+import { SetPassword } from "@/pages/SetPassword";
 
 export const router = createBrowserRouter([
   {
@@ -74,5 +75,8 @@ export const router = createBrowserRouter([
     path: "/auth",
     element: <Auth />,
   },
+  {
+    path: "/auth/set-password",
+    element: <SetPassword />,
+  },
 ]);
-

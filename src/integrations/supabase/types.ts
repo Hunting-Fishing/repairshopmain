@@ -114,10 +114,12 @@ export type Database = {
           created_at: string
           file_url: string | null
           id: string
+          job_id: string | null
           metadata: Json | null
           room_id: string
           sender_id: string
           updated_at: string
+          vehicle_id: string | null
         }
         Insert: {
           content: string
@@ -125,10 +127,12 @@ export type Database = {
           created_at?: string
           file_url?: string | null
           id?: string
+          job_id?: string | null
           metadata?: Json | null
           room_id: string
           sender_id: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Update: {
           content?: string
@@ -136,12 +140,21 @@ export type Database = {
           created_at?: string
           file_url?: string | null
           id?: string
+          job_id?: string | null
           metadata?: Json | null
           room_id?: string
           sender_id?: string
           updated_at?: string
+          vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "chat_messages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "chat_messages_room_id_fkey"
             columns: ["room_id"]
@@ -154,6 +167,13 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -241,27 +261,39 @@ export type Database = {
       }
       chat_rooms: {
         Row: {
+          category: string | null
           created_at: string
           created_by: string
           id: string
+          is_private: boolean | null
+          last_message_at: string | null
+          metadata: Json | null
           name: string | null
           organization_id: string
           type: string
           updated_at: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           created_by: string
           id?: string
+          is_private?: boolean | null
+          last_message_at?: string | null
+          metadata?: Json | null
           name?: string | null
           organization_id: string
           type: string
           updated_at?: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           created_by?: string
           id?: string
+          is_private?: boolean | null
+          last_message_at?: string | null
+          metadata?: Json | null
           name?: string | null
           organization_id?: string
           type?: string
@@ -1375,6 +1407,62 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      pinned_messages: {
+        Row: {
+          id: string
+          message_id: string | null
+          organization_id: string
+          pinned_at: string | null
+          pinned_by: string | null
+          room_id: string | null
+        }
+        Insert: {
+          id?: string
+          message_id?: string | null
+          organization_id: string
+          pinned_at?: string | null
+          pinned_by?: string | null
+          room_id?: string | null
+        }
+        Update: {
+          id?: string
+          message_id?: string | null
+          organization_id?: string
+          pinned_at?: string | null
+          pinned_by?: string | null
+          room_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pinned_messages_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pinned_messages_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pinned_messages_pinned_by_fkey"
+            columns: ["pinned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pinned_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

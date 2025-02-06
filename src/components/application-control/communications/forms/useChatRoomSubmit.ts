@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { StaffMember } from "@/types/staff";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UseChatRoomSubmitProps {
   name: string;
@@ -33,6 +34,7 @@ export function useChatRoomSubmit({
 }: UseChatRoomSubmitProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const validateForm = () => {
     if (roomType === 'direct' && selectedStaffIds.length !== 1) {
@@ -77,7 +79,7 @@ export function useChatRoomSubmit({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    if (!validateForm() || !user) {
       return;
     }
 
@@ -119,11 +121,15 @@ export function useChatRoomSubmit({
         throw roomError;
       }
 
-      if (selectedStaffIds.length > 0 && roomData) {
-        const participantsToInsert = selectedStaffIds.map(staffId => ({
-          room_id: roomData.id,
-          user_id: staffId,
-        }));
+      if (roomData) {
+        // Create array of participants including the current user
+        const participantsToInsert = [
+          { room_id: roomData.id, user_id: user.id },
+          ...selectedStaffIds.map(staffId => ({
+            room_id: roomData.id,
+            user_id: staffId,
+          }))
+        ];
 
         const { error: participantError } = await supabase
           .from("chat_participants")

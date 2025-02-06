@@ -41,17 +41,18 @@ export function VehicleDataTab() {
         throw new Error('No vehicle data file found in storage');
       }
 
-      const modelFile = fileList.find(file => file.name === 'all-vehicles-model.json');
-      if (!modelFile) {
-        throw new Error('Vehicle data file not found in storage');
+      // Get the first JSON file from the bucket
+      const jsonFile = fileList.find(file => file.name.endsWith('.json'));
+      if (!jsonFile) {
+        throw new Error('No JSON file found in storage');
       }
 
-      console.log('Attempting to download file:', modelFile.name);
+      console.log('Attempting to download file:', jsonFile.name);
       
       const { data, error } = await supabase
         .storage
         .from('vehicle_data')
-        .download('all-vehicles-model.json');
+        .download(jsonFile.name);
       
       if (error) {
         console.error('Error downloading file:', error);

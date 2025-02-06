@@ -24,9 +24,9 @@ export function StorageFileViewer({ bucketName, fileName, onClose }: StorageFile
     },
   });
 
-  const isExcel = fileName.toLowerCase().endsWith('.xlsx') || fileName.toLowerCase().endsWith('.xls');
-  const isPDF = fileName.toLowerCase().endsWith('.pdf');
   const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
+  const isPDF = fileName.toLowerCase().endsWith('.pdf');
+  const isExcel = fileName.toLowerCase().endsWith('.xlsx') || fileName.toLowerCase().endsWith('.xls');
 
   return (
     <Card>
@@ -46,7 +46,7 @@ export function StorageFileViewer({ bucketName, fileName, onClose }: StorageFile
                 className="max-w-full h-auto max-h-[500px] object-contain"
               />
             )}
-            {(isExcel || isPDF) && (
+            {(isPDF || isExcel) && (
               <iframe
                 src={url}
                 className="w-full h-[500px] border-none"

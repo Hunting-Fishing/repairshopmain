@@ -1,3 +1,4 @@
+
 import {
   FormControl,
   FormField,
@@ -10,6 +11,10 @@ import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Car } from "lucide-react";
+import { CustomerVehicleDialog } from "@/components/customers/vehicles/CustomerVehicleDialog";
+import { useState } from "react";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -25,7 +30,16 @@ interface WorkOrderFormProps {
 }
 
 export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
-  const handleCustomerVehicleSelect = (customerId: string, vehicleInfo: string) => {
+  const [showVehicleDialog, setShowVehicleDialog] = useState(false);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+
+  const handleCustomerSelect = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    form.setValue('customerId', customerId);
+    setShowVehicleDialog(true);
+  };
+
+  const handleVehicleSelect = (customerId: string, vehicleInfo: string) => {
     form.setValue('customerId', customerId);
     form.setValue('vehicleInfo', vehicleInfo);
     onCustomerSelect?.(customerId, vehicleInfo);
@@ -73,11 +87,13 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
         name="customerId"
         render={() => (
           <FormItem>
-            <FormLabel>Customer & Vehicle</FormLabel>
-            <CustomerSearchCommand 
-              onSelect={handleCustomerVehicleSelect}
-              className="border-input"
-            />
+            <FormLabel>Customer</FormLabel>
+            <FormControl>
+              <CustomerSearchCommand 
+                onSelect={handleCustomerSelect}
+                className="border-input"
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}
@@ -90,10 +106,25 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
           <FormItem>
             <FormLabel>Vehicle Information</FormLabel>
             <FormControl>
-              <input type="hidden" {...field} />
+              <div>
+                <input type="hidden" {...field} />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start text-left font-normal"
+                  onClick={() => selectedCustomerId && setShowVehicleDialog(true)}
+                >
+                  <Car className="mr-2 h-4 w-4" />
+                  {vehicleInfo ? (
+                    <span>{vehicleInfo}</span>
+                  ) : (
+                    <span className="text-muted-foreground">Select a vehicle...</span>
+                  )}
+                </Button>
+              </div>
             </FormControl>
             {vehicleInfo && (
-              <Card className="p-4">
+              <Card className="p-4 mt-2">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {vehicleDetails.year && (
                     <div>
@@ -166,6 +197,12 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
             <FormMessage />
           </FormItem>
         )}
+      />
+
+      <CustomerVehicleDialog
+        customerId={selectedCustomerId}
+        onClose={() => setShowVehicleDialog(false)}
+        onSelect={handleVehicleSelect}
       />
     </div>
   );

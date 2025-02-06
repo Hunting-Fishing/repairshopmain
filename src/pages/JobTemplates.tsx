@@ -3,10 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import Papa from 'papaparse';
+import { parse } from 'papaparse';
 import { toast } from "sonner";
-
-<lov-add-dependency>papaparse@latest</lov-add-dependency>
 
 interface JobTemplate {
   id: string;
@@ -39,7 +37,7 @@ export default function JobTemplates() {
       
       // Parse CSV
       return new Promise<JobTemplate[]>((resolve, reject) => {
-        Papa.parse(text, {
+        parse(text, {
           header: true,
           complete: (results) => {
             const templates = results.data.map((row: any, index) => ({

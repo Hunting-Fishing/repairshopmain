@@ -11,33 +11,12 @@ export function LoadFromBucketSection() {
   const loadFromBucket = async () => {
     setIsLoadingBucketData(true);
     try {
-      // First check if the file exists
-      const { data: fileList, error: listError } = await supabase
-        .storage
-        .from('vehicle_data')
-        .list();
-      
-      if (listError) {
-        console.error('Error listing bucket files:', listError);
-        throw new Error('Could not access vehicle data storage');
-      }
-
-      if (!fileList || fileList.length === 0) {
-        throw new Error('No vehicle data file found in storage');
-      }
-
-      // Get the first JSON file from the bucket
-      const jsonFile = fileList.find(file => file.name.endsWith('.json'));
-      if (!jsonFile) {
-        throw new Error('No JSON file found in storage');
-      }
-
-      console.log('Attempting to download file:', jsonFile.name);
+      console.log('Attempting to download file: all-vehicles-model.json');
       
       const { data, error } = await supabase
         .storage
         .from('vehicle_data')
-        .download(jsonFile.name);
+        .download('all-vehicles-model.json');
       
       if (error) {
         console.error('Error downloading file:', error);

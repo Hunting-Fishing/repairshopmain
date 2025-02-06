@@ -9,20 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Users, Folder, MessageSquare } from "lucide-react";
+import { useChatRoomForm } from "./ChatRoomFormContext";
 
-interface RoomTypeSectionProps {
-  roomType: RoomType;
-  setRoomType: (value: RoomType) => void;
-  type: string;
-  setType: (value: string) => void;
-}
+export function RoomTypeSection() {
+  const { roomType, setRoomType, type, setType } = useChatRoomForm();
 
-export function RoomTypeSection({
-  roomType,
-  setRoomType,
-  type,
-  setType,
-}: RoomTypeSectionProps) {
   const getRoomTypeIcon = (type: RoomType) => {
     switch (type) {
       case "direct":

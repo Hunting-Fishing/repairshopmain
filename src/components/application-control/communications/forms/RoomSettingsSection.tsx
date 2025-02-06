@@ -2,20 +2,16 @@
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Lock, Bell } from "lucide-react";
+import { useChatRoomForm } from "./ChatRoomFormContext";
 
-interface RoomSettingsSectionProps {
-  isPrivate: boolean;
-  setIsPrivate: (value: boolean) => void;
-  enableNotifications: boolean;
-  setEnableNotifications: (value: boolean) => void;
-}
+export function RoomSettingsSection() {
+  const {
+    isPrivate,
+    setIsPrivate,
+    enableNotifications,
+    setEnableNotifications
+  } = useChatRoomForm();
 
-export function RoomSettingsSection({
-  isPrivate,
-  setIsPrivate,
-  enableNotifications,
-  setEnableNotifications,
-}: RoomSettingsSectionProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-2">

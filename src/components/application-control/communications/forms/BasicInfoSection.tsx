@@ -2,20 +2,11 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useChatRoomForm } from "./ChatRoomFormContext";
 
-interface BasicInfoSectionProps {
-  name: string;
-  setName: (value: string) => void;
-  description: string;
-  setDescription: (value: string) => void;
-}
+export function BasicInfoSection() {
+  const { name, setName, description, setDescription } = useChatRoomForm();
 
-export function BasicInfoSection({
-  name,
-  setName,
-  description,
-  setDescription,
-}: BasicInfoSectionProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">

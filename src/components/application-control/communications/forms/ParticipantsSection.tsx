@@ -2,22 +2,20 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { useChatRoomForm } from "./ChatRoomFormContext";
 
 interface ParticipantsSectionProps {
-  selectedStaffIds: string[];
-  setSelectedStaffIds: (value: string[]) => void;
-  maxParticipants: string;
-  setMaxParticipants: (value: string) => void;
   staffOptions: { label: string; value: string; }[];
 }
 
-export function ParticipantsSection({
-  selectedStaffIds = [],
-  setSelectedStaffIds,
-  maxParticipants,
-  setMaxParticipants,
-  staffOptions = [],
-}: ParticipantsSectionProps) {
+export function ParticipantsSection({ staffOptions }: ParticipantsSectionProps) {
+  const { 
+    selectedStaffIds,
+    setSelectedStaffIds,
+    maxParticipants,
+    setMaxParticipants
+  } = useChatRoomForm();
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">

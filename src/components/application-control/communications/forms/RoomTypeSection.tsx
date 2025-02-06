@@ -42,8 +42,8 @@ export function RoomTypeSection() {
       return;
     }
 
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.user) {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session?.user) {
       toast.error("You must be logged in to add categories");
       return;
     }

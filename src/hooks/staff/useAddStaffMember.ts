@@ -32,13 +32,14 @@ export function useAddStaffMember() {
 
       if (error) throw error;
 
-      toast.success("Staff member added successfully");
       queryClient.invalidateQueries({ queryKey: ["staff-members"] });
-      return true;
+      return { success: true, data: response };
     } catch (error) {
       console.error("Error adding staff member:", error);
-      toast.error(error.message || "Failed to add staff member");
-      return false;
+      toast.error("Failed to add staff member", {
+        description: error.message || "Please try again"
+      });
+      return { success: false, error };
     } finally {
       setIsLoading(false);
     }

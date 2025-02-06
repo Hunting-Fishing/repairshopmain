@@ -1,6 +1,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.1.1'
+import { SmtpClient } from "https://deno.land/x/smtp@v0.7.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -50,17 +51,17 @@ serve(async (req) => {
       throw getUserError
     }
 
+    const invitationToken = crypto.randomUUID();
+    const temporaryPassword = Math.random().toString(36).slice(-12);
+
     if (existingUser) {
       authData = { user: existingUser }
       console.log('User already exists:', existingUser.id)
     } else {
-      // Generate a random password if none provided
-      const finalPassword = password || Math.random().toString(36).slice(-8)
-
-      // Create the user
+      // Create the user with the temporary password
       const { data: newAuthData, error: createUserError } = await supabaseClient.auth.admin.createUser({
         email,
-        password: finalPassword,
+        password: temporaryPassword,
         email_confirm: true,
         user_metadata: userData
       })
@@ -74,7 +75,7 @@ serve(async (req) => {
       console.log('New user created:', authData.user.id)
     }
 
-    // Upsert profile
+    // Upsert profile with invitation token
     const { error: profileError } = await supabaseClient
       .from('profiles')
       .upsert({
@@ -88,7 +89,9 @@ serve(async (req) => {
         hire_date: userData.hireDate ? userData.hireDate : null,
         notes: userData.notes,
         schedule: userData.schedule,
-        status: 'active'
+        status: 'active',
+        invitation_token: invitationToken,
+        invitation_sent_at: new Date().toISOString()
       }, { 
         onConflict: 'id',
         ignoreDuplicates: false 
@@ -116,10 +119,45 @@ serve(async (req) => {
       throw membershipError
     }
 
+    // Send invitation email
+    try {
+      const client = new SmtpClient();
+      await client.connectTLS({
+        hostname: Deno.env.get('SMTP_HOSTNAME') || '',
+        port: parseInt(Deno.env.get('SMTP_PORT') || '587'),
+        username: Deno.env.get('SMTP_USERNAME') || '',
+        password: Deno.env.get('SMTP_PASSWORD') || '',
+      });
+
+      const inviteUrl = `${Deno.env.get('APP_URL')}/auth/set-password?token=${invitationToken}`;
+      
+      await client.send({
+        from: Deno.env.get('SMTP_FROM') || '',
+        to: email,
+        subject: "You've been invited to join the team",
+        content: `
+          Hello ${userData.firstName},
+
+          You've been invited to join the team. To get started, please set your password by clicking the link below:
+
+          ${inviteUrl}
+
+          This link will expire in 7 days.
+
+          If you didn't expect this invitation, please ignore this email.
+        `,
+      });
+
+      await client.close();
+    } catch (emailError) {
+      console.error('Error sending invitation email:', emailError);
+      // Don't throw here - we still want to return the user data even if email fails
+    }
+
     return new Response(
       JSON.stringify({ 
         user: authData.user,
-        password: !existingUser ? password : undefined 
+        invitationSent: true
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

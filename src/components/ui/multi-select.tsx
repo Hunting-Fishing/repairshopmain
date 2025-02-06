@@ -40,7 +40,10 @@ export function MultiSelect({
 
   return (
     <Command className={className}>
-      <div className="flex flex-wrap gap-1 border rounded-md p-1 min-h-[2.5rem]">
+      <div 
+        className="flex flex-wrap gap-1 border rounded-md p-1 min-h-[2.5rem]"
+        onClick={() => setOpen(true)}
+      >
         {safeSelected.map((item) => (
           <Badge key={item} variant="secondary" className="rounded-sm">
             {safeOptions.find((option) => option.value === item)?.label}
@@ -62,16 +65,22 @@ export function MultiSelect({
           </Badge>
         ))}
       </div>
-      <CommandGroup className="max-h-[200px] overflow-auto">
-        {safeOptions.map((option) => (
-          <CommandItem
-            key={option.value}
-            onSelect={() => handleSelect(option.value)}
-          >
-            {option.label}
-          </CommandItem>
-        ))}
-      </CommandGroup>
+      {open && (
+        <CommandGroup className="max-h-[200px] overflow-auto">
+          {safeOptions.length > 0 ? (
+            safeOptions.map((option) => (
+              <CommandItem
+                key={option.value}
+                onSelect={() => handleSelect(option.value)}
+              >
+                {option.label}
+              </CommandItem>
+            ))
+          ) : (
+            <CommandItem disabled>No options available</CommandItem>
+          )}
+        </CommandGroup>
+      )}
     </Command>
   );
 }

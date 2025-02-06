@@ -25,6 +25,26 @@ interface JobTemplate {
   is_active: boolean;
 }
 
+const COLUMN_NAMES = {
+  'MAIN': 'Main Tasks',
+  '*00': 'Basic Services',
+  '*01': 'Engine Services',
+  '*02': 'Transmission Services',
+  '*03': 'Brake Services',
+  '*04': 'Suspension Services',
+  '*05': 'Electrical Services',
+  '*06': 'HVAC Services',
+  '*07': 'Exhaust Services',
+  '*08': 'Steering Services',
+  '*09': 'Tire Services',
+  '*10': 'Body Services',
+  '*11': 'Diagnostic Services',
+  '*12': 'Maintenance Services',
+  '*13': 'Performance Services',
+  '*14': 'Safety Services',
+  '*15': 'Miscellaneous Services'
+};
+
 export default function JobTemplates() {
   const { data: templates, isLoading } = useQuery({
     queryKey: ['job-templates-csv'],
@@ -177,20 +197,23 @@ export default function JobTemplates() {
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {templates && Object.entries(templates).map(([category, items]) => (
-              <DropdownMenu key={category}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full">
-                    {category} <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-[200px] max-h-[300px] overflow-y-auto">
-                  {Array.isArray(items) && items.map((item, index) => (
-                    <DropdownMenuItem key={`${category}-${index}`}>
-                      {item}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div key={category} className="flex flex-col space-y-2">
+                <h3 className="font-semibold text-sm">{COLUMN_NAMES[category] || category}</h3>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full justify-between">
+                      Select Task <ChevronDown className="h-4 w-4 opacity-50" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-[250px] max-h-[300px] overflow-y-auto">
+                    {Array.isArray(items) && items.map((item, index) => (
+                      <DropdownMenuItem key={`${category}-${index}`}>
+                        {item}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ))}
           </div>
         </CardContent>

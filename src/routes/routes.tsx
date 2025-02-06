@@ -16,6 +16,7 @@ import { InventorySuppliers } from "@/components/application-control/inventory/I
 import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
 import { SetPassword } from "@/pages/SetPassword";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { ShopList } from "@/components/shops/ShopList";
 
 export const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ export const router = createBrowserRouter([
           {
             path: "communications",
             element: <CommunicationsTab />,
+          },
+          {
+            path: "shops",
+            element: <ShopList />,
           },
         ],
       },

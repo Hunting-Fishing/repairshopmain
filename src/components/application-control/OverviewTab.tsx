@@ -1,3 +1,4 @@
+
 import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package, Truck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ControlPanel } from "./ControlPanel";
@@ -11,7 +12,7 @@ export function OverviewTab() {
       title: "Shop Management",
       description: "Manage shop details, business hours, and settings",
       icon: Building2,
-      action: () => navigate("/shops"),
+      action: () => navigate("/application-control/shops"),
     },
     {
       title: "Staff Management",

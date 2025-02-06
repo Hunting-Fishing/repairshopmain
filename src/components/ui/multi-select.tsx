@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { X } from "lucide-react";
 
 interface Option {
@@ -36,6 +36,7 @@ export function MultiSelect({
     } else {
       onChange([...safeSelected, item]);
     }
+    setOpen(false);
   };
 
   return (
@@ -66,20 +67,22 @@ export function MultiSelect({
         ))}
       </div>
       {open && (
-        <CommandGroup className="max-h-[200px] overflow-auto">
-          {safeOptions.length > 0 ? (
-            safeOptions.map((option) => (
-              <CommandItem
-                key={option.value}
-                onSelect={() => handleSelect(option.value)}
-              >
-                {option.label}
-              </CommandItem>
-            ))
-          ) : (
-            <CommandItem disabled>No options available</CommandItem>
-          )}
-        </CommandGroup>
+        <CommandList className="max-h-[200px] overflow-auto mt-1">
+          <CommandGroup>
+            {safeOptions.length > 0 ? (
+              safeOptions.map((option) => (
+                <CommandItem
+                  key={option.value}
+                  onSelect={() => handleSelect(option.value)}
+                >
+                  {option.label}
+                </CommandItem>
+              ))
+            ) : (
+              <CommandItem disabled>No options available</CommandItem>
+            )}
+          </CommandGroup>
+        </CommandList>
       )}
     </Command>
   );

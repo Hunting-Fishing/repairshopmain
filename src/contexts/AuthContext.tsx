@@ -36,42 +36,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { toast } = useToast();
 
   React.useEffect(() => {
-    console.log("AuthProvider - Initializing");
-    
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("AuthProvider - Initial session:", session);
-      setSession(session);
-      setUser(session?.user ?? null);
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      setSession(initialSession);
+      setUser(initialSession?.user ?? null);
     });
 
-    // Listen for auth changes
+    // Set up the auth state listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("AuthProvider - Auth state changed:", { event: _event, session });
+      console.log("Auth state changed:", { event: _event, session });
       setSession(session);
       setUser(session?.user ?? null);
     });
 
+    // Cleanup subscription
     return () => {
-      console.log("AuthProvider - Cleaning up subscription");
       subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log("AuthProvider - Signing in:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
-      console.log("AuthProvider - Sign in successful");
     } catch (error: any) {
-      console.error("AuthProvider - Sign in error:", error);
       toast({
         title: "Error signing in",
         description: error.message,
@@ -128,10 +122,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  console.log("AuthProvider - Current state:", { session, user });
+  const value = React.useMemo(
+    () => ({
+      session,
+      user,
+      signIn,
+      signUp,
+      signOut,
+    }),
+    [session, user]
+  );
 
   return (
-    <AuthContext.Provider value={{ session, user, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

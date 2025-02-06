@@ -25,6 +25,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { RoomType } from "./types";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { MultiSelect } from "@/components/ui/multi-select";
+import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
 
 export function CreateChatRoomDialog() {
   const [open, setOpen] = useState(false);
@@ -35,8 +37,15 @@ export function CreateChatRoomDialog() {
   const [description, setDescription] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [enableNotifications, setEnableNotifications] = useState(true);
-  const [maxParticipants, setMaxParticipants] = useState<string>(""); // Optional limit
+  const [maxParticipants, setMaxParticipants] = useState<string>("");
+  const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
   const { toast } = useToast();
+  const { data: staffMembers } = useStaffMembers();
+
+  const staffOptions = staffMembers?.map(staff => ({
+    label: `${staff.first_name} ${staff.last_name}`,
+    value: staff.id
+  })) || [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +58,8 @@ export function CreateChatRoomDialog() {
         enableNotifications,
       };
 
-      const { error } = await supabase
+      // First create the chat room
+      const { data: roomData, error: roomError } = await supabase
         .from("chat_rooms")
         .insert([{ 
           name, 
@@ -58,9 +68,25 @@ export function CreateChatRoomDialog() {
           category: roomType === 'work_order' ? 'work-order' : 'general',
           is_private: isPrivate,
           metadata
-        }]);
+        }])
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (roomError) throw roomError;
+
+      // Then add the selected participants
+      if (selectedStaffIds.length > 0 && roomData) {
+        const participantsToInsert = selectedStaffIds.map(staffId => ({
+          room_id: roomData.id,
+          user_id: staffId,
+        }));
+
+        const { error: participantError } = await supabase
+          .from("chat_participants")
+          .insert(participantsToInsert);
+
+        if (participantError) throw participantError;
+      }
 
       toast({
         title: "Success",
@@ -87,6 +113,7 @@ export function CreateChatRoomDialog() {
     setIsPrivate(false);
     setEnableNotifications(true);
     setMaxParticipants("");
+    setSelectedStaffIds([]);
   };
 
   const getRoomTypeIcon = (type: RoomType) => {
@@ -110,7 +137,7 @@ export function CreateChatRoomDialog() {
           New Chat Room
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px]"> {/* Increased width for better layout */}
         <DialogHeader>
           <DialogTitle>Create Chat Room</DialogTitle>
           <DialogDescription>
@@ -182,6 +209,16 @@ export function CreateChatRoomDialog() {
                 <SelectItem value="team">Team</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Select Participants</Label>
+            <MultiSelect
+              options={staffOptions}
+              selected={selectedStaffIds}
+              onChange={setSelectedStaffIds}
+              className="w-full"
+            />
           </div>
 
           <div className="space-y-2">

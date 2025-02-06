@@ -1,9 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
+import { ImagePreview } from "./components/file-preview/ImagePreview";
+import { DocumentPreview } from "./components/file-preview/DocumentPreview";
+import { getFileType } from "./utils/fileTypeUtils";
+import { useFileUrl } from "./hooks/useFileUrl";
 
 interface StorageFileViewerProps {
   bucketName: string;
@@ -12,21 +14,8 @@ interface StorageFileViewerProps {
 }
 
 export function StorageFileViewer({ bucketName, fileName, onClose }: StorageFileViewerProps) {
-  const { data: url } = useQuery({
-    queryKey: ['file-url', bucketName, fileName],
-    queryFn: async () => {
-      const { data } = await supabase
-        .storage
-        .from(bucketName)
-        .createSignedUrl(fileName, 3600); // 1 hour expiry
-      
-      return data?.signedUrl;
-    },
-  });
-
-  const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName);
-  const isPDF = fileName.toLowerCase().endsWith('.pdf');
-  const isExcel = fileName.toLowerCase().endsWith('.xlsx') || fileName.toLowerCase().endsWith('.xls');
+  const { data: url } = useFileUrl(bucketName, fileName);
+  const fileType = getFileType(fileName);
 
   return (
     <Card>
@@ -38,30 +27,24 @@ export function StorageFileViewer({ bucketName, fileName, onClose }: StorageFile
       </CardHeader>
       <CardContent>
         {url && (
-          <div className="flex flex-col items-center justify-center">
-            {isImage && (
-              <img 
-                src={url} 
-                alt={fileName} 
-                className="max-w-full h-auto max-h-[500px] object-contain"
-              />
+          <>
+            {fileType === 'image' && (
+              <ImagePreview url={url} fileName={fileName} />
             )}
-            {(isPDF || isExcel) && (
-              <iframe
-                src={url}
-                className="w-full h-[500px] border-none"
-                title={fileName}
-              />
+            {(fileType === 'pdf' || fileType === 'excel') && (
+              <DocumentPreview url={url} fileName={fileName} />
             )}
-            <Button 
-              className="mt-4" 
-              onClick={() => window.open(url, '_blank')}
-            >
-              Download File
-            </Button>
-          </div>
+            {fileType === 'other' && (
+              <div className="flex justify-center">
+                <Button onClick={() => window.open(url, '_blank')}>
+                  Download File
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </CardContent>
     </Card>
   );
 }
+

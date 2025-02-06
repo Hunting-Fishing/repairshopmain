@@ -1,32 +1,19 @@
-import { useEffect, useState, useRef } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Send, Paperclip, MoreVertical } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Message } from "./types";
+import { MessageList } from "./message/MessageList";
+import { MessageInput } from "./message/MessageInput";
+import { Button } from "@/components/ui/button";
+import { MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface Message {
-  id: string;
-  content: string;
-  sender_id: string;
-  created_at: string;
-  metadata: any;
-  job_id?: string;
-  vehicle_id?: string;
-  sender?: {
-    first_name: string;
-    last_name: string;
-  };
-}
 
 interface ChatWindowProps {
   roomId: string;
@@ -38,16 +25,6 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -73,7 +50,6 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
 
     fetchMessages();
 
-    // Subscribe to new messages
     const channel = supabase
       .channel("chat_messages")
       .on(
@@ -156,6 +132,10 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
     }
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <Card className="h-[calc(100vh-300px)] flex flex-col">
       <CardHeader className="border-b">
@@ -176,57 +156,13 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-0">
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className="bg-muted p-3 rounded-lg"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <Avatar className="h-6 w-6">
-                    <AvatarFallback>
-                      {message.sender?.first_name?.[0]}
-                      {message.sender?.last_name?.[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium">
-                    {message.sender?.first_name} {message.sender?.last_name}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(message.created_at).toLocaleString()}
-                  </span>
-                </div>
-                <p>{message.content}</p>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
-        <form onSubmit={handleSendMessage} className="p-4 border-t flex gap-2">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="flex-1"
-          />
-          <input
-            type="file"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={handleFileUpload}
-          />
-          <Button 
-            type="button" 
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Paperclip className="h-4 w-4" />
-          </Button>
-          <Button type="submit">
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
+        <MessageList messages={messages} />
+        <MessageInput
+          newMessage={newMessage}
+          onMessageChange={setNewMessage}
+          onSendMessage={handleSendMessage}
+          onFileUpload={handleFileUpload}
+        />
       </CardContent>
     </Card>
   );

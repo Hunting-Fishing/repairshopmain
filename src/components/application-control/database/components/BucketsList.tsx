@@ -11,6 +11,8 @@ interface BucketsListProps {
 export function BucketsList({ onSelectBucket }: BucketsListProps) {
   const { data: buckets, isLoading, error } = useStorageBuckets();
 
+  console.log('Buckets data:', buckets);
+
   if (isLoading) {
     return (
       <TableRow>

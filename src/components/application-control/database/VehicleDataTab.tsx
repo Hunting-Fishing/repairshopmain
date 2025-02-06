@@ -28,8 +28,8 @@ export function VehicleDataTab() {
     try {
       const { data, error } = await supabase
         .storage
-        .from('RTE MAIN')
-        .download('Other/all-vehicles-model.json');
+        .from('vehicle_data')
+        .download('all-vehicles-model.json');
       
       if (error) throw error;
 

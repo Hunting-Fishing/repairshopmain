@@ -28,15 +28,17 @@ interface DatabaseWorkOrder {
   description: string;
   status: string;
   created_at: string;
+  customer_id: string;
+  vehicle_id: string;
   customers: {
     first_name: string;
     last_name: string;
-  };
+  } | null;
   vehicles: {
     make: string;
     model: string;
     year: string;
-  };
+  } | null;
 }
 
 export default function WorkOrders() {
@@ -55,6 +57,8 @@ export default function WorkOrders() {
             description,
             status,
             created_at,
+            customer_id,
+            vehicle_id,
             customers:customer_id (
               first_name,
               last_name

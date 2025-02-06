@@ -12,6 +12,7 @@ export function StorageBucketsTab() {
     queryKey: ['storage-buckets'],
     queryFn: async () => {
       try {
+        console.log('Fetching storage buckets...');
         const { data, error } = await supabase
           .storage
           .listBuckets();
@@ -21,8 +22,8 @@ export function StorageBucketsTab() {
           throw error;
         }
         
-        // Add console log to debug the response
         console.log('Raw buckets response:', data);
+        console.log('User session:', await supabase.auth.getSession());
         return data || [];
       } catch (err) {
         console.error('Unexpected error:', err);
@@ -38,6 +39,7 @@ export function StorageBucketsTab() {
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
           Failed to load storage buckets. Error: {error.message}
+          {error.cause && ` (Cause: ${error.cause})`}
         </AlertDescription>
       </Alert>
     );
@@ -68,7 +70,7 @@ export function StorageBucketsTab() {
               ) : !buckets || buckets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground">
-                    No storage buckets found. Error might be related to permissions.
+                    No storage buckets found. This might be due to missing permissions or no buckets exist.
                   </TableCell>
                 </TableRow>
               ) : (

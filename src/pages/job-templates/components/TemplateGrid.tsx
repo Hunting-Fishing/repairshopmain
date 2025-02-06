@@ -19,7 +19,7 @@ export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
             <TemplateDropdown
               key={category}
               category={category}
-              displayName={columnNames[category] || category}
+              displayName={columnNames[category]}
               items={items}
             />
           ))}

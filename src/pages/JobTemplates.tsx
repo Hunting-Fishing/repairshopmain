@@ -3,6 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import Papa from 'papaparse';
+import { toast } from "sonner";
+
+<lov-add-dependency>papaparse@latest</lov-add-dependency>
 
 interface JobTemplate {
   id: string;
@@ -16,19 +20,46 @@ interface JobTemplate {
 
 export default function JobTemplates() {
   const { data: templates, isLoading } = useQuery({
-    queryKey: ['job-templates'],
+    queryKey: ['job-templates-csv'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('job_templates')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching job templates:', error);
-        throw error;
+      // First get the CSV file from storage
+      const { data: fileData, error: fileError } = await supabase
+        .storage
+        .from('RTDATA')
+        .download('Job List 1.csv');
+
+      if (fileError) {
+        console.error('Error fetching CSV file:', fileError);
+        toast.error('Failed to load job templates');
+        throw fileError;
       }
+
+      // Convert the blob to text
+      const text = await fileData.text();
       
-      return data as JobTemplate[];
+      // Parse CSV
+      return new Promise<JobTemplate[]>((resolve, reject) => {
+        Papa.parse(text, {
+          header: true,
+          complete: (results) => {
+            const templates = results.data.map((row: any, index) => ({
+              id: index.toString(), // Generate an ID since CSV might not have one
+              name: row.name || row.Name || 'Unnamed Template',
+              description: row.description || row.Description || null,
+              category: (row.category || row.Category || 'maintenance').toLowerCase(),
+              estimated_hours: parseFloat(row.estimated_hours || row.EstimatedHours) || null,
+              parts_required: [], // We could parse this from CSV if available
+              is_active: true
+            }));
+            resolve(templates);
+          },
+          error: (error) => {
+            console.error('CSV parsing error:', error);
+            toast.error('Failed to parse job templates');
+            reject(error);
+          }
+        });
+      });
     },
   });
 

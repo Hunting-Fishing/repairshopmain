@@ -38,8 +38,7 @@ export function StorageBucketsTab() {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>
-          Failed to load storage buckets. Error: {error.message}
-          {error.cause && ` (Cause: ${error.cause})`}
+          Failed to load storage buckets. Error: {error instanceof Error ? error.message : 'Unknown error'}
         </AlertDescription>
       </Alert>
     );

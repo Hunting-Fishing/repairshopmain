@@ -15,6 +15,22 @@ interface StaffTableRowProps {
 }
 
 export function StaffTableRow({ staff, onViewDetails }: StaffTableRowProps) {
+  const { data: userProfile } = useQuery({
+    queryKey: ['current-user-profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+        
+      return profile;
+    }
+  });
+
   const { data: skillCount } = useQuery({
     queryKey: ['staff-skill-count', staff.id],
     queryFn: async () => {
@@ -59,14 +75,16 @@ export function StaffTableRow({ staff, onViewDetails }: StaffTableRowProps) {
       </TableCell>
       <TableCell className="text-right">
         <div className="flex justify-end gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleResetPassword}
-            title="Reset Password"
-          >
-            <KeyRound className="h-4 w-4" />
-          </Button>
+          {userProfile?.role === 'owner' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleResetPassword}
+              title="Reset Password"
+            >
+              <KeyRound className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"

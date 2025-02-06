@@ -42,56 +42,66 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Process and insert data in batches
-    const batchSize = 50
-    const batches = []
+    // Process and insert data in smaller batches
+    const batchSize = 25 // Reduced from 50 to 25
+    const maxConcurrentBatches = 4
     const errors = []
     
-    for (let i = 0; i < vehicleData.length; i += batchSize) {
-      const batch = vehicleData.slice(i, i + batchSize).map(item => {
-        if (!item.year || !item.make || !item.model) {
-          console.warn('Invalid item found:', item)
-          return null
-        }
+    // Process data in chunks to manage memory
+    for (let i = 0; i < vehicleData.length; i += batchSize * maxConcurrentBatches) {
+      const batchPromises = []
+      
+      // Create up to maxConcurrentBatches promises
+      for (let j = 0; j < maxConcurrentBatches && (i + j * batchSize) < vehicleData.length; j++) {
+        const start = i + j * batchSize
+        const end = Math.min(start + batchSize, vehicleData.length)
+        const batch = vehicleData.slice(start, end).map(item => {
+          if (!item.year || !item.make || !item.model) {
+            console.warn('Invalid item found:', item)
+            return null
+          }
+          
+          return {
+            year: parseInt(item.year),
+            make: item.make?.trim(),
+            model: item.model?.trim(),
+            organization_id: organizationId
+          }
+        }).filter(item => item !== null)
         
-        return {
-          year: parseInt(item.year),
-          make: item.make?.trim(),
-          model: item.model?.trim(),
-          organization_id: organizationId
+        if (batch.length > 0) {
+          const batchPromise = async () => {
+            try {
+              console.log(`Processing batch ${start / batchSize + 1} to ${end / batchSize} (${batch.length} records)`)
+              
+              const { error } = await supabaseAdmin
+                .from('vehicle_models_reference')
+                .upsert(batch, { 
+                  onConflict: 'year,make,model',
+                  ignoreDuplicates: true
+                })
+
+              if (error) {
+                console.error(`Error inserting batch ${start / batchSize + 1}:`, error)
+                errors.push(`Batch ${start / batchSize + 1}: ${error.message}`)
+              } else {
+                console.log(`Successfully inserted batch ${start / batchSize + 1}`)
+              }
+            } catch (error) {
+              console.error(`Error processing batch ${start / batchSize + 1}:`, error)
+              errors.push(`Batch ${start / batchSize + 1}: ${error.message}`)
+            }
+          }
+          
+          batchPromises.push(batchPromise())
         }
-      }).filter(item => item !== null)
-      
-      if (batch.length > 0) {
-        batches.push(batch)
       }
-    }
-
-    console.log(`Processing ${batches.length} batches of vehicle data`)
-
-    // Insert batches sequentially
-    for (let i = 0; i < batches.length; i++) {
-      const batch = batches[i]
-      console.log(`Inserting batch ${i + 1} of ${batches.length} (${batch.length} records)`)
       
-      try {
-        const { error } = await supabaseAdmin
-          .from('vehicle_models_reference')
-          .upsert(batch, { 
-            onConflict: 'year,make,model',
-            ignoreDuplicates: true
-          })
-
-        if (error) {
-          console.error(`Error inserting batch ${i + 1}:`, error)
-          errors.push(`Batch ${i + 1}: ${error.message}`)
-        } else {
-          console.log(`Successfully inserted batch ${i + 1}`)
-        }
-      } catch (error) {
-        console.error(`Error processing batch ${i + 1}:`, error)
-        errors.push(`Batch ${i + 1}: ${error.message}`)
-      }
+      // Wait for current set of batches to complete before moving to next set
+      await Promise.all(batchPromises)
+      
+      // Small delay between batch sets to prevent overwhelming the database
+      await new Promise(resolve => setTimeout(resolve, 100))
     }
 
     if (errors.length > 0) {

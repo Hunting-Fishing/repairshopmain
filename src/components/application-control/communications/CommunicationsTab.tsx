@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ChatRoomList } from "./ChatRoomList";
 import { ChatWindow } from "./ChatWindow";
 import { useChatRooms } from "@/hooks/chat/useChatRooms";
@@ -27,12 +27,10 @@ export function CommunicationsTab() {
           </p>
         </div>
         <div className="flex gap-2">
-          <CreateChatRoomDialog>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Chat Room
-            </Button>
-          </CreateChatRoomDialog>
+          <Button onClick={() => {}}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Chat Room
+          </Button>
           <Button variant="outline" onClick={() => setShowSettings(true)}>
             <Settings className="h-4 w-4" />
           </Button>

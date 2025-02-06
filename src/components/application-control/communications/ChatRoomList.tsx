@@ -10,11 +10,14 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { CreateChatRoomDialog } from "./CreateChatRoomDialog";
 
-export function ChatRoomList({ selectedRoomId, onSelectRoom }: { 
+interface ChatRoomListProps {
   selectedRoomId?: string;
   onSelectRoom: (roomId: string) => void;
-}) {
-  const { data: rooms, isLoading } = useChatRooms();
+  filter?: string;
+}
+
+export function ChatRoomList({ selectedRoomId, onSelectRoom, filter }: ChatRoomListProps) {
+  const { data: rooms, isLoading } = useChatRooms(filter);
 
   if (isLoading) {
     return <div className="space-y-2">

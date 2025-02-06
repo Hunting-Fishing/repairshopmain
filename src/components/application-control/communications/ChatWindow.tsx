@@ -1,10 +1,9 @@
-
 import { useEffect, useState, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, Paperclip, Pin, MoreVertical } from "lucide-react";
+import { Send, Paperclip, MoreVertical } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -23,6 +22,10 @@ interface Message {
   metadata: any;
   job_id?: string;
   vehicle_id?: string;
+  sender?: {
+    first_name: string;
+    last_name: string;
+  };
 }
 
 interface ChatWindowProps {

@@ -86,6 +86,18 @@ export function useChatRoomSubmit({
     setIsLoading(true);
 
     try {
+      // First get the organization_id for the current user
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("organization_id")
+        .eq("id", user.id)
+        .single();
+
+      if (profileError) throw profileError;
+      if (!profileData?.organization_id) {
+        throw new Error("User organization not found");
+      }
+
       let chatName = name;
       let chatDescription = description;
       if (roomType === 'direct' && selectedStaffIds.length === 1) {
@@ -112,7 +124,9 @@ export function useChatRoomSubmit({
           category: roomType === 'work_order' ? 'work-order' : 'general',
           is_private: roomType === 'direct' ? true : isPrivate,
           metadata,
-          work_order_id: roomType === 'work_order' ? workOrderId : null
+          work_order_id: roomType === 'work_order' ? workOrderId : null,
+          organization_id: profileData.organization_id,
+          created_by: user.id
         }])
         .select()
         .single();
@@ -154,6 +168,7 @@ export function useChatRoomSubmit({
           variant: "destructive",
         });
       } else {
+        console.error("Error creating chat room:", error);
         toast({
           title: "Error",
           description: "Failed to create chat room",

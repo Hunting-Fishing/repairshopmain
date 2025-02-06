@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TablesList } from "./TablesList";
 import { StorageBucketsTab } from "./StorageBucketsTab";
+import { VehicleDataTab } from "./VehicleDataTab";
 import { DatabaseIcon } from "lucide-react";
 
 export function DatabaseTab() {
@@ -32,6 +33,7 @@ export function DatabaseTab() {
             <TabsList>
               <TabsTrigger value="tables">Database Tables</TabsTrigger>
               <TabsTrigger value="buckets">Storage Buckets</TabsTrigger>
+              <TabsTrigger value="vehicle-data">Vehicle Data</TabsTrigger>
             </TabsList>
 
             <TabsContent value="tables">
@@ -40,6 +42,10 @@ export function DatabaseTab() {
 
             <TabsContent value="buckets">
               <StorageBucketsTab />
+            </TabsContent>
+
+            <TabsContent value="vehicle-data">
+              <VehicleDataTab />
             </TabsContent>
           </Tabs>
         </CardContent>

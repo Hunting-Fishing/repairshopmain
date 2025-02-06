@@ -23,6 +23,22 @@ interface WorkOrder {
   date: string;
 }
 
+interface DatabaseWorkOrder {
+  id: string;
+  description: string;
+  status: string;
+  created_at: string;
+  customers: {
+    first_name: string;
+    last_name: string;
+  };
+  vehicles: {
+    make: string;
+    model: string;
+    year: string;
+  };
+}
+
 export default function WorkOrders() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
@@ -39,11 +55,11 @@ export default function WorkOrders() {
             description,
             status,
             created_at,
-            customers (
+            customers:customer_id (
               first_name,
               last_name
             ),
-            vehicles (
+            vehicles:vehicle_id (
               make,
               model,
               year
@@ -53,9 +69,9 @@ export default function WorkOrders() {
 
         if (error) throw error;
 
-        const formattedOrders = data.map(order => ({
+        const formattedOrders = (data as DatabaseWorkOrder[]).map(order => ({
           id: order.id,
-          customer: `${order.customers?.first_name} ${order.customers?.last_name}`,
+          customer: order.customers ? `${order.customers.first_name} ${order.customers.last_name}` : 'N/A',
           vehicle: order.vehicles ? `${order.vehicles.year} ${order.vehicles.make} ${order.vehicles.model}` : 'N/A',
           description: order.description,
           status: order.status,

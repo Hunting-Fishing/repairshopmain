@@ -133,8 +133,13 @@ export default function JobTemplates() {
                 }
               });
             }
+
+            // Filter out empty arrays
+            const filteredColumns = Object.fromEntries(
+              Object.entries(columns).filter(([_, items]) => items.length > 0)
+            );
             
-            resolve(columns);
+            resolve(filteredColumns);
           },
           error: (error) => {
             console.error('CSV parsing error:', error);

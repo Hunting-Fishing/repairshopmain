@@ -19,11 +19,16 @@ serve(async (req) => {
     console.log('Received request to import vehicle data')
     const { vehicleData, organizationId } = await req.json()
     
+    // Log initial data received
     console.log('Received data:', {
       organizationId,
       dataLength: vehicleData?.length || 0,
       sampleData: vehicleData?.[0]
     })
+
+    if (!Array.isArray(vehicleData)) {
+      throw new Error('Vehicle data must be an array')
+    }
 
     // Create Supabase client
     const supabaseClient = createClient(
@@ -32,19 +37,29 @@ serve(async (req) => {
     )
 
     // Process and insert data in batches
-    const batchSize = 100 // Reduced batch size for better error handling
+    const batchSize = 50 // Further reduced batch size
     const batches = []
     const errors = []
     
     for (let i = 0; i < vehicleData.length; i += batchSize) {
-      const batch = vehicleData.slice(i, i + batchSize).map(item => ({
-        year: parseInt(item.year),
-        make: item.make?.trim(),
-        model: item.model?.trim(),
-        organization_id: organizationId
-      }))
+      const batch = vehicleData.slice(i, i + batchSize).map(item => {
+        // Validate and clean data
+        if (!item.year || !item.make || !item.model) {
+          console.warn('Invalid item found:', item)
+          return null
+        }
+        
+        return {
+          year: parseInt(item.year),
+          make: item.make?.trim(),
+          model: item.model?.trim(),
+          organization_id: organizationId
+        }
+      }).filter(item => item !== null) // Remove invalid items
       
-      batches.push(batch)
+      if (batch.length > 0) {
+        batches.push(batch)
+      }
     }
 
     console.log(`Processing ${batches.length} batches of vehicle data`)
@@ -54,15 +69,22 @@ serve(async (req) => {
       const batch = batches[i]
       console.log(`Inserting batch ${i + 1} of ${batches.length} (${batch.length} records)`)
       
-      const { error } = await supabaseClient
-        .from('vehicle_models_reference')
-        .upsert(batch, { 
-          onConflict: 'year,make,model',
-          ignoreDuplicates: true // Ignore rather than update duplicates
-        })
+      try {
+        const { error } = await supabaseClient
+          .from('vehicle_models_reference')
+          .upsert(batch, { 
+            onConflict: 'year,make,model',
+            ignoreDuplicates: true
+          })
 
-      if (error) {
-        console.error(`Error inserting batch ${i + 1}:`, error)
+        if (error) {
+          console.error(`Error inserting batch ${i + 1}:`, error)
+          errors.push(`Batch ${i + 1}: ${error.message}`)
+        } else {
+          console.log(`Successfully inserted batch ${i + 1}`)
+        }
+      } catch (error) {
+        console.error(`Error processing batch ${i + 1}:`, error)
         errors.push(`Batch ${i + 1}: ${error.message}`)
       }
     }

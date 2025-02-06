@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 
 const getBaseMenuItems = () => [
   { title: "Dashboard", icon: Home, path: "/" },
@@ -28,27 +29,33 @@ const getBaseMenuItems = () => [
 
 export function AppSidebar() {
   const [unreadCount, setUnreadCount] = useState(0);
+  const { user } = useAuth();
 
-  const { data: userProfile } = useQuery({
+  const { data: profile, isLoading } = useQuery({
     queryKey: ['current-user-profile'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      if (!user?.id) return null;
       
-      const { data: profile } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, role')
         .eq('id', user.id)
         .single();
         
-      return profile;
-    }
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!user?.id
   });
 
   // Get menu items based on user role
   const menuItems = [
     ...getBaseMenuItems(),
-    ...(userProfile?.role === 'owner' || userProfile?.role === 'management' 
+    ...(profile?.role === 'owner' || profile?.role === 'management' 
       ? [{ title: "Application Control", icon: Settings2, path: "/application-control" }] 
       : [])
   ];
@@ -64,7 +71,7 @@ export function AppSidebar() {
           schema: 'public',
           table: 'chat_messages',
         },
-        (payload) => {
+        () => {
           setUnreadCount(prev => prev + 1);
         }
       )
@@ -86,10 +93,15 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="h-[60px] px-6 flex flex-col justify-center border-b">
         <span className="font-bold text-lg">RepairShop Manager</span>
-        {userProfile && (
+        {isLoading ? (
+          <span className="text-sm text-muted-foreground">Loading...</span>
+        ) : profile ? (
           <span className="text-sm text-muted-foreground">
-            Welcome! {userProfile.first_name} {userProfile.last_name} : {formatRole(userProfile.role)}
+            Welcome! {profile.first_name} {profile.last_name}{' '}
+            {profile.role && `: ${formatRole(profile.role)}`}
           </span>
+        ) : (
+          <span className="text-sm text-muted-foreground">Welcome!</span>
         )}
       </SidebarHeader>
       <SidebarContent>

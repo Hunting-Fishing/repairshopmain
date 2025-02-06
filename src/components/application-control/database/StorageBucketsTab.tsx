@@ -11,18 +11,23 @@ export function StorageBucketsTab() {
   const { data: buckets, isLoading, error } = useQuery({
     queryKey: ['storage-buckets'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .storage
-        .listBuckets();
-      
-      if (error) {
-        console.error('Error fetching buckets:', error);
-        throw error;
+      try {
+        const { data, error } = await supabase
+          .storage
+          .listBuckets();
+        
+        if (error) {
+          console.error('Error fetching buckets:', error);
+          throw error;
+        }
+        
+        // Add console log to debug the response
+        console.log('Raw buckets response:', data);
+        return data || [];
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        throw err;
       }
-      
-      // Add console log to debug the response
-      console.log('Buckets fetched:', data);
-      return data;
     },
   });
 
@@ -63,25 +68,27 @@ export function StorageBucketsTab() {
               ) : !buckets || buckets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center text-muted-foreground">
-                    No storage buckets found
+                    No storage buckets found. Error might be related to permissions.
                   </TableCell>
                 </TableRow>
-              ) : buckets.map((bucket) => (
-                <TableRow key={bucket.id}>
-                  <TableCell className="font-medium">{bucket.name}</TableCell>
-                  <TableCell>{new Date(bucket.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs ${bucket.public ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                      {bucket.public ? "Public" : "Private"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
-                      Active
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
+              ) : (
+                buckets.map((bucket) => (
+                  <TableRow key={bucket.id}>
+                    <TableCell className="font-medium">{bucket.name}</TableCell>
+                    <TableCell>{new Date(bucket.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${bucket.public ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                        {bucket.public ? "Public" : "Private"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                        Active
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </ScrollArea>

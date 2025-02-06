@@ -59,7 +59,7 @@ export function CreateChatRoomDialog() {
       return false;
     }
 
-    if (!name.trim()) {
+    if (roomType !== 'direct' && !name.trim()) {
       toast({
         title: "Validation Error",
         description: "Chat room name is required",
@@ -90,8 +90,19 @@ export function CreateChatRoomDialog() {
     setIsLoading(true);
 
     try {
+      // For direct messages, automatically set the name to the recipient's name
+      let chatName = name;
+      let chatDescription = description;
+      if (roomType === 'direct' && selectedStaffIds.length === 1) {
+        const recipient = staffMembers?.find(staff => staff.id === selectedStaffIds[0]);
+        if (recipient) {
+          chatName = `Chat with ${recipient.first_name} ${recipient.last_name}`;
+          chatDescription = `Direct message conversation`;
+        }
+      }
+
       const metadata = {
-        description,
+        description: chatDescription,
         maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
         enableNotifications,
         workOrderId: roomType === 'work_order' ? workOrderId : null,
@@ -101,11 +112,11 @@ export function CreateChatRoomDialog() {
       const { data: roomData, error: roomError } = await supabase
         .from("chat_rooms")
         .insert([{ 
-          name, 
+          name: chatName, 
           type,
           room_type: roomType,
           category: roomType === 'work_order' ? 'work-order' : 'general',
-          is_private: isPrivate,
+          is_private: roomType === 'direct' ? true : isPrivate,
           metadata,
           work_order_id: roomType === 'work_order' ? workOrderId : null
         }])
@@ -183,17 +194,21 @@ export function CreateChatRoomDialog() {
         <DialogHeader>
           <DialogTitle>Create Chat Room</DialogTitle>
           <DialogDescription>
-            Create a new chat room for your team to communicate
+            {roomType === 'direct' 
+              ? 'Select a staff member to start a private conversation'
+              : 'Create a new chat room for your team to communicate'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <BasicInfoSection
-            name={name}
-            setName={setName}
-            description={description}
-            setDescription={setDescription}
-          />
+          {roomType !== 'direct' && (
+            <BasicInfoSection
+              name={name}
+              setName={setName}
+              description={description}
+              setDescription={setDescription}
+            />
+          )}
 
           <RoomTypeSection
             roomType={roomType}
@@ -210,12 +225,14 @@ export function CreateChatRoomDialog() {
             staffOptions={staffOptions}
           />
 
-          <RoomSettingsSection
-            isPrivate={isPrivate}
-            setIsPrivate={setIsPrivate}
-            enableNotifications={enableNotifications}
-            setEnableNotifications={setEnableNotifications}
-          />
+          {roomType !== 'direct' && (
+            <RoomSettingsSection
+              isPrivate={isPrivate}
+              setIsPrivate={setIsPrivate}
+              enableNotifications={enableNotifications}
+              setEnableNotifications={setEnableNotifications}
+            />
+          )}
 
           <DialogFooter>
             <Button variant="outline" type="button" onClick={() => {
@@ -225,7 +242,7 @@ export function CreateChatRoomDialog() {
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              Create Room
+              {roomType === 'direct' ? 'Start Conversation' : 'Create Room'}
             </Button>
           </DialogFooter>
         </form>

@@ -12,19 +12,19 @@ interface ParticipantsSectionProps {
 }
 
 export function ParticipantsSection({
-  selectedStaffIds,
+  selectedStaffIds = [],
   setSelectedStaffIds,
   maxParticipants,
   setMaxParticipants,
-  staffOptions = [], // Provide default empty array
+  staffOptions = [],
 }: ParticipantsSectionProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Select Participants</Label>
         <MultiSelect
-          options={staffOptions || []} // Ensure we always pass an array
-          selected={selectedStaffIds || []} // Ensure we always pass an array
+          options={staffOptions}
+          selected={selectedStaffIds}
           onChange={setSelectedStaffIds}
           className="w-full"
         />

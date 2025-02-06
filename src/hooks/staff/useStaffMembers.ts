@@ -15,7 +15,7 @@ export function useStaffMembers() {
   return useQuery({
     queryKey: ["staff-members", session?.user.id],
     queryFn: async () => {
-      if (!session) throw new Error("No session");
+      if (!session) return [];
 
       const { data: userProfile } = await supabase
         .from("profiles")
@@ -24,7 +24,7 @@ export function useStaffMembers() {
         .maybeSingle();
 
       if (!userProfile?.organization_id) {
-        throw new Error("No organization found");
+        return [];
       }
 
       const { data: profiles, error: profilesError } = await supabase
@@ -43,7 +43,7 @@ export function useStaffMembers() {
         `)
         .eq("organization_id", userProfile.organization_id);
 
-      if (profilesError) throw profilesError;
+      if (profilesError) return [];
       if (!profiles) return [];
 
       const { data: emailData, error: emailError } = await supabase
@@ -51,7 +51,7 @@ export function useStaffMembers() {
           org_id: userProfile.organization_id
         });
 
-      if (emailError) throw emailError;
+      if (emailError) return [];
       if (!emailData) return [];
 
       return profiles.map(profile => ({
@@ -61,6 +61,6 @@ export function useStaffMembers() {
       })) as StaffMember[];
     },
     enabled: !!session?.user.id,
-    initialData: [], // Provide initial empty array
+    initialData: [],
   });
 }

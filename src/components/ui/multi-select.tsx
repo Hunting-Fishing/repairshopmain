@@ -17,31 +17,33 @@ interface MultiSelectProps {
 }
 
 export function MultiSelect({
-  options = [], // Provide default empty array
-  selected = [], // Provide default empty array
+  options = [],
+  selected = [],
   onChange,
   className,
 }: MultiSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const safeOptions = options || [];
+  const safeSelected = selected || [];
 
   const handleUnselect = (item: string) => {
-    onChange((selected || []).filter((i) => i !== item));
+    onChange(safeSelected.filter((i) => i !== item));
   };
 
   const handleSelect = (item: string) => {
-    if ((selected || []).includes(item)) {
+    if (safeSelected.includes(item)) {
       handleUnselect(item);
     } else {
-      onChange([...(selected || []), item]);
+      onChange([...safeSelected, item]);
     }
   };
 
   return (
     <Command className={className}>
-      <div className="flex flex-wrap gap-1 border rounded-md p-1">
-        {(selected || []).map((item) => (
+      <div className="flex flex-wrap gap-1 border rounded-md p-1 min-h-[2.5rem]">
+        {safeSelected.map((item) => (
           <Badge key={item} variant="secondary" className="rounded-sm">
-            {options.find((option) => option.value === item)?.label}
+            {safeOptions.find((option) => option.value === item)?.label}
             <button
               className="ml-1 ring-offset-background rounded-full outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               onKeyDown={(e) => {
@@ -61,7 +63,7 @@ export function MultiSelect({
         ))}
       </div>
       <CommandGroup className="max-h-[200px] overflow-auto">
-        {options.map((option) => (
+        {safeOptions.map((option) => (
           <CommandItem
             key={option.value}
             onSelect={() => handleSelect(option.value)}

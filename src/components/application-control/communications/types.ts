@@ -5,7 +5,10 @@ export interface Message {
   content_type?: string;
   sender_id: string;
   created_at: string;
-  metadata: any;
+  metadata: {
+    url?: string;
+    type?: string;
+  };
   job_id?: string;
   vehicle_id?: string;
   sender?: {
@@ -22,7 +25,7 @@ export interface ChatRoom {
   type: string;
   room_type: RoomType;
   category: string;
-  created_at: string;
+  created_at: string;  
   created_by: string;
   organization_id: string;
   is_private: boolean;
@@ -30,4 +33,3 @@ export interface ChatRoom {
   last_message_at: string;
   work_order_id?: string;
 }
-

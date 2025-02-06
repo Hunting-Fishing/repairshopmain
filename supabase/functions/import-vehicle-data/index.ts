@@ -16,7 +16,14 @@ serve(async (req) => {
   }
 
   try {
+    console.log('Received request to import vehicle data')
     const { vehicleData, organizationId } = await req.json()
+    
+    console.log('Received data:', {
+      organizationId,
+      dataLength: vehicleData?.length || 0,
+      sampleData: vehicleData?.[0]
+    })
 
     // Create Supabase client
     const supabaseClient = createClient(
@@ -43,12 +50,18 @@ serve(async (req) => {
 
     // Insert batches sequentially
     for (const batch of batches) {
+      console.log('Inserting batch of', batch.length, 'records')
       const { error } = await supabaseClient
         .from('vehicle_models_reference')
         .upsert(batch, { onConflict: 'year,make,model' })
 
-      if (error) throw error
+      if (error) {
+        console.error('Error inserting batch:', error)
+        throw error
+      }
     }
+
+    console.log('Successfully imported all vehicle data')
 
     return new Response(
       JSON.stringify({ message: 'Vehicle data imported successfully' }),

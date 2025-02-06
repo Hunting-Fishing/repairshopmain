@@ -3291,6 +3291,41 @@ export type Database = {
           },
         ]
       }
+      vehicle_models_reference: {
+        Row: {
+          created_at: string
+          id: string
+          make: string
+          model: string
+          organization_id: string | null
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          make: string
+          model: string
+          organization_id?: string | null
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          make?: string
+          model?: string
+          organization_id?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_models_reference_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           body_class: string | null

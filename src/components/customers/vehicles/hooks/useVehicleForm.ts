@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -19,12 +20,24 @@ export const useVehicleForm = (customerId: string, onSuccess?: () => void) => {
     setMake("");
     setModel("");
     try {
-      const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/GetMakesForModelYear/${selectedYear}?format=json`);
-      const data = await response.json();
-      setMakes(data.Results.map((result: any) => result.Make_Name));
+      const { data, error } = await supabase
+        .from('vehicle_models_reference')
+        .select('make')
+        .eq('year', parseInt(selectedYear))
+        .order('make')
+        
+      if (error) throw error;
+      
+      // Get unique makes
+      const uniqueMakes = [...new Set(data.map(item => item.make))];
+      setMakes(uniqueMakes);
     } catch (error) {
       console.error("Error fetching makes:", error);
-      toast({ title: "Error", description: "Failed to fetch vehicle makes", variant: "destructive" });
+      toast({ 
+        title: "Error", 
+        description: "Failed to fetch vehicle makes", 
+        variant: "destructive" 
+      });
     }
   };
 
@@ -32,12 +45,25 @@ export const useVehicleForm = (customerId: string, onSuccess?: () => void) => {
     setMake(selectedMake);
     setModel("");
     try {
-      const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/GetModelsForMakeYear/make/${selectedMake}/modelyear/${year}?format=json`);
-      const data = await response.json();
-      setModels(data.Results.map((result: any) => result.Model_Name));
+      const { data, error } = await supabase
+        .from('vehicle_models_reference')
+        .select('model')
+        .eq('year', parseInt(year))
+        .eq('make', selectedMake)
+        .order('model')
+      
+      if (error) throw error;
+      
+      // Get unique models
+      const uniqueModels = [...new Set(data.map(item => item.model))];
+      setModels(uniqueModels);
     } catch (error) {
       console.error("Error fetching models:", error);
-      toast({ title: "Error", description: "Failed to fetch vehicle models", variant: "destructive" });
+      toast({ 
+        title: "Error", 
+        description: "Failed to fetch vehicle models", 
+        variant: "destructive" 
+      });
     }
   };
 
@@ -87,7 +113,11 @@ export const useVehicleForm = (customerId: string, onSuccess?: () => void) => {
       onSuccess?.();
     } catch (error: any) {
       console.error("Error adding vehicle:", error);
-      toast({ title: "Error", description: "Failed to add vehicle: " + error.message, variant: "destructive" });
+      toast({ 
+        title: "Error", 
+        description: "Failed to add vehicle: " + error.message, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
       setShowVinDialog(false);

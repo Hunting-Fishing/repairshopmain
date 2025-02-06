@@ -9,7 +9,14 @@ export function useChatRooms(filter?: string) {
     queryFn: async () => {
       let query = supabase
         .from("chat_rooms")
-        .select("*, sender:created_by(first_name, last_name)")
+        .select(`
+          *,
+          sender:created_by(first_name, last_name),
+          participants:chat_room_participants(
+            user_id,
+            profiles:user_id(first_name, last_name)
+          )
+        `)
         .order("last_message_at", { ascending: false });
 
       if (filter) {

@@ -5,10 +5,34 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, session } = useAuth();
   const navigate = useNavigate();
+
+  // Fetch user profile data
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ['current-user-profile'],
+    queryFn: async () => {
+      if (!session?.user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, role')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      
+      return data;
+    },
+    enabled: !!session?.user?.id
+  });
 
   // If not authenticated, redirect to auth page
   if (!session) {
@@ -27,11 +51,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     ).join(' ');
   };
 
-  const userMetadata = session.user?.user_metadata;
-  const firstName = userMetadata?.firstName || '';
-  const lastName = userMetadata?.lastName || '';
-  const role = userMetadata?.role || '';
-
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -40,7 +59,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="container py-6">
             <div className="flex justify-between items-center mb-4">
               <div className="text-sm text-muted-foreground">
-                Welcome! {firstName} {lastName} : {formatRole(role)}
+                {isLoading ? (
+                  "Loading..."
+                ) : (
+                  <>
+                    Welcome! {profile?.first_name} {profile?.last_name}{' '}
+                    {profile?.role && `: ${formatRole(profile.role)}`}
+                  </>
+                )}
               </div>
               <Button variant="ghost" onClick={handleSignOut}>
                 <LogOut className="mr-2 h-4 w-4" />

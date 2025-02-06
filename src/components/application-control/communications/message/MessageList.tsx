@@ -26,6 +26,8 @@ export function MessageList({ messages }: MessageListProps) {
           <MessageItem
             key={message.id}
             content={message.content}
+            content_type={message.content_type}
+            metadata={message.metadata}
             sender={message.sender}
             created_at={message.created_at}
           />

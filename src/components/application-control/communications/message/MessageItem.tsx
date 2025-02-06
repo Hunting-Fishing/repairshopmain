@@ -7,7 +7,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { MoreVertical, Download, Eye, Share2, FileIcon, ImageIcon } from "lucide-react";
+import { MoreVertical, Download, Eye, Share2, FileIcon } from "lucide-react";
 
 interface MessageItemProps {
   content: string;

@@ -1,3 +1,4 @@
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -21,11 +22,12 @@ export function useCalendarBookings(selectedDate: Date) {
       const { data, error } = await supabase
         .from("bookings")
         .select("*")
-        .gte("start_time", startOfDay.toISOString())
-        .lte("start_time", endOfDay.toISOString())
+        .gte('start_time', startOfDay.toISOString())
+        .lte('start_time', endOfDay.toISOString())
         .order("start_time");
 
       if (error) {
+        console.error("Error fetching bookings:", error);
         toast.error("Error fetching bookings");
         throw error;
       }

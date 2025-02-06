@@ -1,5 +1,5 @@
 
-import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package, Truck } from "lucide-react";
+import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package, Truck, Database } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ControlPanel } from "./ControlPanel";
 import { SystemStatus } from "./SystemStatus";
@@ -55,6 +55,12 @@ export function OverviewTab() {
       description: "Manage suppliers, documents, and transactions",
       icon: Truck,
       action: () => navigate("/inventory/suppliers"),
+    },
+    {
+      title: "Database Management",
+      description: "View and manage database storage and tables",
+      icon: Database,
+      action: () => document.querySelector('[value="database"]')?.dispatchEvent(new Event('click')),
     }
   ];
 

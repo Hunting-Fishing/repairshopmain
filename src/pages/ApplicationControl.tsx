@@ -1,5 +1,5 @@
 
-import { Settings2 } from "lucide-react";
+import { Settings2, DatabaseIcon } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ShopList } from "@/components/shops/ShopList";
@@ -7,6 +7,7 @@ import { OverviewTab } from "@/components/application-control/OverviewTab";
 import { IntegrationsTab } from "@/components/application-control/IntegrationsTab";
 import { InventoryTab } from "@/components/application-control/inventory/InventoryTab";
 import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
+import { DatabaseTab } from "@/components/application-control/database/DatabaseTab";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigate } from "react-router-dom";
@@ -29,7 +30,6 @@ export default function ApplicationControl() {
     }
   });
 
-  // Additional component-level protection
   if (userProfile && !['owner', 'management'].includes(userProfile.role)) {
     toast.error("You don't have permission to access this page");
     return <Navigate to="/" replace />;
@@ -63,6 +63,7 @@ export default function ApplicationControl() {
               <TabsTrigger value="shops">Shops</TabsTrigger>
               <TabsTrigger value="inventory">Inventory</TabsTrigger>
               <TabsTrigger value="communications">Communications</TabsTrigger>
+              <TabsTrigger value="database">Database</TabsTrigger>
               <TabsTrigger value="integrations">Integrations</TabsTrigger>
             </TabsList>
             
@@ -88,6 +89,10 @@ export default function ApplicationControl() {
 
             <TabsContent value="communications">
               <CommunicationsTab />
+            </TabsContent>
+
+            <TabsContent value="database">
+              <DatabaseTab />
             </TabsContent>
 
             <TabsContent value="integrations">

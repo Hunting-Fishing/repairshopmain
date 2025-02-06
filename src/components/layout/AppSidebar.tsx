@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const menuItems = [
   { title: "Dashboard", icon: Home, path: "/" },
@@ -28,6 +29,22 @@ const menuItems = [
 
 export function AppSidebar() {
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const { data: userProfile } = useQuery({
+    queryKey: ['current-user-profile'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name, role')
+        .eq('id', user.id)
+        .single();
+        
+      return profile;
+    }
+  });
 
   useEffect(() => {
     // Subscribe to new messages
@@ -51,10 +68,22 @@ export function AppSidebar() {
     };
   }, []);
 
+  // Format the role for display
+  const formatRole = (role: string) => {
+    return role.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
+  };
+
   return (
     <Sidebar>
-      <SidebarHeader className="h-[60px] px-6 flex items-center border-b">
+      <SidebarHeader className="h-[60px] px-6 flex flex-col justify-center border-b">
         <span className="font-bold text-lg">RepairShop Manager</span>
+        {userProfile && (
+          <span className="text-sm text-muted-foreground">
+            Welcome! {userProfile.first_name} {userProfile.last_name} : {formatRole(userProfile.role)}
+          </span>
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

@@ -22,11 +22,13 @@ import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { RoomType } from "./types";
 
 export function CreateChatRoomDialog() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [type, setType] = useState<string>("");
+  const [roomType, setRoomType] = useState<RoomType>("general");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -37,7 +39,12 @@ export function CreateChatRoomDialog() {
     try {
       const { error } = await supabase
         .from("chat_rooms")
-        .insert([{ name, type }]);
+        .insert([{ 
+          name, 
+          type,
+          room_type: roomType,
+          category: roomType === 'work_order' ? 'work-order' : 'general'
+        }]);
 
       if (error) throw error;
 
@@ -48,6 +55,7 @@ export function CreateChatRoomDialog() {
       setOpen(false);
       setName("");
       setType("");
+      setRoomType("general");
     } catch (error) {
       toast({
         title: "Error",
@@ -88,10 +96,25 @@ export function CreateChatRoomDialog() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Room Type</Label>
-            <Select value={type} onValueChange={setType} required>
+            <Label htmlFor="roomType">Room Type</Label>
+            <Select value={roomType} onValueChange={setRoomType} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select room type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="general">General Chat</SelectItem>
+                <SelectItem value="direct">Direct Message</SelectItem>
+                <SelectItem value="work_order">Work Order Discussion</SelectItem>
+                <SelectItem value="group">Group Chat</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="type">Category</Label>
+            <Select value={type} onValueChange={setType} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="general">General</SelectItem>

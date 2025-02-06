@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChatRoomList } from "./ChatRoomList";
@@ -27,10 +26,7 @@ export function CommunicationsTab() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => {}}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Chat Room
-          </Button>
+          <CreateChatRoomDialog />
           <Button variant="outline" onClick={() => setShowSettings(true)}>
             <Settings className="h-4 w-4" />
           </Button>
@@ -40,9 +36,33 @@ export function CommunicationsTab() {
       <Tabs defaultValue="chats" className="w-full">
         <TabsList>
           <TabsTrigger value="chats">Active Chats</TabsTrigger>
+          <TabsTrigger value="direct">Direct Messages</TabsTrigger>
           <TabsTrigger value="work-orders">Work Order Discussions</TabsTrigger>
           <TabsTrigger value="team">Team Channels</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="direct" className="mt-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="lg:col-span-3 space-y-4">
+                  <ChatRoomList 
+                    selectedRoomId={selectedRoomId} 
+                    onSelectRoom={setSelectedRoomId}
+                    filter="direct"
+                  />
+                </div>
+                <div className="lg:col-span-9">
+                  {selectedRoomId ? (
+                    <ChatWindow roomId={selectedRoomId} roomName={selectedRoom?.name} />
+                  ) : (
+                    <div className="text-muted-foreground">Select a conversation to start messaging</div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="chats" className="mt-6">
           <Card>

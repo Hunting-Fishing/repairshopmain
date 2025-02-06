@@ -1,19 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
-interface ChatRoom {
-  id: string;
-  name: string | null;
-  type: string;
-  category: string;
-  created_at: string;
-  created_by: string;
-  organization_id: string;
-  is_private: boolean;
-  metadata: any;
-  last_message_at: string;
-}
+import { ChatRoom } from "@/components/application-control/communications/types";
 
 export function useChatRooms(filter?: string) {
   return useQuery({
@@ -21,11 +9,17 @@ export function useChatRooms(filter?: string) {
     queryFn: async () => {
       let query = supabase
         .from("chat_rooms")
-        .select("*")
+        .select("*, sender:created_by(first_name, last_name)")
         .order("last_message_at", { ascending: false });
 
       if (filter) {
-        query = query.eq("category", filter);
+        if (filter === 'work-order') {
+          query = query.eq("room_type", "work_order");
+        } else if (filter === 'direct') {
+          query = query.eq("room_type", "direct");
+        } else {
+          query = query.eq("category", filter);
+        }
       }
 
       const { data, error } = await query;

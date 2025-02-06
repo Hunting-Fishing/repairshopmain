@@ -270,8 +270,10 @@ export type Database = {
           metadata: Json | null
           name: string | null
           organization_id: string
+          room_type: string | null
           type: string
           updated_at: string
+          work_order_id: string | null
         }
         Insert: {
           category?: string | null
@@ -283,8 +285,10 @@ export type Database = {
           metadata?: Json | null
           name?: string | null
           organization_id: string
+          room_type?: string | null
           type: string
           updated_at?: string
+          work_order_id?: string | null
         }
         Update: {
           category?: string | null
@@ -296,8 +300,10 @@ export type Database = {
           metadata?: Json | null
           name?: string | null
           organization_id?: string
+          room_type?: string | null
           type?: string
           updated_at?: string
+          work_order_id?: string | null
         }
         Relationships: [
           {
@@ -312,6 +318,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_rooms_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -1439,6 +1452,13 @@ export type Database = {
             columns: ["message_id"]
             isOneToOne: false
             referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pinned_messages_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "work_order_messages"
             referencedColumns: ["id"]
           },
           {
@@ -3268,7 +3288,61 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      work_order_messages: {
+        Row: {
+          content: string | null
+          content_type: string | null
+          created_at: string | null
+          file_url: string | null
+          id: string | null
+          job_id: string | null
+          metadata: Json | null
+          room_id: string | null
+          sender_first_name: string | null
+          sender_id: string | null
+          sender_last_name: string | null
+          updated_at: string | null
+          vehicle_id: string | null
+          work_order_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_rooms_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       auto_assign_technician: {

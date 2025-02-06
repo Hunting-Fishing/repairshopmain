@@ -24,6 +24,7 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -112,6 +113,7 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setIsUploading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -127,11 +129,13 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${roomId}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('chat-attachments')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('chat-attachments')
@@ -151,12 +155,24 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
 
       if (messageError) throw messageError;
 
-    } catch (error) {
+      toast({
+        title: "Success",
+        description: "File uploaded successfully",
+      });
+
+    } catch (error: any) {
+      console.error('Upload error:', error);
       toast({
         title: "Error",
-        description: "Failed to upload file",
+        description: error.message || "Failed to upload file",
         variant: "destructive",
       });
+    } finally {
+      setIsUploading(false);
+      // Clear the input
+      if (event.target) {
+        event.target.value = '';
+      }
     }
   };
 
@@ -190,6 +206,7 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
           onMessageChange={setNewMessage}
           onSendMessage={handleSendMessage}
           onFileUpload={handleFileUpload}
+          isUploading={isUploading}
         />
       </CardContent>
     </Card>

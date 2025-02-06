@@ -29,3 +29,4 @@ export interface ChatRoom {
   last_message_at: string;
   work_order_id?: string;
 }
+

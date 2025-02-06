@@ -97,7 +97,7 @@ export function CreateChatRoomDialog() {
 
           <div className="space-y-2">
             <Label htmlFor="roomType">Room Type</Label>
-            <Select value={roomType} onValueChange={setRoomType} required>
+            <Select value={roomType} onValueChange={(value: RoomType) => setRoomType(value)} required>
               <SelectTrigger>
                 <SelectValue placeholder="Select room type" />
               </SelectTrigger>
@@ -138,3 +138,4 @@ export function CreateChatRoomDialog() {
     </Dialog>
   );
 }
+

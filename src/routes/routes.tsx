@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, Outlet } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "@/pages/Auth";
@@ -12,6 +13,7 @@ import WorkOrders from "@/pages/WorkOrders";
 import ApplicationControl from "@/pages/ApplicationControl";
 import Inventory from "@/pages/Inventory";
 import { InventorySuppliers } from "@/components/application-control/inventory/InventorySuppliers";
+import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +57,10 @@ export const router = createBrowserRouter([
         element: <ApplicationControl />,
       },
       {
+        path: "application-control/communications",
+        element: <CommunicationsTab />,
+      },
+      {
         path: "inventory",
         element: <Inventory />,
       },
@@ -69,3 +75,4 @@ export const router = createBrowserRouter([
     element: <Auth />,
   },
 ]);
+

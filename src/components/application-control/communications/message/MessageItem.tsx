@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
-  DropdownMenuItem, 
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand";
 import { 
   MoreVertical, 
   Download, 
@@ -21,11 +22,13 @@ import {
   Send,
   UserCircle2,
   MessageSquare,
-  Users 
+  Users,
+  AlertCircle 
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface MessageItemProps {
   content: string;
@@ -45,7 +48,23 @@ interface MessageItemProps {
 export function MessageItem({ id, content, content_type, metadata, sender, created_at }: MessageItemProps) {
   const [isForwardDialogOpen, setIsForwardDialogOpen] = useState(false);
   const [workOrderId, setWorkOrderId] = useState("");
+  const [selectedCustomerId, setSelectedCustomerId] = useState("");
+  const [selectedVehicleId, setSelectedVehicleId] = useState("");
   const { toast } = useToast();
+
+  // Fetch active work orders
+  const { data: workOrders } = useQuery({
+    queryKey: ["workOrders", "active"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("customer_repair_jobs")
+        .select("id, description, status")
+        .eq("status", "in-progress");
+      
+      if (error) throw error;
+      return data;
+    }
+  });
 
   const handleDownload = async () => {
     if (metadata?.url) {
@@ -73,11 +92,15 @@ export function MessageItem({ id, content, content_type, metadata, sender, creat
     }
   };
 
+  const handleCustomerSelect = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+  };
+
   const handleSaveToWorkOrder = async () => {
     if (!workOrderId.trim()) {
       toast({
         title: "Error",
-        description: "Please enter a work order number",
+        description: "Please select a work order",
         variant: "destructive",
       });
       return;
@@ -111,6 +134,15 @@ export function MessageItem({ id, content, content_type, metadata, sender, creat
   };
 
   const handleSaveToCustomerFile = async () => {
+    if (!selectedCustomerId) {
+      toast({
+        title: "Error",
+        description: "Please select a customer first",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from("customer_attachments")
@@ -126,6 +158,7 @@ export function MessageItem({ id, content, content_type, metadata, sender, creat
         title: "Success",
         description: "File saved to customer records",
       });
+      setSelectedCustomerId("");
     } catch (error) {
       toast({
         title: "Error",
@@ -331,6 +364,81 @@ export function MessageItem({ id, content, content_type, metadata, sender, creat
         </span>
       </div>
       {renderContent()}
+
+      <Dialog open={isForwardDialogOpen} onOpenChange={setIsForwardDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Forward File</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <h4 className="font-medium">Send to Work Order</h4>
+              <div className="flex gap-2">
+                <select 
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                  value={workOrderId}
+                  onChange={(e) => setWorkOrderId(e.target.value)}
+                >
+                  <option value="">Select a work order...</option>
+                  {workOrders?.map((wo) => (
+                    <option key={wo.id} value={wo.id}>
+                      #{wo.id} - {wo.description}
+                    </option>
+                  ))}
+                </select>
+                <Button onClick={handleSaveToWorkOrder}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Send
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium">Forward to:</h4>
+              <div className="space-y-2">
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Select Customer</h4>
+                  <CustomerSearchCommand onSelect={handleCustomerSelect} />
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start" 
+                    onClick={handleSaveToCustomerFile}
+                    disabled={!selectedCustomerId}
+                  >
+                    <UserCircle2 className="mr-2 h-4 w-4" />
+                    Save to Customer File
+                  </Button>
+                </div>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "This feature will be available soon",
+                    });
+                  }}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Other Chat
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => {
+                    toast({
+                      title: "Coming Soon",
+                      description: "This feature will be available soon",
+                    });
+                  }}
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  Group
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

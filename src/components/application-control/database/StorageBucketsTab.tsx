@@ -4,19 +4,36 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function StorageBucketsTab() {
-  const { data: buckets, isLoading } = useQuery({
+  const { data: buckets, isLoading, error } = useQuery({
     queryKey: ['storage-buckets'],
     queryFn: async () => {
       const { data, error } = await supabase
         .storage
         .listBuckets();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching buckets:', error);
+        throw error;
+      }
       return data;
     },
   });
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>
+          Failed to load storage buckets. Please try again later.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <Card>
@@ -32,18 +49,34 @@ export function StorageBucketsTab() {
                 <TableHead>Name</TableHead>
                 <TableHead>Created At</TableHead>
                 <TableHead>Public</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center">Loading buckets...</TableCell>
+                  <TableCell colSpan={4} className="text-center">Loading buckets...</TableCell>
+                </TableRow>
+              ) : buckets?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                    No storage buckets found
+                  </TableCell>
                 </TableRow>
               ) : buckets?.map((bucket) => (
                 <TableRow key={bucket.id}>
-                  <TableCell>{bucket.name}</TableCell>
+                  <TableCell className="font-medium">{bucket.name}</TableCell>
                   <TableCell>{new Date(bucket.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>{bucket.public ? "Yes" : "No"}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs ${bucket.public ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {bucket.public ? "Public" : "Private"}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                      Active
+                    </span>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

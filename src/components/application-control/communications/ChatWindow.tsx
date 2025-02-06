@@ -1,19 +1,10 @@
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Message } from "./types";
+import { Card, CardContent } from "@/components/ui/card";
 import { MessageList } from "./message/MessageList";
 import { MessageInput } from "./message/MessageInput";
-import { Button } from "@/components/ui/button";
-import { MoreVertical } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { ChatHeader } from "./header/ChatHeader";
+import { useChatMessages } from "@/hooks/chat/useChatMessages";
+import { useMessageActions } from "@/hooks/chat/useMessageActions";
 
 interface ChatWindowProps {
   roomId: string;
@@ -21,160 +12,14 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("chat_messages")
-          .select("*, sender:profiles(first_name, last_name)")
-          .eq("room_id", roomId)
-          .order("created_at", { ascending: true });
-
-        if (error) throw error;
-        setMessages(data);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to load messages",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchMessages();
-
-    const channel = supabase
-      .channel("chat_messages")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-          filter: `room_id=eq.${roomId}`,
-        },
-        (payload) => {
-          setMessages((current) => [...current, payload.new as Message]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [roomId, toast]);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to send messages",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from("chat_messages")
-        .insert([
-          {
-            room_id: roomId,
-            sender_id: user.id,
-            content: newMessage,
-            content_type: "text",
-          },
-        ]);
-
-      if (error) throw error;
-      setNewMessage("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast({
-          title: "Error",
-          description: "You must be logged in to upload files",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${roomId}/${fileName}`;
-
-      const { error: uploadError, data } = await supabase.storage
-        .from('chat-attachments')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('chat-attachments')
-        .getPublicUrl(filePath);
-
-      const { error: messageError } = await supabase
-        .from("chat_messages")
-        .insert([
-          {
-            room_id: roomId,
-            sender_id: user.id,
-            content: file.name,
-            content_type: "file",
-            metadata: { url: publicUrl, type: file.type },
-          },
-        ]);
-
-      if (messageError) throw messageError;
-
-      toast({
-        title: "Success",
-        description: "File uploaded successfully",
-      });
-
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to upload file",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-      // Clear the input
-      if (event.target) {
-        event.target.value = '';
-      }
-    }
-  };
+  const { messages, isLoading } = useChatMessages(roomId);
+  const {
+    newMessage,
+    setNewMessage,
+    isUploading,
+    handleSendMessage,
+    handleFileUpload
+  } = useMessageActions();
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -182,30 +27,14 @@ export function ChatWindow({ roomId, roomName }: ChatWindowProps) {
 
   return (
     <Card className="h-[calc(100vh-300px)] flex flex-col">
-      <CardHeader className="border-b">
-        <div className="flex justify-between items-center">
-          <CardTitle>{roomName || "Chat Room"}</CardTitle>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>View Details</DropdownMenuItem>
-              <DropdownMenuItem>Share Chat</DropdownMenuItem>
-              <DropdownMenuItem>Search Messages</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
+      <ChatHeader roomName={roomName} />
       <CardContent className="flex-1 flex flex-col p-0">
         <MessageList messages={messages} />
         <MessageInput
           newMessage={newMessage}
           onMessageChange={setNewMessage}
-          onSendMessage={handleSendMessage}
-          onFileUpload={handleFileUpload}
+          onSendMessage={(e) => handleSendMessage(e, roomId)}
+          onFileUpload={(e) => handleFileUpload(e, roomId)}
           isUploading={isUploading}
         />
       </CardContent>

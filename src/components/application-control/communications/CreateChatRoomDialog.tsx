@@ -10,23 +10,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Plus, Users, Lock, MessageSquare, Folder, Bell } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { RoomType } from "./types";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { MultiSelect } from "@/components/ui/multi-select";
 import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
+import { BasicInfoSection } from "./forms/BasicInfoSection";
+import { RoomTypeSection } from "./forms/RoomTypeSection";
+import { ParticipantsSection } from "./forms/ParticipantsSection";
+import { RoomSettingsSection } from "./forms/RoomSettingsSection";
 
 export function CreateChatRoomDialog() {
   const [open, setOpen] = useState(false);
@@ -116,19 +108,6 @@ export function CreateChatRoomDialog() {
     setSelectedStaffIds([]);
   };
 
-  const getRoomTypeIcon = (type: RoomType) => {
-    switch (type) {
-      case "direct":
-        return <Users className="h-4 w-4 mr-2" />;
-      case "work_order":
-        return <Folder className="h-4 w-4 mr-2" />;
-      case "group":
-        return <Users className="h-4 w-4 mr-2" />;
-      default:
-        return <MessageSquare className="h-4 w-4 mr-2" />;
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -137,7 +116,7 @@ export function CreateChatRoomDialog() {
           New Chat Room
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]"> {/* Increased width for better layout */}
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Create Chat Room</DialogTitle>
           <DialogDescription>
@@ -146,114 +125,34 @@ export function CreateChatRoomDialog() {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Room Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter room name"
-              required
-            />
-          </div>
+          <BasicInfoSection
+            name={name}
+            setName={setName}
+            description={description}
+            setDescription={setDescription}
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe the purpose of this chat room"
-              className="resize-none"
-              rows={3}
-            />
-          </div>
+          <RoomTypeSection
+            roomType={roomType}
+            setRoomType={setRoomType}
+            type={type}
+            setType={setType}
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="roomType">Room Type</Label>
-            <Select value={roomType} onValueChange={(value: RoomType) => setRoomType(value)} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select room type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="general">
-                  {getRoomTypeIcon("general")}
-                  General Chat
-                </SelectItem>
-                <SelectItem value="direct">
-                  {getRoomTypeIcon("direct")}
-                  Direct Message
-                </SelectItem>
-                <SelectItem value="work_order">
-                  {getRoomTypeIcon("work_order")}
-                  Work Order Discussion
-                </SelectItem>
-                <SelectItem value="group">
-                  {getRoomTypeIcon("group")}
-                  Group Chat
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <ParticipantsSection
+            selectedStaffIds={selectedStaffIds}
+            setSelectedStaffIds={setSelectedStaffIds}
+            maxParticipants={maxParticipants}
+            setMaxParticipants={setMaxParticipants}
+            staffOptions={staffOptions}
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="type">Category</Label>
-            <Select value={type} onValueChange={setType} required>
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="support">Support</SelectItem>
-                <SelectItem value="announcements">Announcements</SelectItem>
-                <SelectItem value="team">Team</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Select Participants</Label>
-            <MultiSelect
-              options={staffOptions}
-              selected={selectedStaffIds}
-              onChange={setSelectedStaffIds}
-              className="w-full"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="maxParticipants">Maximum Participants (Optional)</Label>
-            <Input
-              id="maxParticipants"
-              type="number"
-              min="2"
-              value={maxParticipants}
-              onChange={(e) => setMaxParticipants(e.target.value)}
-              placeholder="Leave empty for unlimited"
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Lock className="h-4 w-4" />
-              <Label htmlFor="private">Private Room</Label>
-              <Switch
-                id="private"
-                checked={isPrivate}
-                onCheckedChange={setIsPrivate}
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Bell className="h-4 w-4" />
-              <Label htmlFor="notifications">Notifications</Label>
-              <Switch
-                id="notifications"
-                checked={enableNotifications}
-                onCheckedChange={setEnableNotifications}
-              />
-            </div>
-          </div>
+          <RoomSettingsSection
+            isPrivate={isPrivate}
+            setIsPrivate={setIsPrivate}
+            enableNotifications={enableNotifications}
+            setEnableNotifications={setEnableNotifications}
+          />
 
           <DialogFooter>
             <Button variant="outline" type="button" onClick={() => {

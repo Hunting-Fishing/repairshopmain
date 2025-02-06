@@ -12,7 +12,7 @@ export function useChatRooms(filter?: string) {
         .select(`
           *,
           sender:created_by(first_name, last_name),
-          participants:chat_room_participants(
+          participants:chat_participants(
             user_id,
             profiles:user_id(first_name, last_name)
           )

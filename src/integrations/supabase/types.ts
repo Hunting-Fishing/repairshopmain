@@ -3604,6 +3604,12 @@ export type Database = {
         | "Electrical"
         | "HVAC"
         | "General"
+      job_template_category:
+        | "maintenance"
+        | "repair"
+        | "diagnostic"
+        | "inspection"
+        | "custom"
       time_off_status: "pending" | "approved" | "rejected"
       time_off_type: "vacation" | "sick" | "personal" | "training"
       user_role:

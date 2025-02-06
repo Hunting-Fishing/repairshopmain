@@ -3404,6 +3404,12 @@ export type Database = {
         }
         Returns: string
       }
+      reset_staff_password: {
+        Args: {
+          staff_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"

@@ -16,12 +16,23 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return null;
       
-      const { data: profile } = await supabase
+      console.log("Current user ID:", user.id);
+      
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single();
         
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return null;
+      }
+      
+      console.log("User profile:", profile);
+      console.log("Allowed roles:", allowedRoles);
+      console.log("User role:", profile?.role);
+      
       return profile;
     }
   });

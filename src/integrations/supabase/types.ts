@@ -3489,6 +3489,14 @@ export type Database = {
           email: string
         }[]
       }
+      get_tables: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          table_name: string
+          table_type: string
+          size: string
+        }[]
+      }
       get_user_organization_id: {
         Args: {
           user_uuid: string

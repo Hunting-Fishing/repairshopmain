@@ -13,10 +13,10 @@ import { cn } from "@/lib/utils";
 interface VehicleListProps {
   customerId?: string;
   onVehicleSelect?: (vehicle: Vehicle | null) => void;
-  selectedVehicle: Vehicle | null;
+  selectedVehicle?: Vehicle | null;
 }
 
-export const VehicleList = ({ customerId, onVehicleSelect, selectedVehicle }: VehicleListProps) => {
+export const VehicleList = ({ customerId, onVehicleSelect, selectedVehicle = null }: VehicleListProps) => {
   const [infoType, setInfoType] = useState<'recalls' | 'safety' | 'complaints' | null>(null);
   const [vehicleForInfo, setVehicleForInfo] = useState<Vehicle | null>(null);
   const queryClient = useQueryClient();

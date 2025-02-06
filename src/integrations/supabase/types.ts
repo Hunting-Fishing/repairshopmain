@@ -418,6 +418,7 @@ export type Database = {
       customer_attachments: {
         Row: {
           created_at: string
+          customer_id: string | null
           file_name: string
           file_url: string
           id: string
@@ -425,6 +426,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          customer_id?: string | null
           file_name: string
           file_url: string
           id?: string
@@ -432,12 +434,20 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          customer_id?: string | null
           file_name?: string
           file_url?: string
           id?: string
           original_message_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "customer_attachments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "customer_attachments_original_message_id_fkey"
             columns: ["original_message_id"]

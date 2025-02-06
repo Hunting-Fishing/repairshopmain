@@ -107,6 +107,17 @@ export function RoomTypeSection() {
             <SelectItem value="support">Support</SelectItem>
             <SelectItem value="announcements">Announcements</SelectItem>
             <SelectItem value="team">Team</SelectItem>
+            <SelectItem value="project">Project</SelectItem>
+            <SelectItem value="sales">Sales</SelectItem>
+            <SelectItem value="marketing">Marketing</SelectItem>
+            <SelectItem value="engineering">Engineering</SelectItem>
+            <SelectItem value="customer-service">Customer Service</SelectItem>
+            <SelectItem value="operations">Operations</SelectItem>
+            <SelectItem value="hr">Human Resources</SelectItem>
+            <SelectItem value="finance">Finance</SelectItem>
+            <SelectItem value="it">IT</SelectItem>
+            <SelectItem value="training">Training</SelectItem>
+            <SelectItem value="events">Events</SelectItem>
             {customCategories.map((category) => (
               <SelectItem key={category} value={category}>
                 {category.charAt(0).toUpperCase() + category.slice(1)}

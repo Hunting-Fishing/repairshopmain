@@ -3377,6 +3377,22 @@ export type Database = {
     }
     Enums: {
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      chat_room_type:
+        | "general"
+        | "support"
+        | "announcements"
+        | "team"
+        | "project"
+        | "sales"
+        | "marketing"
+        | "engineering"
+        | "customer-service"
+        | "operations"
+        | "hr"
+        | "finance"
+        | "it"
+        | "training"
+        | "events"
       time_off_status: "pending" | "approved" | "rejected"
       time_off_type: "vacation" | "sick" | "personal" | "training"
       user_role:

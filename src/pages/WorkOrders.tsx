@@ -69,11 +69,12 @@ export default function WorkOrders() {
               year
             )
           `)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .returns<DatabaseWorkOrder[]>();
 
         if (error) throw error;
 
-        const formattedOrders = (data as DatabaseWorkOrder[]).map(order => ({
+        const formattedOrders = data.map(order => ({
           id: order.id,
           customer: order.customers ? `${order.customers.first_name} ${order.customers.last_name}` : 'N/A',
           vehicle: order.vehicles ? `${order.vehicles.year} ${order.vehicles.make} ${order.vehicles.model}` : 'N/A',

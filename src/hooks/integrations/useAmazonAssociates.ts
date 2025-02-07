@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -58,11 +59,10 @@ export function useAmazonAssociates() {
 
       return existingSettings;
     },
-    retry: false,
-    onError: (error) => {
-      console.error('Error fetching Amazon Associates settings:', error);
-      toast.error("Failed to load Amazon Associates settings");
-    }
+    meta: {
+      errorMessage: "Failed to load Amazon Associates settings"
+    },
+    retry: false
   });
 
   const updateSettings = useMutation({

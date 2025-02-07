@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TimeColumn } from "./TimeColumn";
 import { DayColumn } from "./DayColumn";
 import { CalendarViewProps } from "@/types/calendar";
-import { ColorPalette, PAST_APPOINTMENT_COLORS } from "./ColorPalette";
+import { PAST_APPOINTMENT_COLORS } from "./ColorPalette";
 import { useState, useEffect } from "react";
 
 const WORKING_HOURS = {
@@ -19,7 +19,6 @@ export function WeekView({
   onTimeSlotClick,
 }: CalendarViewProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedPastColor, setSelectedPastColor] = useState<[string, string]>([PAST_APPOINTMENT_COLORS[0], `${PAST_APPOINTMENT_COLORS[0]}80`]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,27 +53,19 @@ export function WeekView({
   }
 
   return (
-    <div className="space-y-4">
-      <ColorPalette 
-        selectedColors={selectedPastColor}
-        onColorSelect={setSelectedPastColor}
-        activeColorIndex={0}
-        onActiveColorChange={() => {}}
-      />
-      <div className="relative grid grid-cols-8 gap-0.5 overflow-x-auto bg-muted/20">
-        <TimeColumn hours={hours} />
-        {weekDays.map((day) => (
-          <DayColumn
-            key={day.toISOString()}
-            day={day}
-            hours={hours}
-            bookings={bookings}
-            onTimeSlotClick={onTimeSlotClick}
-            currentTime={currentTime}
-            pastColor={selectedPastColor[0]}
-          />
-        ))}
-      </div>
+    <div className="relative grid grid-cols-8 gap-0.5 overflow-x-auto bg-muted/20">
+      <TimeColumn hours={hours} />
+      {weekDays.map((day) => (
+        <DayColumn
+          key={day.toISOString()}
+          day={day}
+          hours={hours}
+          bookings={bookings}
+          onTimeSlotClick={onTimeSlotClick}
+          currentTime={currentTime}
+          pastColor={PAST_APPOINTMENT_COLORS[0]}
+        />
+      ))}
     </div>
   );
 }

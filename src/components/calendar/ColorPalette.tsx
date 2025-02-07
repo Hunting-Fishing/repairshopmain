@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -6,10 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const PAST_APPOINTMENT_COLORS = [
-  "#808080", // Gray
-  "#C0C0C0", // Silver
-  "#D3D3D3", // Light gray
-];
+  "#ea384c", // Red 
+  "#0EA5E9", // Ocean Blue
+] as const;
 
 interface ColorPaletteProps {
   selectedColors: [string, string];

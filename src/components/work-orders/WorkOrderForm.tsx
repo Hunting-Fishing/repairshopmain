@@ -11,18 +11,19 @@ import { CustomerSearchCommand } from "@/components/search/CustomerSearchCommand
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Car } from "lucide-react";
 import { CustomerVehicleDialog } from "@/components/customers/vehicles/CustomerVehicleDialog";
 import { useState } from "react";
 import { VehicleFormSelects } from "@/components/customers/vehicles/components/VehicleFormSelects";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
   vehicleInfo: z.string().min(1, "Vehicle information is required"),
   jobDescription: z.string().min(1, "Job description is required"),
+  jobTemplate: z.string().optional(),
 });
 
 type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
@@ -40,6 +41,30 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
   const [model, setModel] = useState("");
   const [makes, setMakes] = useState<string[]>([]);
   const [models, setModels] = useState<string[]>([]);
+
+  // Query for job templates
+  const { data: jobTemplates } = useQuery({
+    queryKey: ['job-templates'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('job_templates')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  // Handle template selection
+  const handleTemplateSelect = (templateId: string) => {
+    const template = jobTemplates?.find(t => t.id === templateId);
+    if (template) {
+      form.setValue('jobTemplate', templateId);
+      form.setValue('jobDescription', template.description || '');
+    }
+  };
 
   // Query for Makes based on selected Year
   const handleYearChange = async (selectedYear: string) => {
@@ -183,6 +208,31 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
                 </div>
               </Card>
             )}
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="jobTemplate"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Job Template</FormLabel>
+            <Select onValueChange={handleTemplateSelect} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a job template" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {jobTemplates?.map((template) => (
+                  <SelectItem key={template.id} value={template.id}>
+                    {template.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         )}

@@ -8,10 +8,26 @@ export const useJobTemplates = () => {
   return useQuery({
     queryKey: ['job-templates-csv'],
     queryFn: async () => {
+      // First fetch the file name from system configuration
+      const { data: configData, error: configError } = await supabase
+        .from('system_configuration')
+        .select('value')
+        .eq('key', 'job_templates_file')
+        .single();
+
+      if (configError) {
+        console.error('Error fetching configuration:', configError);
+        toast.error('Failed to load job templates configuration');
+        throw configError;
+      }
+
+      const fileName = configData.value;
+      
+      // Then fetch the actual CSV file
       const { data: fileData, error: fileError } = await supabase
         .storage
         .from('RTDATA')
-        .download('Job List 1.csv');
+        .download(fileName);
 
       if (fileError) {
         console.error('Error fetching CSV file:', fileError);

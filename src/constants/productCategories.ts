@@ -74,9 +74,9 @@ export const productCategories: ProductCategory[] = [
     directLinks: [
       {
         url: "https://amzn.to/40INV6K",
-        asin: "B07GDC3BKY",
+        asin: "B07BD2LXTF",  // Updated ASIN for a specific featured product
         title: "Featured Automotive Accessories",
-        description: "Browse our featured automotive accessories"
+        description: "High-quality automotive accessories and tools"
       }
     ]
   },

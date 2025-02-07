@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0';
@@ -54,7 +53,7 @@ serve(async (req) => {
       throw new Error('Missing required Amazon credentials');
     }
 
-    const { keywords = "digital camera", marketplace = 'US' } = await req.json();
+    const { keywords, asin, marketplace = 'US' } = await req.json();
 
     // Get organization settings from Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -94,9 +93,8 @@ serve(async (req) => {
     const amzDate = getAmzDate();
     const dateStamp = amzDate.substring(0, 8);
 
-    const payload = JSON.stringify({
-      "Keywords": keywords,
-      "SearchIndex": "Photo",
+    const payload = JSON.stringify(asin ? {
+      "ItemIds": [asin],
       "Resources": [
         "Images.Primary.Large",
         "Images.Primary.Medium",
@@ -111,11 +109,31 @@ serve(async (req) => {
         "Offers.Listings.Price",
         "Offers.Listings.DeliveryInfo.IsPrimeEligible",
         "Offers.Listings.Promotions",
-        "Offers.Summaries"
+        "Offers.Summaries",
+        "CustomerReviews"
       ],
       "PartnerTag": associateTag,
       "PartnerType": "Associates",
-      "Marketplace": "www.amazon.com"
+      "Marketplace": "www.amazon.com",
+      "Operation": "GetItems"
+    } : {
+      "Keywords": keywords,
+      "SearchIndex": "Automotive",
+      "Resources": [
+        "Images.Primary.Large",
+        "Images.Primary.Medium",
+        "Images.Variants.Large",
+        "ItemInfo.Title",
+        "ItemInfo.Features",
+        "ItemInfo.ProductInfo",
+        "Offers.Listings.Price",
+        "Offers.Listings.DeliveryInfo.IsPrimeEligible",
+        "CustomerReviews"
+      ],
+      "PartnerTag": associateTag,
+      "PartnerType": "Associates",
+      "Marketplace": "www.amazon.com",
+      "Operation": "SearchItems"
     });
 
     const canonicalUri = '/paapi5/searchitems';
@@ -173,6 +191,7 @@ serve(async (req) => {
     console.log('Amazon API response status:', response.status);
 
     const data = await response.json();
+    console.log('Amazon API response data:', JSON.stringify(data, null, 2));
 
     // Log the request for tracking
     await supabase.from('amazon_api_requests').insert({

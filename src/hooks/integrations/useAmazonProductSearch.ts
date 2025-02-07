@@ -33,12 +33,24 @@ export function useAmazonProductSearch() {
 
   const searchProductByAsin = useMutation({
     mutationFn: async ({ asin, marketplace = 'US' }: AsinSearchParams) => {
+      console.log('Searching by ASIN:', asin);
       const { data, error } = await supabase.functions.invoke('amazon-product-search', {
         body: { asin, marketplace }
       });
 
       if (error) throw error;
-      return data;
+      
+      if (data?.SearchResult?.Items?.[0]) {
+        const item = data.SearchResult.Items[0];
+        return {
+          title: item.ItemInfo?.Title?.DisplayValue || '',
+          description: item.ItemInfo?.Features?.[0] || '',
+          image: item.Images?.Primary?.Large?.URL || item.Images?.Primary?.Medium?.URL,
+          price: item.Offers?.Listings?.[0]?.Price?.DisplayAmount || '',
+          url: item.DetailPageURL || '',
+        };
+      }
+      return null;
     },
     onError: (error) => {
       console.error('Error searching product by ASIN:', error);

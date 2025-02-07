@@ -1,8 +1,9 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2 } from "lucide-react";
-import { StatsCards } from "../StatsCards";
-import { CalendarSection } from "../CalendarSection";
+import { StatsCards } from "./StatsCards";
+import { CalendarSection } from "./CalendarSection";
 import { cn } from "@/lib/utils";
 
 interface ColorPreferences {

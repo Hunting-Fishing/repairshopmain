@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+export type JobStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
+
 export interface JobTemplate {
   id: string;
   name: string;
@@ -12,6 +14,10 @@ export interface JobTemplate {
   parts_required: any | null;
   is_active: boolean;
   organization_id: string | null;
+  job_number: string | null;
+  sub_tasks: any[] | null;
+  timeline: Record<string, any> | null;
+  status: JobStatus;
 }
 
 export function useJobTemplates() {

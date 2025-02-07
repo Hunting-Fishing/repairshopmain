@@ -1432,9 +1432,13 @@ export type Database = {
           estimated_hours: number | null
           id: string
           is_active: boolean | null
+          job_number: string | null
           name: string
           organization_id: string | null
           parts_required: Json | null
+          status: Database["public"]["Enums"]["job_status"] | null
+          sub_tasks: Json | null
+          timeline: Json | null
           updated_at: string
           updated_by: string | null
         }
@@ -1446,9 +1450,13 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           is_active?: boolean | null
+          job_number?: string | null
           name: string
           organization_id?: string | null
           parts_required?: Json | null
+          status?: Database["public"]["Enums"]["job_status"] | null
+          sub_tasks?: Json | null
+          timeline?: Json | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -1460,9 +1468,13 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           is_active?: boolean | null
+          job_number?: string | null
           name?: string
           organization_id?: string | null
           parts_required?: Json | null
+          status?: Database["public"]["Enums"]["job_status"] | null
+          sub_tasks?: Json | null
+          timeline?: Json | null
           updated_at?: string
           updated_by?: string | null
         }
@@ -3666,6 +3678,7 @@ export type Database = {
         | "Electrical"
         | "HVAC"
         | "General"
+      job_status: "pending" | "in_progress" | "completed" | "cancelled"
       job_template_category:
         | "maintenance"
         | "repair"

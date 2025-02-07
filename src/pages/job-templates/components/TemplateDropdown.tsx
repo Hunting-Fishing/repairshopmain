@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 import { ChevronDown } from "lucide-react";
 import { JobTemplate } from "@/hooks/use-job-templates";
 import { useState } from "react";
@@ -18,6 +19,21 @@ interface TemplateDropdownProps {
 
 export function TemplateDropdown({ category, displayName, items }: TemplateDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="flex flex-col space-y-2 group hover:bg-accent/5 p-2 rounded-lg transition-colors">
@@ -34,7 +50,7 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="start" 
-          className="w-[250px] max-h-[300px] overflow-y-auto"
+          className="w-[300px] max-h-[300px] overflow-y-auto"
         >
           {items.length === 0 ? (
             <div className="px-2 py-4 text-sm text-muted-foreground text-center">
@@ -46,9 +62,28 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
                 key={template.id}
                 className="flex flex-col items-start gap-1 p-2"
               >
-                <span className="font-medium">{template.name}</span>
+                <div className="flex items-center justify-between w-full">
+                  <span className="font-medium">{template.name}</span>
+                  {template.status && (
+                    <Badge variant="secondary" className={getStatusColor(template.status)}>
+                      {template.status.replace('_', ' ')}
+                    </Badge>
+                  )}
+                </div>
+                {template.job_number && (
+                  <span className="text-xs text-muted-foreground">
+                    Job #{template.job_number}
+                  </span>
+                )}
                 {template.description && (
-                  <span className="text-xs text-muted-foreground">{template.description}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {template.description}
+                  </span>
+                )}
+                {template.sub_tasks && template.sub_tasks.length > 0 && (
+                  <span className="text-xs text-muted-foreground">
+                    {template.sub_tasks.length} sub-tasks
+                  </span>
                 )}
               </DropdownMenuItem>
             ))

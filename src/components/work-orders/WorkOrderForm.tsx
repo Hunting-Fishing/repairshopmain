@@ -15,6 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Car } from "lucide-react";
 import { CustomerVehicleDialog } from "@/components/customers/vehicles/CustomerVehicleDialog";
 import { useState } from "react";
+import { VehicleFormSelects } from "@/components/customers/vehicles/components/VehicleFormSelects";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -32,17 +35,69 @@ interface WorkOrderFormProps {
 export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
   const [showVehicleDialog, setShowVehicleDialog] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [year, setYear] = useState("");
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
+  const [makes, setMakes] = useState<string[]>([]);
+  const [models, setModels] = useState<string[]>([]);
+
+  // Query for Makes based on selected Year
+  const handleYearChange = async (selectedYear: string) => {
+    setYear(selectedYear);
+    setMake("");
+    setModel("");
+    try {
+      const { data, error } = await supabase
+        .from('vehicle_models_reference')
+        .select('make')
+        .eq('year', parseInt(selectedYear))
+        .order('make');
+      
+      if (error) throw error;
+      
+      const uniqueMakes = [...new Set(data.map(item => item.make))];
+      setMakes(uniqueMakes);
+    } catch (error) {
+      console.error("Error fetching makes:", error);
+    }
+  };
+
+  // Query for Models based on selected Make and Year
+  const handleMakeChange = async (selectedMake: string) => {
+    setMake(selectedMake);
+    setModel("");
+    try {
+      const { data, error } = await supabase
+        .from('vehicle_models_reference')
+        .select('model')
+        .eq('year', parseInt(year))
+        .eq('make', selectedMake)
+        .order('model');
+      
+      if (error) throw error;
+      
+      const uniqueModels = [...new Set(data.map(item => item.model))];
+      setModels(uniqueModels);
+    } catch (error) {
+      console.error("Error fetching models:", error);
+    }
+  };
+
+  // Handle Model selection and update form
+  const handleModelChange = (selectedModel: string) => {
+    setModel(selectedModel);
+    if (year && make && selectedModel) {
+      const vehicleInfo = `${year} ${make} ${selectedModel}`;
+      form.setValue('vehicleInfo', vehicleInfo);
+      if (selectedCustomerId) {
+        onCustomerSelect?.(selectedCustomerId, vehicleInfo);
+      }
+    }
+  };
 
   const handleCustomerSelect = (customerId: string) => {
     setSelectedCustomerId(customerId);
     form.setValue('customerId', customerId);
-    setShowVehicleDialog(true);
-  };
-
-  const handleVehicleSelect = (customerId: string, vehicleInfo: string) => {
-    form.setValue('customerId', customerId);
-    form.setValue('vehicleInfo', vehicleInfo);
-    onCustomerSelect?.(customerId, vehicleInfo);
   };
 
   // Parse vehicle info string into an object
@@ -58,22 +113,6 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
       details.make = basicInfo[1] || '';
       details.model = basicInfo[2] || '';
     }
-
-    // Extract other details using common patterns
-    const vinMatch = info.match(/VIN:\s*([A-HJ-NPR-Z0-9]{17})/i);
-    if (vinMatch) details.vin = vinMatch[1];
-
-    const trimMatch = info.match(/Trim:\s*([^,]+)/i);
-    if (trimMatch) details.trim = trimMatch[1].trim();
-
-    const engineMatch = info.match(/Engine:\s*([^,]+)/i);
-    if (engineMatch) details.engine = engineMatch[1].trim();
-
-    const fuelMatch = info.match(/Fuel Type:\s*([^,]+)/i);
-    if (fuelMatch) details.fuelType = fuelMatch[1].trim();
-
-    const bodyMatch = info.match(/Body Style:\s*([^,]+)/i);
-    if (bodyMatch) details.bodyStyle = bodyMatch[1].trim();
 
     return details;
   };
@@ -106,21 +145,18 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
           <FormItem>
             <FormLabel>Vehicle Information</FormLabel>
             <FormControl>
-              <div>
+              <div className="space-y-4">
                 <input type="hidden" {...field} />
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                  onClick={() => selectedCustomerId && setShowVehicleDialog(true)}
-                >
-                  <Car className="mr-2 h-4 w-4" />
-                  {vehicleInfo ? (
-                    <span>{vehicleInfo}</span>
-                  ) : (
-                    <span className="text-muted-foreground">Select a vehicle...</span>
-                  )}
-                </Button>
+                <VehicleFormSelects
+                  year={year}
+                  make={make}
+                  model={model}
+                  makes={makes}
+                  models={models}
+                  onYearChange={handleYearChange}
+                  onMakeChange={handleMakeChange}
+                  onModelChange={handleModelChange}
+                />
               </div>
             </FormControl>
             {vehicleInfo && (
@@ -142,36 +178,6 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
                     <div>
                       <p className="text-sm text-muted-foreground">Model</p>
                       <p className="font-medium">{vehicleDetails.model}</p>
-                    </div>
-                  )}
-                  {vehicleDetails.trim && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Trim</p>
-                      <p className="font-medium">{vehicleDetails.trim}</p>
-                    </div>
-                  )}
-                  {vehicleDetails.vin && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">VIN</p>
-                      <p className="font-medium">{vehicleDetails.vin}</p>
-                    </div>
-                  )}
-                  {vehicleDetails.engine && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Engine</p>
-                      <p className="font-medium">{vehicleDetails.engine}</p>
-                    </div>
-                  )}
-                  {vehicleDetails.fuelType && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Fuel Type</p>
-                      <p className="font-medium">{vehicleDetails.fuelType}</p>
-                    </div>
-                  )}
-                  {vehicleDetails.bodyStyle && (
-                    <div>
-                      <p className="text-sm text-muted-foreground">Body Style</p>
-                      <p className="font-medium">{vehicleDetails.bodyStyle}</p>
                     </div>
                   )}
                 </div>
@@ -202,7 +208,11 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
       <CustomerVehicleDialog
         customerId={selectedCustomerId}
         onClose={() => setShowVehicleDialog(false)}
-        onSelect={handleVehicleSelect}
+        onSelect={(customerId, vehicleInfo) => {
+          form.setValue('customerId', customerId);
+          form.setValue('vehicleInfo', vehicleInfo);
+          onCustomerSelect?.(customerId, vehicleInfo);
+        }}
       />
     </div>
   );

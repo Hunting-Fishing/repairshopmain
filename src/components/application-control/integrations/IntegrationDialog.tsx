@@ -1,3 +1,4 @@
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,15 +8,21 @@ import { NhtsaApiDetails } from "./api-details/NhtsaApiDetails";
 import { IntegrationDialogProps } from "./types";
 import { IntegrationResources } from "./cards/IntegrationResources";
 import { useIntegrationConnection } from "@/hooks/integrations/useIntegrationConnection";
+import { AmazonAssociatesDialog } from "./amazon-associates/AmazonAssociatesDialog";
 
 export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationDialogProps) => {
   const { toast } = useToast();
   const [showNhtsaDialog, setShowNhtsaDialog] = useState(false);
+  const [showAmazonDialog, setShowAmazonDialog] = useState(false);
   const { data: connectionData } = useIntegrationConnection(integration.title);
 
   const handleConnect = () => {
     if (integration.title === "NHTSA Database") {
       setShowNhtsaDialog(true);
+      return;
+    }
+    if (integration.title === "Amazon Associates") {
+      setShowAmazonDialog(true);
       return;
     }
     try {
@@ -41,12 +48,13 @@ export const IntegrationDialog = ({ isOpen, onClose, integration }: IntegrationD
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={onClose}>Close</Button>
             <Button onClick={handleConnect}>
-              {integration.status === 'connected' ? 'Reconnect' : 'Connect'}
+              {integration.status === 'connected' ? 'Manage' : 'Connect'}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
       <NhtsaVinDialog isOpen={showNhtsaDialog} onClose={() => { setShowNhtsaDialog(false); onClose(); }} />
+      <AmazonAssociatesDialog isOpen={showAmazonDialog} onClose={() => { setShowAmazonDialog(false); onClose(); }} />
     </>
   );
 };

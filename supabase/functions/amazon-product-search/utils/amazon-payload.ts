@@ -12,19 +12,20 @@ export function buildAmazonPayload(associateTag: string, asin?: string, keywords
       "Resources": commonResources,
       "PartnerTag": associateTag,
       "PartnerType": "Associates",
-      "Marketplace": "www.amazon.com",
+      "Marketplace": "www.amazon.ca",  // Changed to Canadian marketplace
       "Operation": "GetItems"
     };
   }
 
   return {
     "Keywords": keywords,
-    "SearchIndex": "All",  // Changed to match example
+    "SearchIndex": "All",
     "Resources": commonResources,
     "PartnerTag": associateTag,
     "PartnerType": "Associates",
-    "Marketplace": "www.amazon.com",
+    "Marketplace": "www.amazon.ca",  // Changed to Canadian marketplace
     "Operation": "SearchItems",
-    "ItemCount": 3  // Added to match example
+    "ItemCount": 3
   };
 }
+

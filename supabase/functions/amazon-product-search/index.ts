@@ -24,7 +24,7 @@ serve(async (req) => {
       throw new Error('Missing required Amazon credentials');
     }
 
-    const { keywords, asin, marketplace = 'US' } = await req.json();
+    const { keywords, asin, marketplace = 'CA' } = await req.json();
 
     // Get organization settings from Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -58,14 +58,14 @@ serve(async (req) => {
       throw new Error('Amazon Associates integration is not enabled');
     }
 
-    const host = 'webservices.amazon.com';
-    const region = 'us-east-1';  // Changed to match example
+    const host = 'webservices.amazon.ca';  // Changed to Canadian host
+    const region = 'ca-central-1';  // Changed to Canadian region
     const service = 'ProductAdvertisingAPI';
     const amzDate = getAmzDate();
     const dateStamp = amzDate.substring(0, 8);
     
     const payload = JSON.stringify(buildAmazonPayload(associateTag, asin, keywords));
-    const canonicalUri = '/paapi5/searchitems';  // Changed to match example, using same endpoint for both operations
+    const canonicalUri = '/paapi5/searchitems';
     const canonicalQueryString = '';
     const signedHeaders = 'content-encoding;host;x-amz-date;x-amz-target';
     const algorithm = 'AWS4-HMAC-SHA256';

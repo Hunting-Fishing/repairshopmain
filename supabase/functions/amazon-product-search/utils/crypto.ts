@@ -20,9 +20,10 @@ export async function hmacSHA256(key: string | ArrayBuffer, message: string): Pr
 
 export async function generateSignature(stringToSign: string, secretKey: string, date: string) {
   const kDate = await hmacSHA256('AWS4' + secretKey, date.substring(0, 8));
-  const kRegion = await hmacSHA256(kDate, 'us-east-1');  // Changed to match example
+  const kRegion = await hmacSHA256(kDate, 'ca-central-1');  // Changed to Canadian region
   const kService = await hmacSHA256(kRegion, 'ProductAdvertisingAPI');
   const kSigning = await hmacSHA256(kService, 'aws4_request');
   const signature = await hmacSHA256(kSigning, stringToSign);
   return hexEncode(new Uint8Array(signature));
 }
+

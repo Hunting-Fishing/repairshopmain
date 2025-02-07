@@ -78,6 +78,10 @@ export const router = createBrowserRouter([
             element: <ApplicationControl />,
           },
           {
+            path: "calendar-settings",
+            element: <CalendarSettings />,
+          },
+          {
             path: "communications",
             element: <CommunicationsTab />,
           },

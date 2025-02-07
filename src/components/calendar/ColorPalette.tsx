@@ -1,9 +1,5 @@
 
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 export const PAST_APPOINTMENT_COLORS = [
   "#ea384c", // Red 
@@ -23,52 +19,10 @@ export function ColorPalette({
   activeColorIndex,
   onActiveColorChange
 }: ColorPaletteProps) {
-  const [isSaving, setIsSaving] = useState(false);
-
-  const { data: session } = useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      return session;
-    },
-  });
-
-  const handleColorSelect = async () => {
-    if (!session?.user) {
-      console.log("No user session found");
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          color_preferences: {
-            primary_color: PAST_APPOINTMENT_COLORS[0],
-            secondary_color: PAST_APPOINTMENT_COLORS[1],
-            border_color: PAST_APPOINTMENT_COLORS[0],
-            background_color: 'bg-background/95'
-          }
-        })
-        .eq('id', session.user.id);
-
-      if (error) {
-        console.error('Error saving color preferences:', error);
-        toast.error('Failed to save color preferences');
-      }
-    } catch (error) {
-      console.error('Error saving color preferences:', error);
-      toast.error('Failed to save color preferences');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
     <div className="space-y-4 p-4 bg-background/95 rounded-lg border">
       <div className="flex items-center gap-4">
-        <span className="text-sm font-medium">Calendar Color Scheme:</span>
+        <span className="text-sm font-medium">Calendar Colors:</span>
         <div className="flex gap-2">
           <div
             className="w-8 h-8 rounded-full border-2 border-transparent"
@@ -85,4 +39,3 @@ export function ColorPalette({
     </div>
   );
 }
-

@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   ClipboardList, 
@@ -54,15 +53,15 @@ const stats = [
 
 export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
   const cardClass = isModernTheme
-    ? 'hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-purple-50 to-purple-100/30 border border-purple-200/50 backdrop-blur-sm transform hover:scale-105'
+    ? 'hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-blue-50 to-blue-100/30 border border-blue-200/50 backdrop-blur-sm transform hover:scale-105'
     : 'hover:shadow-lg transition-shadow';
 
   const iconClass = isModernTheme
-    ? 'text-[#8B5CF6]'
+    ? 'text-[#0EA5E9]'
     : 'text-muted-foreground';
 
   const valueClass = isModernTheme
-    ? 'bg-gradient-to-br from-[#8B5CF6] to-[#D946EF] bg-clip-text text-transparent font-black'
+    ? 'bg-gradient-to-br from-[#0EA5E9] to-[#38BDF8] bg-clip-text text-transparent font-black'
     : '';
 
   const titleClass = isModernTheme

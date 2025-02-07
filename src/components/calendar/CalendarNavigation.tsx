@@ -21,11 +21,11 @@ export function CalendarNavigation({
   isModernTheme = false,
 }: CalendarNavigationProps) {
   const buttonClass = isModernTheme
-    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white hover:from-[#7C3AED] hover:to-[#C026D3] shadow-md hover:shadow-lg transition-all duration-300'
+    ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-white hover:from-[#0284C7] hover:to-[#0EA5E9] shadow-md hover:shadow-lg transition-all duration-300'
     : '';
 
   const dateClass = isModernTheme
-    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] bg-clip-text text-transparent'
+    ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] bg-clip-text text-transparent'
     : '';
 
   return (

@@ -2,10 +2,9 @@
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
+import { useJobTemplates } from "@/hooks/use-job-templates";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -21,20 +20,7 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  // Query for job templates
-  const { data: jobTemplates } = useQuery({
-    queryKey: ['job-templates'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('job_templates')
-        .select('*')
-        .eq('is_active', true)
-        .order('name');
-      
-      if (error) throw error;
-      return data;
-    }
-  });
+  const { data: jobTemplates, isLoading } = useJobTemplates();
 
   // Handle template selection
   const handleTemplateSelect = (templateId: string) => {
@@ -56,7 +42,7 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
             <Select onValueChange={handleTemplateSelect} defaultValue={field.value}>
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a job template" />
+                  <SelectValue placeholder={isLoading ? "Loading..." : "Select a job template"} />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>

@@ -54,6 +54,6 @@ export function useJobTemplates() {
     },
     refetchOnWindowFocus: false, // Don't refetch on window focus
     staleTime: 0, // Consider data stale immediately
-    cacheTime: 0  // Don't cache the data
+    gcTime: 0  // Don't cache the data (previously cacheTime)
   });
 }

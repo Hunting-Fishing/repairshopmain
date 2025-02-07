@@ -16,10 +16,10 @@ export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
       name="customer_type"
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-gray-700">Customer Type</FormLabel>
+          <FormLabel className="text-gray-700 font-medium">Customer Type</FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
-              <SelectTrigger className="bg-white">
+              <SelectTrigger className="bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-colors">
                 <SelectValue placeholder="Select customer type" />
               </SelectTrigger>
             </FormControl>
@@ -29,7 +29,7 @@ export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
               <SelectItem value="Business">Business</SelectItem>
             </SelectContent>
           </Select>
-          <FormMessage />
+          <FormMessage className="text-[#F97316]" />
         </FormItem>
       )}
     />
@@ -40,11 +40,11 @@ export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
         name="first_name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-gray-700">First Name</FormLabel>
+            <FormLabel className="text-gray-700 font-medium">First Name</FormLabel>
             <FormControl>
-              <Input {...field} className="bg-white" />
+              <Input {...field} className="bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-colors" />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-[#F97316]" />
           </FormItem>
         )}
       />
@@ -53,11 +53,11 @@ export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
         name="last_name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-gray-700">Last Name</FormLabel>
+            <FormLabel className="text-gray-700 font-medium">Last Name</FormLabel>
             <FormControl>
-              <Input {...field} className="bg-white" />
+              <Input {...field} className="bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-colors" />
             </FormControl>
-            <FormMessage />
+            <FormMessage className="text-[#F97316]" />
           </FormItem>
         )}
       />
@@ -68,11 +68,11 @@ export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
       name="email"
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-gray-700">Email</FormLabel>
+          <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
           <FormControl>
-            <Input type="email" {...field} className="bg-white" />
+            <Input type="email" {...field} className="bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-colors" />
           </FormControl>
-          <FormMessage />
+          <FormMessage className="text-[#F97316]" />
         </FormItem>
       )}
     />
@@ -82,11 +82,11 @@ export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
       name="phone_number"
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-gray-700">Phone Number</FormLabel>
+          <FormLabel className="text-gray-700 font-medium">Phone Number</FormLabel>
           <FormControl>
-            <Input {...field} className="bg-white" />
+            <Input {...field} className="bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-colors" />
           </FormControl>
-          <FormMessage />
+          <FormMessage className="text-[#F97316]" />
         </FormItem>
       )}
     />

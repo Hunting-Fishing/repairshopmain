@@ -73,31 +73,37 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 animate-fade-in">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal Information</h3>
-              <div className="bg-white/80 rounded-lg p-6 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <span className="p-1.5 rounded-full bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3]"></span>
+                Personal Information
+              </h3>
+              <div className="bg-gradient-to-br from-white to-[#FDE1D3]/10 rounded-lg p-6 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08)] border border-[#FEC6A1]/20 backdrop-blur-sm">
                 <CustomerFormFields form={form} />
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Address Information</h3>
-            <div className="bg-white/80 rounded-lg p-6 shadow-sm border border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <span className="p-1.5 rounded-full bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3]"></span>
+              Address Information
+            </h3>
+            <div className="bg-gradient-to-br from-white to-[#FDE1D3]/10 rounded-lg p-6 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.08)] border border-[#FEC6A1]/20 backdrop-blur-sm">
               <CustomerAddressFields form={form} />
             </div>
           </div>
         </div>
 
-        <Separator className="my-6" />
+        <Separator className="my-8 bg-[#FEC6A1]/20" />
         
         <div className="flex justify-end">
           <Button 
             type="submit" 
-            className="w-full md:w-auto bg-[#F97316] hover:bg-[#EA580C] text-white px-8"
+            className="w-full md:w-auto bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#EA580C] text-white px-8 shadow-lg hover:shadow-xl transition-all duration-200"
           >
             {mode === "create" ? "Add Customer" : "Update Customer"}
           </Button>

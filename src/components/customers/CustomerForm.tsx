@@ -21,6 +21,7 @@ const formSchema = z.object({
   state_province: z.string().optional(),
   postal_code: z.string().optional(),
   country: z.string().optional(),
+  customer_type: z.enum(["Personal", "Fleet", "Business"]),
 });
 
 export interface CustomerFormProps {
@@ -44,6 +45,7 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
       state_province: "",
       postal_code: "",
       country: "",
+      customer_type: "Personal",
     },
   });
 

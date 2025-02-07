@@ -9,6 +9,7 @@ export interface CustomerFormValues {
   state_province?: string;
   postal_code?: string;
   country?: string;
+  customer_type: 'Personal' | 'Fleet' | 'Business';
 }
 
 export interface Customer {
@@ -22,5 +23,6 @@ export interface Customer {
   state_province?: string;
   postal_code?: string;
   country?: string;
+  customer_type: 'Personal' | 'Fleet' | 'Business';
   created_at: string;
 }

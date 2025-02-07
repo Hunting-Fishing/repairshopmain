@@ -3,6 +3,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -10,6 +11,29 @@ interface CustomerFormFieldsProps {
 
 export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
   <div className="space-y-4">
+    <FormField
+      control={form.control}
+      name="customer_type"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-gray-700">Customer Type</FormLabel>
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormControl>
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="Select customer type" />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="Personal">Personal</SelectItem>
+              <SelectItem value="Fleet">Fleet</SelectItem>
+              <SelectItem value="Business">Business</SelectItem>
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <FormField
         control={form.control}

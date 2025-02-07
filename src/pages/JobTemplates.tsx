@@ -29,6 +29,9 @@ export default function JobTemplates() {
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold">Job Templates</h1>
+      <p className="text-sm text-muted-foreground mb-4">
+        Data source: RTDATA/Job List 1.csv (Supabase Storage)
+      </p>
       <TemplateGrid templates={templates || {}} columnNames={COLUMN_NAMES} />
     </div>
   );

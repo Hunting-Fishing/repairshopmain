@@ -106,7 +106,6 @@ export default function ShopItems() {
     try {
       const result = await searchProducts.mutateAsync({ keywords: keywords.join(" ") });
       console.log("Search results:", result);
-      // TODO: Handle the results display
       return result;
     } catch (error) {
       console.error("Error searching products:", error);
@@ -115,8 +114,8 @@ export default function ShopItems() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="container mx-auto py-8 space-y-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Shop Items</h1>
           <p className="text-muted-foreground">
@@ -125,26 +124,32 @@ export default function ShopItems() {
         </div>
       </div>
 
-      <Tabs defaultValue={productCategories[0].id} className="space-y-4">
-        <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
-          {productCategories.map((category) => (
-            <TabsTrigger
-              key={category.id}
-              value={category.id}
-              onClick={() => setActiveCategory(category.id)}
-              className="text-sm"
-            >
-              {category.name}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <Tabs defaultValue={productCategories[0].id} className="space-y-6">
+        <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b pb-4">
+          <TabsList className="h-auto flex flex-wrap gap-2 bg-transparent">
+            {productCategories.map((category) => (
+              <TabsTrigger
+                key={category.id}
+                value={category.id}
+                onClick={() => setActiveCategory(category.id)}
+                className="px-4 py-2 whitespace-normal text-center h-auto data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                {category.name}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         {productCategories.map((category) => (
-          <TabsContent key={category.id} value={category.id} className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <TabsContent 
+            key={category.id} 
+            value={category.id} 
+            className="space-y-6 mt-4"
+          >
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {searchProducts.isPending ? (
                 Array(6).fill(0).map((_, i) => (
-                  <Card key={i}>
+                  <Card key={i} className="overflow-hidden">
                     <CardHeader>
                       <Skeleton className="h-[200px] w-full" />
                       <Skeleton className="h-4 w-2/3" />
@@ -156,16 +161,16 @@ export default function ShopItems() {
                   </Card>
                 ))
               ) : searchProducts.isError ? (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="col-span-full">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
                     Failed to load products. Please try again later.
                   </AlertDescription>
                 </Alert>
               ) : (
-                <Card>
+                <Card className="col-span-full">
                   <CardHeader>
-                    <CardTitle>Coming Soon</CardTitle>
+                    <CardTitle>Products for {category.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Button 

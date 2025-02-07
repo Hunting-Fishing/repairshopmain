@@ -1,5 +1,4 @@
 
-
 /**
  * File: src/pages/job-templates/components/TemplateGrid.tsx
  * Displays a grid of job templates organized by category
@@ -7,6 +6,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface TemplateGridProps {
   templates: Record<string, string[]>;
@@ -14,10 +17,29 @@ interface TemplateGridProps {
 }
 
 export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
+  const queryClient = useQueryClient();
+
+  const handleRefresh = async () => {
+    try {
+      await queryClient.invalidateQueries({ queryKey: ['job-templates'] });
+      toast.success("Templates refreshed successfully");
+    } catch (error) {
+      toast.error("Failed to refresh templates");
+    }
+  };
+
   return (
     <Card className="h-[600px]">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Templates Library</CardTitle>
+        <Button 
+          variant="outline" 
+          size="icon"
+          onClick={handleRefresh}
+          title="Refresh templates"
+        >
+          <RefreshCw className="h-4 w-4" />
+        </Button>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[500px] pr-4">
@@ -36,4 +58,3 @@ export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
     </Card>
   );
 }
-

@@ -1,17 +1,18 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 export const CustomerFormFields = ({ form }: { form: any }) => (
-  <>
-    <div className="space-y-4">
+  <div className="space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <FormField
         control={form.control}
         name="first_name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>First Name</FormLabel>
+            <FormLabel className="text-gray-700">First Name</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} className="bg-white" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -22,40 +23,42 @@ export const CustomerFormFields = ({ form }: { form: any }) => (
         name="last_name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Last Name</FormLabel>
+            <FormLabel className="text-gray-700">Last Name</FormLabel>
             <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input type="email" {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="phone_number"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Phone Number</FormLabel>
-            <FormControl>
-              <Input {...field} />
+              <Input {...field} className="bg-white" />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
     </div>
-  </>
+    
+    <FormField
+      control={form.control}
+      name="email"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-gray-700">Email</FormLabel>
+          <FormControl>
+            <Input type="email" {...field} className="bg-white" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+    
+    <FormField
+      control={form.control}
+      name="phone_number"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-gray-700">Phone Number</FormLabel>
+          <FormControl>
+            <Input {...field} className="bg-white" />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  </div>
 );

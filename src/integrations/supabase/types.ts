@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      amazon_associates_settings: {
+        Row: {
+          auto_link_enabled: boolean | null
+          created_at: string | null
+          default_marketplace: string | null
+          id: string
+          integration_connection_id: string | null
+          organization_id: string
+          tracking_enabled: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_link_enabled?: boolean | null
+          created_at?: string | null
+          default_marketplace?: string | null
+          id?: string
+          integration_connection_id?: string | null
+          organization_id: string
+          tracking_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_link_enabled?: boolean | null
+          created_at?: string | null
+          default_marketplace?: string | null
+          id?: string
+          integration_connection_id?: string | null
+          organization_id?: string
+          tracking_enabled?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amazon_associates_settings_integration_connection_id_fkey"
+            columns: ["integration_connection_id"]
+            isOneToOne: false
+            referencedRelation: "integration_connections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auth_tokens: {
         Row: {
           created_at: string | null

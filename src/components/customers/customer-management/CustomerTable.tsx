@@ -36,7 +36,7 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
 
   if (isLoading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
         <Skeleton className="h-12 w-full" />
         <Skeleton className="h-12 w-full" />
         <Skeleton className="h-12 w-full" />
@@ -47,18 +47,18 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
   return (
     <Table>
       <TableHeader>
-        <TableRow className="bg-gray-50 hover:bg-gray-50">
-          <TableHead className="font-semibold">Name</TableHead>
-          <TableHead className="font-semibold">Email</TableHead>
-          <TableHead className="font-semibold">Phone</TableHead>
-          <TableHead className="font-semibold">Actions</TableHead>
+        <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
+          <TableHead className="font-semibold text-gray-700">Name</TableHead>
+          <TableHead className="font-semibold text-gray-700">Email</TableHead>
+          <TableHead className="font-semibold text-gray-700">Phone</TableHead>
+          <TableHead className="font-semibold text-gray-700">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {customers.map((customer) => (
           <TableRow
             key={customer.id}
-            className="cursor-pointer transition-colors hover:bg-[#FDE1D3]/20"
+            className="cursor-pointer transition-all duration-200 hover:bg-[#FDE1D3]/20 group"
             onClick={() => handleRowClick(customer.id)}
           >
             <TableCell className="font-medium">
@@ -67,7 +67,10 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
             <TableCell>{customer.email}</TableCell>
             <TableCell>{customer.phone_number}</TableCell>
             <TableCell>
-              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+              <div 
+                className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" 
+                onClick={(e) => e.stopPropagation()}
+              >
                 {onEdit && (
                   <Button
                     variant="ghost"
@@ -92,6 +95,13 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
             </TableCell>
           </TableRow>
         ))}
+        {customers.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={4} className="text-center py-8 text-gray-500">
+              No customers found
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );

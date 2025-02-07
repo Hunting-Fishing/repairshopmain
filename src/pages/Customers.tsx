@@ -82,15 +82,17 @@ export default function Customers() {
   );
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3] rounded-lg p-8 shadow-lg">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="p-3 bg-white rounded-full">
-            <Users className="h-6 w-6 text-[#F97316]" />
+    <div className="space-y-8 animate-fade-in p-6">
+      <div className="bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3] rounded-xl p-8 shadow-lg">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="p-3 bg-white/90 rounded-full shadow-md">
+            <Users className="h-7 w-7 text-[#F97316]" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Customers</h1>
-            <p className="text-gray-600">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              Customers
+            </h1>
+            <p className="text-gray-600 text-lg">
               Manage your customer database efficiently
             </p>
           </div>
@@ -98,18 +100,21 @@ export default function Customers() {
         
         <div className="flex items-center gap-4 mt-6">
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
             <Input
               placeholder="Search customers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white/90 hover:bg-white transition-colors"
+              className="pl-10 bg-white/90 hover:bg-white focus:bg-white transition-colors border-transparent focus:border-[#F97316] shadow-md"
             />
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-[#F97316] hover:bg-[#EA580C] transition-colors">
-                <Plus className="mr-2 h-4 w-4" />
+              <Button 
+                className="bg-[#F97316] hover:bg-[#EA580C] transition-colors shadow-md hover:shadow-lg"
+                size="lg"
+              >
+                <Plus className="mr-2 h-5 w-5" />
                 Add Customer
               </Button>
             </DialogTrigger>
@@ -125,7 +130,7 @@ export default function Customers() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-md p-6 animate-fade-in">
+      <div className="bg-white rounded-xl shadow-lg p-6 animate-fade-in">
         <CustomerTable 
           customers={filteredCustomers} 
           isLoading={isLoading}

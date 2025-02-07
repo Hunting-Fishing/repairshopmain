@@ -41,7 +41,6 @@ async function generateSignature(stringToSign: string, secretKey: string, date: 
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -55,10 +54,7 @@ serve(async (req) => {
       throw new Error('Missing required Amazon credentials');
     }
 
-    const { keywords, marketplace = 'US' } = await req.json();
-    if (!keywords) {
-      throw new Error('Keywords are required');
-    }
+    const { keywords = "digital camera", marketplace = 'US' } = await req.json();
 
     // Get organization settings from Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -92,7 +88,6 @@ serve(async (req) => {
       throw new Error('Amazon Associates integration is not enabled');
     }
 
-    // Prepare the request
     const host = 'webservices.amazon.com';
     const region = 'us-west-2';
     const service = 'ProductAdvertisingAPI';
@@ -101,10 +96,22 @@ serve(async (req) => {
 
     const payload = JSON.stringify({
       "Keywords": keywords,
+      "SearchIndex": "Photo",
       "Resources": [
+        "Images.Primary.Large",
         "Images.Primary.Medium",
+        "Images.Variants.Large",
         "ItemInfo.Title",
-        "Offers.Listings.Price"
+        "ItemInfo.Features",
+        "ItemInfo.ProductInfo",
+        "ItemInfo.ByLineInfo",
+        "ItemInfo.ContentInfo",
+        "ItemInfo.ManufactureInfo",
+        "ItemInfo.TechnicalInfo",
+        "Offers.Listings.Price",
+        "Offers.Listings.DeliveryInfo.IsPrimeEligible",
+        "Offers.Listings.Promotions",
+        "Offers.Summaries"
       ],
       "PartnerTag": associateTag,
       "PartnerType": "Associates",
@@ -148,9 +155,8 @@ serve(async (req) => {
       `SignedHeaders=${signedHeaders}, ` +
       `Signature=${signature}`;
 
-    console.log('Making request to Amazon API...');
+    console.log('Making request to Amazon API for cameras...');
 
-    // Make the request to Amazon
     const response = await fetch(`https://${host}${canonicalUri}`, {
       method: 'POST',
       headers: {

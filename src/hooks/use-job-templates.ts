@@ -27,7 +27,7 @@ export function useJobTemplates() {
         throw error;
       }
       
-      return data as JobTemplate[];
+      return (data || []) as JobTemplate[];
     }
   });
 }

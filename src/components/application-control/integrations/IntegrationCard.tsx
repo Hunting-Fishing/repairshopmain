@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { IntegrationDialog } from "./IntegrationDialog";
@@ -22,6 +23,7 @@ export const IntegrationCard = ({
   const { data: connectionData } = useQuery({
     queryKey: ["integration-connection", title],
     queryFn: async () => {
+      // Get integration ID first
       const { data: integrationData } = await supabase
         .from("integrations")
         .select("id")
@@ -30,11 +32,25 @@ export const IntegrationCard = ({
 
       if (!integrationData?.id) return null;
 
+      // Then get the connection status
       const { data: connection } = await supabase
         .from("integration_connections")
         .select("*")
         .eq("integration_id", integrationData.id)
         .maybeSingle();
+
+      // For Amazon Associates, also check settings table
+      if (title === "Amazon Associates" && connection?.status === "connected") {
+        const { data: amazonSettings } = await supabase
+          .from("amazon_associates_settings")
+          .select("tracking_enabled")
+          .single();
+
+        return {
+          ...connection,
+          status: amazonSettings?.tracking_enabled ? "connected" : "not_connected"
+        };
+      }
 
       return connection;
     },

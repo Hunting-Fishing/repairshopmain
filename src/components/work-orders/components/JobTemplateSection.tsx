@@ -25,25 +25,25 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: templates, isLoading } = useJobTemplates();
+  const { data: templates = {}, isLoading } = useJobTemplates();
   const [open, setOpen] = useState(false);
 
   // Function to get all unique tasks across categories
   const getAllTasks = () => {
+    const tasks: { id: string; name: string }[] = [];
+    
     if (!templates || typeof templates !== 'object') {
       console.log('Templates is null or not an object:', templates);
-      return [];
+      return tasks;
     }
     
     try {
-      const tasks: { id: string; name: string }[] = [];
-      
       Object.entries(templates).forEach(([category, items]) => {
         if (Array.isArray(items)) {
           items.forEach((item, index) => {
             if (item && typeof item === 'string') {
               const trimmedItem = item.trim();
-              if (trimmedItem) { // Only add non-empty strings
+              if (trimmedItem) {
                 tasks.push({
                   id: `${category}-task-${index}`,
                   name: trimmedItem
@@ -54,15 +54,14 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
         }
       });
       
-      console.log('Processed tasks:', tasks); // Debug log
+      console.log('Processed tasks:', tasks);
       return tasks;
     } catch (error) {
       console.error('Error processing templates:', error);
-      return [];
+      return tasks;
     }
   };
 
-  // Handle template selection
   const handleTemplateSelect = (taskName: string) => {
     form.setValue('jobTemplate', taskName);
     form.setValue('jobDescription', taskName);
@@ -71,24 +70,12 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
 
   const tasks = getAllTasks();
 
-  // If loading or no tasks, show appropriate content
   if (isLoading) {
     return (
       <div className="space-y-4">
         <FormLabel>Job Template</FormLabel>
         <Button variant="outline" disabled className="w-full">
           Loading...
-        </Button>
-      </div>
-    );
-  }
-
-  if (!tasks.length) {
-    return (
-      <div className="space-y-4">
-        <FormLabel>Job Template</FormLabel>
-        <Button variant="outline" disabled className="w-full">
-          No templates available
         </Button>
       </div>
     );
@@ -165,3 +152,4 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     </>
   );
 }
+

@@ -1,5 +1,5 @@
 
-import { Car, ClipboardList, Home, Users, Settings2, UserCog, Package } from "lucide-react";
+import { Car, ClipboardList, Home, Users, Settings2, UserCog, Package, ShoppingBag } from "lucide-react";
 
 export const marketingItems = [
   {
@@ -28,5 +28,6 @@ export const getBaseMenuItems = () => [
   { title: "Work Orders", icon: ClipboardList, path: "/work-orders" },
   { title: "Vehicles", icon: Car, path: "/vehicles" },
   { title: "Inventory", icon: Package, path: "/inventory" },
+  { title: "Shop Items", icon: ShoppingBag, path: "/shop-items" },
   { title: "Staff", icon: UserCog, path: "/staff" },
 ];

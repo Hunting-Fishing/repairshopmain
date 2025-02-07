@@ -63,6 +63,10 @@ export const router = createBrowserRouter([
         element: <WorkOrders />,
       },
       {
+        path: "shop-items",
+        element: <ShopItems />,
+      },
+      {
         path: "shops",
         element: <Navigate to="/application-control/shops" replace />,
       },
@@ -93,11 +97,7 @@ export const router = createBrowserRouter([
           {
             path: "job-templates",
             element: <JobTemplates />,
-          },
-          {
-            path: "shop-items",
-            element: <ShopItems />,
-          },
+          }
         ],
       },
       {

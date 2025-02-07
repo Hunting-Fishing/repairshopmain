@@ -1,4 +1,3 @@
-
 import { Car, ClipboardList, Home, Users, Settings2, UserCog, Package, MessageSquare, Wrench } from "lucide-react";
 import {
   Sidebar,
@@ -22,7 +21,6 @@ const getBaseMenuItems = () => [
   { title: "Dashboard", icon: Home, path: "/" },
   { title: "Customers", icon: Users, path: "/customers" },
   { title: "Work Orders", icon: ClipboardList, path: "/work-orders" },
-  { title: "Job Templates", icon: Wrench, path: "/job-templates" },
   { title: "Vehicles", icon: Car, path: "/vehicles" },
   { title: "Inventory", icon: Package, path: "/inventory" },
   { title: "Staff", icon: UserCog, path: "/staff" },

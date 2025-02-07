@@ -1,4 +1,3 @@
-
 import { useAmazonProductSearch } from "@/hooks/integrations/useAmazonProductSearch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +16,7 @@ type ProductCategory = {
     url: string;
     title?: string;
     description?: string;
+    asin?: string;
   }>;
 };
 
@@ -93,7 +93,8 @@ const productCategories: ProductCategory[] = [
     directLinks: [
       {
         url: "https://amzn.to/40INV6K",
-        title: "Recommended Auto Accessories",
+        asin: "B07GDC3BKY",
+        title: "Featured Automotive Accessories",
         description: "Browse our featured automotive accessories"
       }
     ]
@@ -112,7 +113,9 @@ const productCategories: ProductCategory[] = [
 
 export default function ShopItems() {
   const [activeCategory, setActiveCategory] = useState<string>(productCategories[0].id);
-  const { searchProducts } = useAmazonProductSearch();
+  const { searchProducts, searchProductByAsin } = useAmazonProductSearch();
+  const [featuredProduct, setFeaturedProduct] = useState<any>(null);
+  const [isLoadingFeatured, setIsLoadingFeatured] = useState(false);
   
   const handleSearch = async (keywords: string[]) => {
     try {
@@ -128,6 +131,29 @@ export default function ShopItems() {
   const handleDirectLinkClick = (url: string) => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
+
+  const loadFeaturedProduct = async (asin: string) => {
+    try {
+      setIsLoadingFeatured(true);
+      const result = await searchProductByAsin.mutateAsync({ asin });
+      if (result) {
+        setFeaturedProduct(result);
+      }
+    } catch (error) {
+      console.error("Error loading featured product:", error);
+      toast.error("Failed to load featured product details.");
+    } finally {
+      setIsLoadingFeatured(false);
+    }
+  };
+
+  useEffect(() => {
+    const miscCategory = productCategories.find(cat => cat.id === "misc");
+    const featuredAsin = miscCategory?.directLinks?.[0]?.asin;
+    if (featuredAsin) {
+      loadFeaturedProduct(featuredAsin);
+    }
+  }, []);
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -171,18 +197,31 @@ export default function ShopItems() {
             className="space-y-6 mt-4"
           >
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {/* Display Direct Links if available */}
-              {category.directLinks?.map((link, index) => (
-                <Card key={`direct-${index}`} className="overflow-hidden">
+              {category.id === "misc" && featuredProduct && (
+                <Card className="overflow-hidden">
                   <CardHeader>
-                    <CardTitle>{link.title || "Featured Product"}</CardTitle>
+                    <CardTitle>{featuredProduct.title || "Featured Product"}</CardTitle>
+                    {featuredProduct.image && (
+                      <div className="aspect-square overflow-hidden rounded-lg">
+                        <img 
+                          src={featuredProduct.image} 
+                          alt={featuredProduct.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
                   </CardHeader>
-                  <CardContent>
-                    <p className="mb-4 text-muted-foreground">
-                      {link.description || "Click to view this recommended product"}
+                  <CardContent className="space-y-4">
+                    <p className="text-muted-foreground">
+                      {featuredProduct.description}
                     </p>
+                    {featuredProduct.price && (
+                      <p className="text-lg font-bold">
+                        Price: {featuredProduct.price}
+                      </p>
+                    )}
                     <Button 
-                      onClick={() => handleDirectLinkClick(link.url)}
+                      onClick={() => handleDirectLinkClick(featuredProduct.url || category.directLinks?.[0]?.url)}
                       className="w-full"
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
@@ -190,9 +229,19 @@ export default function ShopItems() {
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
-
-              {/* Product Search Section */}
+              )}
+              {isLoadingFeatured && category.id === "misc" && (
+                <Card className="overflow-hidden">
+                  <CardHeader>
+                    <Skeleton className="h-[200px] w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </CardHeader>
+                  <CardContent>
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4 mt-2" />
+                  </CardContent>
+                </Card>
+              )}
               {searchProducts.isPending ? (
                 Array(6).fill(0).map((_, i) => (
                   <Card key={i} className="overflow-hidden">

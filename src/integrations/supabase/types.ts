@@ -1708,6 +1708,7 @@ export type Database = {
           status: string | null
           street_address: string | null
           technician_settings: Json | null
+          theme_preference: string | null
           updated_at: string
         }
         Insert: {
@@ -1737,6 +1738,7 @@ export type Database = {
           status?: string | null
           street_address?: string | null
           technician_settings?: Json | null
+          theme_preference?: string | null
           updated_at?: string
         }
         Update: {
@@ -1766,6 +1768,7 @@ export type Database = {
           status?: string | null
           street_address?: string | null
           technician_settings?: Json | null
+          theme_preference?: string | null
           updated_at?: string
         }
         Relationships: [

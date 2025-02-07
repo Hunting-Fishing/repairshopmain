@@ -54,25 +54,33 @@ const stats = [
 
 export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
   const cardClass = isModernTheme
-    ? 'hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-orange-50 to-orange-100/30 border border-orange-200/50 backdrop-blur-sm'
+    ? 'hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-purple-50 to-purple-100/30 border border-purple-200/50 backdrop-blur-sm transform hover:scale-105'
     : 'hover:shadow-lg transition-shadow';
 
   const iconClass = isModernTheme
-    ? 'text-[#F97316]'
+    ? 'text-[#8B5CF6]'
     : 'text-muted-foreground';
+
+  const valueClass = isModernTheme
+    ? 'bg-gradient-to-br from-[#8B5CF6] to-[#D946EF] bg-clip-text text-transparent font-black'
+    : '';
+
+  const titleClass = isModernTheme
+    ? 'text-gray-700 font-semibold'
+    : '';
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
       {stats.map((stat) => (
         <Card key={stat.title} className={cardClass}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className={`text-sm font-medium ${isModernTheme ? 'text-gray-700' : ''}`}>
+            <CardTitle className={`text-sm font-medium ${titleClass}`}>
               {stat.title}
             </CardTitle>
             <stat.icon className={`h-4 w-4 ${iconClass}`} />
           </CardHeader>
           <CardContent>
-            <div className={`text-2xl font-bold ${isModernTheme ? 'bg-gradient-to-br from-[#F97316] to-[#EA580C] bg-clip-text text-transparent' : ''}`}>
+            <div className={`text-2xl font-bold ${valueClass}`}>
               {stat.value}
             </div>
             <div className="flex items-center text-xs">

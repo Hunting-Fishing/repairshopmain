@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DayView } from "@/components/calendar/DayView";
 import { WeekView } from "@/components/calendar/WeekView";
@@ -7,6 +8,7 @@ import { Booking } from "@/types/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarSettingsFormValues } from "../calendar/settings/types";
+import { cn } from "@/lib/utils";
 
 interface CalendarSectionProps {
   selectedDate: Date;
@@ -16,6 +18,7 @@ interface CalendarSectionProps {
   onDateChange: (date: Date | undefined) => void;
   onViewChange: (view: "day" | "week" | "month") => void;
   onTimeSlotClick: (start: Date, end: Date) => void;
+  isModernTheme?: boolean;
 }
 
 export function CalendarSection({
@@ -26,6 +29,7 @@ export function CalendarSection({
   onDateChange,
   onViewChange,
   onTimeSlotClick,
+  isModernTheme = false,
 }: CalendarSectionProps) {
   // Fetch calendar settings
   const { data: settings } = useQuery({
@@ -49,13 +53,20 @@ export function CalendarSection({
     }
   });
 
-  // Use settings or fallback to defaults
   const workingHours = {
     start: settings?.workingHoursStart ? parseInt(settings.workingHoursStart) : 8,
     end: settings?.workingHoursEnd ? parseInt(settings.workingHoursEnd) : 18,
   };
 
   const use24HourTime = settings?.use24HourTime ?? false;
+
+  const cardClass = isModernTheme
+    ? 'bg-gradient-to-br from-white via-purple-50 to-purple-100/30 shadow-lg border border-purple-200/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300'
+    : '';
+
+  const headerClass = isModernTheme
+    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] bg-clip-text text-transparent font-bold'
+    : '';
 
   const renderCalendarView = () => {
     const viewProps = {
@@ -78,14 +89,15 @@ export function CalendarSection({
   };
 
   return (
-    <Card>
+    <Card className={cn("", cardClass)}>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Calendar</CardTitle>
+        <CardTitle className={headerClass}>Calendar</CardTitle>
         <CalendarNavigation
           selectedDate={selectedDate}
           onDateChange={onDateChange}
           view={view}
           onViewChange={onViewChange}
+          isModernTheme={isModernTheme}
         />
       </CardHeader>
       <CardContent>

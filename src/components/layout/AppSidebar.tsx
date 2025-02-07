@@ -1,4 +1,3 @@
-
 import { Car, ClipboardList, Home, Users, Settings2, UserCog, Package, MessageSquare } from "lucide-react";
 import {
   Sidebar,
@@ -28,21 +27,21 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const marketingItems = [
   {
-    title: "NHTSA Integration",
-    description: "Access vehicle data instantly",
-    color: "bg-blue-500",
-    path: "/application-control/integrations"
-  },
-  {
-    title: "Amazon Associates",
-    description: "Boost your parts revenue",
+    title: "Parts Revenue",
+    description: "Earn commissions on Amazon parts sales",
     color: "bg-orange-500",
     path: "/application-control/integrations"
   },
   {
-    title: "Coming Soon",
-    description: "New integrations monthly",
-    color: "bg-purple-500",
+    title: "Auto-Link Parts",
+    description: "Automatic part linking to Amazon",
+    color: "bg-orange-600",
+    path: "/application-control/integrations"
+  },
+  {
+    title: "Prime Benefits",
+    description: "Fast shipping for your customers",
+    color: "bg-orange-700",
     path: "/application-control/integrations"
   }
 ];
@@ -178,7 +177,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Marketing Carousel */}
+        {/* Amazon Marketing Carousel */}
         <div className="mt-auto px-4 py-6">
           <Carousel className="w-full" opts={{ loop: true }}>
             <CarouselContent>
@@ -203,4 +202,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-

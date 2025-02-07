@@ -22,7 +22,15 @@ export function useJobTemplates() {
         .eq('is_active', true)
         .order('name');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching job templates:', error);
+        throw error;
+      }
+      
+      if (!data || data.length === 0) {
+        return [];
+      }
+      
       return data as JobTemplate[];
     }
   });

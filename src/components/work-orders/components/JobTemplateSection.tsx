@@ -3,7 +3,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
-import { useJobTemplates } from "@/pages/job-templates/hooks/useJobTemplates";
+import { useJobTemplates, JobTemplate } from "@/hooks/use-job-templates";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,62 +25,27 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: templates, isLoading } = useJobTemplates();
+  const { data: templates = [], isLoading } = useJobTemplates();
   const [open, setOpen] = useState(false);
 
-  // Function to get all unique tasks across categories
-  const getAllTasks = () => {
-    const tasks: { id: string; name: string }[] = [];
-    
-    if (!templates || !Object.keys(templates).length) {
-      console.log('No templates available:', templates);
-      return tasks;
-    }
-    
-    try {
-      Object.entries(templates).forEach(([category, items]) => {
-        if (Array.isArray(items)) {
-          items.forEach((item, index) => {
-            if (item && typeof item === 'string') {
-              const trimmedItem = item.trim();
-              if (trimmedItem) {
-                tasks.push({
-                  id: `${category}-task-${index}`,
-                  name: trimmedItem
-                });
-              }
-            }
-          });
-        }
-      });
-      
-      return tasks;
-    } catch (error) {
-      console.error('Error processing templates:', error);
-      return tasks;
-    }
-  };
-
-  const handleTemplateSelect = (taskName: string) => {
-    form.setValue('jobTemplate', taskName);
-    form.setValue('jobDescription', taskName);
+  const handleTemplateSelect = (template: JobTemplate) => {
+    form.setValue('jobTemplate', template.name);
+    form.setValue('jobDescription', template.description || template.name);
     setOpen(false);
   };
-
-  const tasks = getAllTasks();
 
   if (isLoading) {
     return (
       <div className="space-y-4">
         <FormLabel>Job Template</FormLabel>
         <Button variant="outline" disabled className="w-full">
-          Loading...
+          Loading templates...
         </Button>
       </div>
     );
   }
 
-  if (!tasks.length) {
+  if (!templates.length) {
     return (
       <div className="space-y-4">
         <FormLabel>Job Template</FormLabel>
@@ -110,33 +75,31 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value || "Search templates..."}
+                    {field.value || "Select a template..."}
                   </Button>
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0">
                 <Command>
-                  <CommandInput placeholder="Search job templates..." />
+                  <CommandInput placeholder="Search templates..." />
                   <CommandEmpty>No templates found.</CommandEmpty>
-                  {tasks.length > 0 && (
-                    <CommandGroup>
-                      {tasks.map((task) => (
-                        <CommandItem
-                          value={task.name}
-                          key={task.id}
-                          onSelect={() => handleTemplateSelect(task.name)}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              task.name === field.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {task.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
+                  <CommandGroup>
+                    {templates.map((template) => (
+                      <CommandItem
+                        value={template.name}
+                        key={template.id}
+                        onSelect={() => handleTemplateSelect(template)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            template.name === field.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {template.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
                 </Command>
               </PopoverContent>
             </Popover>

@@ -30,7 +30,10 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
 
   // Function to get all unique tasks across categories
   const getAllTasks = () => {
-    if (!templates || typeof templates !== 'object') return [];
+    if (!templates || typeof templates !== 'object') {
+      console.log('Templates is null or not an object:', templates);
+      return [];
+    }
     
     try {
       const tasks: { id: string; name: string }[] = [];
@@ -39,15 +42,19 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
         if (Array.isArray(items)) {
           items.forEach((item, index) => {
             if (item && typeof item === 'string') {
-              tasks.push({
-                id: `${category}-task-${index}`,
-                name: item.trim()
-              });
+              const trimmedItem = item.trim();
+              if (trimmedItem) { // Only add non-empty strings
+                tasks.push({
+                  id: `${category}-task-${index}`,
+                  name: trimmedItem
+                });
+              }
             }
           });
         }
       });
       
+      console.log('Processed tasks:', tasks); // Debug log
       return tasks;
     } catch (error) {
       console.error('Error processing templates:', error);
@@ -63,6 +70,29 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
   };
 
   const tasks = getAllTasks();
+
+  // If loading or no tasks, show appropriate content
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <FormLabel>Job Template</FormLabel>
+        <Button variant="outline" disabled className="w-full">
+          Loading...
+        </Button>
+      </div>
+    );
+  }
+
+  if (!tasks.length) {
+    return (
+      <div className="space-y-4">
+        <FormLabel>Job Template</FormLabel>
+        <Button variant="outline" disabled className="w-full">
+          No templates available
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -83,11 +113,7 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value
-                      ? field.value
-                      : isLoading 
-                        ? "Loading..."
-                        : "Search templates..."}
+                    {field.value || "Search templates..."}
                   </Button>
                 </FormControl>
               </PopoverTrigger>

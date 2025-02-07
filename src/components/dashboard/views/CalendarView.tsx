@@ -24,6 +24,7 @@ interface CalendarViewProps {
   onTimeSlotClick: (start: Date, end: Date) => void;
   toggleCalendarSize: () => void;
   colorPreferences: ColorPreferences;
+  isModernTheme?: boolean;
 }
 
 export function CalendarView({
@@ -37,20 +38,29 @@ export function CalendarView({
   onTimeSlotClick,
   toggleCalendarSize,
   colorPreferences,
+  isModernTheme = false,
 }: CalendarViewProps) {
+  const cardClass = isModernTheme
+    ? 'bg-gradient-to-br from-white via-orange-50 to-orange-100/30 shadow-lg border border-orange-200/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300'
+    : '';
+
+  const buttonClass = isModernTheme
+    ? 'bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white hover:from-[#EA580C] hover:to-[#C2410C] shadow-md hover:shadow-lg transition-all duration-300'
+    : '';
+
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <StatsCards />
+      <Card className={cn("p-6", cardClass)}>
+        <StatsCards isModernTheme={isModernTheme} />
       </Card>
 
       <div className="space-y-4">
         <div className="flex justify-end">
           <Button
-            variant="outline"
+            variant={isModernTheme ? "default" : "outline"}
             size="sm"
             onClick={toggleCalendarSize}
-            className="flex items-center gap-2"
+            className={cn("flex items-center gap-2", buttonClass)}
           >
             {isCalendarExpanded ? (
               <>
@@ -74,6 +84,7 @@ export function CalendarView({
           onDateChange={onDateChange}
           onViewChange={onViewChange}
           onTimeSlotClick={onTimeSlotClick}
+          isModernTheme={isModernTheme}
         />
       </div>
     </div>

@@ -10,6 +10,8 @@ import { GridView } from "./views/GridView";
 import { ListView } from "./views/ListView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface TimeSlot {
   start: Date;
@@ -23,6 +25,7 @@ export function DashboardLayout() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
+  const [isModernTheme, setIsModernTheme] = useState(false);
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -75,12 +78,35 @@ export function DashboardLayout() {
     background_color: "bg-background/95"
   };
 
+  const modernClass = isModernTheme 
+    ? 'bg-gradient-to-br from-white via-orange-50 to-orange-100/30 shadow-lg rounded-2xl border border-orange-200/50 backdrop-blur-sm transition-all duration-300'
+    : '';
+
   return (
     <ErrorBoundary>
-      <div className="space-y-6 animate-fade-in">
-        <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
+      <div className={`space-y-6 animate-fade-in p-4 md:p-6 ${isModernTheme ? 'bg-gradient-to-br from-[#FEF7CD]/30 via-transparent to-[#FDE1D3]/30' : ''}`}>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex-1">
+            <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="theme-toggle" className="text-sm font-medium">
+              {isModernTheme ? "Modern" : "Basic"} Theme
+            </Label>
+            <Switch
+              id="theme-toggle"
+              checked={isModernTheme}
+              onCheckedChange={setIsModernTheme}
+              className="data-[state=checked]:bg-gradient-to-r from-[#F97316] to-[#EA580C]"
+            />
+          </div>
+        </div>
 
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}>
+        <Tabs 
+          value={viewMode} 
+          onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
+          className={`${modernClass}`}
+        >
           <TabsContent value="calendar" className="mt-0">
             <CalendarView
               selectedDate={selectedDate}
@@ -93,6 +119,7 @@ export function DashboardLayout() {
               onTimeSlotClick={handleTimeSlotClick}
               toggleCalendarSize={toggleCalendarSize}
               colorPreferences={colorPreferences}
+              isModernTheme={isModernTheme}
             />
           </TabsContent>
 

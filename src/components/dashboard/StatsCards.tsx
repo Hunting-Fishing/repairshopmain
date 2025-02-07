@@ -10,6 +10,10 @@ import {
   TrendingDown,
 } from "lucide-react";
 
+interface StatsCardsProps {
+  isModernTheme?: boolean;
+}
+
 const stats = [
   {
     title: "Total Work Orders",
@@ -48,26 +52,36 @@ const stats = [
   }
 ];
 
-export function StatsCards() {
+export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
+  const cardClass = isModernTheme
+    ? 'hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white via-orange-50 to-orange-100/30 border border-orange-200/50 backdrop-blur-sm'
+    : 'hover:shadow-lg transition-shadow';
+
+  const iconClass = isModernTheme
+    ? 'text-[#F97316]'
+    : 'text-muted-foreground';
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
       {stats.map((stat) => (
-        <Card key={stat.title} className="hover:shadow-lg transition-shadow">
+        <Card key={stat.title} className={cardClass}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className={`text-sm font-medium ${isModernTheme ? 'text-gray-700' : ''}`}>
               {stat.title}
             </CardTitle>
-            <stat.icon className="h-4 w-4 text-muted-foreground" />
+            <stat.icon className={`h-4 w-4 ${iconClass}`} />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
+            <div className={`text-2xl font-bold ${isModernTheme ? 'bg-gradient-to-br from-[#F97316] to-[#EA580C] bg-clip-text text-transparent' : ''}`}>
+              {stat.value}
+            </div>
             <div className="flex items-center text-xs">
               {stat.trendUp ? (
-                <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                <TrendingUp className={`h-3 w-3 ${stat.trendUp ? 'text-green-500' : 'text-red-500'} mr-1`} />
               ) : (
-                <TrendingDown className="h-3 w-3 text-red-500 mr-1" />
+                <TrendingDown className={`h-3 w-3 ${stat.trendUp ? 'text-green-500' : 'text-red-500'} mr-1`} />
               )}
-              <span className={stat.trendUp ? "text-green-500" : "text-red-500"}>
+              <span className={stat.trendUp ? 'text-green-500' : 'text-red-500'}>
                 {stat.trend}
               </span>
               <span className="text-muted-foreground ml-1">from last month</span>

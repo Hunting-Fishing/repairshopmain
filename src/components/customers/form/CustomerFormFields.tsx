@@ -1,8 +1,14 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { UseFormReturn } from "react-hook-form";
+import { CustomerFormValues } from "../types/customerTypes";
 
-export const CustomerFormFields = ({ form }: { form: any }) => (
+interface CustomerFormFieldsProps {
+  form: UseFormReturn<CustomerFormValues>;
+}
+
+export const CustomerFormFields = ({ form }: CustomerFormFieldsProps) => (
   <div className="space-y-4">
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <FormField

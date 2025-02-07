@@ -3,7 +3,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
-import { useJobTemplates } from "@/hooks/use-job-templates";
+import { useJobTemplates } from "@/pages/job-templates/hooks/useJobTemplates";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -25,17 +25,23 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: jobTemplates, isLoading } = useJobTemplates();
+  const { data: templates, isLoading } = useJobTemplates();
   const [open, setOpen] = useState(false);
 
+  // Function to get all unique tasks across categories
+  const getAllTasks = () => {
+    if (!templates) return [];
+    return Object.values(templates).flat().map((task, index) => ({
+      id: `task-${index}`,
+      name: task
+    }));
+  };
+
   // Handle template selection
-  const handleTemplateSelect = (templateId: string) => {
-    const template = jobTemplates?.find(t => t.id === templateId);
-    if (template) {
-      form.setValue('jobTemplate', templateId);
-      form.setValue('jobDescription', template.description || '');
-      setOpen(false);
-    }
+  const handleTemplateSelect = (taskName: string) => {
+    form.setValue('jobTemplate', taskName);
+    form.setValue('jobDescription', taskName);
+    setOpen(false);
   };
 
   return (
@@ -57,8 +63,8 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value && jobTemplates
-                      ? jobTemplates.find((template) => template.id === field.value)?.name
+                    {field.value
+                      ? field.value
                       : isLoading 
                         ? "Loading..."
                         : "Search templates..."}
@@ -70,19 +76,19 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                   <CommandInput placeholder="Search job templates..." />
                   <CommandEmpty>No templates found.</CommandEmpty>
                   <CommandGroup>
-                    {(jobTemplates || []).map((template) => (
+                    {getAllTasks().map((task) => (
                       <CommandItem
-                        value={template.name}
-                        key={template.id}
-                        onSelect={() => handleTemplateSelect(template.id)}
+                        value={task.name}
+                        key={task.id}
+                        onSelect={() => handleTemplateSelect(task.name)}
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            template.id === field.value ? "opacity-100" : "opacity-0"
+                            task.name === field.value ? "opacity-100" : "opacity-0"
                           )}
                         />
-                        {template.name}
+                        {task.name}
                       </CommandItem>
                     ))}
                   </CommandGroup>

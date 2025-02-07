@@ -1,9 +1,19 @@
-import { Zap, CreditCard, BarChart, Clock, Cloud, Smartphone } from "lucide-react";
+
+import { Zap, CreditCard, BarChart, Clock, Cloud, Smartphone, ShoppingBag } from "lucide-react";
 import { IntegrationCategory } from "../types";
 
 export const businessIntegrations: IntegrationCategory = {
   title: "Business Operations",
   items: [
+    {
+      title: "Amazon Associates",
+      description: "Track and manage affiliate sales through Amazon's Associates program",
+      icon: ShoppingBag,
+      status: "not_connected",
+      onConnect: () => console.log("Connect to Amazon Associates"),
+      websiteUrl: "https://affiliate-program.amazon.com/",
+      documentationUrl: "https://affiliate-program.amazon.com/help/node/topic/GP38PJ6EUR6PFBEC",
+    },
     {
       title: "Zapier",
       description: "Automate workflows by connecting with thousands of apps",

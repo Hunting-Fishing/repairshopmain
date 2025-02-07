@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useAmazonAssociates } from "@/hooks/integrations/useAmazonAssociates";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AmazonProductSearch } from "./AmazonProductSearch";
 
 interface AmazonAssociatesDialogProps {
   isOpen: boolean;
@@ -38,6 +39,7 @@ export function AmazonAssociatesDialog({ isOpen, onClose }: AmazonAssociatesDial
           <TabsList>
             <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="api">API Settings</TabsTrigger>
+            <TabsTrigger value="search">Product Search</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-6">
@@ -135,6 +137,10 @@ export function AmazonAssociatesDialog({ isOpen, onClose }: AmazonAssociatesDial
                 </div>
               </div>
             </div>
+          </TabsContent>
+
+          <TabsContent value="search" className="space-y-6">
+            <AmazonProductSearch />
           </TabsContent>
         </Tabs>
 

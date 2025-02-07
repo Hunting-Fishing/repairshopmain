@@ -21,7 +21,7 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="w-full justify-between">
-            Select Task <ChevronDown className="h-4 w-4 opacity-50" />
+            Select Template <ChevronDown className="h-4 w-4 opacity-50" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-[250px] max-h-[300px] overflow-y-auto">

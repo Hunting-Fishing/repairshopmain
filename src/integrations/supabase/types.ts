@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      amazon_api_requests: {
+        Row: {
+          created_at: string | null
+          error_message: string | null
+          id: string
+          marketplace: string | null
+          operation: string
+          organization_id: string | null
+          request_details: Json | null
+          response_time: number | null
+          status: string
+          timestamp: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          marketplace?: string | null
+          operation: string
+          organization_id?: string | null
+          request_details?: Json | null
+          response_time?: number | null
+          status: string
+          timestamp?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          marketplace?: string | null
+          operation?: string
+          organization_id?: string | null
+          request_details?: Json | null
+          response_time?: number | null
+          status?: string
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "amazon_api_requests_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       amazon_associates_settings: {
         Row: {
           api_region: string | null

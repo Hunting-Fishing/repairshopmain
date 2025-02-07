@@ -81,36 +81,41 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                     value={searchValue}
                     onValueChange={setSearchValue}
                   />
-                  <CommandEmpty>No templates found.</CommandEmpty>
-                  <ScrollArea className="h-[200px]">
-                    <CommandGroup>
-                      {filteredTemplates.map((template) => (
-                        <CommandItem
-                          key={template.id}
-                          value={template.name}
-                          onSelect={() => handleTemplateSelect(template)}
-                          className="flex items-center gap-2"
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              template.name === field.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          <div className="flex flex-col">
-                            <span className="font-medium">{template.name}</span>
-                            {template.description && (
-                              <span className="text-sm text-muted-foreground">
-                                {template.description.length > 50
-                                  ? `${template.description.slice(0, 50)}...`
-                                  : template.description}
-                              </span>
-                            )}
-                          </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </ScrollArea>
+                  {isLoading ? (
+                    <CommandEmpty>Loading templates...</CommandEmpty>
+                  ) : filteredTemplates.length === 0 ? (
+                    <CommandEmpty>No templates found.</CommandEmpty>
+                  ) : (
+                    <ScrollArea className="h-[200px]">
+                      <CommandGroup>
+                        {filteredTemplates.map((template) => (
+                          <CommandItem
+                            key={template.id}
+                            value={template.name}
+                            onSelect={() => handleTemplateSelect(template)}
+                            className="flex items-center gap-2"
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                template.name === field.value ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            <div className="flex flex-col">
+                              <span className="font-medium">{template.name}</span>
+                              {template.description && (
+                                <span className="text-sm text-muted-foreground">
+                                  {template.description.length > 50
+                                    ? `${template.description.slice(0, 50)}...`
+                                    : template.description}
+                                </span>
+                              )}
+                            </div>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </ScrollArea>
+                  )}
                 </Command>
               </PopoverContent>
             </Popover>

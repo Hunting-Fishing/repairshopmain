@@ -4,6 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { parseJobTemplatesCsv } from "../utils/csvParser";
 
+/**
+ * Hook to fetch and parse job templates from a CSV file stored in Supabase Storage.
+ * 
+ * Data Source:
+ * - Bucket: RTDATA (public bucket in Supabase Storage)
+ * - File: Job List 1.csv (configured in system_configuration table)
+ * - Format: CSV file containing job template categories and their items
+ * 
+ * Note: The file name is stored in the system_configuration table with the key 'job_templates_file'
+ * to allow for easy updates without code changes.
+ */
 export const useJobTemplates = () => {
   return useQuery({
     queryKey: ['job-templates-csv'],
@@ -23,7 +34,7 @@ export const useJobTemplates = () => {
 
       const fileName = configData.value;
       
-      // Then fetch the actual CSV file
+      // Then fetch the actual CSV file from the RTDATA bucket in Supabase Storage
       const { data: fileData, error: fileError } = await supabase
         .storage
         .from('RTDATA')

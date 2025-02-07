@@ -1,9 +1,17 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2 } from "lucide-react";
 import { StatsCards } from "../StatsCards";
 import { CalendarSection } from "../CalendarSection";
 import { cn } from "@/lib/utils";
+
+interface ColorPreferences {
+  primary_color: string;
+  secondary_color: string;
+  border_color: string;
+  background_color: string;
+}
 
 interface CalendarViewProps {
   selectedDate: Date;
@@ -15,6 +23,7 @@ interface CalendarViewProps {
   onViewChange: (view: "day" | "week" | "month") => void;
   onTimeSlotClick: (start: Date, end: Date) => void;
   toggleCalendarSize: () => void;
+  colorPreferences: ColorPreferences;
 }
 
 export function CalendarView({
@@ -27,6 +36,7 @@ export function CalendarView({
   onViewChange,
   onTimeSlotClick,
   toggleCalendarSize,
+  colorPreferences,
 }: CalendarViewProps) {
   return (
     <div className={cn(

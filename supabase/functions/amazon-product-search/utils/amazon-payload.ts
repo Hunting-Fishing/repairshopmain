@@ -2,28 +2,14 @@
 export function buildAmazonPayload(associateTag: string, asin?: string, keywords?: string) {
   const commonResources = [
     "Images.Primary.Large",
-    "Images.Primary.Medium",
-    "Images.Variants.Large",
     "ItemInfo.Title",
-    "ItemInfo.Features",
-    "Offers.Listings.Price",
-    "Offers.Listings.DeliveryInfo.IsPrimeEligible",
-    "CustomerReviews"
+    "Offers.Listings.Price"
   ];
 
   if (asin) {
     return {
       "ItemIds": [asin],
-      "Resources": [
-        ...commonResources,
-        "ItemInfo.ProductInfo",
-        "ItemInfo.ByLineInfo",
-        "ItemInfo.ContentInfo",
-        "ItemInfo.ManufactureInfo",
-        "ItemInfo.TechnicalInfo",
-        "Offers.Listings.Promotions",
-        "Offers.Summaries"
-      ],
+      "Resources": commonResources,
       "PartnerTag": associateTag,
       "PartnerType": "Associates",
       "Marketplace": "www.amazon.com",
@@ -33,12 +19,12 @@ export function buildAmazonPayload(associateTag: string, asin?: string, keywords
 
   return {
     "Keywords": keywords,
-    "SearchIndex": "Automotive",
+    "SearchIndex": "All",  // Changed to match example
     "Resources": commonResources,
     "PartnerTag": associateTag,
     "PartnerType": "Associates",
     "Marketplace": "www.amazon.com",
-    "Operation": "SearchItems"
+    "Operation": "SearchItems",
+    "ItemCount": 3  // Added to match example
   };
 }
-

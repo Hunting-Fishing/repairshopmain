@@ -59,25 +59,26 @@ serve(async (req) => {
     }
 
     const host = 'webservices.amazon.com';
-    const region = 'us-west-2';
+    const region = 'us-east-1';  // Changed to match example
     const service = 'ProductAdvertisingAPI';
     const amzDate = getAmzDate();
     const dateStamp = amzDate.substring(0, 8);
     
     const payload = JSON.stringify(buildAmazonPayload(associateTag, asin, keywords));
-    const canonicalUri = asin ? '/paapi5/getitems' : '/paapi5/searchitems';
+    const canonicalUri = '/paapi5/searchitems';  // Changed to match example, using same endpoint for both operations
     const canonicalQueryString = '';
-    const signedHeaders = 'content-encoding;content-type;host;x-amz-date;x-amz-target';
+    const signedHeaders = 'content-encoding;host;x-amz-date;x-amz-target';
     const algorithm = 'AWS4-HMAC-SHA256';
     const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
-    const target = asin ? 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems' : 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems';
+    const target = asin 
+      ? 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems' 
+      : 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems';
 
     const canonicalHeaders = 
       'content-encoding:amz-1.0\n' +
-      'content-type:application/json; charset=utf-8\n' +
-      `host:${host}\n` +
-      `x-amz-date:${amzDate}\n` +
-      `x-amz-target:${target}\n`;
+      'host:' + host + '\n' +
+      'x-amz-date:' + amzDate + '\n' +
+      'x-amz-target:' + target + '\n';
 
     const canonicalRequest = [
       'POST',
@@ -88,6 +89,8 @@ serve(async (req) => {
       await crypto.subtle.digest('SHA-256', encoder.encode(payload)).then(hash => hexEncode(new Uint8Array(hash)))
     ].join('\n');
 
+    console.log('Canonical Request:', canonicalRequest);
+
     const stringToSign = [
       algorithm,
       amzDate,
@@ -95,7 +98,11 @@ serve(async (req) => {
       await crypto.subtle.digest('SHA-256', encoder.encode(canonicalRequest)).then(hash => hexEncode(new Uint8Array(hash)))
     ].join('\n');
 
+    console.log('String to Sign:', stringToSign);
+
     const signature = await generateSignature(stringToSign, secretKey, dateStamp);
+
+    console.log('Generated Signature:', signature);
 
     const authorizationHeader = 
       `${algorithm} ` +
@@ -105,17 +112,18 @@ serve(async (req) => {
 
     console.log('Making request to Amazon API...');
     console.log('Request URL:', `https://${host}${canonicalUri}`);
+    console.log('Authorization Header:', authorizationHeader);
     console.log('Request payload:', payload);
 
     const response = await fetch(`https://${host}${canonicalUri}`, {
       method: 'POST',
       headers: {
         'Content-Encoding': 'amz-1.0',
-        'Content-Type': 'application/json; charset=utf-8',
+        'Host': host,
         'X-Amz-Date': amzDate,
         'X-Amz-Target': target,
         'Authorization': authorizationHeader,
-        'Host': host
+        'Content-Type': 'application/json; charset=UTF-8'
       },
       body: payload
     });

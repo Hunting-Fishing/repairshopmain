@@ -9,13 +9,14 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const encoder = new TextEncoder();
+
 function getAmzDate() {
   const date = new Date();
   return date.toISOString().replace(/[:-]|\.\d{3}/g, '');
 }
 
 async function hmacSHA256(key: string | ArrayBuffer, message: string): Promise<ArrayBuffer> {
-  const encoder = new TextEncoder();
   const keyBuffer = key instanceof ArrayBuffer ? key : encoder.encode(key);
   const messageBuffer = encoder.encode(message);
   
@@ -31,7 +32,6 @@ async function hmacSHA256(key: string | ArrayBuffer, message: string): Promise<A
 }
 
 async function generateSignature(stringToSign: string, secretKey: string, date: string) {
-  const encoder = new TextEncoder();
   const kDate = await hmacSHA256('AWS4' + secretKey, date.substring(0, 8));
   const kRegion = await hmacSHA256(kDate, 'us-west-2');
   const kService = await hmacSHA256(kRegion, 'ProductAdvertisingAPI');

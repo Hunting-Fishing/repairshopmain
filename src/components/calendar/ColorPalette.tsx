@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -16,30 +17,6 @@ interface ColorPaletteProps {
   onActiveColorChange: (index: 0 | 1) => void;
 }
 
-export const DISTINCT_COLORS = [
-  "#000000", // Black
-  "#808080", // Gray
-  "#FFFFFF", // White
-  "#8B4513", // Brown
-  "#FFA500", // Orange
-  "#FFFF00", // Yellow
-  "#008000", // Green
-  "#808000", // Olive
-  "#DAA520", // Mustard
-  "#008080", // Teal
-  "#00FFFF", // Cyan
-  "#87CEEB", // Light blue
-  "#0000FF", // Blue
-  "#000080", // Dark blue
-  "#800000", // Maroon
-  "#FF0000", // Red
-  "#800080", // Purple
-  "#FF00FF", // Magenta
-  "#FFC0CB", // Pink
-  "#FFD700", // Gold
-  "#C0C0C0", // Silver
-];
-
 export function ColorPalette({ 
   selectedColors, 
   onColorSelect,
@@ -56,15 +33,11 @@ export function ColorPalette({
     },
   });
 
-  const handleColorSelect = async (color: string) => {
+  const handleColorSelect = async () => {
     if (!session?.user) {
       console.log("No user session found");
       return;
     }
-
-    const newColors: [string, string] = [...selectedColors] as [string, string];
-    newColors[activeColorIndex] = color;
-    onColorSelect(newColors);
 
     setIsSaving(true);
     try {
@@ -72,9 +45,9 @@ export function ColorPalette({
         .from('profiles')
         .update({
           color_preferences: {
-            primary_color: newColors[0],
-            secondary_color: newColors[1],
-            border_color: newColors[0],
+            primary_color: PAST_APPOINTMENT_COLORS[0],
+            secondary_color: PAST_APPOINTMENT_COLORS[1],
+            border_color: PAST_APPOINTMENT_COLORS[0],
             background_color: 'bg-background/95'
           }
         })
@@ -94,49 +67,22 @@ export function ColorPalette({
 
   return (
     <div className="space-y-4 p-4 bg-background/95 rounded-lg border">
-      <div className="flex items-center gap-4 mb-2">
-        <span className="text-sm font-medium">Select colors:</span>
+      <div className="flex items-center gap-4">
+        <span className="text-sm font-medium">Calendar Color Scheme:</span>
         <div className="flex gap-2">
-          <button
-            className={cn(
-              "w-8 h-8 rounded-l-full border-2 transition-transform",
-              activeColorIndex === 0 ? "border-primary scale-110" : "border-transparent"
-            )}
-            style={{ 
-              background: `linear-gradient(135deg, ${selectedColors[0]} 50%, transparent 50%)`,
-            }}
-            onClick={() => onActiveColorChange(0)}
-            title="Primary Color"
+          <div
+            className="w-8 h-8 rounded-full border-2 border-transparent"
+            style={{ backgroundColor: PAST_APPOINTMENT_COLORS[0] }}
+            title="Primary Color (Past Events)"
           />
-          <button
-            className={cn(
-              "w-8 h-8 rounded-r-full border-2 transition-transform",
-              activeColorIndex === 1 ? "border-primary scale-110" : "border-transparent"
-            )}
-            style={{ 
-              background: `linear-gradient(315deg, ${selectedColors[1]} 50%, transparent 50%)`,
-            }}
-            onClick={() => onActiveColorChange(1)}
-            title="Secondary Color"
+          <div
+            className="w-8 h-8 rounded-full border-2 border-transparent"
+            style={{ backgroundColor: PAST_APPOINTMENT_COLORS[1] }}
+            title="Secondary Color (Current Events)"
           />
         </div>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {DISTINCT_COLORS.map((color) => (
-          <button
-            key={color}
-            className={cn(
-              "w-8 h-8 rounded-full border-2 transition-transform hover:scale-110",
-              selectedColors.includes(color) ? "border-primary" : "border-transparent",
-              isSaving && "opacity-50 cursor-not-allowed"
-            )}
-            style={{ backgroundColor: color }}
-            onClick={() => !isSaving && handleColorSelect(color)}
-            title={color}
-            disabled={isSaving}
-          />
-        ))}
       </div>
     </div>
   );
 }
+

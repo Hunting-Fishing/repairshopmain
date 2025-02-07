@@ -1,5 +1,9 @@
 
-// File: src/pages/job-templates/components/TemplateGrid.tsx
+
+/**
+ * File: src/pages/job-templates/components/TemplateGrid.tsx
+ * Displays a grid of job templates organized by category
+ */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { ScrollArea } from "@/components/ui/scroll-area";

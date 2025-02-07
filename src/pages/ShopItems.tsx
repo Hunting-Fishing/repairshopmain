@@ -87,7 +87,7 @@ export default function ShopItems() {
         {productCategories.map((category) => (
           <TabsContent key={category.id} value={category.id} className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {searchProducts.isLoading ? (
+              {searchProducts.isPending ? (
                 Array(6).fill(0).map((_, i) => (
                   <Card key={i}>
                     <CardHeader>

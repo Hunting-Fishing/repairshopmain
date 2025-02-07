@@ -1,5 +1,9 @@
 
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const PAST_APPOINTMENT_COLORS = [
   "#808080", // Gray
@@ -44,10 +48,50 @@ export function ColorPalette({
   activeColorIndex,
   onActiveColorChange
 }: ColorPaletteProps) {
-  const handleColorSelect = (color: string) => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const { data: session } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  const handleColorSelect = async (color: string) => {
+    if (!session?.user) {
+      console.log("No user session found");
+      return;
+    }
+
     const newColors: [string, string] = [...selectedColors] as [string, string];
     newColors[activeColorIndex] = color;
     onColorSelect(newColors);
+
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          color_preferences: {
+            primary_color: newColors[0],
+            secondary_color: newColors[1],
+            border_color: newColors[0],
+            background_color: 'bg-background/95'
+          }
+        })
+        .eq('id', session.user.id);
+
+      if (error) {
+        console.error('Error saving color preferences:', error);
+        toast.error('Failed to save color preferences');
+      }
+    } catch (error) {
+      console.error('Error saving color preferences:', error);
+      toast.error('Failed to save color preferences');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -85,11 +129,13 @@ export function ColorPalette({
             key={color}
             className={cn(
               "w-8 h-8 rounded-full border-2 transition-transform hover:scale-110",
-              selectedColors.includes(color) ? "border-primary" : "border-transparent"
+              selectedColors.includes(color) ? "border-primary" : "border-transparent",
+              isSaving && "opacity-50 cursor-not-allowed"
             )}
             style={{ backgroundColor: color }}
-            onClick={() => handleColorSelect(color)}
+            onClick={() => !isSaving && handleColorSelect(color)}
             title={color}
+            disabled={isSaving}
           />
         ))}
       </div>

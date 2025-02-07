@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -7,6 +8,8 @@ import { DashboardHeader } from "./DashboardHeader";
 import { CalendarView } from "./views/CalendarView";
 import { GridView } from "./views/GridView";
 import { ListView } from "./views/ListView";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TimeSlot {
   start: Date;
@@ -20,6 +23,30 @@ export function DashboardLayout() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
+
+  const { data: session } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  const { data: userProfile } = useQuery({
+    queryKey: ["user-profile", session?.user.id],
+    queryFn: async () => {
+      if (!session?.user.id) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("color_preferences")
+        .eq("id", session.user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user.id,
+  });
 
   const { data: bookings, isLoading, error } = useCalendarBookings(selectedDate);
 
@@ -41,6 +68,13 @@ export function DashboardLayout() {
     throw error;
   }
 
+  const colorPreferences = userProfile?.color_preferences || {
+    primary_color: "#F97316",
+    secondary_color: "#FDE1D3",
+    border_color: "#F97316",
+    background_color: "bg-background/95"
+  };
+
   return (
     <ErrorBoundary>
       <div className="space-y-6 animate-fade-in">
@@ -58,6 +92,7 @@ export function DashboardLayout() {
               onViewChange={setView}
               onTimeSlotClick={handleTimeSlotClick}
               toggleCalendarSize={toggleCalendarSize}
+              colorPreferences={colorPreferences}
             />
           </TabsContent>
 

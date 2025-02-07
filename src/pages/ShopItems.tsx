@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, ShoppingCart, ExternalLink } from "lucide-react";
+import { AlertCircle, ShoppingCart, ExternalLink, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -138,6 +138,14 @@ export default function ShopItems() {
             Browse recommended tools and equipment for your shop
           </p>
         </div>
+        <Button
+          variant="outline"
+          onClick={() => handleDirectLinkClick('https://amzn.to/40INV6K')}
+          className="flex items-center gap-2"
+        >
+          <Search className="h-4 w-4" />
+          Search Amazon
+        </Button>
       </div>
 
       <Tabs defaultValue={productCategories[0].id} className="space-y-6">

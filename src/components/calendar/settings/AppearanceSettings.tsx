@@ -4,16 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { UseFormReturn } from "react-hook-form";
 import { CalendarSettingsFormValues } from "./types";
-import { ColorPalette } from "../ColorPalette";
-import { useState } from "react";
 
 interface AppearanceSettingsProps {
   form: UseFormReturn<CalendarSettingsFormValues>;
 }
 
 export function AppearanceSettings({ form }: AppearanceSettingsProps) {
-  const [selectedColors, setSelectedColors] = useState<[string, string]>(["#9b87f5", "#9b87f580"]);
-
   return (
     <Card className="border-[#FEC6A1]">
       <CardHeader className="bg-[#FDE1D3] rounded-t-lg">
@@ -47,19 +43,6 @@ export function AppearanceSettings({ form }: AppearanceSettingsProps) {
             </FormItem>
           )}
         />
-
-        <FormItem>
-          <FormLabel>Past Appointments Color</FormLabel>
-          <ColorPalette 
-            selectedColors={selectedColors}
-            onColorSelect={setSelectedColors}
-            activeColorIndex={0}
-            onActiveColorChange={() => {}}
-          />
-          <FormDescription>
-            Choose how past appointments are displayed in the calendar
-          </FormDescription>
-        </FormItem>
       </CardContent>
     </Card>
   );

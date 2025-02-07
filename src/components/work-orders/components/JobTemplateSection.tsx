@@ -45,17 +45,6 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     );
   }
 
-  if (!templates.length) {
-    return (
-      <div className="space-y-4">
-        <FormLabel>Job Template</FormLabel>
-        <Button variant="outline" disabled className="w-full">
-          No templates available
-        </Button>
-      </div>
-    );
-  }
-
   return (
     <>
       <FormField

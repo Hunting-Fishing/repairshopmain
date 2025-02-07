@@ -1,4 +1,5 @@
 
+// File: src/pages/job-templates/components/TemplateGrid.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -31,3 +32,4 @@ export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
     </Card>
   );
 }
+

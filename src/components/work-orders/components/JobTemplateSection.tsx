@@ -1,10 +1,15 @@
 
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { useJobTemplates } from "@/hooks/use-job-templates";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -21,6 +26,7 @@ interface JobTemplateSectionProps {
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
   const { data: jobTemplates, isLoading } = useJobTemplates();
+  const [open, setOpen] = useState(false);
 
   // Handle template selection
   const handleTemplateSelect = (templateId: string) => {
@@ -28,6 +34,7 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     if (template) {
       form.setValue('jobTemplate', templateId);
       form.setValue('jobDescription', template.description || '');
+      setOpen(false);
     }
   };
 
@@ -37,22 +44,51 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
         control={form.control}
         name="jobTemplate"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="flex flex-col">
             <FormLabel>Job Template</FormLabel>
-            <Select onValueChange={handleTemplateSelect} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder={isLoading ? "Loading..." : "Select a job template"} />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {jobTemplates?.map((template) => (
-                  <SelectItem key={template.id} value={template.id}>
-                    {template.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      "w-full justify-between",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value
+                      ? jobTemplates?.find((template) => template.id === field.value)?.name
+                      : isLoading 
+                        ? "Loading..."
+                        : "Search templates..."}
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0">
+                <Command>
+                  <CommandInput placeholder="Search job templates..." />
+                  <CommandEmpty>No templates found.</CommandEmpty>
+                  <CommandGroup>
+                    {jobTemplates?.map((template) => (
+                      <CommandItem
+                        value={template.name}
+                        key={template.id}
+                        onSelect={() => handleTemplateSelect(template.id)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            template.id === field.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {template.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
             <FormMessage />
           </FormItem>
         )}

@@ -18,9 +18,12 @@ export function useJobTemplates() {
   return useQuery({
     queryKey: ['job-templates'],
     queryFn: async () => {
+      console.log('Fetching job templates...');
+      
       const { data: user } = await supabase.auth.getUser();
       
       if (!user.user) {
+        console.log('No authenticated user found');
         throw new Error('User not authenticated');
       }
 
@@ -37,6 +40,8 @@ export function useJobTemplates() {
         throw profileError;
       }
 
+      console.log('User organization_id:', profile.organization_id);
+
       const { data, error } = await supabase
         .from('job_templates')
         .select('*')
@@ -49,6 +54,8 @@ export function useJobTemplates() {
         toast.error('Error loading templates');
         throw error;
       }
+
+      console.log('Templates fetched:', data);
       
       return (data || []) as JobTemplate[];
     },

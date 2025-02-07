@@ -52,8 +52,8 @@ export function useJobTemplates() {
       
       return (data || []) as JobTemplate[];
     },
-    refetchOnWindowFocus: false, // Don't refetch on window focus
-    staleTime: 0, // Consider data stale immediately
-    gcTime: 0  // Don't cache the data (previously cacheTime)
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+    gcTime: 0
   });
 }

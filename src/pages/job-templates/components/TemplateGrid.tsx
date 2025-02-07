@@ -24,12 +24,15 @@ export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
   const handleRefresh = async () => {
     try {
       setIsRefreshing(true);
-      
+      console.log('Starting template refresh...');
+
       // First invalidate and remove existing data
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['job-templates'] }),
         queryClient.removeQueries({ queryKey: ['job-templates'] })
       ]);
+
+      console.log('Queries invalidated and removed');
 
       // Then force a fresh refetch
       await queryClient.refetchQueries({ 
@@ -38,6 +41,7 @@ export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
         type: 'active'
       });
 
+      console.log('Templates refreshed successfully');
       toast.success("Templates refreshed successfully");
     } catch (error) {
       console.error('Refresh error:', error);

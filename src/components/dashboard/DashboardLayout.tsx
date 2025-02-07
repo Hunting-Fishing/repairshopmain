@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface TimeSlot {
   start: Date;
@@ -25,7 +26,6 @@ export function DashboardLayout() {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
-  const [isModernTheme, setIsModernTheme] = useState(false);
 
   const { data: session } = useQuery({
     queryKey: ["session"],
@@ -35,13 +35,13 @@ export function DashboardLayout() {
     },
   });
 
-  const { data: userProfile } = useQuery({
+  const { data: userProfile, refetch: refetchProfile } = useQuery({
     queryKey: ["user-profile", session?.user.id],
     queryFn: async () => {
       if (!session?.user.id) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("color_preferences")
+        .select("color_preferences, theme_preference")
         .eq("id", session.user.id)
         .single();
       
@@ -50,6 +50,8 @@ export function DashboardLayout() {
     },
     enabled: !!session?.user.id,
   });
+
+  const [isModernTheme, setIsModernTheme] = useState(userProfile?.theme_preference === 'modern');
 
   const { data: bookings, isLoading, error } = useCalendarBookings(selectedDate);
 
@@ -65,6 +67,24 @@ export function DashboardLayout() {
 
   const toggleCalendarSize = () => {
     setIsCalendarExpanded(!isCalendarExpanded);
+  };
+
+  const handleThemeChange = async (checked: boolean) => {
+    if (!session?.user.id) return;
+
+    setIsModernTheme(checked);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ theme_preference: checked ? 'modern' : 'basic' })
+      .eq('id', session.user.id);
+
+    if (error) {
+      toast.error("Failed to save theme preference");
+      setIsModernTheme(!checked); // Revert on error
+      return;
+    }
+
+    refetchProfile(); // Refresh profile data
   };
 
   if (error) {
@@ -96,7 +116,7 @@ export function DashboardLayout() {
             <Switch
               id="theme-toggle"
               checked={isModernTheme}
-              onCheckedChange={setIsModernTheme}
+              onCheckedChange={handleThemeChange}
               className="data-[state=checked]:bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8]"
             />
           </div>

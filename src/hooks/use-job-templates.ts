@@ -24,7 +24,7 @@ export function useJobTemplates() {
       
       if (!user.user) {
         console.log('No authenticated user found');
-        throw new Error('User not authenticated');
+        throw new Error('You must be logged in to view templates');
       }
 
       // Get the user's organization_id from their profile
@@ -37,7 +37,12 @@ export function useJobTemplates() {
       if (profileError) {
         console.error('Error fetching user profile:', profileError);
         toast.error('Error loading templates');
-        throw profileError;
+        throw new Error('Failed to load user profile');
+      }
+
+      if (!profile?.organization_id) {
+        console.log('No organization ID found for user');
+        throw new Error('No organization found for your account');
       }
 
       console.log('User organization_id:', profile.organization_id);
@@ -52,15 +57,16 @@ export function useJobTemplates() {
       if (error) {
         console.error('Error fetching job templates:', error);
         toast.error('Error loading templates');
-        throw error;
+        throw new Error('Failed to load templates');
       }
 
       console.log('Templates fetched:', data);
       
       return (data || []) as JobTemplate[];
     },
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-    gcTime: 0
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }

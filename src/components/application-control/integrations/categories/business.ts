@@ -1,4 +1,3 @@
-
 import { Zap, CreditCard, BarChart, Clock, Cloud, Smartphone, ShoppingBag } from "lucide-react";
 import { IntegrationCategory } from "../types";
 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Users, Search, Filter } from "lucide-react";
@@ -118,12 +117,17 @@ export default function Customers() {
                 Add Customer
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] bg-gradient-to-b from-white to-[#FDE1D3]/20 border-[#FEC6A1]/30">
               <ScrollArea className="max-h-[80vh]">
-                <DialogHeader>
-                  <DialogTitle>Add New Customer</DialogTitle>
+                <DialogHeader className="bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3] p-6 rounded-t-lg">
+                  <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <Users className="h-6 w-6 text-[#F97316]" />
+                    Add New Customer
+                  </DialogTitle>
                 </DialogHeader>
-                <CustomerForm onSuccess={handleCustomerAdded} />
+                <div className="p-6">
+                  <CustomerForm onSuccess={handleCustomerAdded} />
+                </div>
               </ScrollArea>
             </DialogContent>
           </Dialog>

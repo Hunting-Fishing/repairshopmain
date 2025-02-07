@@ -33,16 +33,22 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     if (!templates || typeof templates !== 'object') return [];
     
     try {
-      const allTasks = Object.values(templates)
-        .filter(Array.isArray) // Ensure we only work with arrays
-        .flat()
-        .filter(Boolean) // Remove any null/undefined values
-        .map((task, index) => ({
-          id: `task-${index}`,
-          name: task
-        }));
+      const tasks: { id: string; name: string }[] = [];
       
-      return allTasks;
+      Object.entries(templates).forEach(([category, items]) => {
+        if (Array.isArray(items)) {
+          items.forEach((item, index) => {
+            if (item && typeof item === 'string') {
+              tasks.push({
+                id: `${category}-task-${index}`,
+                name: item.trim()
+              });
+            }
+          });
+        }
+      });
+      
+      return tasks;
     } catch (error) {
       console.error('Error processing templates:', error);
       return [];

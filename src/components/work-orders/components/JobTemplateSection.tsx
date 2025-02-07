@@ -5,11 +5,12 @@ import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { useJobTemplates, JobTemplate } from "@/hooks/use-job-templates";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Check } from "lucide-react";
+import { Check, Folder, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -59,11 +60,21 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                     )}
                     disabled={isLoading}
                   >
-                    {isLoading ? "Loading templates..." : field.value || "Select a template..."}
+                    {isLoading ? (
+                      "Loading templates..."
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <Folder className="h-4 w-4" />
+                          {field.value || "Select a template..."}
+                        </div>
+                        <Search className="h-4 w-4 opacity-50" />
+                      </>
+                    )}
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0">
+              <PopoverContent className="w-[400px] p-0" align="start">
                 <Command shouldFilter={false}>
                   <CommandInput 
                     placeholder="Search templates..." 
@@ -71,23 +82,35 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                     onValueChange={setSearchValue}
                   />
                   <CommandEmpty>No templates found.</CommandEmpty>
-                  <CommandGroup>
-                    {filteredTemplates.map((template) => (
-                      <CommandItem
-                        key={template.id}
-                        value={template.name}
-                        onSelect={() => handleTemplateSelect(template)}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            template.name === field.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {template.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  <ScrollArea className="h-[200px]">
+                    <CommandGroup>
+                      {filteredTemplates.map((template) => (
+                        <CommandItem
+                          key={template.id}
+                          value={template.name}
+                          onSelect={() => handleTemplateSelect(template)}
+                          className="flex items-center gap-2"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              template.name === field.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">{template.name}</span>
+                            {template.description && (
+                              <span className="text-sm text-muted-foreground">
+                                {template.description.length > 50
+                                  ? `${template.description.slice(0, 50)}...`
+                                  : template.description}
+                              </span>
+                            )}
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </ScrollArea>
                 </Command>
               </PopoverContent>
             </Popover>

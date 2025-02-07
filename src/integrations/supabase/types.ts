@@ -11,32 +11,53 @@ export type Database = {
     Tables: {
       amazon_associates_settings: {
         Row: {
+          api_region: string | null
+          api_version: string | null
           auto_link_enabled: boolean | null
           created_at: string | null
           default_marketplace: string | null
           id: string
           integration_connection_id: string | null
+          marketplace_endpoints: Json | null
           organization_id: string
+          partner_tag: string | null
+          partner_type: string | null
+          rate_limit_config: Json | null
+          request_quota: Json | null
           tracking_enabled: boolean | null
           updated_at: string | null
         }
         Insert: {
+          api_region?: string | null
+          api_version?: string | null
           auto_link_enabled?: boolean | null
           created_at?: string | null
           default_marketplace?: string | null
           id?: string
           integration_connection_id?: string | null
+          marketplace_endpoints?: Json | null
           organization_id: string
+          partner_tag?: string | null
+          partner_type?: string | null
+          rate_limit_config?: Json | null
+          request_quota?: Json | null
           tracking_enabled?: boolean | null
           updated_at?: string | null
         }
         Update: {
+          api_region?: string | null
+          api_version?: string | null
           auto_link_enabled?: boolean | null
           created_at?: string | null
           default_marketplace?: string | null
           id?: string
           integration_connection_id?: string | null
+          marketplace_endpoints?: Json | null
           organization_id?: string
+          partner_tag?: string | null
+          partner_type?: string | null
+          rate_limit_config?: Json | null
+          request_quota?: Json | null
           tracking_enabled?: boolean | null
           updated_at?: string | null
         }

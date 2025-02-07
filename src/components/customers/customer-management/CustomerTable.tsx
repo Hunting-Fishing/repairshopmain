@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import {
   Table,
@@ -46,21 +47,21 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
   return (
     <Table>
       <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Phone</TableHead>
-          <TableHead>Actions</TableHead>
+        <TableRow className="bg-gray-50 hover:bg-gray-50">
+          <TableHead className="font-semibold">Name</TableHead>
+          <TableHead className="font-semibold">Email</TableHead>
+          <TableHead className="font-semibold">Phone</TableHead>
+          <TableHead className="font-semibold">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {customers.map((customer) => (
           <TableRow
             key={customer.id}
-            className="cursor-pointer hover:bg-muted/50"
+            className="cursor-pointer transition-colors hover:bg-[#FDE1D3]/20"
             onClick={() => handleRowClick(customer.id)}
           >
-            <TableCell>
+            <TableCell className="font-medium">
               {customer.first_name} {customer.last_name}
             </TableCell>
             <TableCell>{customer.email}</TableCell>
@@ -71,18 +72,20 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="hover:bg-[#FDE1D3]/50"
                     onClick={() => onEdit(customer)}
                   >
-                    <Edit className="h-4 w-4" />
+                    <Edit className="h-4 w-4 text-[#F97316]" />
                   </Button>
                 )}
                 {onDelete && (
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="hover:bg-red-100"
                     onClick={() => onDelete(customer)}
                   >
-                    <Trash className="h-4 w-4" />
+                    <Trash className="h-4 w-4 text-red-500" />
                   </Button>
                 )}
               </div>

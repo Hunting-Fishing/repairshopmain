@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Plus, Users, Search, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -14,9 +15,11 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CustomerForm } from "@/components/customers/CustomerForm";
 import { CustomerTable, Customer } from "@/components/customers/customer-management/CustomerTable";
+import { Input } from "@/components/ui/input";
 
 export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { toast } = useToast();
 
   const { data: customers = [], refetch, isLoading } = useQuery({
@@ -72,38 +75,63 @@ export default function Customers() {
     });
   };
 
+  const filteredCustomers = customers.filter(customer => 
+    customer.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    customer.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    customer.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground">
-            Manage your customer database
-          </p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3] rounded-lg p-8 shadow-lg">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="p-3 bg-white rounded-full">
+            <Users className="h-6 w-6 text-[#F97316]" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">Customers</h1>
+            <p className="text-gray-600">
+              Manage your customer database efficiently
+            </p>
+          </div>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Customer
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
-            <ScrollArea className="max-h-[80vh]">
-              <DialogHeader>
-                <DialogTitle>Add New Customer</DialogTitle>
-              </DialogHeader>
-              <CustomerForm onSuccess={handleCustomerAdded} />
-            </ScrollArea>
-          </DialogContent>
-        </Dialog>
+        
+        <div className="flex items-center gap-4 mt-6">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search customers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white/90 hover:bg-white transition-colors"
+            />
+          </div>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-[#F97316] hover:bg-[#EA580C] transition-colors">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Customer
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] max-h-[90vh]">
+              <ScrollArea className="max-h-[80vh]">
+                <DialogHeader>
+                  <DialogTitle>Add New Customer</DialogTitle>
+                </DialogHeader>
+                <CustomerForm onSuccess={handleCustomerAdded} />
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      <CustomerTable 
-        customers={customers} 
-        isLoading={isLoading}
-        onDelete={handleDelete}
-      />
+      <div className="bg-white rounded-lg shadow-md p-6 animate-fade-in">
+        <CustomerTable 
+          customers={filteredCustomers} 
+          isLoading={isLoading}
+          onDelete={handleDelete}
+        />
+      </div>
     </div>
   );
 }

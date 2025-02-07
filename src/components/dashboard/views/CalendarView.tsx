@@ -41,11 +41,11 @@ export function CalendarView({
   isModernTheme = false,
 }: CalendarViewProps) {
   const cardClass = isModernTheme
-    ? 'bg-gradient-to-br from-white via-purple-50 to-purple-100/30 shadow-lg border border-purple-200/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300'
+    ? 'bg-gradient-to-br from-white via-blue-50 to-blue-100/30 shadow-lg border border-blue-200/50 backdrop-blur-sm hover:shadow-xl transition-all duration-300'
     : '';
 
   const buttonClass = isModernTheme
-    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white hover:from-[#7C3AED] hover:to-[#C026D3] shadow-md hover:shadow-lg transition-all duration-300'
+    ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-white hover:from-[#0284C7] hover:to-[#0EA5E9] shadow-md hover:shadow-lg transition-all duration-300'
     : '';
 
   return (

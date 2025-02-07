@@ -3,42 +3,12 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0';
 import { encode as hexEncode } from "https://deno.land/std@0.168.0/encoding/hex.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { corsHeaders } from "./utils/headers.ts";
+import { getAmzDate } from "./utils/dates.ts";
+import { generateSignature } from "./utils/crypto.ts";
+import { buildAmazonPayload } from "./utils/amazon-payload.ts";
 
 const encoder = new TextEncoder();
-
-function getAmzDate() {
-  const date = new Date();
-  return date.toISOString().replace(/[:-]|\.\d{3}/g, '');
-}
-
-async function hmacSHA256(key: string | ArrayBuffer, message: string): Promise<ArrayBuffer> {
-  const keyBuffer = key instanceof ArrayBuffer ? key : encoder.encode(key);
-  const messageBuffer = encoder.encode(message);
-  
-  const cryptoKey = await crypto.subtle.importKey(
-    'raw',
-    keyBuffer,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-  
-  return await crypto.subtle.sign('HMAC', cryptoKey, messageBuffer);
-}
-
-async function generateSignature(stringToSign: string, secretKey: string, date: string) {
-  const kDate = await hmacSHA256('AWS4' + secretKey, date.substring(0, 8));
-  const kRegion = await hmacSHA256(kDate, 'us-west-2');
-  const kService = await hmacSHA256(kRegion, 'ProductAdvertisingAPI');
-  const kSigning = await hmacSHA256(kService, 'aws4_request');
-  const signature = await hmacSHA256(kSigning, stringToSign);
-  return hexEncode(new Uint8Array(signature));
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -93,50 +63,8 @@ serve(async (req) => {
     const service = 'ProductAdvertisingAPI';
     const amzDate = getAmzDate();
     const dateStamp = amzDate.substring(0, 8);
-
-    const payload = JSON.stringify(asin ? {
-      "ItemIds": [asin],
-      "Resources": [
-        "Images.Primary.Large",
-        "Images.Primary.Medium",
-        "Images.Variants.Large",
-        "ItemInfo.Title",
-        "ItemInfo.Features",
-        "ItemInfo.ProductInfo",
-        "ItemInfo.ByLineInfo",
-        "ItemInfo.ContentInfo",
-        "ItemInfo.ManufactureInfo",
-        "ItemInfo.TechnicalInfo",
-        "Offers.Listings.Price",
-        "Offers.Listings.DeliveryInfo.IsPrimeEligible",
-        "Offers.Listings.Promotions",
-        "Offers.Summaries",
-        "CustomerReviews"
-      ],
-      "PartnerTag": associateTag,
-      "PartnerType": "Associates",
-      "Marketplace": "www.amazon.com",
-      "Operation": "GetItems"
-    } : {
-      "Keywords": keywords,
-      "SearchIndex": "Automotive",
-      "Resources": [
-        "Images.Primary.Large",
-        "Images.Primary.Medium",
-        "Images.Variants.Large",
-        "ItemInfo.Title",
-        "ItemInfo.Features",
-        "ItemInfo.ProductInfo",
-        "Offers.Listings.Price",
-        "Offers.Listings.DeliveryInfo.IsPrimeEligible",
-        "CustomerReviews"
-      ],
-      "PartnerTag": associateTag,
-      "PartnerType": "Associates",
-      "Marketplace": "www.amazon.com",
-      "Operation": "SearchItems"
-    });
-
+    
+    const payload = JSON.stringify(buildAmazonPayload(associateTag, asin, keywords));
     const canonicalUri = asin ? '/paapi5/getitems' : '/paapi5/searchitems';
     const canonicalQueryString = '';
     const signedHeaders = 'content-encoding;content-type;host;x-amz-date;x-amz-target';
@@ -193,7 +121,7 @@ serve(async (req) => {
     });
 
     console.log('Amazon API response status:', response.status);
-
+    
     const data = await response.json();
     console.log('Amazon API response data:', JSON.stringify(data, null, 2));
 
@@ -216,3 +144,4 @@ serve(async (req) => {
     });
   }
 });
+

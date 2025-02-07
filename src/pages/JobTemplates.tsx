@@ -15,14 +15,14 @@ export default function JobTemplates() {
     );
   }
 
-  // Group templates by category
+  // Group templates by category and include full template data
   const groupedTemplates = templates?.reduce((acc, template) => {
     if (!acc[template.category]) {
       acc[template.category] = [];
     }
-    acc[template.category].push(template.name);
+    acc[template.category].push(template);
     return acc;
-  }, {} as Record<string, string[]>) || {};
+  }, {} as Record<string, typeof templates>) || {};
 
   // Map category codes to display names
   const categoryNames: Record<string, string> = {

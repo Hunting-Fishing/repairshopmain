@@ -1,8 +1,4 @@
 
-/**
- * File: src/pages/job-templates/components/TemplateGrid.tsx
- * Displays a grid of job templates organized by category
- */
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TemplateDropdown } from "./TemplateDropdown";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,9 +7,10 @@ import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
+import { JobTemplate } from "@/hooks/use-job-templates";
 
 interface TemplateGridProps {
-  templates: Record<string, string[]>;
+  templates: Record<string, JobTemplate[]>;
   columnNames: Record<string, string>;
 }
 

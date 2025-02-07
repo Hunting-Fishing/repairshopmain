@@ -7,11 +7,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
+import { JobTemplate } from "@/hooks/use-job-templates";
 
 interface TemplateDropdownProps {
   category: string;
   displayName: string;
-  items: string[];
+  items: JobTemplate[];
 }
 
 export function TemplateDropdown({ category, displayName, items }: TemplateDropdownProps) {
@@ -25,9 +26,9 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-[250px] max-h-[300px] overflow-y-auto">
-          {items.map((item, index) => (
-            <DropdownMenuItem key={`${category}-${index}`}>
-              {item}
+          {items.map((template) => (
+            <DropdownMenuItem key={template.id}>
+              {template.name}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>

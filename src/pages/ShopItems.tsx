@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, ShoppingCart } from "lucide-react";
+import { AlertCircle, ShoppingCart, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -13,6 +13,11 @@ type ProductCategory = {
   id: string;
   name: string;
   keywords: string[];
+  directLinks?: Array<{
+    url: string;
+    title?: string;
+    description?: string;
+  }>;
 };
 
 const productCategories: ProductCategory[] = [
@@ -84,7 +89,14 @@ const productCategories: ProductCategory[] = [
   {
     id: "misc",
     name: "Miscellaneous & Accessories",
-    keywords: ["automotive accessories", "misc automotive tools"]
+    keywords: ["automotive accessories", "misc automotive tools"],
+    directLinks: [
+      {
+        url: "https://amzn.to/40INV6K",
+        title: "Recommended Auto Accessories",
+        description: "Browse our featured automotive accessories"
+      }
+    ]
   },
   {
     id: "steering",
@@ -111,6 +123,10 @@ export default function ShopItems() {
       console.error("Error searching products:", error);
       toast.error("Failed to load products. Please try again later.");
     }
+  };
+
+  const handleDirectLinkClick = (url: string) => {
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -147,6 +163,28 @@ export default function ShopItems() {
             className="space-y-6 mt-4"
           >
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {/* Display Direct Links if available */}
+              {category.directLinks?.map((link, index) => (
+                <Card key={`direct-${index}`} className="overflow-hidden">
+                  <CardHeader>
+                    <CardTitle>{link.title || "Featured Product"}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="mb-4 text-muted-foreground">
+                      {link.description || "Click to view this recommended product"}
+                    </p>
+                    <Button 
+                      onClick={() => handleDirectLinkClick(link.url)}
+                      className="w-full"
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      View on Amazon
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+
+              {/* Product Search Section */}
               {searchProducts.isPending ? (
                 Array(6).fill(0).map((_, i) => (
                   <Card key={i} className="overflow-hidden">
@@ -178,7 +216,7 @@ export default function ShopItems() {
                       className="w-full"
                     >
                       <ShoppingCart className="mr-2 h-4 w-4" />
-                      Load Products
+                      Load More Products
                     </Button>
                   </CardContent>
                 </Card>

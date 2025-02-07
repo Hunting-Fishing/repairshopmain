@@ -38,9 +38,6 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     }
   };
 
-  // Ensure we have a valid array even during loading
-  const templates = jobTemplates || [];
-
   return (
     <>
       <FormField
@@ -60,8 +57,8 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value
-                      ? templates.find((template) => template.id === field.value)?.name
+                    {field.value && jobTemplates
+                      ? jobTemplates.find((template) => template.id === field.value)?.name
                       : isLoading 
                         ? "Loading..."
                         : "Search templates..."}
@@ -73,7 +70,7 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                   <CommandInput placeholder="Search job templates..." />
                   <CommandEmpty>No templates found.</CommandEmpty>
                   <CommandGroup>
-                    {templates.map((template) => (
+                    {(jobTemplates || []).map((template) => (
                       <CommandItem
                         value={template.name}
                         key={template.id}

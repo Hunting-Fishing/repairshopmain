@@ -1,4 +1,5 @@
-import { Car, ClipboardList, Home, Users, Settings2, UserCog, Package, MessageSquare, Wrench } from "lucide-react";
+
+import { Car, ClipboardList, Home, Users, Settings2, UserCog, Package, MessageSquare } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -16,6 +17,35 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card, CardContent } from "@/components/ui/card";
+
+const marketingItems = [
+  {
+    title: "NHTSA Integration",
+    description: "Access vehicle data instantly",
+    color: "bg-blue-500",
+    path: "/application-control/integrations"
+  },
+  {
+    title: "Amazon Associates",
+    description: "Boost your parts revenue",
+    color: "bg-orange-500",
+    path: "/application-control/integrations"
+  },
+  {
+    title: "Coming Soon",
+    description: "New integrations monthly",
+    color: "bg-purple-500",
+    path: "/application-control/integrations"
+  }
+];
 
 const getBaseMenuItems = () => [
   { title: "Dashboard", icon: Home, path: "/" },
@@ -124,7 +154,6 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
 
-              {/* Chat Button with Notification Badge */}
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link 
@@ -148,7 +177,30 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Marketing Carousel */}
+        <div className="mt-auto px-4 py-6">
+          <Carousel className="w-full" opts={{ loop: true }}>
+            <CarouselContent>
+              {marketingItems.map((item, index) => (
+                <CarouselItem key={index}>
+                  <Link to={item.path}>
+                    <Card className={`${item.color} text-white hover:opacity-90 transition-opacity`}>
+                      <CardContent className="p-4">
+                        <h3 className="font-semibold">{item.title}</h3>
+                        <p className="text-sm opacity-90">{item.description}</p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="h-6 w-6" />
+            <CarouselNext className="h-6 w-6" />
+          </Carousel>
+        </div>
       </SidebarContent>
     </Sidebar>
   );
 }
+

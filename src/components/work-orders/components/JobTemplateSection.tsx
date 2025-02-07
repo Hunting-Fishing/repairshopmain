@@ -25,15 +25,15 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: templates = {}, isLoading } = useJobTemplates();
+  const { data: templates, isLoading } = useJobTemplates();
   const [open, setOpen] = useState(false);
 
   // Function to get all unique tasks across categories
   const getAllTasks = () => {
     const tasks: { id: string; name: string }[] = [];
     
-    if (!templates || typeof templates !== 'object') {
-      console.log('Templates is null or not an object:', templates);
+    if (!templates || !Object.keys(templates).length) {
+      console.log('No templates available:', templates);
       return tasks;
     }
     
@@ -54,7 +54,6 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
         }
       });
       
-      console.log('Processed tasks:', tasks);
       return tasks;
     } catch (error) {
       console.error('Error processing templates:', error);
@@ -76,6 +75,17 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
         <FormLabel>Job Template</FormLabel>
         <Button variant="outline" disabled className="w-full">
           Loading...
+        </Button>
+      </div>
+    );
+  }
+
+  if (!tasks.length) {
+    return (
+      <div className="space-y-4">
+        <FormLabel>Job Template</FormLabel>
+        <Button variant="outline" disabled className="w-full">
+          No templates available
         </Button>
       </div>
     );
@@ -108,23 +118,25 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                 <Command>
                   <CommandInput placeholder="Search job templates..." />
                   <CommandEmpty>No templates found.</CommandEmpty>
-                  <CommandGroup>
-                    {tasks.map((task) => (
-                      <CommandItem
-                        value={task.name}
-                        key={task.id}
-                        onSelect={() => handleTemplateSelect(task.name)}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            task.name === field.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {task.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  {tasks.length > 0 && (
+                    <CommandGroup>
+                      {tasks.map((task) => (
+                        <CommandItem
+                          value={task.name}
+                          key={task.id}
+                          onSelect={() => handleTemplateSelect(task.name)}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              task.name === field.value ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {task.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
                 </Command>
               </PopoverContent>
             </Popover>
@@ -152,4 +164,3 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     </>
   );
 }
-

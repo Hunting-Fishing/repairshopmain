@@ -39,21 +39,13 @@ export function CalendarView({
   colorPreferences,
 }: CalendarViewProps) {
   return (
-    <div className={cn(
-      "grid gap-6",
-      isCalendarExpanded ? "" : "grid-cols-1 lg:grid-cols-2"
-    )}>
-      {!isCalendarExpanded && (
-        <Card className="p-6 space-y-6">
-          <StatsCards />
-        </Card>
-      )}
+    <div className="space-y-6">
+      <Card className="p-6">
+        <StatsCards />
+      </Card>
 
-      <div className={cn(
-        "transition-all duration-300",
-        isCalendarExpanded ? "col-span-full" : ""
-      )}>
-        <div className="flex justify-end mb-4">
+      <div className="space-y-4">
+        <div className="flex justify-end">
           <Button
             variant="outline"
             size="sm"
@@ -77,7 +69,7 @@ export function CalendarView({
         <CalendarSection
           selectedDate={selectedDate}
           view={view}
-          bookings={bookings}
+          bookings={bookings || []}
           isLoading={isLoading}
           onDateChange={onDateChange}
           onViewChange={onViewChange}

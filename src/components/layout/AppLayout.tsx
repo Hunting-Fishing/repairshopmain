@@ -7,20 +7,23 @@ import { LogOut } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { useState } from "react";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, session } = useAuth();
   const navigate = useNavigate();
 
-  // Fetch user profile data
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, refetch: refetchProfile } = useQuery({
     queryKey: ['current-user-profile'],
     queryFn: async () => {
       if (!session?.user?.id) return null;
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, role')
+        .select('first_name, last_name, role, theme_preference')
         .eq('id', session.user.id)
         .single();
         
@@ -32,30 +35,49 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       return data;
     },
     enabled: !!session?.user?.id,
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes (formerly cacheTime)
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
   });
+
+  const [isModernTheme, setIsModernTheme] = useState(profile?.theme_preference === 'modern');
+
+  const handleThemeChange = async (checked: boolean) => {
+    if (!session?.user?.id) return;
+
+    setIsModernTheme(checked);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ theme_preference: checked ? 'modern' : 'basic' })
+      .eq('id', session.user.id);
+
+    if (error) {
+      toast.error("Failed to save theme preference");
+      setIsModernTheme(!checked); // Revert on error
+      return;
+    }
+
+    refetchProfile();
+  };
 
   // If not authenticated, redirect to auth page
   if (!session) {
     return <Navigate to="/auth" replace />;
   }
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
-  };
-
   // Format role for display
   const formatRole = (role: string) => {
-    return role.split('_').map(word => 
+    return role?.split('_').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
   };
 
+  const modernClass = isModernTheme 
+    ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50' 
+    : '';
+
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className={`min-h-screen flex w-full bg-background ${modernClass}`}>
         <AppSidebar />
         <main className="flex-1 overflow-y-auto">
           <div className="container py-6">
@@ -70,10 +92,23 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </>
                 )}
               </div>
-              <Button variant="ghost" onClick={handleSignOut}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign Out
-              </Button>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="global-theme-toggle" className="text-sm font-medium">
+                    {isModernTheme ? "Modern" : "Basic"} Theme
+                  </Label>
+                  <Switch
+                    id="global-theme-toggle"
+                    checked={isModernTheme}
+                    onCheckedChange={handleThemeChange}
+                    className="data-[state=checked]:bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8]"
+                  />
+                </div>
+                <Button variant="ghost" onClick={signOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
             {children}
           </div>
@@ -82,3 +117,4 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </SidebarProvider>
   );
 }
+

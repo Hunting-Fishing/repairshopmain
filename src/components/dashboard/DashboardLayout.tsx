@@ -10,9 +10,6 @@ import { GridView } from "./views/GridView";
 import { ListView } from "./views/ListView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
 
 interface TimeSlot {
   start: Date;
@@ -35,7 +32,7 @@ export function DashboardLayout() {
     },
   });
 
-  const { data: userProfile, refetch: refetchProfile } = useQuery({
+  const { data: userProfile } = useQuery({
     queryKey: ["user-profile", session?.user.id],
     queryFn: async () => {
       if (!session?.user.id) return null;
@@ -50,8 +47,6 @@ export function DashboardLayout() {
     },
     enabled: !!session?.user.id,
   });
-
-  const [isModernTheme, setIsModernTheme] = useState(userProfile?.theme_preference === 'modern');
 
   const { data: bookings, isLoading, error } = useCalendarBookings(selectedDate);
 
@@ -69,24 +64,6 @@ export function DashboardLayout() {
     setIsCalendarExpanded(!isCalendarExpanded);
   };
 
-  const handleThemeChange = async (checked: boolean) => {
-    if (!session?.user.id) return;
-
-    setIsModernTheme(checked);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ theme_preference: checked ? 'modern' : 'basic' })
-      .eq('id', session.user.id);
-
-    if (error) {
-      toast.error("Failed to save theme preference");
-      setIsModernTheme(!checked); // Revert on error
-      return;
-    }
-
-    refetchProfile(); // Refresh profile data
-  };
-
   if (error) {
     throw error;
   }
@@ -98,34 +75,19 @@ export function DashboardLayout() {
     background_color: "bg-background/95"
   };
 
-  const modernClass = isModernTheme 
-    ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50' 
-    : '';
-
   return (
     <ErrorBoundary>
-      <div className={`space-y-6 animate-fade-in p-4 md:p-6 ${modernClass}`}>
+      <div className="space-y-6 animate-fade-in p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
             <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
-          </div>
-          <div className="flex items-center gap-2">
-            <Label htmlFor="theme-toggle" className="text-sm font-medium">
-              {isModernTheme ? "Modern" : "Basic"} Theme
-            </Label>
-            <Switch
-              id="theme-toggle"
-              checked={isModernTheme}
-              onCheckedChange={handleThemeChange}
-              className="data-[state=checked]:bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8]"
-            />
           </div>
         </div>
 
         <Tabs 
           value={viewMode} 
           onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
-          className={`${isModernTheme ? 'bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100/50' : ''}`}
+          className={`${userProfile?.theme_preference === 'modern' ? 'bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100/50' : ''}`}
         >
           <TabsContent value="calendar" className="mt-0">
             <CalendarView
@@ -139,7 +101,7 @@ export function DashboardLayout() {
               onTimeSlotClick={handleTimeSlotClick}
               toggleCalendarSize={toggleCalendarSize}
               colorPreferences={colorPreferences}
-              isModernTheme={isModernTheme}
+              isModernTheme={userProfile?.theme_preference === 'modern'}
             />
           </TabsContent>
 
@@ -162,3 +124,4 @@ export function DashboardLayout() {
     </ErrorBoundary>
   );
 }
+

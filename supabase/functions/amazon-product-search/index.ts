@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0';
-import { HmacSHA256 } from 'https://deno.land/x/hmac@v2.0.1/mod.ts';
+import * as hex from "https://deno.land/std@0.168.0/encoding/hex.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,12 +14,30 @@ function getAmzDate() {
   return date.toISOString().replace(/[:-]|\.\d{3}/g, '');
 }
 
+async function hmacSHA256(key: string | ArrayBuffer, message: string): Promise<ArrayBuffer> {
+  const encoder = new TextEncoder();
+  const keyBuffer = key instanceof ArrayBuffer ? key : encoder.encode(key);
+  const messageBuffer = encoder.encode(message);
+  
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyBuffer,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  
+  return await crypto.subtle.sign('HMAC', cryptoKey, messageBuffer);
+}
+
 async function generateSignature(stringToSign: string, secretKey: string, date: string) {
-  const dateKey = await new HmacSHA256('AWS4' + secretKey, date.substring(0, 8)).digest();
-  const regionKey = await new HmacSHA256(dateKey, 'us-west-2').digest();
-  const serviceKey = await new HmacSHA256(regionKey, 'ProductAdvertisingAPI').digest();
-  const signingKey = await new HmacSHA256(serviceKey, 'aws4_request').digest();
-  return new HmacSHA256(signingKey, stringToSign).toString();
+  const encoder = new TextEncoder();
+  const kDate = await hmacSHA256('AWS4' + secretKey, date.substring(0, 8));
+  const kRegion = await hmacSHA256(kDate, 'us-west-2');
+  const kService = await hmacSHA256(kRegion, 'ProductAdvertisingAPI');
+  const kSigning = await hmacSHA256(kService, 'aws4_request');
+  const signature = await hmacSHA256(kSigning, stringToSign);
+  return hex.encodeHex(new Uint8Array(signature));
 }
 
 serve(async (req) => {
@@ -112,14 +130,14 @@ serve(async (req) => {
       canonicalQueryString,
       canonicalHeaders,
       signedHeaders,
-      await new HmacSHA256().update(payload).digest('hex')
+      await crypto.subtle.digest('SHA-256', encoder.encode(payload)).then(hash => hex.encodeHex(new Uint8Array(hash)))
     ].join('\n');
 
     const stringToSign = [
       algorithm,
       amzDate,
       credentialScope,
-      await new HmacSHA256().update(canonicalRequest).digest('hex')
+      await crypto.subtle.digest('SHA-256', encoder.encode(canonicalRequest)).then(hash => hex.encodeHex(new Uint8Array(hash)))
     ].join('\n');
 
     const signature = await generateSignature(stringToSign, secretKey, dateStamp);
@@ -129,6 +147,8 @@ serve(async (req) => {
       `Credential=${accessKeyId}/${credentialScope}, ` +
       `SignedHeaders=${signedHeaders}, ` +
       `Signature=${signature}`;
+
+    console.log('Making request to Amazon API...');
 
     // Make the request to Amazon
     const response = await fetch(`https://${host}${canonicalUri}`, {
@@ -143,6 +163,8 @@ serve(async (req) => {
       },
       body: payload
     });
+
+    console.log('Amazon API response status:', response.status);
 
     const data = await response.json();
 

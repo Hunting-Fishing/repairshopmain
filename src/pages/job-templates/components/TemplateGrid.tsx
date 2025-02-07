@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface TemplateGridProps {
   templates: Record<string, string[]>;
@@ -18,13 +19,21 @@ interface TemplateGridProps {
 
 export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
   const queryClient = useQueryClient();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
     try {
-      await queryClient.invalidateQueries({ queryKey: ['job-templates'] });
+      setIsRefreshing(true);
+      // Force refetch by removing existing data
+      await queryClient.resetQueries({ queryKey: ['job-templates'] });
+      // Then refetch
+      await queryClient.refetchQueries({ queryKey: ['job-templates'] });
       toast.success("Templates refreshed successfully");
     } catch (error) {
+      console.error('Refresh error:', error);
       toast.error("Failed to refresh templates");
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -37,8 +46,9 @@ export function TemplateGrid({ templates, columnNames }: TemplateGridProps) {
           size="icon"
           onClick={handleRefresh}
           title="Refresh templates"
+          disabled={isRefreshing}
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
         </Button>
       </CardHeader>
       <CardContent>

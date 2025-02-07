@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0';
@@ -136,18 +137,19 @@ serve(async (req) => {
       "Operation": "SearchItems"
     });
 
-    const canonicalUri = '/paapi5/searchitems';
+    const canonicalUri = asin ? '/paapi5/getitems' : '/paapi5/searchitems';
     const canonicalQueryString = '';
     const signedHeaders = 'content-encoding;content-type;host;x-amz-date;x-amz-target';
     const algorithm = 'AWS4-HMAC-SHA256';
     const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+    const target = asin ? 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.GetItems' : 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems';
 
     const canonicalHeaders = 
       'content-encoding:amz-1.0\n' +
       'content-type:application/json; charset=utf-8\n' +
       `host:${host}\n` +
       `x-amz-date:${amzDate}\n` +
-      'x-amz-target:com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems\n';
+      `x-amz-target:${target}\n`;
 
     const canonicalRequest = [
       'POST',
@@ -173,7 +175,9 @@ serve(async (req) => {
       `SignedHeaders=${signedHeaders}, ` +
       `Signature=${signature}`;
 
-    console.log('Making request to Amazon API for cameras...');
+    console.log('Making request to Amazon API...');
+    console.log('Request URL:', `https://${host}${canonicalUri}`);
+    console.log('Request payload:', payload);
 
     const response = await fetch(`https://${host}${canonicalUri}`, {
       method: 'POST',
@@ -181,7 +185,7 @@ serve(async (req) => {
         'Content-Encoding': 'amz-1.0',
         'Content-Type': 'application/json; charset=utf-8',
         'X-Amz-Date': amzDate,
-        'X-Amz-Target': 'com.amazon.paapi5.v1.ProductAdvertisingAPIv1.SearchItems',
+        'X-Amz-Target': target,
         'Authorization': authorizationHeader,
         'Host': host
       },
@@ -196,9 +200,9 @@ serve(async (req) => {
     // Log the request for tracking
     await supabase.from('amazon_api_requests').insert({
       organization_id: profile.organization_id,
-      request_type: 'search',
+      request_type: asin ? 'get_item' : 'search',
       status: response.status,
-      keywords: keywords
+      keywords: keywords || asin
     });
 
     return new Response(JSON.stringify(data), {

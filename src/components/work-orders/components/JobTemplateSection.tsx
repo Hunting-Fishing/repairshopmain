@@ -27,12 +27,17 @@ interface JobTemplateSectionProps {
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
   const { data: templates = [], isLoading } = useJobTemplates();
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   const handleTemplateSelect = (template: JobTemplate) => {
     form.setValue('jobTemplate', template.name);
     form.setValue('jobDescription', template.description || template.name);
     setOpen(false);
   };
+
+  const filteredTemplates = templates.filter((template) =>
+    template.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   return (
     <>
@@ -59,28 +64,30 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0">
-                <Command>
-                  <CommandInput placeholder="Search templates..." />
+                <Command shouldFilter={false}>
+                  <CommandInput 
+                    placeholder="Search templates..." 
+                    value={searchValue}
+                    onValueChange={setSearchValue}
+                  />
                   <CommandEmpty>No templates found.</CommandEmpty>
-                  {templates && templates.length > 0 && (
-                    <CommandGroup>
-                      {templates.map((template) => (
-                        <CommandItem
-                          value={template.name}
-                          key={template.id}
-                          onSelect={() => handleTemplateSelect(template)}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              template.name === field.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {template.name}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  )}
+                  <CommandGroup>
+                    {filteredTemplates.map((template) => (
+                      <CommandItem
+                        key={template.id}
+                        value={template.name}
+                        onSelect={() => handleTemplateSelect(template)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            template.name === field.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {template.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
                 </Command>
               </PopoverContent>
             </Popover>

@@ -70,7 +70,7 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                   <CommandInput placeholder="Search job templates..." />
                   <CommandEmpty>No templates found.</CommandEmpty>
                   <CommandGroup>
-                    {jobTemplates?.map((template) => (
+                    {(jobTemplates || [])?.map((template) => (
                       <CommandItem
                         value={template.name}
                         key={template.id}

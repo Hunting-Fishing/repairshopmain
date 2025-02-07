@@ -10,6 +10,7 @@ import { GridView } from "./views/GridView";
 import { ListView } from "./views/ListView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { StatsCards } from "./StatsCards";
 
 interface TimeSlot {
   start: Date;
@@ -38,7 +39,7 @@ export function DashboardLayout() {
       if (!session?.user.id) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("color_preferences, theme_preference")
+        .select("theme_preference")
         .eq("id", session.user.id)
         .single();
       
@@ -68,26 +69,27 @@ export function DashboardLayout() {
     throw error;
   }
 
-  const colorPreferences = userProfile?.color_preferences || {
-    primary_color: "#F97316",
-    secondary_color: "#FDE1D3",
-    border_color: "#F97316",
-    background_color: "bg-background/95"
-  };
+  const isModernTheme = userProfile?.theme_preference === 'modern';
 
   return (
     <ErrorBoundary>
-      <div className="space-y-6 animate-fade-in p-4 md:p-6">
+      <div className={`space-y-6 animate-fade-in p-4 md:p-6 ${
+        isModernTheme ? 'text-blue-900' : ''
+      }`}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
             <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
           </div>
         </div>
 
+        <div className="mb-6">
+          <StatsCards isModernTheme={isModernTheme} />
+        </div>
+
         <Tabs 
           value={viewMode} 
           onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
-          className={`${userProfile?.theme_preference === 'modern' ? 'bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100/50' : ''}`}
+          className={`${isModernTheme ? 'bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100/50' : ''}`}
         >
           <TabsContent value="calendar" className="mt-0">
             <CalendarView
@@ -100,8 +102,13 @@ export function DashboardLayout() {
               onViewChange={setView}
               onTimeSlotClick={handleTimeSlotClick}
               toggleCalendarSize={toggleCalendarSize}
-              colorPreferences={colorPreferences}
-              isModernTheme={userProfile?.theme_preference === 'modern'}
+              colorPreferences={{
+                primary_color: isModernTheme ? "#0EA5E9" : "#F97316",
+                secondary_color: isModernTheme ? "#EFF6FF" : "#FDE1D3",
+                border_color: isModernTheme ? "#0EA5E9" : "#F97316",
+                background_color: "bg-background/95"
+              }}
+              isModernTheme={isModernTheme}
             />
           </TabsContent>
 

@@ -80,46 +80,83 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   // Apply theme classes to the root layout
-  const modernClass = isModernTheme 
-    ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50' 
-    : '';
+  const themeClass = isModernTheme ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50' : '';
 
   return (
     <SidebarProvider>
-      <div className={`min-h-screen flex w-full bg-background ${modernClass}`}>
+      <div className={`min-h-screen flex w-full bg-background ${themeClass}`}>
         <AppSidebar />
         <main className="flex-1 overflow-y-auto">
           <div className="container py-6">
-            <div className="flex justify-between items-center mb-4">
-              <div className="text-sm text-muted-foreground">
+            <div className={`flex justify-between items-center mb-4 p-4 rounded-lg ${
+              isModernTheme 
+                ? 'bg-white/80 backdrop-blur-sm shadow-lg border border-blue-100/50'
+                : 'bg-background'
+            }`}>
+              <div className={`${
+                isModernTheme 
+                  ? 'text-blue-900 font-medium'
+                  : 'text-muted-foreground'
+              }`}>
                 {isLoading ? (
                   "Loading..."
                 ) : (
                   <>
                     Welcome! {profile?.first_name} {profile?.last_name}{' '}
-                    {profile?.role && `: ${formatRole(profile.role)}`}
+                    {profile?.role && (
+                      <span className={`${
+                        isModernTheme 
+                          ? 'text-blue-600 font-semibold'
+                          : 'text-muted-foreground'
+                      }`}>
+                        : {formatRole(profile.role)}
+                      </span>
+                    )}
                   </>
                 )}
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="global-theme-toggle" className="text-sm font-medium">
+                  <Label 
+                    htmlFor="global-theme-toggle" 
+                    className={`text-sm font-medium ${
+                      isModernTheme 
+                        ? 'text-blue-900'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
                     {isModernTheme ? "Modern" : "Basic"} Theme
                   </Label>
                   <Switch
                     id="global-theme-toggle"
                     checked={isModernTheme}
                     onCheckedChange={handleThemeChange}
-                    className="data-[state=checked]:bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8]"
+                    className={`${
+                      isModernTheme 
+                        ? 'data-[state=checked]:bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8]'
+                        : ''
+                    }`}
                   />
                 </div>
-                <Button variant="ghost" onClick={signOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
+                <Button 
+                  variant={isModernTheme ? "default" : "ghost"}
+                  onClick={signOut}
+                  className={isModernTheme ? 'bg-white/90 hover:bg-white text-blue-600' : ''}
+                >
+                  <LogOut className={`mr-2 h-4 w-4 ${
+                    isModernTheme ? 'text-blue-500' : ''
+                  }`} />
                   Sign Out
                 </Button>
               </div>
             </div>
-            {children}
+            <div className={`${
+              isModernTheme 
+                ? 'text-blue-900'
+                : ''
+            }`}>
+              {children}
+            </div>
           </div>
         </main>
       </div>

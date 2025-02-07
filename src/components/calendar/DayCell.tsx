@@ -1,5 +1,5 @@
 
-import { format, isSameDay, isSameMonth } from "date-fns";
+import { format, isSameDay, isSameMonth, isBefore } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Booking } from "@/types/calendar";
 import { BookingCard } from "./BookingCard";
@@ -26,7 +26,7 @@ export function DayCell({
     isSameDay(new Date(booking.start_time), day)
   );
 
-  const isPast = isSameDay(day, currentTime);
+  const isPast = isBefore(day, currentTime);
   const isToday = isSameDay(day, currentTime);
 
   return (

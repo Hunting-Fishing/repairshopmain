@@ -1,13 +1,13 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   ClipboardList, 
-  DollarSign, 
   Users, 
   Wrench,
+  Clock,
+  Star,
   TrendingUp,
   TrendingDown,
-  Clock,
-  Star 
 } from "lucide-react";
 
 const stats = [
@@ -33,13 +33,6 @@ const stats = [
     trendUp: false,
   },
   {
-    title: "Revenue (MTD)",
-    value: "$45,231",
-    icon: DollarSign,
-    trend: "+8%",
-    trendUp: true,
-  },
-  {
     title: "Average Service Time",
     value: "2.5 hrs",
     icon: Clock,
@@ -57,7 +50,7 @@ const stats = [
 
 export function StatsCards() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
       {stats.map((stat) => (
         <Card key={stat.title} className="hover:shadow-lg transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

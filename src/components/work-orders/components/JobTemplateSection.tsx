@@ -30,11 +30,23 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
 
   // Function to get all unique tasks across categories
   const getAllTasks = () => {
-    if (!templates) return [];
-    return Object.values(templates).flat().map((task, index) => ({
-      id: `task-${index}`,
-      name: task
-    }));
+    if (!templates || typeof templates !== 'object') return [];
+    
+    try {
+      const allTasks = Object.values(templates)
+        .filter(Array.isArray) // Ensure we only work with arrays
+        .flat()
+        .filter(Boolean) // Remove any null/undefined values
+        .map((task, index) => ({
+          id: `task-${index}`,
+          name: task
+        }));
+      
+      return allTasks;
+    } catch (error) {
+      console.error('Error processing templates:', error);
+      return [];
+    }
   };
 
   // Handle template selection
@@ -43,6 +55,8 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     form.setValue('jobDescription', taskName);
     setOpen(false);
   };
+
+  const tasks = getAllTasks();
 
   return (
     <>
@@ -76,7 +90,7 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                   <CommandInput placeholder="Search job templates..." />
                   <CommandEmpty>No templates found.</CommandEmpty>
                   <CommandGroup>
-                    {getAllTasks().map((task) => (
+                    {tasks.map((task) => (
                       <CommandItem
                         value={task.name}
                         key={task.id}

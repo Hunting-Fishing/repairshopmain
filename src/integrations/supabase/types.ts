@@ -1647,6 +1647,7 @@ export type Database = {
           calendar_settings: Json | null
           certifications: Json[] | null
           city: string | null
+          color_preferences: Json | null
           country: string | null
           created_at: string
           custom_role_id: string | null
@@ -1675,6 +1676,7 @@ export type Database = {
           calendar_settings?: Json | null
           certifications?: Json[] | null
           city?: string | null
+          color_preferences?: Json | null
           country?: string | null
           created_at?: string
           custom_role_id?: string | null
@@ -1703,6 +1705,7 @@ export type Database = {
           calendar_settings?: Json | null
           certifications?: Json[] | null
           city?: string | null
+          color_preferences?: Json | null
           country?: string | null
           created_at?: string
           custom_role_id?: string | null

@@ -51,14 +51,14 @@ export function ColorPalette({
   };
 
   return (
-    <div className="space-y-4 p-4 bg-background/95 rounded-lg border border-[#F97316]">
+    <div className="space-y-4 p-4 bg-background/95 rounded-lg border">
       <div className="flex items-center gap-4 mb-2">
         <span className="text-sm font-medium">Select colors:</span>
         <div className="flex gap-2">
           <button
             className={cn(
               "w-8 h-8 rounded-l-full border-2 transition-transform",
-              activeColorIndex === 0 ? "border-[#F97316] scale-110" : "border-transparent"
+              activeColorIndex === 0 ? "border-primary scale-110" : "border-transparent"
             )}
             style={{ 
               background: `linear-gradient(135deg, ${selectedColors[0]} 50%, transparent 50%)`,
@@ -69,7 +69,7 @@ export function ColorPalette({
           <button
             className={cn(
               "w-8 h-8 rounded-r-full border-2 transition-transform",
-              activeColorIndex === 1 ? "border-[#F97316] scale-110" : "border-transparent"
+              activeColorIndex === 1 ? "border-primary scale-110" : "border-transparent"
             )}
             style={{ 
               background: `linear-gradient(315deg, ${selectedColors[1]} 50%, transparent 50%)`,
@@ -85,7 +85,7 @@ export function ColorPalette({
             key={color}
             className={cn(
               "w-8 h-8 rounded-full border-2 transition-transform hover:scale-110",
-              selectedColors.includes(color) ? "border-[#F97316]" : "border-transparent"
+              selectedColors.includes(color) ? "border-primary" : "border-transparent"
             )}
             style={{ backgroundColor: color }}
             onClick={() => handleColorSelect(color)}

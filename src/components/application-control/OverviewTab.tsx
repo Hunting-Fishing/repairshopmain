@@ -1,5 +1,5 @@
 
-import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package, Truck, Database } from "lucide-react";
+import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package, Truck, Database, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ControlPanel } from "./ControlPanel";
 import { SystemStatus } from "./SystemStatus";
@@ -49,6 +49,12 @@ export function OverviewTab() {
       description: "Manage inventory items and categories",
       icon: Package,
       action: () => navigate("/inventory"),
+    },
+    {
+      title: "Job Templates",
+      description: "Manage job templates and procedures",
+      icon: ClipboardList,
+      action: () => navigate("/application-control/job-templates"),
     },
     {
       title: "Supplier Management",

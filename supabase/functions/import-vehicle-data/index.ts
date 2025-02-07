@@ -43,8 +43,8 @@ serve(async (req) => {
     )
 
     // Process and insert data in smaller batches
-    const batchSize = 25 // Reduced from 50 to 25
-    const maxConcurrentBatches = 4
+    const batchSize = 10 // Reduced from 25 to 10
+    const maxConcurrentBatches = 2 // Reduced from 4 to 2
     const errors = []
     
     // Process data in chunks to manage memory
@@ -100,8 +100,8 @@ serve(async (req) => {
       // Wait for current set of batches to complete before moving to next set
       await Promise.all(batchPromises)
       
-      // Small delay between batch sets to prevent overwhelming the database
-      await new Promise(resolve => setTimeout(resolve, 100))
+      // Increased delay between batch sets to prevent overwhelming the database
+      await new Promise(resolve => setTimeout(resolve, 500))
     }
 
     if (errors.length > 0) {

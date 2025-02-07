@@ -3297,7 +3297,7 @@ export type Database = {
           id: string
           make: string
           model: string
-          organization_id: string | null
+          organization_id: string
           year: number
         }
         Insert: {
@@ -3305,7 +3305,7 @@ export type Database = {
           id?: string
           make: string
           model: string
-          organization_id?: string | null
+          organization_id: string
           year: number
         }
         Update: {
@@ -3313,7 +3313,7 @@ export type Database = {
           id?: string
           make?: string
           model?: string
-          organization_id?: string | null
+          organization_id?: string
           year?: number
         }
         Relationships: [

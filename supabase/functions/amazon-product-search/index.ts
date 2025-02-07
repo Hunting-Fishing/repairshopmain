@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0';
-import * as hex from "https://deno.land/std@0.168.0/encoding/hex.ts";
+import { encode as hexEncode } from "https://deno.land/std@0.168.0/encoding/hex.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,7 +37,7 @@ async function generateSignature(stringToSign: string, secretKey: string, date: 
   const kService = await hmacSHA256(kRegion, 'ProductAdvertisingAPI');
   const kSigning = await hmacSHA256(kService, 'aws4_request');
   const signature = await hmacSHA256(kSigning, stringToSign);
-  return hex.encodeHex(new Uint8Array(signature));
+  return hexEncode(new Uint8Array(signature));
 }
 
 serve(async (req) => {
@@ -137,14 +137,14 @@ serve(async (req) => {
       canonicalQueryString,
       canonicalHeaders,
       signedHeaders,
-      await crypto.subtle.digest('SHA-256', encoder.encode(payload)).then(hash => hex.encodeHex(new Uint8Array(hash)))
+      await crypto.subtle.digest('SHA-256', encoder.encode(payload)).then(hash => hexEncode(new Uint8Array(hash)))
     ].join('\n');
 
     const stringToSign = [
       algorithm,
       amzDate,
       credentialScope,
-      await crypto.subtle.digest('SHA-256', encoder.encode(canonicalRequest)).then(hash => hex.encodeHex(new Uint8Array(hash)))
+      await crypto.subtle.digest('SHA-256', encoder.encode(canonicalRequest)).then(hash => hexEncode(new Uint8Array(hash)))
     ].join('\n');
 
     const signature = await generateSignature(stringToSign, secretKey, dateStamp);

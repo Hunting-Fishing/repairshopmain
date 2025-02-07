@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, session } = useAuth();
@@ -39,7 +39,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     gcTime: 1000 * 60 * 30,
   });
 
-  const [isModernTheme, setIsModernTheme] = useState(profile?.theme_preference === 'modern');
+  const [isModernTheme, setIsModernTheme] = useState(false);
+
+  // Initialize theme from profile data
+  useEffect(() => {
+    if (profile?.theme_preference) {
+      setIsModernTheme(profile.theme_preference === 'modern');
+    }
+  }, [profile]);
 
   const handleThemeChange = async (checked: boolean) => {
     if (!session?.user?.id) return;
@@ -56,7 +63,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    refetchProfile();
+    await refetchProfile();
+    toast.success("Theme preference saved");
   };
 
   // If not authenticated, redirect to auth page
@@ -71,6 +79,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     ).join(' ');
   };
 
+  // Apply theme classes to the root layout
   const modernClass = isModernTheme 
     ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50' 
     : '';
@@ -117,4 +126,3 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </SidebarProvider>
   );
 }
-

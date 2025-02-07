@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Users, Search, Filter } from "lucide-react";
+import { Plus, Users, Search, LayoutGrid, List } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,10 +16,12 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { CustomerForm } from "@/components/customers/CustomerForm";
 import { CustomerTable, Customer } from "@/components/customers/customer-management/CustomerTable";
 import { Input } from "@/components/ui/input";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const { toast } = useToast();
 
   const { data: customers = [], refetch, isLoading } = useQuery({
@@ -108,6 +110,14 @@ export default function Customers() {
               className="pl-10 bg-white/90 hover:bg-white focus:bg-white transition-colors border-transparent focus:border-[#F97316] shadow-md"
             />
           </div>
+          <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "list" | "grid")} className="bg-white/90 p-1 rounded-lg shadow-md">
+            <ToggleGroupItem value="list" aria-label="List View" className="data-[state=on]:bg-[#F97316] data-[state=on]:text-white">
+              <List className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="grid" aria-label="Grid View" className="data-[state=on]:bg-[#F97316] data-[state=on]:text-white">
+              <LayoutGrid className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button 
@@ -138,11 +148,30 @@ export default function Customers() {
       </div>
 
       <div className="bg-white rounded-xl shadow-lg p-6 animate-fade-in">
-        <CustomerTable 
-          customers={filteredCustomers} 
-          isLoading={isLoading}
-          onDelete={handleDelete}
-        />
+        {viewMode === "list" ? (
+          <CustomerTable 
+            customers={filteredCustomers} 
+            isLoading={isLoading}
+            onDelete={handleDelete}
+          />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredCustomers.map((customer) => (
+              <div key={customer.id} className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="p-2 bg-[#FDE1D3] rounded-full">
+                    <Users className="h-4 w-4 text-[#F97316]" />
+                  </div>
+                  <h3 className="font-medium">{customer.first_name} {customer.last_name}</h3>
+                </div>
+                <div className="space-y-1 text-sm text-gray-600">
+                  <p>{customer.email}</p>
+                  <p>{customer.phone_number}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

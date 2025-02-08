@@ -1,12 +1,15 @@
+
 import { InventoryCard } from "./InventoryCard";
 import { InventorySort } from "./InventorySort";
 import { InventoryPagination } from "./InventoryPagination";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Filter, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { InventoryItem } from "../types";
 
 interface InventoryListViewProps {
@@ -81,17 +84,46 @@ export function InventoryListView({
     </Alert>
   );
 
-  if (!items?.length) return (
-    <div className="text-center py-8 text-muted-foreground">
-      No items found. Try adjusting your search or filters.
-    </div>
-  );
-
   const allSelected = items.length > 0 && selectedItems.length === items.length;
   const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <div className="flex items-center gap-4">
+        <div className="flex-1 flex items-center gap-4">
+          <Button className="gap-2 bg-green-500 hover:bg-green-600">
+            <Plus className="h-4 w-4" />
+            New Order
+          </Button>
+          <Button variant="outline" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+          <Input
+            placeholder="Search orders..."
+            className="max-w-xs"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-lg">
+            <span className="font-medium">{items.length}</span>
+            <span>orders</span>
+          </div>
+          <div className="flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-lg">
+            <span className="font-medium">
+              {items.filter(item => item.status === 'needs_attention').length}
+            </span>
+            <span>urgent</span>
+          </div>
+          <div className="flex items-center gap-2 bg-orange-100 text-orange-800 px-4 py-2 rounded-lg">
+            <span className="font-medium">
+              {items.filter(item => item.quantity_in_stock <= (item.reorder_point || 5)).length}
+            </span>
+            <span>low stock</span>
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <Checkbox
@@ -112,7 +144,7 @@ export function InventoryListView({
 
       <div 
         ref={parentRef} 
-        className="h-[800px] overflow-auto"
+        className="h-[800px] overflow-auto bg-white rounded-lg shadow-sm border"
       >
         <div
           style={{
@@ -121,7 +153,7 @@ export function InventoryListView({
             position: 'relative',
           }}
         >
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 absolute top-0 left-0 w-full">
+          <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3 absolute top-0 left-0 w-full">
             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
               const item = items[virtualRow.index];
               return (

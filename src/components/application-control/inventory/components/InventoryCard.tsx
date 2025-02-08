@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -14,6 +15,24 @@ interface InventoryCardProps {
 }
 
 export function InventoryCard({ item, selected = false, onSelect }: InventoryCardProps) {
+  const getStatusColor = (status: string) => {
+    const colors = {
+      needs_attention: "bg-orange-500 hover:bg-orange-600",
+      active: "bg-blue-500 hover:bg-blue-600",
+      processed: "bg-green-500 hover:bg-green-600",
+    };
+    return colors[status as keyof typeof colors] || "bg-gray-500 hover:bg-gray-600";
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels = {
+      needs_attention: "Waiting for parts",
+      active: "In work",
+      processed: "Done",
+    };
+    return labels[status as keyof typeof labels] || status;
+  };
+
   return (
     <Card className="hover:shadow-md transition-shadow relative">
       {onSelect && (
@@ -24,41 +43,38 @@ export function InventoryCard({ item, selected = false, onSelect }: InventoryCar
           />
         </div>
       )}
-      <CardHeader>
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{item.name}</CardTitle>
-          {item.quantity_in_stock === 0 ? (
-            <Badge variant="destructive">Out of Stock</Badge>
-          ) : item.quantity_in_stock <= (item.reorder_point || 5) ? (
-            <Badge variant="secondary">Low Stock</Badge>
-          ) : null}
+          <Badge className={getStatusColor(item.status)}>
+            {getStatusLabel(item.status)}
+          </Badge>
         </div>
-        <CardDescription>SKU: {item.sku || 'N/A'}</CardDescription>
+        <CardDescription>Order #{item.id.slice(0, 8)}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Quantity</span>
-            <span className="font-medium">{item.quantity_in_stock || 0}</span>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">Category</p>
+              <p className="font-medium">{item.category?.name || 'Uncategorized'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Quantity</p>
+              <p className="font-medium">{item.quantity_in_stock || 0}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Unit Cost</p>
+              <p className="font-medium">${item.unit_cost?.toFixed(2) || '0.00'}</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Total Value</p>
+              <p className="font-medium text-green-600">
+                ${((item.quantity_in_stock || 0) * (item.unit_cost || 0)).toFixed(2)}
+              </p>
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Category</span>
-            <span>{item.category?.name || 'Uncategorized'}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Supplier</span>
-            <span>{item.supplier?.name || 'No supplier'}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Unit Cost</span>
-            <span className="font-medium">${item.unit_cost?.toFixed(2) || '0.00'}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Total Value</span>
-            <span className="font-medium text-green-600">
-              ${((item.quantity_in_stock || 0) * (item.unit_cost || 0)).toFixed(2)}
-            </span>
-          </div>
+          
           {item.quantity_in_stock <= (item.reorder_point || 5) && (
             <div className="mt-4 p-2 bg-yellow-50 text-yellow-800 rounded-md flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />

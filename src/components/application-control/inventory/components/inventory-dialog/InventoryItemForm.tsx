@@ -7,11 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 import { useInventoryFormSubmit } from "../../hooks/useInventoryFormSubmit";
 import { inventoryItemSchema, type InventoryFormSchema } from "./form-sections/validation";
 import type { InventoryItem } from "../../types/base";
@@ -60,295 +57,390 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full bg-[#F0F0F0]">
         <div className="h-full flex flex-col">
-          <div className="flex-1 p-6">
-            <Tabs defaultValue="basic" className="h-full">
-              <TabsList className="mb-4 bg-white border border-gray-200">
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="inventory">Inventory</TabsTrigger>
-                <TabsTrigger value="pricing">Pricing</TabsTrigger>
-                <TabsTrigger value="details">Additional Details</TabsTrigger>
-              </TabsList>
-              
-              <ScrollArea className="h-[calc(100vh-280px)]">
-                <div className="pr-4">
-                  <TabsContent value="basic" className="m-0">
-                    <Card className="p-6">
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Item Name</FormLabel>
-                              <FormControl>
-                                <Input {...field} className="bg-white" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="sku"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>SKU</FormLabel>
-                              <FormControl>
-                                <Input {...field} className="bg-white" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="upc_ean"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>UPC/EAN</FormLabel>
-                              <FormControl>
-                                <Input {...field} className="bg-white" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="description"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Description</FormLabel>
-                              <FormControl>
-                                <Textarea {...field} className="bg-white resize-none h-32" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </Card>
-                  </TabsContent>
+          <ScrollArea className="flex-1 p-6">
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Item Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} className="bg-white resize-none h-32" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
 
-                  <TabsContent value="inventory" className="m-0">
-                    <Card className="p-6">
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="quantity_in_stock"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Quantity on Hand</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  {...field}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                  className="bg-white" 
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="unit_of_measure"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Unit of Measure</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Select unit" />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="each">Each</SelectItem>
-                                  <SelectItem value="box">Box</SelectItem>
-                                  <SelectItem value="pound">Pound</SelectItem>
-                                  <SelectItem value="gallon">Gallon</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="reorder_point"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Reorder Point</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  {...field}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                  className="bg-white" 
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="lead_time_days"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Lead Time (days)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  {...field}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                  className="bg-white" 
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="pricing" className="m-0">
-                    <Card className="p-6">
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="unit_cost"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Unit Cost</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  step="0.01"
-                                  {...field}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                  className="bg-white" 
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="selling_price"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Selling Price</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  step="0.01"
-                                  {...field}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                  className="bg-white" 
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </Card>
-                  </TabsContent>
-
-                  <TabsContent value="details" className="m-0">
-                    <Card className="p-6">
-                      <div className="space-y-4">
-                        <FormField
-                          control={form.control}
-                          name="weight"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Weight</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  step="0.01"
-                                  {...field}
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
-                                  className="bg-white" 
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="dimensions"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Dimensions</FormLabel>
-                              <FormControl>
-                                <Input {...field} className="bg-white" placeholder="L x W x H" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="purchase_order_number"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Purchase Order Number</FormLabel>
-                              <FormControl>
-                                <Input {...field} className="bg-white" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="sales_order_number"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Sales Order Number</FormLabel>
-                              <FormControl>
-                                <Input {...field} className="bg-white" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="return_info"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Return Information</FormLabel>
-                              <FormControl>
-                                <Textarea {...field} className="bg-white resize-none h-20" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                        
-                        <FormField
-                          control={form.control}
-                          name="notes"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Notes</FormLabel>
-                              <FormControl>
-                                <Textarea {...field} className="bg-white resize-none h-20" />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    </Card>
-                  </TabsContent>
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Select status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="inactive">Inactive</SelectItem>
+                            <SelectItem value="needs_attention">Needs Attention</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </ScrollArea>
-            </Tabs>
-          </div>
+              </Card>
+
+              {/* Inventory Details */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Inventory Details</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="quantity_in_stock"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Quantity in Stock</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              className="bg-white" 
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="unit_of_measure"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Unit of Measure</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="bg-white">
+                                <SelectValue placeholder="Select unit" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="each">Each</SelectItem>
+                              <SelectItem value="box">Box</SelectItem>
+                              <SelectItem value="pound">Pound</SelectItem>
+                              <SelectItem value="gallon">Gallon</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="reorder_point"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Reorder Point</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              className="bg-white" 
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="lead_time_days"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Lead Time (days)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              className="bg-white" 
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </Card>
+
+              {/* Pricing */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Pricing</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="unit_cost"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit Cost</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            className="bg-white" 
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="selling_price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Selling Price</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            step="0.01"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            className="bg-white" 
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </Card>
+
+              {/* Product Identification */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Product Identification</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="sku"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SKU</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-white" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="barcode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Barcode</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-white" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="upc_ean"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>UPC/EAN</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </Card>
+
+              {/* Physical Attributes */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Physical Attributes</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="weight"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Weight</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              step="0.01"
+                              {...field}
+                              onChange={(e) => field.onChange(Number(e.target.value))}
+                              className="bg-white" 
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="dimensions"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Dimensions</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-white" placeholder="L x W x H" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Storage Location</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </Card>
+
+              {/* Additional Information */}
+              <Card className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="purchase_order_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Purchase Order Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-white" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="sales_order_number"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sales Order Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} className="bg-white" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="preferred_vendor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Preferred Vendor</FormLabel>
+                        <FormControl>
+                          <Input {...field} className="bg-white" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="vehicle_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vehicle Type</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-white">
+                              <SelectValue placeholder="Select vehicle type" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="general">General</SelectItem>
+                            <SelectItem value="car">Car</SelectItem>
+                            <SelectItem value="truck">Truck</SelectItem>
+                            <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Notes</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} className="bg-white resize-none h-20" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="return_info"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Return Information</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} className="bg-white resize-none h-20" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </Card>
+            </div>
+          </ScrollArea>
           
           <div className="border-t border-gray-200 bg-gray-50 p-4 flex justify-end space-x-4">
             <Button 
@@ -372,3 +464,4 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
     </Form>
   );
 }
+

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SkillAssessmentForm } from "./components/SkillAssessmentForm";
 import { useSkillAssessmentSubmit } from "./hooks/useSkillAssessmentSubmit";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { skillAssessmentSchema } from "./schema";
 
 interface SkillAssessmentDialogProps {

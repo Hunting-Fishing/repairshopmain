@@ -19,7 +19,7 @@ export function InventoryItemDialog({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
-        className="w-[600px] sm:w-[540px] overflow-y-auto"
+        className="w-[800px] sm:w-[600px] overflow-y-auto"
         side="right"
       >
         <SheetHeader>

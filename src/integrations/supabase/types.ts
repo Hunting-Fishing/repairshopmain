@@ -1471,7 +1471,7 @@ export type Database = {
           reorder_quantity: number | null
           selling_price: number | null
           sku: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["inventory_item_status"] | null
           subcategory: string | null
           supplier_id: string | null
           unit_cost: number | null
@@ -1495,7 +1495,7 @@ export type Database = {
           reorder_quantity?: number | null
           selling_price?: number | null
           sku?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["inventory_item_status"] | null
           subcategory?: string | null
           supplier_id?: string | null
           unit_cost?: number | null
@@ -1519,7 +1519,7 @@ export type Database = {
           reorder_quantity?: number | null
           selling_price?: number | null
           sku?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["inventory_item_status"] | null
           subcategory?: string | null
           supplier_id?: string | null
           unit_cost?: number | null
@@ -3917,6 +3917,7 @@ export type Database = {
         | "it"
         | "training"
         | "events"
+      inventory_item_status: "active" | "inactive" | "needs_attention"
       job_category:
         | "Steering"
         | "Suspension"

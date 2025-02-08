@@ -5,6 +5,8 @@ export type InventoryCategory = Database["public"]["Tables"]["inventory_categori
 export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"];
 export type InventorySupplier = Database["public"]["Tables"]["inventory_suppliers"]["Row"];
 
+export type InventoryItemStatus = 'active' | 'inactive' | 'needs_attention';
+
 // Analytics types
 
 export interface SupplierAnalyticsData {
@@ -118,6 +120,7 @@ export interface InventoryItemFormData {
   selling_price?: number;
   location?: string;
   barcode?: string;
+  status?: InventoryItemStatus;
 }
 
 // UI specific types

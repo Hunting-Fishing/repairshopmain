@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Edit } from "lucide-react";
-import type { InventoryItem } from "../types";
+import type { InventoryItem, InventoryItemStatus } from "../types";
 
 interface InventoryCardProps {
   item: InventoryItem & {
@@ -17,22 +17,22 @@ interface InventoryCardProps {
 }
 
 export function InventoryCard({ item, selected = false, onSelect, onEdit }: InventoryCardProps) {
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: InventoryItemStatus) => {
     const colors = {
       needs_attention: "bg-orange-500 hover:bg-orange-600",
       active: "bg-blue-500 hover:bg-blue-600",
-      processed: "bg-green-500 hover:bg-green-600",
+      inactive: "bg-gray-500 hover:bg-gray-600",
     };
-    return colors[status as keyof typeof colors] || "bg-gray-500 hover:bg-gray-600";
+    return colors[status] || "bg-gray-500 hover:bg-gray-600";
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status: InventoryItemStatus) => {
     const labels = {
-      needs_attention: "Waiting for parts",
-      active: "In work",
-      processed: "Done",
+      needs_attention: "Needs Attention",
+      active: "Active",
+      inactive: "Inactive",
     };
-    return labels[status as keyof typeof labels] || status;
+    return labels[status] || status;
   };
 
   return (
@@ -49,8 +49,8 @@ export function InventoryCard({ item, selected = false, onSelect, onEdit }: Inve
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{item.name}</CardTitle>
           <div className="flex items-center gap-2">
-            <Badge className={getStatusColor(item.status)}>
-              {getStatusLabel(item.status)}
+            <Badge className={getStatusColor(item.status as InventoryItemStatus)}>
+              {getStatusLabel(item.status as InventoryItemStatus)}
             </Badge>
             {onEdit && (
               <Button

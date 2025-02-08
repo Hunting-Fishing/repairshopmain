@@ -1591,6 +1591,50 @@ export type Database = {
           },
         ]
       }
+      inventory_metrics: {
+        Row: {
+          calculated_at: string | null
+          created_at: string | null
+          id: string
+          low_stock_items: number | null
+          metadata: Json | null
+          organization_id: string
+          out_of_stock_items: number | null
+          total_items: number | null
+          total_value: number | null
+        }
+        Insert: {
+          calculated_at?: string | null
+          created_at?: string | null
+          id?: string
+          low_stock_items?: number | null
+          metadata?: Json | null
+          organization_id: string
+          out_of_stock_items?: number | null
+          total_items?: number | null
+          total_value?: number | null
+        }
+        Update: {
+          calculated_at?: string | null
+          created_at?: string | null
+          id?: string
+          low_stock_items?: number | null
+          metadata?: Json | null
+          organization_id?: string
+          out_of_stock_items?: number | null
+          total_items?: number | null
+          total_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_metrics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_notifications: {
         Row: {
           alert_type: string

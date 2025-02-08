@@ -1,9 +1,10 @@
+
 import { Package, Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { InventoryList } from "@/components/application-control/inventory/InventoryList";
 import { InventoryFilters } from "@/components/application-control/inventory/InventoryFilters";
-import { InventoryOverview } from "@/components/application-control/inventory/InventoryOverview";
+import { InventoryMetrics } from "@/components/application-control/inventory/components/InventoryMetrics";
 import { useInventoryData } from "@/components/application-control/inventory/hooks/useInventoryData";
 
 export default function Inventory() {
@@ -45,7 +46,7 @@ export default function Inventory() {
         </div>
       </div>
 
-      <InventoryOverview />
+      <InventoryMetrics />
 
       <div className="flex gap-4 items-center">
         <div className="relative flex-1">

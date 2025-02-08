@@ -61,7 +61,6 @@ export function InventoryList() {
       const data = {
         ...formData,
         created_by: user?.id,
-        organization_id: user?.organization_id,
       } as Partial<InventoryItem>;
 
       if (selectedItem) {

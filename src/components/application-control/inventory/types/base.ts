@@ -1,3 +1,4 @@
+
 import { Database } from "@/integrations/supabase/types";
 
 // Base types from database
@@ -5,6 +6,7 @@ export type InventoryCategory = Database["public"]["Tables"]["inventory_categori
 export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"];
 export type InventoryItemStatus = Database["public"]["Enums"]["inventory_item_status"];
 export type UnitOfMeasure = Database["public"]["Enums"]["unit_of_measure"];
+export type AutomotiveCategory = Database["public"]["Enums"]["automotive_category"];
 
 export interface InventoryItemFormData {
   name: string;
@@ -33,6 +35,7 @@ export interface InventoryItemFormData {
   notes?: string;
   preferred_vendor?: string;
   upc_ean?: string;
+  automotive_category?: AutomotiveCategory;
 }
 
 export interface InventorySupplier {

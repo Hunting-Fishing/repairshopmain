@@ -34,8 +34,8 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
       status: item?.status ?? "active",
       sku: item?.sku ?? "",
       barcode: item?.barcode ?? "",
-      vehicle_type: item?.vehicle_type ?? "general",
-      unit_of_measure: item?.unit_of_measure ?? "",
+      automotive_category: item?.automotive_category ?? "Other",
+      unit_of_measure: item?.unit_of_measure ?? "Each",
       lead_time_days: item?.lead_time_days ?? 0,
       weight: item?.weight ?? 0,
       dimensions: item?.dimensions ?? "",
@@ -122,21 +122,23 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
                       <h3 className="text-lg font-semibold">Vehicle Application</h3>
                       <FormField
                         control={form.control}
-                        name="vehicle_type"
+                        name="automotive_category"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-base">Vehicle Type</FormLabel>
+                            <FormLabel className="text-base">Category</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger className="h-12 text-lg">
-                                  <SelectValue placeholder="Select type" />
+                                  <SelectValue placeholder="Select category" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="general">General</SelectItem>
-                                <SelectItem value="car">Car</SelectItem>
-                                <SelectItem value="truck">Truck</SelectItem>
-                                <SelectItem value="suv">SUV</SelectItem>
+                                <SelectItem value="Other">General</SelectItem>
+                                <SelectItem value="Engine">Engine</SelectItem>
+                                <SelectItem value="Transmission">Transmission</SelectItem>
+                                <SelectItem value="Brakes">Brakes</SelectItem>
+                                <SelectItem value="Suspension">Suspension</SelectItem>
+                                <SelectItem value="Electrical">Electrical</SelectItem>
                               </SelectContent>
                             </Select>
                           </FormItem>

@@ -210,3 +210,4 @@ export function InventoryItemForm({ item, onSubmit, onCancel }: InventoryItemFor
     </Form>
   );
 }
+

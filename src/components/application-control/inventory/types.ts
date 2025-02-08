@@ -2,7 +2,9 @@ import { Database } from "@/integrations/supabase/types";
 
 // Base types from database
 export type InventoryCategory = Database["public"]["Tables"]["inventory_categories"]["Row"];
-export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"];
+export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"] & {
+  image_url?: string;
+};
 export type InventorySupplier = Database["public"]["Tables"]["inventory_suppliers"]["Row"];
 
 export type InventoryItemStatus = 'active' | 'inactive' | 'needs_attention';

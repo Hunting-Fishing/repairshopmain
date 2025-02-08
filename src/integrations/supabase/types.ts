@@ -1480,12 +1480,14 @@ export type Database = {
           last_restock_date: string | null
           location: string | null
           manufacturer: string | null
+          markup_percentage: number | null
           minimum_order_quantity: number | null
           name: string
           organization_id: string
           quantity_in_stock: number | null
           reorder_point: number | null
           reorder_quantity: number | null
+          retail_price: number | null
           selling_price: number | null
           sku: string | null
           status: Database["public"]["Enums"]["inventory_item_status"] | null
@@ -1509,12 +1511,14 @@ export type Database = {
           last_restock_date?: string | null
           location?: string | null
           manufacturer?: string | null
+          markup_percentage?: number | null
           minimum_order_quantity?: number | null
           name: string
           organization_id: string
           quantity_in_stock?: number | null
           reorder_point?: number | null
           reorder_quantity?: number | null
+          retail_price?: number | null
           selling_price?: number | null
           sku?: string | null
           status?: Database["public"]["Enums"]["inventory_item_status"] | null
@@ -1538,12 +1542,14 @@ export type Database = {
           last_restock_date?: string | null
           location?: string | null
           manufacturer?: string | null
+          markup_percentage?: number | null
           minimum_order_quantity?: number | null
           name?: string
           organization_id?: string
           quantity_in_stock?: number | null
           reorder_point?: number | null
           reorder_quantity?: number | null
+          retail_price?: number | null
           selling_price?: number | null
           sku?: string | null
           status?: Database["public"]["Enums"]["inventory_item_status"] | null

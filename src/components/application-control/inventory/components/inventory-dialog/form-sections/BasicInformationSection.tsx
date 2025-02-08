@@ -1,10 +1,10 @@
 
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { UseFormReturn } from "react-hook-form";
-import { Card } from "@/components/ui/card";
 import type { InventoryFormSchema } from "./validation";
 
 interface BasicInformationSectionProps {
@@ -13,9 +13,11 @@ interface BasicInformationSectionProps {
 
 export function BasicInformationSection({ form }: BasicInformationSectionProps) {
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Basic Information</h3>
-      <div className="space-y-4">
+    <Card>
+      <CardHeader>
+        <CardTitle>Basic Information</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -23,8 +25,11 @@ export function BasicInformationSection({ form }: BasicInformationSectionProps) 
             <FormItem>
               <FormLabel>Item Name</FormLabel>
               <FormControl>
-                <Input {...field} className="bg-white" />
+                <Input {...field} className="bg-background" placeholder="Enter item name" />
               </FormControl>
+              <FormDescription>
+                The name that will be displayed in the inventory list
+              </FormDescription>
             </FormItem>
           )}
         />
@@ -36,7 +41,11 @@ export function BasicInformationSection({ form }: BasicInformationSectionProps) 
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea {...field} className="bg-white resize-none h-32" />
+                <Textarea 
+                  {...field} 
+                  className="bg-background resize-none min-h-[100px]" 
+                  placeholder="Enter item description"
+                />
               </FormControl>
             </FormItem>
           )}
@@ -50,7 +59,7 @@ export function BasicInformationSection({ form }: BasicInformationSectionProps) 
               <FormLabel>Status</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="bg-white">
+                  <SelectTrigger className="bg-background">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                 </FormControl>
@@ -63,7 +72,7 @@ export function BasicInformationSection({ form }: BasicInformationSectionProps) 
             </FormItem>
           )}
         />
-      </div>
+      </CardContent>
     </Card>
   );
 }

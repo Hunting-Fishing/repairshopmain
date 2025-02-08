@@ -12,6 +12,8 @@ import { ProductIdentificationSection } from "./form-sections/ProductIdentificat
 import { InventoryDetailsSection } from "./form-sections/InventoryDetailsSection";
 import { PricingSection } from "./form-sections/PricingSection";
 import { AdditionalInformationSection } from "./form-sections/AdditionalInformationSection";
+import { Separator } from "@/components/ui/separator";
+import { Loader2 } from "lucide-react";
 
 interface InventoryFormProps {
   item?: InventoryItem;
@@ -56,35 +58,55 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full">
-        <div className="h-full flex flex-col">
-          <ScrollArea className="flex-1">
-            <div className="p-6 space-y-6">
-              <BasicInformationSection form={form} />
-              <ProductIdentificationSection form={form} />
-              <InventoryDetailsSection form={form} />
-              <PricingSection form={form} />
-              <AdditionalInformationSection form={form} />
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full flex flex-col">
+        <ScrollArea className="flex-1">
+          <div className="space-y-8 p-6">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-semibold tracking-tight">
+                  {item ? 'Edit' : 'Add'} Inventory Item
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Fill in the details below to {item ? 'update' : 'create'} an inventory item.
+                </p>
+              </div>
+
+              <Separator className="my-6" />
+
+              <div className="space-y-8">
+                <BasicInformationSection form={form} />
+                <ProductIdentificationSection form={form} />
+                <InventoryDetailsSection form={form} />
+                <PricingSection form={form} />
+                <AdditionalInformationSection form={form} />
+              </div>
             </div>
-          </ScrollArea>
-          
-          <div className="border-t border-gray-200 bg-gray-50 p-4 flex justify-end space-x-4">
-            <Button 
-              variant="outline" 
-              type="button" 
-              onClick={onCancel}
-              className="h-11 px-6 text-base"
-            >
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={isSubmitting}
-              className="h-11 px-6 text-base bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Save Item
-            </Button>
           </div>
+        </ScrollArea>
+        
+        <div className="border-t border-border/50 bg-muted/50 p-4 flex justify-end space-x-4">
+          <Button 
+            variant="outline" 
+            type="button" 
+            onClick={onCancel}
+            className="min-w-[100px]"
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="min-w-[100px] bg-primary hover:bg-primary/90"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save Item'
+            )}
+          </Button>
         </div>
       </form>
     </Form>

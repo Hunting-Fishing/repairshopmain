@@ -1,5 +1,5 @@
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import { InventoryForm } from "./InventoryItemForm";
 import type { InventoryItem, InventoryItemFormData } from "../../types";
 
@@ -19,14 +19,10 @@ export function InventoryItemDialog({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
-        className="w-[1000px] sm:max-w-[1200px] p-0 border-l border-gray-200"
+        className="w-[1000px] sm:max-w-[1200px] p-0 border-l border-border/50"
         side="right"
       >
-        <SheetHeader className="p-6 border-b border-gray-200 bg-white">
-          <SheetTitle className="text-xl font-semibold text-gray-800">
-            {item ? 'Edit' : 'Add'} Inventory Item
-          </SheetTitle>
-        </SheetHeader>
+        <SheetHeader className="p-0" />
         <InventoryForm 
           item={item} 
           onSubmit={onSubmit}

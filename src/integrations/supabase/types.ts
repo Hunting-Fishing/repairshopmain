@@ -1467,6 +1467,7 @@ export type Database = {
       }
       inventory_items: {
         Row: {
+          average_turnover_rate: number | null
           barcode: string | null
           category_id: string | null
           condition: string | null
@@ -1475,8 +1476,11 @@ export type Database = {
           description: string | null
           id: string
           image_url: string | null
+          last_audit_date: string | null
+          last_restock_date: string | null
           location: string | null
           manufacturer: string | null
+          minimum_order_quantity: number | null
           name: string
           organization_id: string
           quantity_in_stock: number | null
@@ -1492,6 +1496,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          average_turnover_rate?: number | null
           barcode?: string | null
           category_id?: string | null
           condition?: string | null
@@ -1500,8 +1505,11 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          last_audit_date?: string | null
+          last_restock_date?: string | null
           location?: string | null
           manufacturer?: string | null
+          minimum_order_quantity?: number | null
           name: string
           organization_id: string
           quantity_in_stock?: number | null
@@ -1517,6 +1525,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          average_turnover_rate?: number | null
           barcode?: string | null
           category_id?: string | null
           condition?: string | null
@@ -1525,8 +1534,11 @@ export type Database = {
           description?: string | null
           id?: string
           image_url?: string | null
+          last_audit_date?: string | null
+          last_restock_date?: string | null
           location?: string | null
           manufacturer?: string | null
+          minimum_order_quantity?: number | null
           name?: string
           organization_id?: string
           quantity_in_stock?: number | null

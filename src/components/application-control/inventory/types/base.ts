@@ -85,4 +85,3 @@ export interface InventoryItemFormData {
   preferred_vendor?: string;
   upc_ean?: string;
 }
-

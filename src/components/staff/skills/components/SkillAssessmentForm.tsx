@@ -9,6 +9,7 @@ import { SkillFormFields } from "../form/SkillFormFields";
 import { ProficiencyField } from "../form/ProficiencyField";
 import { NotesField } from "../form/NotesField";
 import { SkillAssessmentReview } from "./SkillAssessmentReview";
+import { useState } from "react";
 
 interface SkillAssessmentFormProps {
   onSubmit: (values: any) => void;

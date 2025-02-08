@@ -149,14 +149,19 @@ export function InventoryListView({
             position: 'relative',
           }}
         >
-          <div className="grid gap-4 p-4 md:grid-cols-2 lg:grid-cols-3 absolute top-0 left-0 w-full">
+          <div className="grid gap-6 p-6 md:grid-cols-2 lg:grid-cols-3 absolute top-0 left-0 w-full">
             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
               const item = items[virtualRow.index];
               return (
                 <div
                   key={virtualRow.key}
                   data-index={virtualRow.index}
+                  className="relative"
                   style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >

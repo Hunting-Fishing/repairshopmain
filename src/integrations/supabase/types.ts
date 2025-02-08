@@ -1476,21 +1476,29 @@ export type Database = {
           condition: string | null
           created_at: string | null
           created_by: string | null
+          date_received: string | null
           description: string | null
+          dimensions: string | null
           id: string
           image_url: string | null
           last_audit_date: string | null
           last_restock_date: string | null
+          lead_time_days: number | null
           location: string | null
           manufacturer: string | null
           markup_percentage: number | null
           minimum_order_quantity: number | null
           name: string
+          notes: string | null
           organization_id: string
+          preferred_vendor: string | null
+          purchase_order_number: string | null
           quantity_in_stock: number | null
           reorder_point: number | null
           reorder_quantity: number | null
           retail_price: number | null
+          return_info: string | null
+          sales_order_number: string | null
           selling_price: number | null
           sku: string | null
           status: Database["public"]["Enums"]["inventory_item_status"] | null
@@ -1499,8 +1507,10 @@ export type Database = {
           unit_cost: number | null
           unit_of_measure: Database["public"]["Enums"]["unit_of_measure"] | null
           unit_quantity: number | null
+          upc_ean: string | null
           updated_at: string | null
           updated_by: string | null
+          weight: number | null
         }
         Insert: {
           automotive_category?:
@@ -1512,21 +1522,29 @@ export type Database = {
           condition?: string | null
           created_at?: string | null
           created_by?: string | null
+          date_received?: string | null
           description?: string | null
+          dimensions?: string | null
           id?: string
           image_url?: string | null
           last_audit_date?: string | null
           last_restock_date?: string | null
+          lead_time_days?: number | null
           location?: string | null
           manufacturer?: string | null
           markup_percentage?: number | null
           minimum_order_quantity?: number | null
           name: string
+          notes?: string | null
           organization_id: string
+          preferred_vendor?: string | null
+          purchase_order_number?: string | null
           quantity_in_stock?: number | null
           reorder_point?: number | null
           reorder_quantity?: number | null
           retail_price?: number | null
+          return_info?: string | null
+          sales_order_number?: string | null
           selling_price?: number | null
           sku?: string | null
           status?: Database["public"]["Enums"]["inventory_item_status"] | null
@@ -1537,8 +1555,10 @@ export type Database = {
             | Database["public"]["Enums"]["unit_of_measure"]
             | null
           unit_quantity?: number | null
+          upc_ean?: string | null
           updated_at?: string | null
           updated_by?: string | null
+          weight?: number | null
         }
         Update: {
           automotive_category?:
@@ -1550,21 +1570,29 @@ export type Database = {
           condition?: string | null
           created_at?: string | null
           created_by?: string | null
+          date_received?: string | null
           description?: string | null
+          dimensions?: string | null
           id?: string
           image_url?: string | null
           last_audit_date?: string | null
           last_restock_date?: string | null
+          lead_time_days?: number | null
           location?: string | null
           manufacturer?: string | null
           markup_percentage?: number | null
           minimum_order_quantity?: number | null
           name?: string
+          notes?: string | null
           organization_id?: string
+          preferred_vendor?: string | null
+          purchase_order_number?: string | null
           quantity_in_stock?: number | null
           reorder_point?: number | null
           reorder_quantity?: number | null
           retail_price?: number | null
+          return_info?: string | null
+          sales_order_number?: string | null
           selling_price?: number | null
           sku?: string | null
           status?: Database["public"]["Enums"]["inventory_item_status"] | null
@@ -1575,8 +1603,10 @@ export type Database = {
             | Database["public"]["Enums"]["unit_of_measure"]
             | null
           unit_quantity?: number | null
+          upc_ean?: string | null
           updated_at?: string | null
           updated_by?: string | null
+          weight?: number | null
         }
         Relationships: [
           {

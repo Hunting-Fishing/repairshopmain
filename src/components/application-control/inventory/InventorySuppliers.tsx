@@ -1,72 +1,53 @@
+
+import { useState } from "react";
 import { useOrganizationData } from "@/hooks/staff/useOrganizationData";
 import { useSuppliers } from "./hooks/useSuppliers";
-import { SupplierDetailsDialog } from "./components/supplier/supplier-details/SupplierDetailsDialog";
 import { SupplierErrorBoundary } from "./components/supplier/SupplierErrorBoundary";
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, ListFilter } from "lucide-react";
 import { SupplierListView } from "./components/supplier/supplier-list/SupplierListView";
-import { AnalyticsTabContent } from "./components/supplier/analytics/AnalyticsTabContent";
-import { SupplierHeader } from "./components/supplier/supplier-list/SupplierHeader";
-import { SupplierLoading } from "./components/supplier/supplier-list/SupplierLoading";
-import { SupplierError } from "./components/supplier/supplier-list/SupplierError";
-import { useSupplierAnalytics } from "./hooks/useSupplierAnalytics";
+import { SupplierDetailsView } from "./components/supplier/supplier-details/SupplierDetailsView";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft } from "lucide-react";
 import type { InventorySupplier } from "./types";
 
-interface InventorySuppliersProps {
-  suppliers?: InventorySupplier[];
-}
-
-export function InventorySuppliers({ suppliers = [] }: InventorySuppliersProps) {
+export function InventorySuppliers() {
   const { userProfile } = useOrganizationData();
   const [selectedSupplier, setSelectedSupplier] = useState<InventorySupplier | null>(null);
   
-  const { suppliers: hookSuppliers, isLoading, error } = useSuppliers(userProfile?.organization_id);
-  const displaySuppliers = hookSuppliers || suppliers;
+  const { suppliers, isLoading, error } = useSuppliers(userProfile?.organization_id);
 
-  if (isLoading) return <SupplierLoading />;
-  if (error) return <SupplierError error={error} />;
-  if (!Array.isArray(displaySuppliers)) {
-    console.error("InventorySuppliers - suppliers is not an array:", displaySuppliers);
-    return <SupplierErrorBoundary error={new Error("Invalid suppliers data")} />;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <SupplierErrorBoundary error={error} />;
+  if (!Array.isArray(suppliers)) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>Invalid suppliers data</AlertDescription>
+      </Alert>
+    );
   }
 
-  const analytics = useSupplierAnalytics(displaySuppliers);
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-      <SupplierHeader totalSuppliers={displaySuppliers.length} />
-
-      <Tabs defaultValue="list" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="list" className="flex items-center gap-2">
-            <ListFilter className="h-4 w-4" />
-            Supplier List
-          </TabsTrigger>
-          <TabsTrigger value="reports" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            Reports & Analytics
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="list" className="space-y-4">
-          <SupplierListView 
-            suppliers={displaySuppliers}
-            isLoading={isLoading}
-            onSupplierClick={setSelectedSupplier}
+    <div className="space-y-6">
+      {selectedSupplier ? (
+        <div className="space-y-6">
+          <Button
+            variant="outline"
+            onClick={() => setSelectedSupplier(null)}
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to List
+          </Button>
+          <SupplierDetailsView 
+            supplier={selectedSupplier}
+            onClose={() => setSelectedSupplier(null)}
           />
-        </TabsContent>
-
-        <TabsContent value="reports" className="space-y-4">
-          <AnalyticsTabContent analytics={analytics} />
-        </TabsContent>
-      </Tabs>
-
-      {selectedSupplier && (
-        <SupplierDetailsDialog
-          supplier={selectedSupplier}
-          open={!!selectedSupplier}
-          onOpenChange={() => setSelectedSupplier(null)}
+        </div>
+      ) : (
+        <SupplierListView
+          suppliers={suppliers}
+          isLoading={isLoading}
+          onSupplierClick={setSelectedSupplier}
         />
       )}
     </div>

@@ -18,3 +18,8 @@ export function formatCurrency(amount: number | null | undefined): string {
     currency: 'USD',
   }).format(amount);
 }
+
+export function formatDateTime(date: string | Date) {
+  return format(new Date(date), 'MMM dd, yyyy HH:mm');
+}
+

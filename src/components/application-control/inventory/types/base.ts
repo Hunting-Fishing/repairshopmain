@@ -1,12 +1,28 @@
-
 import { Database } from "@/integrations/supabase/types";
 
 // Base types from database
 export type InventoryCategory = Database["public"]["Tables"]["inventory_categories"]["Row"];
-export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"] & {
+export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"];
+export type InventoryItemStatus = Database["public"]["Enums"]["inventory_item_status"];
+export type UnitOfMeasure = Database["public"]["Enums"]["unit_of_measure"];
+
+export interface InventoryItemFormData {
+  name: string;
+  sku?: string;
+  description?: string;
+  category_id?: string;
+  supplier_id?: string;
+  quantity_in_stock?: number;
+  reorder_point?: number;
+  reorder_quantity?: number;
+  unit_cost?: number;
+  selling_price?: number;
+  markup_percentage?: number;
+  location?: string;
+  barcode?: string;
+  status?: InventoryItemStatus;
   image_url?: string;
-  vehicle_type?: string;
-  unit_of_measure?: string;
+  unit_of_measure?: UnitOfMeasure;
   lead_time_days?: number;
   weight?: number;
   dimensions?: string;
@@ -17,9 +33,7 @@ export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row
   notes?: string;
   preferred_vendor?: string;
   upc_ean?: string;
-};
-
-export type InventoryItemStatus = 'active' | 'inactive' | 'needs_attention';
+}
 
 export interface InventorySupplier {
   id: string;
@@ -50,40 +64,8 @@ export interface InventorySupplier {
   };
 }
 
-// Form data types
 export interface CategoryFormData {
   name: string;
   description?: string;
   parent_id?: string;
 }
-
-export interface InventoryItemFormData {
-  name: string;
-  sku?: string;
-  description?: string;
-  category_id?: string;
-  supplier_id?: string;
-  quantity_in_stock?: number;
-  reorder_point?: number;
-  reorder_quantity?: number;
-  unit_cost?: number;
-  selling_price?: number;
-  markup_percentage?: number;
-  location?: string;
-  barcode?: string;
-  status?: InventoryItemStatus;
-  image_url?: string;
-  vehicle_type?: string;
-  unit_of_measure?: string;
-  lead_time_days?: number;
-  weight?: number;
-  dimensions?: string;
-  date_received?: string;
-  purchase_order_number?: string;
-  sales_order_number?: string;
-  return_info?: string;
-  notes?: string;
-  preferred_vendor?: string;
-  upc_ean?: string;
-}
-

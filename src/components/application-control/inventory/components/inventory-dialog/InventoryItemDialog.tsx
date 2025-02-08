@@ -19,21 +19,19 @@ export function InventoryItemDialog({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
-        className="w-[800px] sm:max-w-[900px] overflow-y-auto bg-[#F8FAFC] border-l border-gray-200"
+        className="w-[1000px] sm:max-w-[1200px] p-0 border-l border-gray-200"
         side="right"
       >
-        <SheetHeader>
-          <SheetTitle className="text-xl font-semibold text-gray-800 px-4">
+        <SheetHeader className="p-6 border-b border-gray-200 bg-white">
+          <SheetTitle className="text-xl font-semibold text-gray-800">
             {item ? 'Edit' : 'Add'} Inventory Item
           </SheetTitle>
         </SheetHeader>
-        <div className="mt-6">
-          <InventoryForm 
-            item={item} 
-            onSubmit={onSubmit}
-            onCancel={() => onOpenChange(false)}
-          />
-        </div>
+        <InventoryForm 
+          item={item} 
+          onSubmit={onSubmit}
+          onCancel={() => onOpenChange(false)}
+        />
       </SheetContent>
     </Sheet>
   );

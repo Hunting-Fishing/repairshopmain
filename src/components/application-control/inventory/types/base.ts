@@ -6,8 +6,18 @@ export type InventoryCategory = Database["public"]["Tables"]["inventory_categori
 export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"] & {
   image_url?: string;
   vehicle_type?: string;
+  unit_of_measure?: string;
+  lead_time_days?: number;
+  weight?: number;
+  dimensions?: string;
+  date_received?: string;
+  purchase_order_number?: string;
+  sales_order_number?: string;
+  return_info?: string;
+  notes?: string;
+  preferred_vendor?: string;
+  upc_ean?: string;
 };
-export type InventorySupplier = Database["public"]["Tables"]["inventory_suppliers"]["Row"];
 
 export type InventoryItemStatus = 'active' | 'inactive' | 'needs_attention';
 
@@ -34,4 +44,15 @@ export interface InventoryItemFormData {
   status?: InventoryItemStatus;
   image_url?: string;
   vehicle_type?: string;
+  unit_of_measure?: string;
+  lead_time_days?: number;
+  weight?: number;
+  dimensions?: string;
+  date_received?: string;
+  purchase_order_number?: string;
+  sales_order_number?: string;
+  return_info?: string;
+  notes?: string;
+  preferred_vendor?: string;
+  upc_ean?: string;
 }

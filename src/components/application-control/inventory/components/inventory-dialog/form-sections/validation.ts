@@ -17,7 +17,18 @@ export const inventoryItemSchema = z.object({
   category_id: z.string().optional(),
   supplier_id: z.string().optional(),
   barcode: z.string().optional(),
-  vehicle_type: z.string().optional()
+  vehicle_type: z.string().optional(),
+  unit_of_measure: z.string().optional(),
+  lead_time_days: z.number().min(0).optional(),
+  weight: z.number().min(0).optional(),
+  dimensions: z.string().optional(),
+  date_received: z.string().optional(),
+  purchase_order_number: z.string().optional(),
+  sales_order_number: z.string().optional(),
+  return_info: z.string().optional(),
+  notes: z.string().optional(),
+  preferred_vendor: z.string().optional(),
+  upc_ean: z.string().optional()
 }) as z.ZodType<InventoryItemFormData>;
 
 export type InventoryFormSchema = z.infer<typeof inventoryItemSchema>;

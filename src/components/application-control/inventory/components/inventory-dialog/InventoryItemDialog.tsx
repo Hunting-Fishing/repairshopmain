@@ -19,11 +19,11 @@ export function InventoryItemDialog({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
-        className="w-[500px] sm:max-w-[600px] overflow-y-auto"
+        className="w-[800px] sm:max-w-[900px] overflow-y-auto bg-[#F8FAFC] border-l border-gray-200"
         side="right"
       >
         <SheetHeader>
-          <SheetTitle className="text-xl font-semibold">
+          <SheetTitle className="text-xl font-semibold text-gray-800 px-4">
             {item ? 'Edit' : 'Add'} Inventory Item
           </SheetTitle>
         </SheetHeader>

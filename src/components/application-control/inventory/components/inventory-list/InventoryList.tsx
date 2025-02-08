@@ -1,13 +1,15 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Box, Minus, Plus } from "lucide-react";
+import { Box, Minus, Plus, Eye } from "lucide-react";
 import type { InventoryItem } from "../../types";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { InventoryItemDetails } from "../item-details/InventoryItemDetails";
 
 interface InventoryListProps {
   items: InventoryItem[];
@@ -15,6 +17,7 @@ interface InventoryListProps {
 
 export function InventoryList({ items }: InventoryListProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const { toast } = useToast();
 
   const filteredItems = items.filter(item =>
@@ -61,9 +64,18 @@ export function InventoryList({ items }: InventoryListProps) {
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between">
                 <CardTitle className="text-lg">{item.name}</CardTitle>
-                <Badge variant={item.quantity_in_stock <= (item.reorder_point || 0) ? "destructive" : "secondary"}>
-                  {item.quantity_in_stock} in stock
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant={item.quantity_in_stock <= (item.reorder_point || 0) ? "destructive" : "secondary"}>
+                    {item.quantity_in_stock} in stock
+                  </Badge>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSelectedItem(item)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -118,6 +130,12 @@ export function InventoryList({ items }: InventoryListProps) {
           </Card>
         ))}
       </div>
+
+      <InventoryItemDetails
+        item={selectedItem}
+        open={!!selectedItem}
+        onOpenChange={(open) => !open && setSelectedItem(null)}
+      />
     </div>
   );
 }

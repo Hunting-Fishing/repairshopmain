@@ -3920,6 +3920,13 @@ export type Database = {
         | "it"
         | "training"
         | "events"
+      inventory_change_type:
+        | "create"
+        | "update"
+        | "delete"
+        | "stock_adjustment"
+        | "work_order"
+        | "warranty_claim"
       inventory_item_status: "active" | "inactive" | "needs_attention"
       job_category:
         | "Steering"

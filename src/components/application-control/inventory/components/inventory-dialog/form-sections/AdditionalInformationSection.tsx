@@ -13,100 +13,118 @@ interface AdditionalInformationSectionProps {
 
 export function AdditionalInformationSection({ form }: AdditionalInformationSectionProps) {
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
+    <Card className="p-6 space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="purchase_order_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Purchase Order Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter PO number" className="bg-white" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="sales_order_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sales Order Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter SO number" className="bg-white" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
-            name="purchase_order_number"
+            name="preferred_vendor"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Purchase Order Number</FormLabel>
+                <FormLabel>Preferred Vendor</FormLabel>
                 <FormControl>
-                  <Input {...field} className="bg-white" />
+                  <Input {...field} placeholder="Enter preferred vendor" className="bg-white" />
                 </FormControl>
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
-            name="sales_order_number"
+            name="automotive_category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Sales Order Number</FormLabel>
-                <FormControl>
-                  <Input {...field} className="bg-white" />
-                </FormControl>
+                <FormLabel>Vehicle Type</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="bg-white">
+                      <SelectValue placeholder="Select vehicle type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Other">General</SelectItem>
+                    <SelectItem value="Engine">Engine</SelectItem>
+                    <SelectItem value="Transmission">Transmission</SelectItem>
+                    <SelectItem value="Brakes">Brakes</SelectItem>
+                    <SelectItem value="Suspension">Suspension</SelectItem>
+                    <SelectItem value="Electrical">Electrical</SelectItem>
+                    <SelectItem value="HVAC">HVAC</SelectItem>
+                    <SelectItem value="Body">Body</SelectItem>
+                    <SelectItem value="Lighting">Lighting</SelectItem>
+                    <SelectItem value="Filters">Filters</SelectItem>
+                    <SelectItem value="Accessories">Accessories</SelectItem>
+                    <SelectItem value="Tools">Tools</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormItem>
             )}
           />
+
+          <div className="grid grid-cols-1 gap-4">
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Enter any additional notes"
+                      className="bg-white resize-none min-h-[100px]" 
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="return_info"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Return Information</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Enter return policy or information"
+                      className="bg-white resize-none min-h-[100px]" 
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
-
-        <FormField
-          control={form.control}
-          name="preferred_vendor"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Preferred Vendor</FormLabel>
-              <FormControl>
-                <Input {...field} className="bg-white" />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="automotive_category"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Vehicle Type</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <FormControl>
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Select vehicle type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Other">General</SelectItem>
-                  <SelectItem value="Engine">Engine</SelectItem>
-                  <SelectItem value="Transmission">Transmission</SelectItem>
-                  <SelectItem value="Brakes">Brakes</SelectItem>
-                  <SelectItem value="Suspension">Suspension</SelectItem>
-                  <SelectItem value="Electrical">Electrical</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Notes</FormLabel>
-              <FormControl>
-                <Textarea {...field} className="bg-white resize-none h-20" />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="return_info"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Return Information</FormLabel>
-              <FormControl>
-                <Textarea {...field} className="bg-white resize-none h-20" />
-              </FormControl>
-            </FormItem>
-          )}
-        />
       </div>
     </Card>
   );

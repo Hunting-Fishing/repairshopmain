@@ -17,28 +17,39 @@ export function InventoryMetrics() {
     );
   }
 
+  // Default values if no metrics exist yet
+  const defaultMetrics = {
+    total_value: 0,
+    total_items: 0,
+    low_stock_items: 0,
+    out_of_stock_items: 0
+  };
+
+  // Use metrics if they exist, otherwise use default values
+  const currentMetrics = metrics || defaultMetrics;
+
   const metricCards = [
     {
       title: "Total Value",
-      value: `$${(metrics?.total_value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      value: `$${currentMetrics.total_value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       icon: DollarSign,
       className: "text-green-500",
     },
     {
       title: "Total Items",
-      value: (metrics?.total_items || 0).toLocaleString(),
+      value: currentMetrics.total_items.toLocaleString(),
       icon: Package,
       className: "text-blue-500",
     },
     {
       title: "Low Stock Items",
-      value: (metrics?.low_stock_items || 0).toLocaleString(),
+      value: currentMetrics.low_stock_items.toLocaleString(),
       icon: AlertTriangle,
       className: "text-yellow-500",
     },
     {
       title: "Out of Stock",
-      value: (metrics?.out_of_stock_items || 0).toLocaleString(),
+      value: currentMetrics.out_of_stock_items.toLocaleString(),
       icon: TrendingDown,
       className: "text-red-500",
     },

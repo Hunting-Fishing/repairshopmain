@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -23,9 +22,10 @@ import { ImageSection } from "./form-sections/ImageSection";
 interface InventoryFormProps {
   item?: InventoryItem;
   onSubmit: (data: Partial<InventoryItem>) => void;
+  onCancel: () => void;
 }
 
-export function InventoryForm({ item, onSubmit }: InventoryFormProps) {
+export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) {
   const form = useForm<InventoryFormSchema>({
     resolver: zodResolver(inventoryItemSchema),
     defaultValues: {
@@ -165,7 +165,10 @@ export function InventoryForm({ item, onSubmit }: InventoryFormProps) {
         {changes && <InventoryReviewChanges changes={changes} />}
 
         <div className="flex justify-end gap-4">
-          <Button type="submit" disabled={isSubmitting} size="lg">
+          <Button variant="outline" type="button" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : (item ? "Update" : "Create")} Item
           </Button>
         </div>

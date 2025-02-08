@@ -1,6 +1,6 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { InventoryForm } from "./InventoryForm";
+import { InventoryForm } from "./InventoryItemForm";
 import { InventoryItem } from "../../types";
 
 interface InventoryDialogProps {
@@ -22,7 +22,11 @@ export function InventoryDialog({
         <SheetHeader>
           <SheetTitle>{item ? 'Edit' : 'Add'} Inventory Item</SheetTitle>
         </SheetHeader>
-        <InventoryForm item={item} onSubmit={onSubmit} />
+        <InventoryForm 
+          item={item} 
+          onSubmit={onSubmit}
+          onCancel={() => onOpenChange(false)}
+        />
       </SheetContent>
     </Sheet>
   );

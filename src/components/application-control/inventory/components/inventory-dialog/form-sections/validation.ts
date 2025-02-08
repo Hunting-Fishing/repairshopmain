@@ -11,7 +11,7 @@ export const inventoryItemSchema = z.object({
   reorder_quantity: z.number().min(0, "Reorder quantity cannot be negative").optional(),
   sku: z.string().optional(),
   location: z.string().optional(),
-  status: z.enum(["active", "inactive", "needs_attention"]),
+  status: z.enum(["active", "inactive", "needs_attention"]).default("active"),
   image_url: z.string().optional(),
   category_id: z.string().optional(),
   supplier_id: z.string().optional(),
@@ -19,4 +19,3 @@ export const inventoryItemSchema = z.object({
 });
 
 export type InventoryFormSchema = z.infer<typeof inventoryItemSchema>;
-

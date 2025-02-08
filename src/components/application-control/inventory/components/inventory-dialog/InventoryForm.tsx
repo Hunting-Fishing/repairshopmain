@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +16,7 @@ import { ReorderSection } from "./form-sections/ReorderSection";
 import { StatusSection } from "./form-sections/StatusSection";
 import { inventoryItemSchema, type InventoryFormSchema } from "./form-sections/validation";
 import type { InventoryItem } from "../../types/base";
+import { ImageSection } from "./form-sections/ImageSection";
 
 interface InventoryFormProps {
   item?: InventoryItem;
@@ -61,7 +61,7 @@ export function InventoryForm({ item, onSubmit }: InventoryFormProps) {
       // Default markup of 30% if no selling price is set
       form.setValue("selling_price", Number((cost * 1.3).toFixed(2)));
     }
-  }, [unitCost]);
+  }, [unitCost, form, sellingPrice]);
 
   return (
     <Form {...form}>
@@ -76,6 +76,7 @@ export function InventoryForm({ item, onSubmit }: InventoryFormProps) {
 
           <TabsContent value="basic" className="space-y-4 mt-4">
             <BasicInfoSection form={form} />
+            <ImageSection form={form} />
           </TabsContent>
 
           <TabsContent value="pricing" className="space-y-4 mt-4">

@@ -121,6 +121,7 @@ export interface InventoryItemFormData {
   location?: string;
   barcode?: string;
   status?: InventoryItemStatus;
+  image_url?: string;
 }
 
 // UI specific types

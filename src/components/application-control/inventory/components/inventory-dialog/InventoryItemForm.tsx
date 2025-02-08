@@ -4,18 +4,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useFileUpload } from "../../hooks/useFileUpload";
 import { useInventoryFormSubmit } from "../../hooks/useInventoryFormSubmit";
 import { InventoryReviewChanges } from "./InventoryReviewChanges";
-import type { InventoryItem } from "../../types";
+import type { InventoryItem, InventoryItemFormData } from "../../types";
 
 interface InventoryItemFormProps {
   item?: InventoryItem;
-  onSubmit: (data: Partial<InventoryItem>) => void;
+  onSubmit: (data: InventoryItemFormData) => void;
   onCancel: () => void;
 }
 
 export function InventoryItemForm({ item, onSubmit, onCancel }: InventoryItemFormProps) {
-  const form = useForm({
+  const { uploadFile, isUploading } = useFileUpload();
+  
+  const form = useForm<InventoryItemFormData>({
     defaultValues: {
       name: item?.name || "",
       description: item?.description || "",
@@ -24,6 +28,8 @@ export function InventoryItemForm({ item, onSubmit, onCancel }: InventoryItemFor
       reorder_point: item?.reorder_point || 0,
       sku: item?.sku || "",
       location: item?.location || "",
+      status: item?.status || "active",
+      image_url: item?.image_url || "",
     },
   });
 
@@ -32,6 +38,16 @@ export function InventoryItemForm({ item, onSubmit, onCancel }: InventoryItemFor
     onSubmit,
     originalData: item,
   });
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = await uploadFile(file);
+      if (imageUrl) {
+        form.setValue('image_url', imageUrl);
+      }
+    }
+  };
 
   return (
     <Form {...form}>
@@ -131,13 +147,62 @@ export function InventoryItemForm({ item, onSubmit, onCancel }: InventoryItemFor
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="needs_attention">Needs Attention</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="image_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Image</FormLabel>
+              <FormControl>
+                <div className="space-y-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                  />
+                  {field.value && (
+                    <img
+                      src={field.value}
+                      alt="Item preview"
+                      className="h-32 w-32 object-cover rounded-md"
+                    />
+                  )}
+                </div>
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
         {changes && <InventoryReviewChanges changes={changes} />}
 
         <div className="flex justify-end gap-4">
           <Button type="button" variant="outline" onClick={onCancel}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting || isUploading}>
             {isSubmitting ? "Saving..." : item ? "Update Item" : "Add Item"}
           </Button>
         </div>

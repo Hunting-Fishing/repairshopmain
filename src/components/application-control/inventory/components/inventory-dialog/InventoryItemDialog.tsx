@@ -1,13 +1,13 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { InventoryItemForm } from "./InventoryItemForm";
-import type { InventoryItem } from "../../types";
+import type { InventoryItem, InventoryItemFormData } from "../../types";
 
 interface InventoryItemDialogProps {
   item?: InventoryItem;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Partial<InventoryItem>) => void;
+  onSubmit: (data: InventoryItemFormData) => void;
 }
 
 export function InventoryItemDialog({

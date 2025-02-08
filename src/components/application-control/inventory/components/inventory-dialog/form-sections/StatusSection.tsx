@@ -1,8 +1,7 @@
-
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
-import type { InventoryItemFormData } from "../../../types";
+import type { InventoryItemFormData } from "../../../types/base";
 
 interface StatusSectionProps {
   form: UseFormReturn<InventoryItemFormData>;

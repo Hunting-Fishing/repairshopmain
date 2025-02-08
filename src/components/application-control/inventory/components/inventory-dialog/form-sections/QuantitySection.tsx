@@ -1,8 +1,7 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-import type { InventoryItemFormData } from "../../../types";
+import type { InventoryItemFormData } from "../../../types/base";
 
 interface QuantitySectionProps {
   form: UseFormReturn<InventoryItemFormData>;
@@ -60,4 +59,3 @@ export function QuantitySection({ form }: QuantitySectionProps) {
     </div>
   );
 }
-

@@ -2,7 +2,7 @@ import { DollarSign, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSupplierTransactions } from "../hooks/useSupplierTransactions";
-import type { InventorySupplier } from "../../../types";
+import type { InventorySupplier } from "../../../types/supplier";
 
 interface SupplierTransactionsProps {
   supplier: InventorySupplier;

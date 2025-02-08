@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { AnalyticsData, CategoryStats } from "../../types";
+import type { AnalyticsData, CategoryStats } from "../../types/analytics";
 
 interface InventoryItemWithCategory {
   id: string;

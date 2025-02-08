@@ -1,9 +1,8 @@
-
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UseFormReturn } from "react-hook-form";
-import type { InventoryItemFormData } from "../../../types";
+import type { InventoryItemFormData } from "../../../types/base";
 
 interface BasicInfoSectionProps {
   form: UseFormReturn<InventoryItemFormData>;

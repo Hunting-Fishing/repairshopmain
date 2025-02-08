@@ -1,7 +1,7 @@
 import { DollarSign, CreditCard, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { InventorySupplier } from "../../../types";
+import type { InventorySupplier } from "../../../types/supplier";
 
 interface SupplierFinancialsProps {
   supplier: InventorySupplier;

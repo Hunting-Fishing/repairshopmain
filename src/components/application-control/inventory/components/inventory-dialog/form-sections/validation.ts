@@ -1,11 +1,16 @@
 
 import * as z from "zod";
-import type { InventoryItemFormData } from "../../../types/base";
-import { Database } from "@/integrations/supabase/types";
 
-type UnitOfMeasure = Database["public"]["Enums"]["unit_of_measure"];
-type InventoryItemStatus = Database["public"]["Enums"]["inventory_item_status"];
-type AutomotiveCategory = Database["public"]["Enums"]["automotive_category"];
+// Define the types from our database
+type UnitOfMeasure = 'Each' | 'Pair' | 'Set' | 'Litre' | 'Gallon' | 'Quart' | 'Ounce' | 
+                     'Milliliter' | 'Gram' | 'Kilogram' | 'Pound' | 'Foot' | 'Meter' | 
+                     'Inch' | 'Box' | 'Case' | 'Roll' | 'Sheet';
+
+type InventoryItemStatus = 'active' | 'inactive' | 'needs_attention';
+
+type AutomotiveCategory = 'Electrical' | 'Brakes' | 'Suspension' | 'Fluids' | 'Steering' |
+                         'Engine' | 'Transmission' | 'Exhaust' | 'HVAC' | 'Body' |
+                         'Lighting' | 'Filters' | 'Accessories' | 'Tools' | 'Other';
 
 export const inventoryItemSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -23,7 +28,9 @@ export const inventoryItemSchema = z.object({
   category_id: z.string().optional(),
   supplier_id: z.string().optional(),
   barcode: z.string().optional(),
-  unit_of_measure: z.enum(['Each', 'Pair', 'Set', 'Litre', 'Gallon', 'Quart', 'Ounce', 'Milliliter', 'Gram', 'Kilogram', 'Pound', 'Foot', 'Meter', 'Inch', 'Box', 'Case', 'Roll', 'Sheet'] as [UnitOfMeasure, ...UnitOfMeasure[]]).default('Each'),
+  unit_of_measure: z.enum(['Each', 'Pair', 'Set', 'Litre', 'Gallon', 'Quart', 'Ounce', 
+    'Milliliter', 'Gram', 'Kilogram', 'Pound', 'Foot', 'Meter', 
+    'Inch', 'Box', 'Case', 'Roll', 'Sheet'] as [UnitOfMeasure, ...UnitOfMeasure[]]).default('Each'),
   lead_time_days: z.number().min(0).optional(),
   weight: z.number().min(0).optional(),
   dimensions: z.string().optional(),
@@ -34,7 +41,9 @@ export const inventoryItemSchema = z.object({
   notes: z.string().optional(),
   preferred_vendor: z.string().optional(),
   upc_ean: z.string().optional(),
-  automotive_category: z.enum(['Electrical', 'Brakes', 'Suspension', 'Fluids', 'Steering', 'Engine', 'Transmission', 'Exhaust', 'HVAC', 'Body', 'Lighting', 'Filters', 'Accessories', 'Tools', 'Other'] as [AutomotiveCategory, ...AutomotiveCategory[]]).default('Other')
-}) as z.ZodType<InventoryItemFormData>;
+  automotive_category: z.enum(['Electrical', 'Brakes', 'Suspension', 'Fluids', 'Steering',
+    'Engine', 'Transmission', 'Exhaust', 'HVAC', 'Body',
+    'Lighting', 'Filters', 'Accessories', 'Tools', 'Other'] as [AutomotiveCategory, ...AutomotiveCategory[]]).default('Other')
+});
 
 export type InventoryFormSchema = z.infer<typeof inventoryItemSchema>;

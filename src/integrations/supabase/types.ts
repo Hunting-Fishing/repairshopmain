@@ -1462,6 +1462,7 @@ export type Database = {
           created_by: string | null
           description: string | null
           id: string
+          image_url: string | null
           location: string | null
           manufacturer: string | null
           name: string
@@ -1486,6 +1487,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          image_url?: string | null
           location?: string | null
           manufacturer?: string | null
           name: string
@@ -1510,6 +1512,7 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           id?: string
+          image_url?: string | null
           location?: string | null
           manufacturer?: string | null
           name?: string

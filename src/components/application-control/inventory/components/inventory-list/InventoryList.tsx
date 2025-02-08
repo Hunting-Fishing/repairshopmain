@@ -1,11 +1,14 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Box, Minus, Plus, Eye } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon, Download, RefreshCw } from "lucide-react";
 import type { InventoryItem } from "../../types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -18,118 +21,154 @@ interface InventoryListProps {
 export function InventoryList({ items }: InventoryListProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const { toast } = useToast();
 
   const filteredItems = items.filter(item =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const updateInventoryLevels = async (itemId: string, reorderPoint: number, reorderQuantity: number) => {
+  const handleSelectAll = (checked: boolean) => {
+    setSelectedItems(checked ? filteredItems.map(item => item.id) : []);
+  };
+
+  const handleSelectItem = (itemId: string, checked: boolean) => {
+    setSelectedItems(prev =>
+      checked ? [...prev, itemId] : prev.filter(id => id !== itemId)
+    );
+  };
+
+  const handleProcess = async (itemId: string) => {
     const { error } = await supabase
       .from('inventory_items')
-      .update({
-        reorder_point: reorderPoint,
-        reorder_quantity: reorderQuantity
-      })
+      .update({ status: 'processed' })
       .eq('id', itemId);
 
     if (error) {
       toast({
-        variant: "destructive",
-        title: "Error updating inventory levels",
-        description: error.message
+        title: "Error processing item",
+        description: error.message,
+        variant: "destructive"
       });
     } else {
       toast({
-        title: "Inventory levels updated",
-        description: "The minimum and maximum levels have been updated successfully."
+        title: "Item processed successfully",
+        description: "The inventory item has been marked as processed."
       });
     }
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-4">
+      <div className="flex justify-between items-center gap-4 mb-6">
         <Input
-          placeholder="Search inventory items..."
+          placeholder="Search by order, customer, SKU..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-sm"
+          className="max-w-md"
         />
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-[160px] justify-start text-left font-normal">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {startDate ? format(startDate, "PPP") : "Start Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={setStartDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-[160px] justify-start text-left font-normal">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {endDate ? format(endDate, "PPP") : "End Date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={setEndDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Button variant="secondary" className="gap-2">
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          <Button variant="secondary" className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Sync Orders
+          </Button>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredItems.map((item) => (
-          <Card key={item.id} className="relative">
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between">
-                <CardTitle className="text-lg">{item.name}</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant={item.quantity_in_stock <= (item.reorder_point || 0) ? "destructive" : "secondary"}>
-                    {item.quantity_in_stock} in stock
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setSelectedItem(item)}
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1">
-                    <Minus className="h-4 w-4" />
-                    Minimum Level
-                  </span>
-                  <span>{item.reorder_point || 0}</span>
-                </div>
-                <Slider
-                  defaultValue={[item.reorder_point || 0]}
-                  max={100}
-                  step={1}
-                  onValueChange={(value) => {
-                    if (item.id) {
-                      updateInventoryLevels(item.id, value[0], item.reorder_quantity || 0);
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-1">
-                    <Plus className="h-4 w-4" />
-                    Maximum Level
-                  </span>
-                  <span>{item.reorder_quantity || 0}</span>
-                </div>
-                <Slider
-                  defaultValue={[item.reorder_quantity || 0]}
-                  max={200}
-                  step={1}
-                  onValueChange={(value) => {
-                    if (item.id) {
-                      updateInventoryLevels(item.id, item.reorder_point || 0, value[0]);
-                    }
-                  }}
-                />
-              </div>
-
-              <div className="flex items-center justify-between text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Box className="h-4 w-4" />
-                  Current Stock Level
-                </span>
-                <span className="font-medium text-foreground">{item.quantity_in_stock}</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Card>
+        <div className="rounded-md border">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-muted/50">
+                <th className="p-4 text-left">
+                  <Checkbox
+                    checked={selectedItems.length === filteredItems.length}
+                    onCheckedChange={handleSelectAll}
+                  />
+                </th>
+                <th className="p-4 text-left">Actions</th>
+                <th className="p-4 text-left">Status</th>
+                <th className="p-4 text-left">Date</th>
+                <th className="p-4 text-left">Channel</th>
+                <th className="p-4 text-left">Order #</th>
+                <th className="p-4 text-left">Contact</th>
+                <th className="p-4 text-right">Total</th>
+                <th className="p-4 text-right"># Items</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.map((item) => (
+                <tr key={item.id} className="border-b">
+                  <td className="p-4">
+                    <Checkbox
+                      checked={selectedItems.includes(item.id)}
+                      onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
+                    />
+                  </td>
+                  <td className="p-4">
+                    <Button
+                      variant={item.status === 'needs_attention' ? 'destructive' : 'secondary'}
+                      size="sm"
+                      onClick={() => handleProcess(item.id)}
+                    >
+                      {item.status === 'needs_attention' ? 'Resolve' : 'Process'}
+                    </Button>
+                  </td>
+                  <td className="p-4">
+                    <Badge variant={item.status === 'needs_attention' ? 'destructive' : 'secondary'}>
+                      {item.status || 'PROCESSED'}
+                    </Badge>
+                  </td>
+                  <td className="p-4">{format(new Date(item.created_at), 'M/d/yy')}</td>
+                  <td className="p-4">{item.source || 'shopify'}</td>
+                  <td className="p-4">{item.sku || item.id.slice(0, 4)}</td>
+                  <td className="p-4">Tester Tester</td>
+                  <td className="p-4 text-right">${item.unit_cost?.toFixed(2) || '0.00'}</td>
+                  <td className="p-4 text-right">{item.quantity_in_stock || 1}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
 
       <InventoryItemDetails
         item={selectedItem}

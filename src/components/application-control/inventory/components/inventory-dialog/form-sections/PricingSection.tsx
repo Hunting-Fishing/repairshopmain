@@ -12,8 +12,8 @@ interface PricingSectionProps {
 }
 
 export function PricingSection({ form }: PricingSectionProps) {
-  const unitCost = form.watch("unit_cost");
-  const markupPercentage = form.watch("markup_percentage") ?? 0;
+  const unitCost = form.watch("unit_cost") || 0;
+  const markupPercentage = form.watch("markup_percentage") || 0;
 
   // Update selling price when unit cost or markup changes
   useEffect(() => {
@@ -100,3 +100,4 @@ export function PricingSection({ form }: PricingSectionProps) {
     </Card>
   );
 }
+

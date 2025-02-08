@@ -68,6 +68,7 @@ export interface InventoryItemFormData {
   reorder_quantity?: number;
   unit_cost?: number;
   selling_price?: number;
+  markup_percentage?: number;
   location?: string;
   barcode?: string;
   status?: InventoryItemStatus;
@@ -85,3 +86,4 @@ export interface InventoryItemFormData {
   preferred_vendor?: string;
   upc_ean?: string;
 }
+

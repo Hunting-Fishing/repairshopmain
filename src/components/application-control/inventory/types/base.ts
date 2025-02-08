@@ -21,6 +21,35 @@ export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row
 
 export type InventoryItemStatus = 'active' | 'inactive' | 'needs_attention';
 
+export interface InventorySupplier {
+  id: string;
+  organization_id: string;
+  name: string;
+  contact_person?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  status: 'active' | 'inactive';
+  payment_status?: string;
+  tax_id?: string;
+  payment_method?: string;
+  credit_limit?: number;
+  currency?: string;
+  total_spent?: number;
+  last_order_date?: string;
+  last_payment_date?: string;
+  rating?: number;
+  reliability_score?: number;
+  fulfillment_rate?: number;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+  payment_terms?: {
+    type: string;
+    discount: number | null;
+  };
+}
+
 // Form data types
 export interface CategoryFormData {
   name: string;
@@ -56,3 +85,4 @@ export interface InventoryItemFormData {
   preferred_vendor?: string;
   upc_ean?: string;
 }
+

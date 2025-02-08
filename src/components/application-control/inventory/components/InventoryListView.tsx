@@ -28,6 +28,8 @@ interface InventoryListViewProps {
   onSelectAll: (selected: boolean) => void;
   onSort: (field: 'name' | 'quantity_in_stock' | 'unit_cost') => void;
   onPageChange: (page: number) => void;
+  onAddItem: () => void;
+  onEditItem: (item: InventoryItem) => void;
 }
 
 export function InventoryListView({
@@ -43,6 +45,8 @@ export function InventoryListView({
   onSelectAll,
   onSort,
   onPageChange,
+  onAddItem,
+  onEditItem,
 }: InventoryListViewProps) {
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -87,23 +91,23 @@ export function InventoryListView({
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <div className="flex-1 flex items-center gap-4">
-          <Button className="gap-2 bg-green-500 hover:bg-green-600">
+          <Button className="gap-2 bg-green-500 hover:bg-green-600" onClick={onAddItem}>
             <Plus className="h-4 w-4" />
-            New Order
+            New Item
           </Button>
           <Button variant="outline" className="gap-2">
             <Filter className="h-4 w-4" />
             Filter
           </Button>
           <Input
-            placeholder="Search orders..."
+            placeholder="Search items..."
             className="max-w-xs"
           />
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-lg">
             <span className="font-medium">{items.length}</span>
-            <span>orders</span>
+            <span>items</span>
           </div>
           <div className="flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-lg">
             <span className="font-medium">
@@ -169,6 +173,7 @@ export function InventoryListView({
                     item={item}
                     selected={selectedItems.includes(item.id)}
                     onSelect={(selected) => onSelectItem(item.id, selected)}
+                    onEdit={() => onEditItem(item)}
                   />
                 </div>
               );

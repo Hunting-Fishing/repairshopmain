@@ -70,7 +70,7 @@ function Content({ categories, items, suppliers }: TabContentProps) {
       </TabsContent>
 
       <TabsContent value="inventory" className="mt-4">
-        <InventoryList items={items} />
+        <InventoryList />
       </TabsContent>
       
       <TabsContent value="categories" className="mt-4">

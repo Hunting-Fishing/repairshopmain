@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { InventoryItem } from "../types";
@@ -52,10 +52,6 @@ export function InventoryListView({
     estimateSize: () => 320,
     overscan: 5,
   });
-
-  useEffect(() => {
-    rowVirtualizer.measure();
-  }, [items, rowVirtualizer]);
 
   if (isLoading) {
     return (

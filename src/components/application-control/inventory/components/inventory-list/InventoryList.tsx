@@ -1,8 +1,7 @@
 
 import { useState } from "react";
-import { InventoryListView } from "../InventoryListView";
 import { useInventoryQuery } from "../../hooks/useInventoryQuery";
-import { InventoryItemDetails } from "../item-details/InventoryItemDetails";
+import { InventoryListView } from "../InventoryListView";
 
 export function InventoryList() {
   const [searchQuery, setSearchQuery] = useState("");

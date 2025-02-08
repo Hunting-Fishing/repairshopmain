@@ -59,7 +59,7 @@ export function AdditionalInformationSection({ form }: AdditionalInformationSect
 
         <FormField
           control={form.control}
-          name="vehicle_type"
+          name="automotive_category"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Vehicle Type</FormLabel>
@@ -70,10 +70,12 @@ export function AdditionalInformationSection({ form }: AdditionalInformationSect
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="car">Car</SelectItem>
-                  <SelectItem value="truck">Truck</SelectItem>
-                  <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                  <SelectItem value="Other">General</SelectItem>
+                  <SelectItem value="Engine">Engine</SelectItem>
+                  <SelectItem value="Transmission">Transmission</SelectItem>
+                  <SelectItem value="Brakes">Brakes</SelectItem>
+                  <SelectItem value="Suspension">Suspension</SelectItem>
+                  <SelectItem value="Electrical">Electrical</SelectItem>
                 </SelectContent>
               </Select>
             </FormItem>

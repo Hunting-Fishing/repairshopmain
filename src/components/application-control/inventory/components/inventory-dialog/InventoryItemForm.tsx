@@ -13,7 +13,7 @@ import { InventoryDetailsSection } from "./form-sections/InventoryDetailsSection
 import { PricingSection } from "./form-sections/PricingSection";
 import { AdditionalInformationSection } from "./form-sections/AdditionalInformationSection";
 import { Separator } from "@/components/ui/separator";
-import { Loader2 } from "lucide-react";
+import { Loader2, Save, X } from "lucide-react";
 
 interface InventoryFormProps {
   item?: InventoryItem;
@@ -61,19 +61,21 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
       <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full flex flex-col">
         <ScrollArea className="flex-1">
           <div className="space-y-8 p-6">
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-semibold tracking-tight">
-                  {item ? 'Edit' : 'Add'} Inventory Item
-                </h2>
-                <p className="text-sm text-muted-foreground">
-                  Fill in the details below to {item ? 'update' : 'create'} an inventory item.
-                </p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-semibold tracking-tight">
+                    {item ? 'Edit' : 'Add'} Inventory Item
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Fill in the details below to {item ? 'update' : 'create'} an inventory item.
+                  </p>
+                </div>
               </div>
 
               <Separator className="my-6" />
 
-              <div className="space-y-8">
+              <div className="space-y-6">
                 <BasicInformationSection form={form} />
                 <ProductIdentificationSection form={form} />
                 <InventoryDetailsSection form={form} />
@@ -84,13 +86,14 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
           </div>
         </ScrollArea>
         
-        <div className="border-t border-border/50 bg-muted/50 p-4 flex justify-end space-x-4">
+        <div className="border-t bg-muted/50 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 flex justify-end space-x-4">
           <Button 
             variant="outline" 
             type="button" 
             onClick={onCancel}
             className="min-w-[100px]"
           >
+            <X className="w-4 h-4 mr-2" />
             Cancel
           </Button>
           <Button 
@@ -104,7 +107,10 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
                 Saving...
               </>
             ) : (
-              'Save Item'
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                Save Item
+              </>
             )}
           </Button>
         </div>

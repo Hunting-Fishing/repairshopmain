@@ -13,7 +13,7 @@ interface BasicInformationSectionProps {
 
 export function BasicInformationSection({ form }: BasicInformationSectionProps) {
   return (
-    <Card>
+    <Card className="border border-border/50">
       <CardHeader>
         <CardTitle>Basic Information</CardTitle>
       </CardHeader>

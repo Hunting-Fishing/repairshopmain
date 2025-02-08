@@ -7,8 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Download, RefreshCw } from "lucide-react";
+import { Calendar as CalendarIcon, Download, Filter, Plus, RefreshCw } from "lucide-react";
 import type { InventoryItem } from "../../types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -60,56 +67,60 @@ export function InventoryList({ items }: InventoryListProps) {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    const colors = {
+      needs_attention: "bg-orange-500 hover:bg-orange-600",
+      active: "bg-blue-500 hover:bg-blue-600",
+      processed: "bg-green-500 hover:bg-green-600",
+    };
+    return colors[status as keyof typeof colors] || "bg-gray-500 hover:bg-gray-600";
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels = {
+      needs_attention: "Waiting for parts",
+      active: "In work",
+      processed: "Done",
+    };
+    return labels[status as keyof typeof labels] || status;
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center gap-4 mb-6">
-        <Input
-          placeholder="Search by order, customer, SKU..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="max-w-md"
-        />
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex-1 flex items-center gap-4">
+          <Button className="gap-2 bg-green-500 hover:bg-green-600">
+            <Plus className="h-4 w-4" />
+            Order
+          </Button>
+          <Button variant="outline" className="gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+          <Input
+            placeholder="Search orders..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-xs"
+          />
+        </div>
         <div className="flex items-center gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[160px] justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {startDate ? format(startDate, "PPP") : "Start Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={startDate}
-                onSelect={setStartDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-[160px] justify-start text-left font-normal">
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {endDate ? format(endDate, "PPP") : "End Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={endDate}
-                onSelect={setEndDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          <Button variant="secondary" className="gap-2">
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-          <Button variant="secondary" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Sync Orders
-          </Button>
+          <div className="flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-lg">
+            <span className="font-medium">{items.length}</span>
+            <span>orders</span>
+          </div>
+          <div className="flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-lg">
+            <span className="font-medium">
+              {items.filter(item => item.status === 'needs_attention').length}
+            </span>
+            <span>urgent</span>
+          </div>
+          <div className="flex items-center gap-2 bg-orange-100 text-orange-800 px-4 py-2 rounded-lg">
+            <span className="font-medium">
+              {items.filter(item => item.quantity_in_stock <= (item.reorder_point || 5)).length}
+            </span>
+            <span>low stock</span>
+          </div>
         </div>
       </div>
 
@@ -124,14 +135,14 @@ export function InventoryList({ items }: InventoryListProps) {
                     onCheckedChange={handleSelectAll}
                   />
                 </th>
-                <th className="p-4 text-left">Actions</th>
-                <th className="p-4 text-left">Status</th>
-                <th className="p-4 text-left">Date</th>
-                <th className="p-4 text-left">SKU</th>
                 <th className="p-4 text-left">Order #</th>
-                <th className="p-4 text-left">Name</th>
+                <th className="p-4 text-left">Due Date</th>
+                <th className="p-4 text-left">Status</th>
+                <th className="p-4 text-left">Item</th>
+                <th className="p-4 text-left">Category</th>
+                <th className="p-4 text-left">Client</th>
+                <th className="p-4 text-left">Specialist</th>
                 <th className="p-4 text-right">Price</th>
-                <th className="p-4 text-right">Quantity</th>
               </tr>
             </thead>
             <tbody>
@@ -143,26 +154,33 @@ export function InventoryList({ items }: InventoryListProps) {
                       onCheckedChange={(checked) => handleSelectItem(item.id, checked as boolean)}
                     />
                   </td>
+                  <td className="p-4 font-medium">{item.id.slice(0, 8)}</td>
+                  <td className="p-4">{format(new Date(item.created_at), 'MMM d, yyyy')}</td>
                   <td className="p-4">
-                    <Button
-                      variant={item.status === 'needs_attention' ? 'destructive' : 'secondary'}
-                      size="sm"
-                      onClick={() => handleProcess(item.id)}
-                    >
-                      {item.status === 'needs_attention' ? 'Resolve' : 'Process'}
-                    </Button>
+                    <Select defaultValue={item.status}>
+                      <SelectTrigger className={`w-[140px] text-white ${getStatusColor(item.status)}`}>
+                        <SelectValue>{getStatusLabel(item.status)}</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="needs_attention">Waiting for parts</SelectItem>
+                        <SelectItem value="active">In work</SelectItem>
+                        <SelectItem value="processed">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </td>
                   <td className="p-4">
-                    <Badge variant={item.status === 'needs_attention' ? 'destructive' : 'secondary'}>
-                      {item.status || 'PROCESSED'}
-                    </Badge>
+                    <div>
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-muted-foreground">{item.sku}</div>
+                    </div>
                   </td>
-                  <td className="p-4">{format(new Date(item.created_at), 'M/d/yy')}</td>
-                  <td className="p-4">{item.sku || '-'}</td>
-                  <td className="p-4">{item.id.slice(0, 8)}</td>
-                  <td className="p-4">{item.name}</td>
+                  <td className="p-4">{item.category?.name || 'Uncategorized'}</td>
+                  <td className="p-4">
+                    <div className="font-medium">Customer Name</div>
+                    <div className="text-sm text-muted-foreground">ID: {item.created_by}</div>
+                  </td>
+                  <td className="p-4">Assigned Staff</td>
                   <td className="p-4 text-right">${item.unit_cost?.toFixed(2) || '0.00'}</td>
-                  <td className="p-4 text-right">{item.quantity_in_stock || 0}</td>
                 </tr>
               ))}
             </tbody>

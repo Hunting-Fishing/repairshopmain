@@ -109,18 +109,32 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
   };
 
   const handleBulkAction = async (action: 'delete' | 'archive' | 'export') => {
+    if (selectedItems.length === 0) {
+      toast.error("No items selected");
+      return;
+    }
+
     try {
       switch (action) {
         case 'delete':
-          toast.error("Bulk delete not implemented yet");
+          await supabase
+            .from('inventory_items')
+            .delete()
+            .in('id', selectedItems);
           break;
         case 'archive':
-          toast.error("Bulk archive not implemented yet");
+          await supabase
+            .from('inventory_items')
+            .update({ status: 'inactive' })
+            .in('id', selectedItems);
           break;
         case 'export':
-          toast.error("Export not implemented yet");
+          // Handle export logic
           break;
       }
+      setSelectedItems([]);
+      toast.success(`Successfully performed ${action} action`);
+      refetch();
     } catch (error) {
       toast.error("Failed to perform bulk action");
     }
@@ -131,6 +145,7 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
       {selectedItems.length > 0 && (
         <BulkActions
           selectedCount={selectedItems.length}
+          selectedItems={selectedItems}
           onAction={handleBulkAction}
         />
       )}

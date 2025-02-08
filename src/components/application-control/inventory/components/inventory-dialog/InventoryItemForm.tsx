@@ -8,7 +8,6 @@ import { useInventoryFormSubmit } from "../../hooks/useInventoryFormSubmit";
 import { inventoryItemSchema, type InventoryFormSchema } from "./form-sections/validation";
 import type { InventoryItem } from "../../types/base";
 import { BasicInformationSection } from "./form-sections/BasicInformationSection";
-import { InventoryDetailsSection } from "./form-sections/InventoryDetailsSection";
 import { PricingSection } from "./form-sections/PricingSection";
 import { ProductIdentificationSection } from "./form-sections/ProductIdentificationSection";
 import { PhysicalAttributesSection } from "./form-sections/PhysicalAttributesSection";
@@ -44,7 +43,8 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
       return_info: item?.return_info ?? "",
       notes: item?.notes ?? "",
       preferred_vendor: item?.preferred_vendor ?? "",
-      upc_ean: item?.upc_ean ?? ""
+      upc_ean: item?.upc_ean ?? "",
+      markup_percentage: item?.markup_percentage ?? 40,
     },
   });
 
@@ -56,16 +56,19 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full bg-[#F0F0F0]">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full">
         <div className="h-full flex flex-col">
-          <ScrollArea className="flex-1 p-6">
-            <div className="space-y-6">
-              <BasicInformationSection form={form} />
-              <InventoryDetailsSection form={form} />
-              <PricingSection form={form} />
-              <ProductIdentificationSection form={form} />
-              <PhysicalAttributesSection form={form} />
-              <AdditionalInformationSection form={form} />
+          <ScrollArea className="flex-1">
+            <div className="max-w-4xl mx-auto p-6 space-y-6">
+              <div className="grid gap-6">
+                <BasicInformationSection form={form} />
+                <PricingSection form={form} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <ProductIdentificationSection form={form} />
+                  <PhysicalAttributesSection form={form} />
+                </div>
+                <AdditionalInformationSection form={form} />
+              </div>
             </div>
           </ScrollArea>
           
@@ -76,7 +79,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
               onClick={onCancel}
               className="bg-white hover:bg-gray-50"
             >
-              Cancel
+              Reset
             </Button>
             <Button 
               type="submit" 

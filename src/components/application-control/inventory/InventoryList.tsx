@@ -1,9 +1,13 @@
+
 import { useState } from "react";
 import { useInventoryQuery } from "./hooks/useInventoryQuery";
 import { useInventorySubscription } from "./hooks/useInventorySubscription";
 import { InventoryListView } from "./components/InventoryListView";
 import { toast } from "sonner";
 import { BulkActions } from "./components/BulkActions";
+import { InventoryItemDialog } from "./components/inventory-dialog/InventoryItemDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import type { InventoryItem } from "./types";
 
 interface InventoryListProps {
@@ -23,6 +27,9 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
   const [sortField, setSortField] = useState<SortField>('name');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<InventoryItem | undefined>(undefined);
+  const { user } = useAuth();
   const itemsPerPage = 9;
 
   const { data: itemsData, isLoading, error, refetch } = useInventoryQuery({
@@ -47,7 +54,7 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    setSelectedItems([]); // Clear selections on page change
+    setSelectedItems([]);
     if (error) {
       toast.error("Failed to load inventory items. Please try again.");
     }
@@ -63,6 +70,42 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
 
   const handleSelectAll = (selected: boolean) => {
     setSelectedItems(selected ? (itemsData?.items || []).map(item => item.id) : []);
+  };
+
+  const handleAddItem = () => {
+    setSelectedItem(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleEditItem = (item: InventoryItem) => {
+    setSelectedItem(item);
+    setDialogOpen(true);
+  };
+
+  const handleSubmitItem = async (data: Partial<InventoryItem>) => {
+    try {
+      if (selectedItem) {
+        const { error } = await supabase
+          .from('inventory_items')
+          .update(data)
+          .eq('id', selectedItem.id);
+
+        if (error) throw error;
+        toast.success("Item updated successfully");
+      } else {
+        const { error } = await supabase
+          .from('inventory_items')
+          .insert([{ ...data, created_by: user?.id }]);
+
+        if (error) throw error;
+        toast.success("Item added successfully");
+      }
+      
+      setDialogOpen(false);
+      refetch();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   const handleBulkAction = async (action: 'delete' | 'archive' | 'export') => {
@@ -104,6 +147,14 @@ export function InventoryList({ searchQuery, filters }: InventoryListProps) {
         onSelectAll={handleSelectAll}
         onSort={handleSort}
         onPageChange={handlePageChange}
+        onAddItem={handleAddItem}
+        onEditItem={handleEditItem}
+      />
+      <InventoryItemDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        item={selectedItem}
+        onSubmit={handleSubmitItem}
       />
     </div>
   );

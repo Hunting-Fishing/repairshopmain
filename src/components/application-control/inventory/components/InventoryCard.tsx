@@ -2,7 +2,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Edit } from "lucide-react";
 import type { InventoryItem } from "../types";
 
 interface InventoryCardProps {
@@ -12,9 +13,10 @@ interface InventoryCardProps {
   };
   selected?: boolean;
   onSelect?: (selected: boolean) => void;
+  onEdit?: (item: InventoryItem) => void;
 }
 
-export function InventoryCard({ item, selected = false, onSelect }: InventoryCardProps) {
+export function InventoryCard({ item, selected = false, onSelect, onEdit }: InventoryCardProps) {
   const getStatusColor = (status: string) => {
     const colors = {
       needs_attention: "bg-orange-500 hover:bg-orange-600",
@@ -46,11 +48,23 @@ export function InventoryCard({ item, selected = false, onSelect }: InventoryCar
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">{item.name}</CardTitle>
-          <Badge className={getStatusColor(item.status)}>
-            {getStatusLabel(item.status)}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={getStatusColor(item.status)}>
+              {getStatusLabel(item.status)}
+            </Badge>
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(item)}
+                className="h-8 w-8"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
-        <CardDescription>Order #{item.id.slice(0, 8)}</CardDescription>
+        <CardDescription>SKU: {item.sku || 'N/A'}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

@@ -1467,6 +1467,9 @@ export type Database = {
       }
       inventory_items: {
         Row: {
+          automotive_category:
+            | Database["public"]["Enums"]["automotive_category"]
+            | null
           average_turnover_rate: number | null
           barcode: string | null
           category_id: string | null
@@ -1494,10 +1497,15 @@ export type Database = {
           subcategory: string | null
           supplier_id: string | null
           unit_cost: number | null
+          unit_of_measure: Database["public"]["Enums"]["unit_of_measure"] | null
+          unit_quantity: number | null
           updated_at: string | null
           updated_by: string | null
         }
         Insert: {
+          automotive_category?:
+            | Database["public"]["Enums"]["automotive_category"]
+            | null
           average_turnover_rate?: number | null
           barcode?: string | null
           category_id?: string | null
@@ -1525,10 +1533,17 @@ export type Database = {
           subcategory?: string | null
           supplier_id?: string | null
           unit_cost?: number | null
+          unit_of_measure?:
+            | Database["public"]["Enums"]["unit_of_measure"]
+            | null
+          unit_quantity?: number | null
           updated_at?: string | null
           updated_by?: string | null
         }
         Update: {
+          automotive_category?:
+            | Database["public"]["Enums"]["automotive_category"]
+            | null
           average_turnover_rate?: number | null
           barcode?: string | null
           category_id?: string | null
@@ -1556,6 +1571,10 @@ export type Database = {
           subcategory?: string | null
           supplier_id?: string | null
           unit_cost?: number | null
+          unit_of_measure?:
+            | Database["public"]["Enums"]["unit_of_measure"]
+            | null
+          unit_quantity?: number | null
           updated_at?: string | null
           updated_by?: string | null
         }
@@ -4037,6 +4056,22 @@ export type Database = {
       }
     }
     Enums: {
+      automotive_category:
+        | "Electrical"
+        | "Brakes"
+        | "Suspension"
+        | "Fluids"
+        | "Steering"
+        | "Engine"
+        | "Transmission"
+        | "Exhaust"
+        | "HVAC"
+        | "Body"
+        | "Lighting"
+        | "Filters"
+        | "Accessories"
+        | "Tools"
+        | "Other"
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"
       chat_room_type:
         | "general"
@@ -4080,6 +4115,25 @@ export type Database = {
         | "custom"
       time_off_status: "pending" | "approved" | "rejected"
       time_off_type: "vacation" | "sick" | "personal" | "training"
+      unit_of_measure:
+        | "Each"
+        | "Pair"
+        | "Set"
+        | "Litre"
+        | "Gallon"
+        | "Quart"
+        | "Ounce"
+        | "Milliliter"
+        | "Gram"
+        | "Kilogram"
+        | "Pound"
+        | "Foot"
+        | "Meter"
+        | "Inch"
+        | "Box"
+        | "Case"
+        | "Roll"
+        | "Sheet"
       user_role:
         | "owner"
         | "management"

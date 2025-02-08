@@ -6,7 +6,8 @@ import { useSupplierRealtime } from "../hooks/useSupplierRealtime";
 import { supabase } from "@/integrations/supabase/client";
 import { DocumentUploader } from "./documents/DocumentUploader";
 import { DocumentList } from "./documents/DocumentList";
-import type { InventorySupplier, SupplierDocument } from "../../../types/supplier";
+import type { InventorySupplier } from "../../../types/base";
+import type { SupplierDocument } from "../../../types/supplier";
 
 interface SupplierDocumentsProps {
   supplier: InventorySupplier;

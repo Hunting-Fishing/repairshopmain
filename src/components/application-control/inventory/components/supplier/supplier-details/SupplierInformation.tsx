@@ -1,9 +1,10 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { InventorySupplier } from "../../../types/supplier";
+import type { InventorySupplier } from "../../../types/base";
 import { ContactInformation } from "./sections/ContactInformation";
 import { BusinessDetails } from "./sections/BusinessDetails";
 import { FinancialInformation } from "./sections/FinancialInformation";

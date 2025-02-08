@@ -127,11 +127,11 @@ export function InventoryList({ items }: InventoryListProps) {
                 <th className="p-4 text-left">Actions</th>
                 <th className="p-4 text-left">Status</th>
                 <th className="p-4 text-left">Date</th>
-                <th className="p-4 text-left">Channel</th>
+                <th className="p-4 text-left">SKU</th>
                 <th className="p-4 text-left">Order #</th>
-                <th className="p-4 text-left">Contact</th>
-                <th className="p-4 text-right">Total</th>
-                <th className="p-4 text-right"># Items</th>
+                <th className="p-4 text-left">Name</th>
+                <th className="p-4 text-right">Price</th>
+                <th className="p-4 text-right">Quantity</th>
               </tr>
             </thead>
             <tbody>
@@ -158,11 +158,11 @@ export function InventoryList({ items }: InventoryListProps) {
                     </Badge>
                   </td>
                   <td className="p-4">{format(new Date(item.created_at), 'M/d/yy')}</td>
-                  <td className="p-4">{item.source || 'shopify'}</td>
-                  <td className="p-4">{item.sku || item.id.slice(0, 4)}</td>
-                  <td className="p-4">Tester Tester</td>
+                  <td className="p-4">{item.sku || '-'}</td>
+                  <td className="p-4">{item.id.slice(0, 8)}</td>
+                  <td className="p-4">{item.name}</td>
                   <td className="p-4 text-right">${item.unit_cost?.toFixed(2) || '0.00'}</td>
-                  <td className="p-4 text-right">{item.quantity_in_stock || 1}</td>
+                  <td className="p-4 text-right">{item.quantity_in_stock || 0}</td>
                 </tr>
               ))}
             </tbody>

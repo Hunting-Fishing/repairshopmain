@@ -1,34 +1,55 @@
 
-import { Bar, BarChart, Line, LineChart, PieChart, Pie, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Line, LineChart, PieChart, Pie, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import type { CategoryStats } from "../../types";
 
 interface InventoryChartProps {
   data: CategoryStats[] | Array<{ name: string; value: number }>;
-  type?: 'bar' | 'line' | 'pie';
+  type?: 'bar' | 'line' | 'pie' | 'stacked';
+  showLegend?: boolean;
+  height?: number;
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
-export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
+export function InventoryChart({ 
+  data, 
+  type = 'bar', 
+  showLegend = false,
+  height = 400 
+}: InventoryChartProps) {
   if (type === 'pie') {
     return (
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, value }) => `${name}: $${value}`}
-            outerRadius={150}
+            label={({ name, value, percent }) => `${name}: $${value} (${(percent * 100).toFixed(0)}%)`}
+            outerRadius={height / 3}
             fill="#8884d8"
             dataKey="totalValue"
+            animationBegin={0}
+            animationDuration={1500}
           >
             {data.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Cell 
+                key={`cell-${index}`} 
+                fill={COLORS[index % COLORS.length]}
+                className="hover:opacity-80 transition-opacity duration-200"
+              />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip 
+            formatter={(value: number) => `$${value.toFixed(2)}`}
+            contentStyle={{ 
+              backgroundColor: 'hsl(var(--background))',
+              border: '1px solid hsl(var(--border))',
+              borderRadius: '0.5rem'
+            }}
+          />
+          {showLegend && <Legend />}
         </PieChart>
       </ResponsiveContainer>
     );
@@ -36,7 +57,7 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
 
   if (type === 'line') {
     return (
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart data={data}>
           <XAxis
             dataKey="name"
@@ -80,16 +101,62 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
             dataKey={data[0]?.hasOwnProperty('totalValue') ? 'totalValue' : 'value'}
             stroke="currentColor"
             strokeWidth={2}
-            dot={false}
+            dot={{ strokeWidth: 2 }}
+            activeDot={{ r: 6, strokeWidth: 2 }}
             className="stroke-primary"
           />
+          {showLegend && <Legend />}
         </LineChart>
       </ResponsiveContainer>
     );
   }
 
+  if (type === 'stacked') {
+    return (
+      <ResponsiveContainer width="100%" height={height}>
+        <BarChart data={data}>
+          <XAxis
+            dataKey="name"
+            stroke="#888888"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            stroke="#888888"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => `$${value}`}
+          />
+          <Tooltip
+            contentStyle={{ 
+              backgroundColor: 'hsl(var(--background))',
+              border: '1px solid hsl(var(--border))',
+              borderRadius: '0.5rem'
+            }}
+            formatter={(value: number) => `$${value.toFixed(2)}`}
+          />
+          <Bar
+            dataKey="inStock"
+            stackId="a"
+            fill={COLORS[0]}
+            radius={[4, 4, 0, 0]}
+          />
+          <Bar
+            dataKey="lowStock"
+            stackId="a"
+            fill={COLORS[1]}
+            radius={[4, 4, 0, 0]}
+          />
+          {showLegend && <Legend />}
+        </BarChart>
+      </ResponsiveContainer>
+    );
+  }
+
   return (
-    <ResponsiveContainer width="100%" height={400}>
+    <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data}>
         <XAxis
           dataKey="name"
@@ -134,6 +201,7 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
           radius={[4, 4, 0, 0]}
           className="fill-primary"
         />
+        {showLegend && <Legend />}
       </BarChart>
     </ResponsiveContainer>
   );

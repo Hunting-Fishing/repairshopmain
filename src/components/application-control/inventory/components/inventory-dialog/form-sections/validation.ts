@@ -8,6 +8,7 @@ export const inventoryItemSchema = z.object({
   quantity_in_stock: z.number().min(0, "Quantity cannot be negative").default(0),
   unit_cost: z.number().min(0, "Cost cannot be negative").default(0),
   selling_price: z.number().min(0, "Price cannot be negative").default(0),
+  markup_percentage: z.number().min(0).max(1000).default(0),
   reorder_point: z.number().min(0, "Reorder point cannot be negative").default(0),
   reorder_quantity: z.number().min(0, "Reorder quantity cannot be negative").optional(),
   sku: z.string().optional(),

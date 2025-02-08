@@ -40,7 +40,7 @@ export function InventoryItemForm({ item, onSubmit, onCancel }: InventoryItemFor
 
   const { handleSubmit, isSubmitting, changes } = useInventoryFormSubmit({
     form,
-    onSubmit: async (data) => {
+    onSubmit: async (data: InventoryItemFormData) => {
       try {
         await onSubmit(data);
         toast.success(item ? "Item updated successfully" : "Item added successfully");

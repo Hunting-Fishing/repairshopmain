@@ -1,3 +1,4 @@
+
 import { BookingRow, BookingInsert, BookingUpdate } from './tables/bookings'
 import { OrganizationRow, OrganizationInsert, OrganizationUpdate } from './tables/organizations'
 import { ProfileRow, ProfileInsert, ProfileUpdate } from './tables/profiles'

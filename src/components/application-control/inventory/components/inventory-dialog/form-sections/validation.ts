@@ -17,6 +17,6 @@ export const inventoryItemSchema = z.object({
   category_id: z.string().optional(),
   supplier_id: z.string().optional(),
   barcode: z.string().optional()
-}) satisfies z.ZodType<InventoryItemFormData>;
+}) as z.ZodType<InventoryItemFormData>;
 
 export type InventoryFormSchema = z.infer<typeof inventoryItemSchema>;

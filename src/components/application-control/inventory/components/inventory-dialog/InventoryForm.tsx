@@ -27,20 +27,20 @@ export function InventoryForm({ item, onSubmit }: InventoryFormProps) {
   const form = useForm<InventoryFormSchema>({
     resolver: zodResolver(inventoryItemSchema),
     defaultValues: {
-      name: item?.name || "",
-      description: item?.description || "",
-      quantity_in_stock: item?.quantity_in_stock || 0,
-      unit_cost: item?.unit_cost || 0,
-      reorder_point: item?.reorder_point || 0,
-      selling_price: item?.selling_price || 0,
-      reorder_quantity: item?.reorder_quantity || 0,
-      sku: item?.sku || "",
-      status: item?.status || "active",
-      location: item?.location || "",
-      category_id: item?.category_id || "",
-      supplier_id: item?.supplier_id || "",
-      image_url: item?.image_url || "",
-      barcode: item?.barcode || ""
+      name: item?.name ?? "",
+      description: item?.description ?? "",
+      quantity_in_stock: item?.quantity_in_stock ?? 0,
+      unit_cost: item?.unit_cost ?? 0,
+      reorder_point: item?.reorder_point ?? 0,
+      selling_price: item?.selling_price ?? 0,
+      reorder_quantity: item?.reorder_quantity ?? 0,
+      sku: item?.sku ?? "",
+      status: item?.status ?? "active",
+      location: item?.location ?? "",
+      category_id: item?.category_id ?? "",
+      supplier_id: item?.supplier_id ?? "",
+      image_url: item?.image_url ?? "",
+      barcode: item?.barcode ?? ""
     },
   });
 

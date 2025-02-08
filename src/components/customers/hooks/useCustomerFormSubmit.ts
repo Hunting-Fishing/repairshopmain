@@ -1,11 +1,16 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { CustomerFormValues } from "../types/customerTypes";
 
-export function useCustomerFormSubmit({ onSuccess, initialData, mode }: {
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { CustomerFormValues } from "../types/customerTypes";
+import { useCustomerFormData } from "./useCustomerFormData";
+import { useCustomerDataSave } from "./useCustomerDataSave";
+
+export function useCustomerFormSubmit({ 
+  onSuccess, 
+  initialData, 
+  mode 
+}: {
   onSuccess: () => void;
   initialData?: any;
   mode: "create" | "edit";
@@ -15,111 +20,14 @@ export function useCustomerFormSubmit({ onSuccess, initialData, mode }: {
   const [changeNotes, setChangeNotes] = useState("");
   const [pendingChanges, setPendingChanges] = useState<any>(null);
 
-  const form = useForm<CustomerFormValues>({
-    defaultValues: initialData || {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone_number: "",
-      street_address: "",
-      city: "",
-      state_province: "",
-      postal_code: "",
-      country: "",
-      notes: "",
-      vehicle_make: "",
-      vehicle_model: "",
-      vehicle_year: "",
-    },
-  });
-
-  const { data: userProfile } = useQuery({
-    queryKey: ["user-profile"],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id) return null;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("organization_id")
-        .eq("id", session.user.id)
-        .single();
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const createHistoryRecords = async (
-    customerId: string,
-    userId: string,
-    changes: Record<string, { old: any; new: any }>,
-    notes: string
-  ) => {
-    const historyRecords = Object.entries(changes).map(([field, values]) => ({
-      customer_id: customerId,
-      changed_by: userId,
-      change_type: mode === "create" ? "create" : "update",
-      field_name: field,
-      old_value: values.old?.toString() || null,
-      new_value: values.new?.toString() || null,
-      notes,
-    }));
-
-    const { error } = await supabase
-      .from("customer_history")
-      .insert(historyRecords);
-
-    if (error) throw error;
-  };
-
-  const saveCustomer = async (values: CustomerFormValues, userId: string, notes: string) => {
-    const { data, error } = mode === "create"
-      ? await supabase
-          .from("customers")
-          .insert({
-            ...values,
-            organization_id: userProfile?.organization_id,
-            created_by: userId,
-            updated_by: userId,
-          })
-          .select()
-          .single()
-      : await supabase
-          .from("customers")
-          .update({
-            ...values,
-            updated_by: userId,
-          })
-          .eq("id", initialData.id)
-          .select()
-          .single();
-
-    if (error) throw error;
-
-    if (mode === "edit" && pendingChanges) {
-      await createHistoryRecords(
-        initialData.id,
-        userId,
-        pendingChanges.changes,
-        notes
-      );
-    } else if (mode === "create" && data) {
-      await createHistoryRecords(
-        data.id,
-        userId,
-        Object.keys(values).reduce((acc, key) => ({
-          ...acc,
-          [key]: { old: null, new: values[key as keyof CustomerFormValues] },
-        }), {}),
-        "Initial customer creation"
-      );
-    }
-  };
+  const { form } = useCustomerFormData({ initialData });
+  const { saveCustomer } = useCustomerDataSave();
 
   const handleSubmit = async (values: CustomerFormValues) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id || !userProfile?.organization_id) {
-        throw new Error("User session or organization not found");
+      if (!session?.user.id) {
+        throw new Error("User session not found");
       }
 
       if (mode === "edit") {
@@ -144,7 +52,7 @@ export function useCustomerFormSubmit({ onSuccess, initialData, mode }: {
         }
       }
 
-      await saveCustomer(values, session.user.id, "");
+      await saveCustomer(values, session.user.id, "", mode, initialData);
       onSuccess();
     } catch (error: any) {
       toast({
@@ -159,10 +67,17 @@ export function useCustomerFormSubmit({ onSuccess, initialData, mode }: {
     if (!pendingChanges) return;
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user.id) {
+        throw new Error("User session not found");
+      }
+
       await saveCustomer(
         pendingChanges.values,
-        pendingChanges.userId,
-        changeNotes
+        session.user.id,
+        changeNotes,
+        mode,
+        initialData
       );
       setShowNotesDialog(false);
       setPendingChanges(null);
@@ -187,5 +102,6 @@ export function useCustomerFormSubmit({ onSuccess, initialData, mode }: {
       onNotesChange: setChangeNotes,
     },
     handleNotesSubmit,
+    pendingChanges,
   };
 }

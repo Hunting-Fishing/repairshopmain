@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useInventoryQuery } from "../../hooks/useInventoryQuery";
 import { InventoryListView } from "../InventoryListView";
+import { toast } from "sonner";
+import type { InventoryItem } from "../../types";
 
 export function InventoryList() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,6 +40,14 @@ export function InventoryList() {
     }
   };
 
+  const handleAddItem = () => {
+    toast.info("Add item functionality not implemented yet");
+  };
+
+  const handleEditItem = (item: InventoryItem) => {
+    toast.info("Edit item functionality not implemented yet");
+  };
+
   return (
     <InventoryListView
       items={data?.items || []}
@@ -52,6 +62,8 @@ export function InventoryList() {
       onSelectAll={handleSelectAll}
       onSort={handleSort}
       onPageChange={setCurrentPage}
+      onAddItem={handleAddItem}
+      onEditItem={handleEditItem}
     />
   );
 }

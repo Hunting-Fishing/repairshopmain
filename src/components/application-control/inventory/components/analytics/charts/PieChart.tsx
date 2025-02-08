@@ -1,5 +1,5 @@
 
-import { PieChart as RechartsBarPie, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { PieChart as RechartsBarPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 import { BaseChartProps, COLORS, tooltipStyles } from "../types";
 
 export function PieChartComponent({ data, height = 400, showLegend }: BaseChartProps) {

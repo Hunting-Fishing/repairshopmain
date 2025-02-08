@@ -19,7 +19,7 @@ export function InventoryItemDialog({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent 
-        className="w-[1000px] sm:max-w-[1200px] overflow-hidden p-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        className="w-[1000px] sm:max-w-[1200px] overflow-hidden p-0 bg-gradient-to-br from-background via-background/95 to-background/90 backdrop-blur-lg supports-[backdrop-filter]:bg-background/60 border-l border-border/20"
         side="right"
       >
         <SheetHeader className="p-0" />

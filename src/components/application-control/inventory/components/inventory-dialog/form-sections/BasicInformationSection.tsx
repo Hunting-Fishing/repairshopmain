@@ -2,8 +2,8 @@
 import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
 import type { InventoryFormSchema } from "./validation";
 
@@ -13,7 +13,7 @@ interface BasicInformationSectionProps {
 
 export function BasicInformationSection({ form }: BasicInformationSectionProps) {
   return (
-    <Card className="border border-border/50">
+    <Card className="border border-border/40 bg-gradient-to-br from-card to-card/95 shadow-sm">
       <CardHeader>
         <CardTitle>Basic Information</CardTitle>
       </CardHeader>
@@ -25,7 +25,7 @@ export function BasicInformationSection({ form }: BasicInformationSectionProps) 
             <FormItem>
               <FormLabel>Item Name</FormLabel>
               <FormControl>
-                <Input {...field} className="bg-background" placeholder="Enter item name" />
+                <Input {...field} className="bg-background/50" placeholder="Enter item name" />
               </FormControl>
               <FormDescription>
                 The name that will be displayed in the inventory list
@@ -43,7 +43,7 @@ export function BasicInformationSection({ form }: BasicInformationSectionProps) 
               <FormControl>
                 <Textarea 
                   {...field} 
-                  className="bg-background resize-none min-h-[100px]" 
+                  className="bg-background/50 resize-none min-h-[100px]" 
                   placeholder="Enter item description"
                 />
               </FormControl>
@@ -59,7 +59,7 @@ export function BasicInformationSection({ form }: BasicInformationSectionProps) 
               <FormLabel>Status</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
-                  <SelectTrigger className="bg-background">
+                  <SelectTrigger className="bg-background/50">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                 </FormControl>

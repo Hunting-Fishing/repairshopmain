@@ -13,7 +13,7 @@ import { InventoryDetailsSection } from "./form-sections/InventoryDetailsSection
 import { PricingSection } from "./form-sections/PricingSection";
 import { AdditionalInformationSection } from "./form-sections/AdditionalInformationSection";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Save, X } from "lucide-react";
+import { Loader2, Save, X, PackageOpen } from "lucide-react";
 
 interface InventoryFormProps {
   item?: InventoryItem;
@@ -63,13 +63,18 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
           <div className="space-y-8 p-6">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-semibold tracking-tight">
-                    {item ? 'Edit' : 'Add'} Inventory Item
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Fill in the details below to {item ? 'update' : 'create'} an inventory item.
-                  </p>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-md bg-primary/10">
+                    <PackageOpen className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-semibold tracking-tight">
+                      {item ? 'Edit' : 'Add'} Inventory Item
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Fill in the details below to {item ? 'update' : 'create'} an inventory item.
+                    </p>
+                  </div>
                 </div>
               </div>
 

@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { InventoryItem } from "../types";
@@ -53,7 +54,39 @@ export function useInventoryQuery({
       query = query.range(start, start + itemsPerPage - 1);
 
       const { data, error, count } = await query.throwOnError();
+      
       if (error) throw error;
+
+      // Log inventory problems
+      if (data) {
+        const problems = data.reduce((issues, item) => {
+          if (item.quantity_in_stock === 0) {
+            issues.outOfStock.push(item.name);
+          } else if (item.quantity_in_stock < (item.reorder_point || 10)) {
+            issues.lowStock.push(item.name);
+          }
+          if (!item.supplier_id) {
+            issues.noSupplier.push(item.name);
+          }
+          if (item.unit_cost === null || item.unit_cost === 0) {
+            issues.noCost.push(item.name);
+          }
+          return issues;
+        }, {
+          outOfStock: [] as string[],
+          lowStock: [] as string[],
+          noSupplier: [] as string[],
+          noCost: [] as string[]
+        });
+
+        console.log('Inventory Analysis:', {
+          total: data.length,
+          problems,
+          totalValue: data.reduce((sum, item) => 
+            sum + ((item.quantity_in_stock || 0) * (item.unit_cost || 0)), 0
+          ),
+        });
+      }
       
       return { items: data, total: count || 0 };
     }

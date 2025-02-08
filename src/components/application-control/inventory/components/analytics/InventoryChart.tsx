@@ -1,13 +1,39 @@
 
-import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Line, LineChart, PieChart, Pie, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import type { CategoryStats } from "../../types";
 
 interface InventoryChartProps {
-  data: CategoryStats[];
-  type?: 'bar' | 'line';
+  data: CategoryStats[] | Array<{ name: string; value: number }>;
+  type?: 'bar' | 'line' | 'pie';
 }
 
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+
 export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
+  if (type === 'pie') {
+    return (
+      <ResponsiveContainer width="100%" height={400}>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={({ name, value }) => `${name}: $${value}`}
+            outerRadius={150}
+            fill="#8884d8"
+            dataKey="totalValue"
+          >
+            {data.map((_, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
+    );
+  }
+
   if (type === 'line') {
     return (
       <ResponsiveContainer width="100%" height={400}>
@@ -30,7 +56,7 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
             content={({ active, payload }) => {
               if (!active || !payload || payload.length === 0) return null;
               
-              const data = payload[0]?.payload as CategoryStats;
+              const data = payload[0]?.payload;
               if (!data) return null;
 
               return (
@@ -38,16 +64,10 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col">
                       <span className="text-[0.70rem] uppercase text-muted-foreground">
-                        Category
-                      </span>
-                      <span className="font-bold">{data.name}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[0.70rem] uppercase text-muted-foreground">
-                        Value
+                        {data.name}
                       </span>
                       <span className="font-bold">
-                        ${data.totalValue.toFixed(2)}
+                        ${(data.totalValue || data.value).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -57,7 +77,7 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
           />
           <Line
             type="monotone"
-            dataKey="totalValue"
+            dataKey={data[0]?.hasOwnProperty('totalValue') ? 'totalValue' : 'value'}
             stroke="currentColor"
             strokeWidth={2}
             dot={false}
@@ -89,7 +109,7 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
           content={({ active, payload }) => {
             if (!active || !payload || payload.length === 0) return null;
             
-            const data = payload[0]?.payload as CategoryStats;
+            const data = payload[0]?.payload;
             if (!data) return null;
 
             return (
@@ -97,29 +117,11 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
                 <div className="grid grid-cols-2 gap-2">
                   <div className="flex flex-col">
                     <span className="text-[0.70rem] uppercase text-muted-foreground">
-                      Category
-                    </span>
-                    <span className="font-bold">{data.name}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[0.70rem] uppercase text-muted-foreground">
-                      Value
+                      {data.name}
                     </span>
                     <span className="font-bold">
-                      ${data.totalValue.toFixed(2)}
+                      ${(data.totalValue || data.value).toFixed(2)}
                     </span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[0.70rem] uppercase text-muted-foreground">
-                      Items
-                    </span>
-                    <span className="font-bold">{data.totalItems}</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[0.70rem] uppercase text-muted-foreground">
-                      Low Stock
-                    </span>
-                    <span className="font-bold">{data.lowStock}</span>
                   </div>
                 </div>
               </div>
@@ -127,7 +129,7 @@ export function InventoryChart({ data, type = 'bar' }: InventoryChartProps) {
           }}
         />
         <Bar
-          dataKey="totalValue"
+          dataKey={data[0]?.hasOwnProperty('totalValue') ? 'totalValue' : 'value'}
           fill="currentColor"
           radius={[4, 4, 0, 0]}
           className="fill-primary"

@@ -10,15 +10,21 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import type { InventorySupplier } from "./types";
 
-export function InventorySuppliers() {
+interface InventorySuppliersProps {
+  initialSuppliers?: InventorySupplier[];
+}
+
+export function InventorySuppliers({ initialSuppliers }: InventorySuppliersProps) {
   const { userProfile } = useOrganizationData();
   const [selectedSupplier, setSelectedSupplier] = useState<InventorySupplier | null>(null);
   
   const { suppliers, isLoading, error } = useSuppliers(userProfile?.organization_id);
 
+  const suppliersList = initialSuppliers || suppliers;
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <SupplierErrorBoundary error={error} />;
-  if (!Array.isArray(suppliers)) {
+  if (!Array.isArray(suppliersList)) {
     return (
       <Alert variant="destructive">
         <AlertDescription>Invalid suppliers data</AlertDescription>
@@ -45,7 +51,7 @@ export function InventorySuppliers() {
         </div>
       ) : (
         <SupplierListView
-          suppliers={suppliers}
+          suppliers={suppliersList}
           isLoading={isLoading}
           onSupplierClick={setSelectedSupplier}
         />

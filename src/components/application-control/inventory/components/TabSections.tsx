@@ -1,6 +1,6 @@
 
 import { TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ListTree, Users, Settings, List, History, BarChart3 } from "lucide-react";
+import { ListTree, Users, Settings, List as ListIcon, History, BarChart3 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InventoryOverview } from "../InventoryOverview";
 import { InventoryList } from "../components/inventory-list/InventoryList";
@@ -31,7 +31,7 @@ function Loading() {
   );
 }
 
-function List() {
+function TabList() {
   return (
     <TabsList className="w-full grid grid-cols-6 lg:w-[900px]">
       <TabsTrigger value="overview" className="flex items-center gap-2">
@@ -39,7 +39,7 @@ function List() {
         Overview
       </TabsTrigger>
       <TabsTrigger value="inventory" className="flex items-center gap-2">
-        <List className="h-4 w-4" />
+        <ListIcon className="h-4 w-4" />
         Inventory
       </TabsTrigger>
       <TabsTrigger value="categories" className="flex items-center gap-2">
@@ -94,6 +94,7 @@ function Content({ categories, items, suppliers }: TabContentProps) {
 
 export const TabSections = {
   Loading,
-  List,
+  List: TabList,
   Content,
 };
+

@@ -33,7 +33,7 @@ function Loading() {
 
 function TabList() {
   return (
-    <TabsList className="w-full grid grid-cols-6 lg:w-[900px]">
+    <TabsList>
       <TabsTrigger value="overview" className="flex items-center gap-2">
         <BarChart3 className="h-4 w-4" />
         Overview
@@ -97,4 +97,3 @@ export const TabSections = {
   List: TabList,
   Content,
 };
-

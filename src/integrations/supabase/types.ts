@@ -1579,6 +1579,66 @@ export type Database = {
           },
         ]
       }
+      inventory_notifications: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          current_value: number | null
+          id: string
+          inventory_item_id: string | null
+          message: string
+          metadata: Json | null
+          organization_id: string
+          priority: string | null
+          read_at: string | null
+          status: string | null
+          threshold_value: number | null
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          inventory_item_id?: string | null
+          message: string
+          metadata?: Json | null
+          organization_id: string
+          priority?: string | null
+          read_at?: string | null
+          status?: string | null
+          threshold_value?: number | null
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          current_value?: number | null
+          id?: string
+          inventory_item_id?: string | null
+          message?: string
+          metadata?: Json | null
+          organization_id?: string
+          priority?: string | null
+          read_at?: string | null
+          status?: string | null
+          threshold_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_notifications_inventory_item_id_fkey"
+            columns: ["inventory_item_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_notifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       inventory_suppliers: {
         Row: {
           address: string | null

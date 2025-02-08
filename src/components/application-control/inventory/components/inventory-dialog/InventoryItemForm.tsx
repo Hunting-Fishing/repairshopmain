@@ -1,5 +1,5 @@
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormDescription } from "@/components/ui/form";
@@ -72,7 +72,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
                   <Input 
                     type="number" 
                     {...field}
-                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
                   />
                 </FormControl>
               </FormItem>
@@ -91,7 +91,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
                       type="number" 
                       step="0.01"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </FormControl>
                 </FormItem>
@@ -109,7 +109,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
                       type="number" 
                       step="0.01"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
                       disabled={!useManualPrice}
                     />
                   </FormControl>
@@ -145,7 +145,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
 
           <FormField
             control={form.control}
-            name="vehicle_type"
+            name="status"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Vehicle Type</FormLabel>

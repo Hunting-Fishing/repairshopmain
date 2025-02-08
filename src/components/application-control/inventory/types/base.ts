@@ -5,6 +5,7 @@ import { Database } from "@/integrations/supabase/types";
 export type InventoryCategory = Database["public"]["Tables"]["inventory_categories"]["Row"];
 export type InventoryItem = Database["public"]["Tables"]["inventory_items"]["Row"] & {
   image_url?: string;
+  vehicle_type?: string;
 };
 export type InventorySupplier = Database["public"]["Tables"]["inventory_suppliers"]["Row"];
 
@@ -32,4 +33,5 @@ export interface InventoryItemFormData {
   barcode?: string;
   status?: InventoryItemStatus;
   image_url?: string;
+  vehicle_type?: string;
 }

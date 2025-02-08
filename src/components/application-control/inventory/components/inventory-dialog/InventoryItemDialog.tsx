@@ -18,9 +18,14 @@ export function InventoryItemDialog({
 }: InventoryItemDialogProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[600px] sm:w-[540px]">
+      <SheetContent 
+        className="w-[600px] sm:w-[540px] overflow-y-auto"
+        side="right"
+      >
         <SheetHeader>
-          <SheetTitle>{item ? 'Edit' : 'Add'} Inventory Item</SheetTitle>
+          <SheetTitle className="text-xl font-semibold">
+            {item ? 'Edit' : 'Add'} Inventory Item
+          </SheetTitle>
         </SheetHeader>
         <div className="mt-6">
           <InventoryItemForm 

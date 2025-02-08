@@ -1,5 +1,5 @@
 
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import type { InventoryItemFormData } from "../../../types";
@@ -18,8 +18,18 @@ export function QuantitySection({ form }: QuantitySectionProps) {
           <FormItem>
             <FormLabel>Quantity in Stock</FormLabel>
             <FormControl>
-              <Input type="number" {...field} />
+              <Input 
+                type="number" 
+                min="0"
+                placeholder="Enter quantity"
+                {...field} 
+                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+              />
             </FormControl>
+            <FormDescription>
+              Current stock level
+            </FormDescription>
+            <FormMessage />
           </FormItem>
         )}
       />
@@ -31,8 +41,19 @@ export function QuantitySection({ form }: QuantitySectionProps) {
           <FormItem>
             <FormLabel>Unit Cost</FormLabel>
             <FormControl>
-              <Input type="number" step="0.01" {...field} />
+              <Input 
+                type="number" 
+                step="0.01" 
+                min="0"
+                placeholder="Enter cost"
+                {...field}
+                onChange={(e) => field.onChange(e.target.valueAsNumber)}
+              />
             </FormControl>
+            <FormDescription>
+              Cost per unit (in dollars)
+            </FormDescription>
+            <FormMessage />
           </FormItem>
         )}
       />

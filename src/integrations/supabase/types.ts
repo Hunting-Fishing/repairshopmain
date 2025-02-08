@@ -1388,43 +1388,55 @@ export type Database = {
       }
       inventory_history: {
         Row: {
+          affected_quantity: number | null
+          change_category: string | null
           change_type: string
           created_at: string | null
           created_by: string | null
           id: string
           inventory_item_id: string | null
+          new_quantity: number | null
           new_value: Json | null
           notes: string | null
           old_value: Json | null
           organization_id: string
+          previous_quantity: number | null
           quantity_change: number | null
           reference_id: string | null
           reference_type: string | null
         }
         Insert: {
+          affected_quantity?: number | null
+          change_category?: string | null
           change_type: string
           created_at?: string | null
           created_by?: string | null
           id?: string
           inventory_item_id?: string | null
+          new_quantity?: number | null
           new_value?: Json | null
           notes?: string | null
           old_value?: Json | null
           organization_id: string
+          previous_quantity?: number | null
           quantity_change?: number | null
           reference_id?: string | null
           reference_type?: string | null
         }
         Update: {
+          affected_quantity?: number | null
+          change_category?: string | null
           change_type?: string
           created_at?: string | null
           created_by?: string | null
           id?: string
           inventory_item_id?: string | null
+          new_quantity?: number | null
           new_value?: Json | null
           notes?: string | null
           old_value?: Json | null
           organization_id?: string
+          previous_quantity?: number | null
           quantity_change?: number | null
           reference_id?: string | null
           reference_type?: string | null

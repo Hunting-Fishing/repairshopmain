@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInventoryFormSubmit } from "../../hooks/useInventoryFormSubmit";
 import { inventoryItemSchema, type InventoryFormSchema } from "./form-sections/validation";
 import type { InventoryItem } from "../../types/base";
@@ -13,7 +14,7 @@ import { InventoryDetailsSection } from "./form-sections/InventoryDetailsSection
 import { PricingSection } from "./form-sections/PricingSection";
 import { AdditionalInformationSection } from "./form-sections/AdditionalInformationSection";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Save, X, PackageOpen } from "lucide-react";
+import { Loader2, Save, X, PackageOpen, ScanLine, Microscope, DollarSign, Info } from "lucide-react";
 
 interface InventoryFormProps {
   item?: InventoryItem;
@@ -59,37 +60,74 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full flex flex-col">
-        <ScrollArea className="flex-1">
-          <div className="space-y-8 p-6">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-md bg-primary/10">
-                    <PackageOpen className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-semibold tracking-tight">
-                      {item ? 'Edit' : 'Add'} Inventory Item
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      Fill in the details below to {item ? 'update' : 'create'} an inventory item.
-                    </p>
-                  </div>
-                </div>
+        <div className="p-6 space-y-6 flex-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-md bg-primary/10">
+                <PackageOpen className="h-6 w-6 text-primary" />
               </div>
-
-              <Separator className="my-6" />
-
-              <div className="space-y-6">
-                <BasicInformationSection form={form} />
-                <ProductIdentificationSection form={form} />
-                <InventoryDetailsSection form={form} />
-                <PricingSection form={form} />
-                <AdditionalInformationSection form={form} />
+              <div>
+                <h2 className="text-2xl font-semibold tracking-tight">
+                  {item ? 'Edit' : 'Add'} Inventory Item
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Fill in the details below to {item ? 'update' : 'create'} an inventory item.
+                </p>
               </div>
             </div>
           </div>
-        </ScrollArea>
+
+          <Separator className="my-6" />
+
+          <ScrollArea className="h-[calc(100vh-280px)]">
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="w-full justify-start mb-6 bg-background/50 p-1 backdrop-blur-sm">
+                <TabsTrigger value="basic" className="flex items-center gap-2">
+                  <PackageOpen className="h-4 w-4" />
+                  Basic Info
+                </TabsTrigger>
+                <TabsTrigger value="identification" className="flex items-center gap-2">
+                  <ScanLine className="h-4 w-4" />
+                  Identification
+                </TabsTrigger>
+                <TabsTrigger value="details" className="flex items-center gap-2">
+                  <Microscope className="h-4 w-4" />
+                  Details
+                </TabsTrigger>
+                <TabsTrigger value="pricing" className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4" />
+                  Pricing
+                </TabsTrigger>
+                <TabsTrigger value="additional" className="flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  Additional
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="space-y-6 px-1">
+                <TabsContent value="basic" className="mt-0">
+                  <BasicInformationSection form={form} />
+                </TabsContent>
+
+                <TabsContent value="identification" className="mt-0">
+                  <ProductIdentificationSection form={form} />
+                </TabsContent>
+
+                <TabsContent value="details" className="mt-0">
+                  <InventoryDetailsSection form={form} />
+                </TabsContent>
+
+                <TabsContent value="pricing" className="mt-0">
+                  <PricingSection form={form} />
+                </TabsContent>
+
+                <TabsContent value="additional" className="mt-0">
+                  <AdditionalInformationSection form={form} />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </ScrollArea>
+        </div>
         
         <div className="border-t bg-muted/50 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 flex justify-end space-x-4">
           <Button 
@@ -123,3 +161,4 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
     </Form>
   );
 }
+

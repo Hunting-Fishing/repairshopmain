@@ -1,7 +1,7 @@
 
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { UseFormReturn } from "react-hook-form";
 import { Barcode, QrCode, ScanLine } from "lucide-react";
 import type { InventoryFormSchema } from "./validation";
@@ -13,13 +13,7 @@ interface ProductIdentificationSectionProps {
 export function ProductIdentificationSection({ form }: ProductIdentificationSectionProps) {
   return (
     <Card className="border border-border/40 bg-gradient-to-br from-card to-card/95 shadow-sm">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <ScanLine className="h-5 w-5 text-primary" />
-          Product Identification
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-6">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -27,7 +21,7 @@ export function ProductIdentificationSection({ form }: ProductIdentificationSect
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-2">
-                  <QrCode className="h-4 w-4 text-muted-foreground" />
+                  <QrCode className="h-4 w-4 text-primary" />
                   SKU
                 </FormLabel>
                 <FormControl>
@@ -43,7 +37,7 @@ export function ProductIdentificationSection({ form }: ProductIdentificationSect
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="flex items-center gap-2">
-                  <Barcode className="h-4 w-4 text-muted-foreground" />
+                  <Barcode className="h-4 w-4 text-primary" />
                   Barcode
                 </FormLabel>
                 <FormControl>
@@ -60,7 +54,7 @@ export function ProductIdentificationSection({ form }: ProductIdentificationSect
           render={({ field }) => (
             <FormItem>
               <FormLabel className="flex items-center gap-2">
-                <ScanLine className="h-4 w-4 text-muted-foreground" />
+                <ScanLine className="h-4 w-4 text-primary" />
                 UPC/EAN
               </FormLabel>
               <FormControl>

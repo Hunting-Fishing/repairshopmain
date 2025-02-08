@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -63,11 +62,11 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
         <div className="p-6 space-y-6 flex-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-md bg-primary/10">
+              <div className="p-3 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm">
                 <PackageOpen className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h2 className="text-2xl font-semibold tracking-tight">
+                <h2 className="text-2xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
                   {item ? 'Edit' : 'Add'} Inventory Item
                 </h2>
                 <p className="text-sm text-muted-foreground">
@@ -81,47 +80,47 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
 
           <ScrollArea className="h-[calc(100vh-280px)]">
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="w-full justify-start mb-6 bg-background/50 p-1 backdrop-blur-sm">
-                <TabsTrigger value="basic" className="flex items-center gap-2">
+              <TabsList className="w-full justify-start mb-6 bg-background/50 p-1.5 backdrop-blur-sm rounded-lg border border-border/40">
+                <TabsTrigger value="basic" className="flex items-center gap-2 data-[state=active]:bg-primary/10">
                   <PackageOpen className="h-4 w-4" />
                   Basic Info
                 </TabsTrigger>
-                <TabsTrigger value="identification" className="flex items-center gap-2">
+                <TabsTrigger value="identification" className="flex items-center gap-2 data-[state=active]:bg-primary/10">
                   <ScanLine className="h-4 w-4" />
                   Identification
                 </TabsTrigger>
-                <TabsTrigger value="details" className="flex items-center gap-2">
+                <TabsTrigger value="details" className="flex items-center gap-2 data-[state=active]:bg-primary/10">
                   <Microscope className="h-4 w-4" />
                   Details
                 </TabsTrigger>
-                <TabsTrigger value="pricing" className="flex items-center gap-2">
+                <TabsTrigger value="pricing" className="flex items-center gap-2 data-[state=active]:bg-primary/10">
                   <DollarSign className="h-4 w-4" />
                   Pricing
                 </TabsTrigger>
-                <TabsTrigger value="additional" className="flex items-center gap-2">
+                <TabsTrigger value="additional" className="flex items-center gap-2 data-[state=active]:bg-primary/10">
                   <Info className="h-4 w-4" />
                   Additional
                 </TabsTrigger>
               </TabsList>
 
               <div className="space-y-6 px-1">
-                <TabsContent value="basic" className="mt-0">
+                <TabsContent value="basic" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
                   <BasicInformationSection form={form} />
                 </TabsContent>
 
-                <TabsContent value="identification" className="mt-0">
+                <TabsContent value="identification" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
                   <ProductIdentificationSection form={form} />
                 </TabsContent>
 
-                <TabsContent value="details" className="mt-0">
+                <TabsContent value="details" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
                   <InventoryDetailsSection form={form} />
                 </TabsContent>
 
-                <TabsContent value="pricing" className="mt-0">
+                <TabsContent value="pricing" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
                   <PricingSection form={form} />
                 </TabsContent>
 
-                <TabsContent value="additional" className="mt-0">
+                <TabsContent value="additional" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
                   <AdditionalInformationSection form={form} />
                 </TabsContent>
               </div>
@@ -129,12 +128,12 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
           </ScrollArea>
         </div>
         
-        <div className="border-t bg-muted/50 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 flex justify-end space-x-4">
+        <div className="border-t bg-gradient-to-b from-background/50 to-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 flex justify-end space-x-4">
           <Button 
             variant="outline" 
             type="button" 
             onClick={onCancel}
-            className="min-w-[100px]"
+            className="min-w-[100px] border-border/40 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors"
           >
             <X className="w-4 h-4 mr-2" />
             Cancel
@@ -142,7 +141,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            className="min-w-[100px] bg-primary hover:bg-primary/90"
+            className="min-w-[100px] bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200"
           >
             {isSubmitting ? (
               <>
@@ -161,4 +160,3 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
     </Form>
   );
 }
-

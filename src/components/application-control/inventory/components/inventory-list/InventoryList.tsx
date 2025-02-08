@@ -22,7 +22,11 @@ import { useToast } from "@/hooks/use-toast";
 import { InventoryItemDetails } from "../item-details/InventoryItemDetails";
 
 interface InventoryListProps {
-  items: InventoryItem[];
+  items: (InventoryItem & {
+    category?: {
+      name: string;
+    } | null;
+  })[];
 }
 
 export function InventoryList({ items }: InventoryListProps) {

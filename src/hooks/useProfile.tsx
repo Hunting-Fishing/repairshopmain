@@ -22,7 +22,27 @@ export function useProfile(userId: string | undefined) {
           theme_preference,
           organization_id,
           status,
-          custom_role_id
+          custom_role_id,
+          created_at,
+          updated_at,
+          calendar_settings,
+          technician_settings,
+          schedule,
+          hire_date,
+          notes,
+          invitation_token,
+          invitation_sent_at,
+          street_address,
+          city,
+          state_province,
+          postal_code,
+          country,
+          phone_number,
+          emergency_contact,
+          preferred_working_hours,
+          certifications,
+          color_preferences,
+          skills
         `)
         .eq('id', userId)
         .single();

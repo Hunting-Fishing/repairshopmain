@@ -39,13 +39,23 @@ export interface SortState {
   priority?: number;
 }
 
+// Remove the index signature and explicitly define all possible properties
 export interface FilterState {
-  [key: string]: string | number | boolean | null | Array<string | number>;
   search?: string;
   dateRange?: {
     start: string;
     end: string;
   };
+  status?: string;
+  category?: string;
+  type?: string;
+  priority?: number;
+  tags?: string[];
+  assignedTo?: string;
+  createdBy?: string;
+  labels?: string[];
+  isActive?: boolean;
+  customFilters?: Record<string, string | number | boolean | (string | number)[]>;
 }
 
 export interface ViewState {
@@ -95,3 +105,4 @@ export interface Timestamps {
   updated_at: string;
   deleted_at?: string;
 }
+

@@ -1157,6 +1157,7 @@ export type Database = {
           enabled_stats: string[] | null
           id: string
           layout_config: Json | null
+          stats_order: Json | null
           updated_at: string
           user_id: string
         }
@@ -1165,6 +1166,7 @@ export type Database = {
           enabled_stats?: string[] | null
           id?: string
           layout_config?: Json | null
+          stats_order?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -1173,6 +1175,7 @@ export type Database = {
           enabled_stats?: string[] | null
           id?: string
           layout_config?: Json | null
+          stats_order?: Json | null
           updated_at?: string
           user_id?: string
         }

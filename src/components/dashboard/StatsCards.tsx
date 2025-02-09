@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   ClipboardList, 
@@ -12,6 +11,8 @@ import {
 import { useStatsQuery } from "./hooks/useStatsQuery";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 interface StatsCardsProps {
   isModernTheme?: boolean;
@@ -45,6 +46,21 @@ const formatTitle = (type: string): string => {
 
 export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
   const { data: stats, isLoading, error } = useStatsQuery();
+  const { data: settings } = useQuery({
+    queryKey: ['dashboard-stats-config'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data } = await supabase
+        .from('dashboard_settings')
+        .select('stats_order')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      return data;
+    }
+  });
 
   if (error) {
     return (
@@ -72,9 +88,15 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
     );
   }
 
+  const sortedStats = stats?.sort((a, b) => {
+    const aOrder = settings?.stats_order?.find(item => item.id === a.type)?.order || 0;
+    const bOrder = settings?.stats_order?.find(item => item.id === b.type)?.order || 0;
+    return aOrder - bOrder;
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      {stats?.map((stat) => {
+      {sortedStats?.map((stat, index) => {
         const Icon = statIcons[stat.type as keyof typeof statIcons];
         
         return (
@@ -95,7 +117,7 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
                     ? "text-gray-600 dark:text-gray-300" 
                     : "text-white/90"
                 )}>
-                  {formatTitle(stat.type)}
+                  Card {index + 1} - {formatTitle(stat.type)}
                 </CardTitle>
                 {Icon && (
                   <Icon className={cn(

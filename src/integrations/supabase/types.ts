@@ -2239,6 +2239,7 @@ export type Database = {
           country: string | null
           created_at: string
           custom_role_id: string | null
+          dashboard_preferences: Json | null
           emergency_contact: Json | null
           first_name: string | null
           hire_date: string | null
@@ -2269,6 +2270,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           custom_role_id?: string | null
+          dashboard_preferences?: Json | null
           emergency_contact?: Json | null
           first_name?: string | null
           hire_date?: string | null
@@ -2299,6 +2301,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           custom_role_id?: string | null
+          dashboard_preferences?: Json | null
           emergency_contact?: Json | null
           first_name?: string | null
           hire_date?: string | null

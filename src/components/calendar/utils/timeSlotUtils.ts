@@ -26,14 +26,19 @@ async function fetchCalendarSettings(): Promise<CalendarSettings> {
     const { data: settings, error } = await supabase
       .from('calendar_settings')
       .select('*')
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Error fetching calendar settings:', error);
       return DEFAULT_SETTINGS;
     }
 
-    return settings || DEFAULT_SETTINGS;
+    // If no settings found, return defaults
+    if (!settings) {
+      return DEFAULT_SETTINGS;
+    }
+
+    return settings;
   } catch (error) {
     console.error('Error fetching calendar settings:', error);
     return DEFAULT_SETTINGS;

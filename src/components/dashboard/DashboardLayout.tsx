@@ -73,9 +73,11 @@ export function DashboardLayout() {
 
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen animate-fade-in bg-gradient-to-br from-background/80 via-background/50 to-background/90 p-4 md:p-6 ${
-        isModernTheme ? 'text-blue-900' : ''
-      }`}>
+      <div className={`min-h-screen animate-fade-in bg-gradient-to-br ${
+        isModernTheme 
+          ? 'from-blue-50 via-white to-blue-50'
+          : 'from-background/80 via-background/50 to-background/90'
+      } p-4 md:p-6`}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
             <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
@@ -86,9 +88,11 @@ export function DashboardLayout() {
           <StatsCards isModernTheme={isModernTheme} />
         </div>
 
-        <div className={`rounded-xl bg-white/30 backdrop-blur-lg shadow-xl border border-white/20 p-6 ${
-          isModernTheme ? 'bg-gradient-to-br from-white/80 via-blue-50/30 to-blue-100/20' : ''
-        }`}>
+        <div className={`rounded-xl ${
+          isModernTheme 
+            ? 'bg-white/80 backdrop-blur-lg shadow-lg border border-blue-100/50'
+            : 'bg-white/30 backdrop-blur-lg shadow-xl border border-white/20'
+        } p-6`}>
           <Tabs 
             value={viewMode} 
             onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}

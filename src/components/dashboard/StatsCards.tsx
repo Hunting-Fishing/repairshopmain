@@ -31,14 +31,6 @@ const statIcons = {
   customer_satisfaction: Star,
 };
 
-const statGradients = {
-  total_work_orders: "from-blue-500 to-purple-600",
-  active_customers: "from-green-500 to-teal-600",
-  pending_jobs: "from-amber-500 to-orange-600",
-  average_service_time: "from-pink-500 to-rose-600",
-  customer_satisfaction: "from-violet-500 to-purple-600",
-};
-
 const formatValue = (type: string, value: number): string => {
   switch (type) {
     case 'average_service_time':
@@ -92,15 +84,18 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
       {stats?.map((stat) => {
         const Icon = statIcons[stat.type as keyof typeof statIcons];
-        const gradient = statGradients[stat.type as keyof typeof statGradients];
         
         return (
           <Card 
             key={stat.type} 
             className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
               isModernTheme 
-                ? 'bg-gradient-to-br from-white/80 via-white/60 to-white/40 backdrop-blur-lg border border-white/20 shadow-xl hover:shadow-2xl'
-                : 'bg-gradient-to-br ' + gradient + ' text-white'
+                ? 'bg-white/80 backdrop-blur-lg border border-blue-100/50 shadow-lg hover:shadow-xl'
+                : `bg-gradient-to-br from-${stat.type === 'total_work_orders' ? 'blue-500 to-purple-600' : 
+                    stat.type === 'active_customers' ? 'green-500 to-teal-600' :
+                    stat.type === 'pending_jobs' ? 'amber-500 to-orange-600' :
+                    stat.type === 'average_service_time' ? 'pink-500 to-rose-600' :
+                    'violet-500 to-purple-600'} text-white`
             }`}
           >
             <CardHeader className="pb-2">
@@ -118,7 +113,7 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
             <CardContent>
               <div className={`text-2xl font-bold mb-1 ${
                 isModernTheme 
-                  ? 'bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent'
+                  ? 'bg-gradient-to-br from-blue-600 to-blue-800 bg-clip-text text-transparent'
                   : 'text-white'
               }`}>
                 {formatValue(stat.type, stat.value)}

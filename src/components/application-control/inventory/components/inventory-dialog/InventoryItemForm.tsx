@@ -74,7 +74,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full flex flex-col">
-        <div className="flex-1 bg-white dark:bg-gray-900 rounded-lg shadow-xl">
+        <div className="flex-1 bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-900/95 dark:to-gray-900/90 rounded-lg shadow-xl">
           <div className="p-6 space-y-6">
             <FormHeader 
               isEdit={!!item} 
@@ -90,31 +90,31 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
 
                 <div className="space-y-6">
                   <TabsContent value="basic" className="mt-0 space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-md">
                       <BasicInformationSection form={form} />
                     </div>
                   </TabsContent>
 
                   <TabsContent value="identification" className="mt-0 space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-md">
                       <ProductIdentificationSection form={form} />
                     </div>
                   </TabsContent>
 
                   <TabsContent value="details" className="mt-0 space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-md">
                       <InventoryDetailsSection form={form} />
                     </div>
                   </TabsContent>
 
                   <TabsContent value="pricing" className="mt-0 space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-md">
                       <PricingSection form={form} />
                     </div>
                   </TabsContent>
 
                   <TabsContent value="additional" className="mt-0 space-y-4 focus-visible:outline-none focus-visible:ring-0">
-                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200 hover:shadow-md">
                       <AdditionalInformationSection form={form} />
                     </div>
                   </TabsContent>

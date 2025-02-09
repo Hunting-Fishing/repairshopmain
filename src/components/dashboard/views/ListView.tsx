@@ -1,18 +1,15 @@
 
 import { Card } from "@/components/ui/card";
 import { StatsCards } from "../StatsCards";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { DataTable } from "../components/DataTable";
 import { columns } from "../components/table/columns";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useViewState } from "@/hooks/useViewState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useAppointments } from "@/hooks/useAppointments";
 
 export function ListView() {
   const {
@@ -27,23 +24,12 @@ export function ListView() {
     sort_preferences: { field = "created_at", direction = "desc" }
   } = viewState;
 
-  const { data: appointments, isLoading, error } = useQuery({
-    queryKey: ["appointments", searchQuery, currentPage, itemsPerPage, field, direction],
-    queryFn: async () => {
-      const query = supabase
-        .from("bookings")
-        .select("*, profiles(first_name, last_name)")
-        .order(field, { ascending: direction === "asc" })
-        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
-
-      if (searchQuery) {
-        query.textSearch("customer_name", searchQuery);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    },
+  const { data: appointments, isLoading, error } = useAppointments({
+    searchQuery,
+    currentPage,
+    itemsPerPage,
+    sortField: field,
+    sortDirection: direction
   });
 
   const handleSearchChange = (value: string) => {

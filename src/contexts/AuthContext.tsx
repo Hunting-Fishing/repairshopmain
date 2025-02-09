@@ -28,7 +28,8 @@ interface SignUpData {
   country: string;
 }
 
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+// Export the context so it can be imported elsewhere
+export const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);

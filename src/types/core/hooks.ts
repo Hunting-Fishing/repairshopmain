@@ -1,5 +1,5 @@
 
-import type { BaseError, QueryResult } from './index';
+import type { BaseError, QueryResult, PaginationState, SortState, FilterState } from './index';
 
 export interface UseQueryOptions<T> {
   onSuccess?: (data: T) => void;
@@ -41,3 +41,4 @@ export interface UseFilterState {
   removeFilter: (key: string) => void;
   clearFilters: () => void;
 }
+

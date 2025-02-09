@@ -8,11 +8,13 @@ import { columns } from "../components/table/columns";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function ListView() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: appointments, isLoading } = useQuery({
+  const { data: appointments, isLoading, error } = useQuery({
     queryKey: ["appointments", searchQuery],
     queryFn: async () => {
       const query = supabase
@@ -29,6 +31,16 @@ export function ListView() {
       return data;
     },
   });
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
+        <AlertDescription>Failed to load appointments: {error.message}</AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -26,6 +26,14 @@ export function DataTable({ columns, data, isLoading }: DataTableProps) {
     );
   }
 
+  if (data.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        No appointments found
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-md border">
       <Table>

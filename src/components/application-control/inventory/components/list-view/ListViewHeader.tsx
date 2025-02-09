@@ -1,7 +1,6 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { InventorySort } from "../InventorySort";
-import type { InventoryItem } from "../../types";
 
 interface ListViewHeaderProps {
   allSelected: boolean;

@@ -4,6 +4,7 @@ import { AlertCircle } from "lucide-react";
 import { InventoryListHeader } from "../InventoryListHeader";
 import { VirtualizedList } from "./VirtualizedList";
 import { InventoryPagination } from "../InventoryPagination";
+import { ListViewHeader } from "./ListViewHeader";
 import type { InventoryItem } from "../../types";
 
 interface InventoryListCoreProps {
@@ -11,7 +12,11 @@ interface InventoryListCoreProps {
   totalPages: number;
   currentPage: number;
   selectedItems: string[];
+  sortField: 'name' | 'quantity_in_stock' | 'unit_cost';
+  sortOrder: 'asc' | 'desc';
   onSelectItem: (itemId: string, selected: boolean) => void;
+  onSelectAll: (selected: boolean) => void;
+  onSort: (field: 'name' | 'quantity_in_stock' | 'unit_cost') => void;
   onPageChange: (page: number) => void;
   onEditItem: (item: InventoryItem) => void;
 }
@@ -21,7 +26,11 @@ export function InventoryListCore({
   totalPages,
   currentPage,
   selectedItems,
+  sortField,
+  sortOrder,
   onSelectItem,
+  onSelectAll,
+  onSort,
   onPageChange,
   onEditItem,
 }: InventoryListCoreProps) {
@@ -34,8 +43,20 @@ export function InventoryListCore({
     );
   }
 
+  const allSelected = items.length > 0 && selectedItems.length === items.length;
+  const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
+
   return (
     <div className="space-y-4">
+      <ListViewHeader
+        allSelected={allSelected}
+        someSelected={someSelected}
+        selectedCount={selectedItems.length}
+        sortField={sortField}
+        sortOrder={sortOrder}
+        onSelectAll={onSelectAll}
+        onSort={onSort}
+      />
       <VirtualizedList
         items={items}
         selectedItems={selectedItems}

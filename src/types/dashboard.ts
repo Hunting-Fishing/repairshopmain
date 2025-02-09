@@ -12,6 +12,9 @@ export interface ViewState {
     itemsPerPage: number;
     currentPage: number;
   };
+  isCalendarExpanded?: boolean;
+  viewMode?: 'calendar' | 'grid' | 'list';
+  defaultView?: 'day' | 'week' | 'month';
 }
 
 export interface AppointmentFilters {
@@ -27,3 +30,4 @@ export interface SortConfig {
   field: string;
   direction: 'asc' | 'desc';
 }
+

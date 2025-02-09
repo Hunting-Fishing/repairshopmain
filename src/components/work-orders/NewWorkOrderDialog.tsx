@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -32,6 +33,23 @@ export function NewWorkOrderDialog() {
   const { toast } = useToast();
   const { user } = useAuth();
   
+  // Fetch user's organization_id
+  const { data: profile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id
+  });
+
   const form = useForm<WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
     defaultValues: {
@@ -47,6 +65,10 @@ export function NewWorkOrderDialog() {
         throw new Error("User not authenticated");
       }
 
+      if (!profile?.organization_id) {
+        throw new Error("Organization not found");
+      }
+
       const { error } = await supabase
         .from('customer_repair_jobs')
         .insert({
@@ -56,6 +78,7 @@ export function NewWorkOrderDialog() {
           job_type: data.jobTemplate || 'general',
           created_by: user.id,
           updated_by: user.id,
+          organization_id: profile.organization_id,
           status: 'quoted'
         });
 

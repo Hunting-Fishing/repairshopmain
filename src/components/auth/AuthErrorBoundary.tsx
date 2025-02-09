@@ -48,3 +48,4 @@ export class AuthErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+

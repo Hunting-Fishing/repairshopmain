@@ -28,3 +28,4 @@ export function useProfile(userId: string | undefined) {
     gcTime: 1000 * 60 * 30, // 30 minutes
   });
 }
+

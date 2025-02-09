@@ -73,7 +73,7 @@ export function DashboardLayout() {
 
   return (
     <ErrorBoundary>
-      <div className={`space-y-6 animate-fade-in p-4 md:p-6 ${
+      <div className={`min-h-screen animate-fade-in bg-gradient-to-br from-background/80 via-background/50 to-background/90 p-4 md:p-6 ${
         isModernTheme ? 'text-blue-900' : ''
       }`}>
         <div className="flex items-center justify-between mb-6">
@@ -82,44 +82,48 @@ export function DashboardLayout() {
           </div>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-8">
           <StatsCards isModernTheme={isModernTheme} />
         </div>
 
-        <Tabs 
-          value={viewMode} 
-          onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
-          className={`${isModernTheme ? 'bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-blue-100/50' : ''}`}
-        >
-          <TabsContent value="calendar" className="mt-0">
-            <CalendarView
-              selectedDate={selectedDate}
-              view={view}
-              bookings={bookings || []}
-              isLoading={isLoading}
-              isCalendarExpanded={isCalendarExpanded}
-              onDateChange={(date) => date && setSelectedDate(date)}
-              onViewChange={setView}
-              onTimeSlotClick={handleTimeSlotClick}
-              toggleCalendarSize={toggleCalendarSize}
-              colorPreferences={{
-                primary_color: isModernTheme ? "#0EA5E9" : "#F97316",
-                secondary_color: isModernTheme ? "#EFF6FF" : "#FDE1D3",
-                border_color: isModernTheme ? "#0EA5E9" : "#F97316",
-                background_color: "bg-background/95"
-              }}
-              isModernTheme={isModernTheme}
-            />
-          </TabsContent>
+        <div className={`rounded-xl bg-white/30 backdrop-blur-lg shadow-xl border border-white/20 p-6 ${
+          isModernTheme ? 'bg-gradient-to-br from-white/80 via-blue-50/30 to-blue-100/20' : ''
+        }`}>
+          <Tabs 
+            value={viewMode} 
+            onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
+            className="space-y-6"
+          >
+            <TabsContent value="calendar" className="mt-0">
+              <CalendarView
+                selectedDate={selectedDate}
+                view={view}
+                bookings={bookings || []}
+                isLoading={isLoading}
+                isCalendarExpanded={isCalendarExpanded}
+                onDateChange={(date) => date && setSelectedDate(date)}
+                onViewChange={setView}
+                onTimeSlotClick={handleTimeSlotClick}
+                toggleCalendarSize={toggleCalendarSize}
+                colorPreferences={{
+                  primary_color: isModernTheme ? "#0EA5E9" : "#F97316",
+                  secondary_color: isModernTheme ? "#EFF6FF" : "#FDE1D3",
+                  border_color: isModernTheme ? "#0EA5E9" : "#F97316",
+                  background_color: "bg-background/95"
+                }}
+                isModernTheme={isModernTheme}
+              />
+            </TabsContent>
 
-          <TabsContent value="grid" className="mt-0">
-            <GridView />
-          </TabsContent>
+            <TabsContent value="grid" className="mt-0">
+              <GridView />
+            </TabsContent>
 
-          <TabsContent value="list" className="mt-0">
-            <ListView />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="list" className="mt-0">
+              <ListView />
+            </TabsContent>
+          </Tabs>
+        </div>
 
         <BookingDialog
           open={isBookingDialogOpen}

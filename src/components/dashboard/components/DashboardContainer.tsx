@@ -10,13 +10,15 @@ export function DashboardContainer({ children, isModernTheme }: DashboardContain
   return (
     <div 
       className={cn(
-        "min-h-screen animate-fade-in bg-gradient-to-br p-4 md:p-6",
+        "min-h-screen animate-fade-in p-4 md:p-6 lg:p-8",
         isModernTheme 
-          ? "from-blue-50 via-white to-blue-50 dark:from-background/80 dark:via-background/50 dark:to-background/90"
-          : "from-background/80 via-background/50 to-background/90"
+          ? "bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900/50 dark:to-gray-900/80"
+          : "bg-gradient-to-br from-gray-100 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
       )}
     >
-      {children}
+      <div className="max-w-7xl mx-auto">
+        {children}
+      </div>
     </div>
   );
 }

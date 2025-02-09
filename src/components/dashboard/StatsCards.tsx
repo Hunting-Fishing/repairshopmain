@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useStatsQuery } from "./hooks/useStatsQuery";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface StatsCardsProps {
   isModernTheme?: boolean;
@@ -46,9 +47,8 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
   const { data: stats, isLoading, error } = useStatsQuery();
 
   if (error) {
-    console.error('Error fetching stats:', error);
     return (
-      <div className="text-red-500 p-4 rounded-lg bg-red-50">
+      <div className="text-red-500 p-4 rounded-lg bg-red-50 dark:bg-red-900/10">
         Failed to load statistics. Please try again later.
       </div>
     );
@@ -60,11 +60,11 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
         {[...Array(5)].map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader className="pb-2">
-              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
             </CardHeader>
             <CardContent>
-              <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
             </CardContent>
           </Card>
         ))}
@@ -80,58 +80,71 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
         return (
           <Card 
             key={stat.type} 
-            className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
+            className={cn(
+              "relative overflow-hidden transition-all duration-300 hover:scale-105",
               isModernTheme 
-                ? 'bg-white/80 backdrop-blur-lg border border-blue-100/50 shadow-lg hover:shadow-xl'
-                : `bg-gradient-to-br from-${stat.type === 'total_work_orders' ? 'blue-500 to-purple-600' : 
-                    stat.type === 'active_customers' ? 'green-500 to-teal-600' :
-                    stat.type === 'pending_jobs' ? 'amber-500 to-orange-600' :
-                    stat.type === 'average_service_time' ? 'pink-500 to-rose-600' :
-                    'violet-500 to-purple-600'} text-white`
-            }`}
+                ? "bg-white/80 dark:bg-gray-900/50 backdrop-blur-lg border border-blue-100/50 dark:border-blue-900/50 shadow-lg hover:shadow-xl"
+                : "bg-gradient-to-br from-blue-500/90 to-blue-600/90 dark:from-blue-600/90 dark:to-blue-700/90 text-white"
+            )}
           >
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
-                <CardTitle className={`text-sm font-medium ${
-                  isModernTheme ? 'text-gray-700' : 'text-white/90'
-                }`}>
+                <CardTitle className={cn(
+                  "text-sm font-medium",
+                  isModernTheme 
+                    ? "text-gray-700 dark:text-gray-200" 
+                    : "text-white/90"
+                )}>
                   {formatTitle(stat.type)}
                 </CardTitle>
                 {Icon && (
-                  <Icon className={`h-5 w-5 ${
-                    isModernTheme ? 'text-blue-500' : 'text-white/90'
-                  }`} />
+                  <Icon className={cn(
+                    "h-5 w-5",
+                    isModernTheme 
+                      ? "text-blue-500 dark:text-blue-400" 
+                      : "text-white/90"
+                  )} />
                 )}
               </div>
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold mb-1 ${
+              <div className={cn(
+                "text-2xl font-bold mb-1",
                 isModernTheme 
-                  ? 'bg-gradient-to-br from-blue-600 to-blue-800 bg-clip-text text-transparent'
-                  : 'text-white'
-              }`}>
+                  ? "bg-gradient-to-br from-blue-600 to-blue-800 dark:from-blue-400 dark:to-blue-600 bg-clip-text text-transparent"
+                  : "text-white"
+              )}>
                 {formatValue(stat.type, stat.value)}
               </div>
               <div className="flex items-center text-xs">
                 {stat.trend_direction ? (
-                  <TrendingUp className={`h-3 w-3 ${
+                  <TrendingUp className={cn(
+                    "h-3 w-3 mr-1",
                     isModernTheme 
-                      ? 'text-green-500'
-                      : 'text-white/90'
-                  } mr-1`} />
+                      ? "text-green-500 dark:text-green-400"
+                      : "text-white/90"
+                  )} />
                 ) : (
-                  <TrendingDown className={`h-3 w-3 ${
+                  <TrendingDown className={cn(
+                    "h-3 w-3 mr-1",
                     isModernTheme 
-                      ? 'text-red-500'
-                      : 'text-white/90'
-                  } mr-1`} />
+                      ? "text-red-500 dark:text-red-400"
+                      : "text-white/90"
+                  )} />
                 )}
-                <span className={stat.trend_direction ? 'text-green-500' : 'text-red-500'}>
+                <span className={cn(
+                  stat.trend_direction 
+                    ? "text-green-500 dark:text-green-400" 
+                    : "text-red-500 dark:text-red-400"
+                )}>
                   {stat.trend_direction ? '+' : ''}{stat.trend}%
                 </span>
-                <span className={`ml-1 ${
-                  isModernTheme ? 'text-gray-500' : 'text-white/75'
-                }`}>
+                <span className={cn(
+                  "ml-1",
+                  isModernTheme 
+                    ? "text-gray-500 dark:text-gray-400" 
+                    : "text-white/75"
+                )}>
                   from last month
                 </span>
               </div>

@@ -2996,6 +2996,36 @@ export type Database = {
           },
         ]
       }
+      stats: {
+        Row: {
+          created_at: string | null
+          id: string
+          trend: number | null
+          trend_direction: boolean | null
+          type: string
+          updated_at: string | null
+          value: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          trend?: number | null
+          trend_direction?: boolean | null
+          type: string
+          updated_at?: string | null
+          value: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          trend?: number | null
+          trend_direction?: boolean | null
+          type?: string
+          updated_at?: string | null
+          value?: number
+        }
+        Relationships: []
+      }
       supplier_analytics: {
         Row: {
           average_delivery_time: number | null

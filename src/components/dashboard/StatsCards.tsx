@@ -9,112 +9,147 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StatsCardsProps {
   isModernTheme?: boolean;
 }
 
-const stats = [
-  {
-    title: "Total Work Orders",
-    value: "156",
-    icon: ClipboardList,
-    trend: "+12%",
-    trendUp: true,
-    gradient: "from-blue-500 to-purple-600",
-  },
-  {
-    title: "Active Customers",
-    value: "89",
-    icon: Users,
-    trend: "+4%",
-    trendUp: true,
-    gradient: "from-green-500 to-teal-600",
-  },
-  {
-    title: "Pending Jobs",
-    value: "24",
-    icon: Wrench,
-    trend: "-2%",
-    trendUp: false,
-    gradient: "from-amber-500 to-orange-600",
-  },
-  {
-    title: "Average Service Time",
-    value: "2.5 hrs",
-    icon: Clock,
-    trend: "-5%",
-    trendUp: true,
-    gradient: "from-pink-500 to-rose-600",
-  },
-  {
-    title: "Customer Satisfaction",
-    value: "4.8/5",
-    icon: Star,
-    trend: "+2%",
-    trendUp: true,
-    gradient: "from-violet-500 to-purple-600",
+interface StatData {
+  type: string;
+  value: number;
+  trend: number;
+  trend_direction: boolean;
+}
+
+const statIcons = {
+  total_work_orders: ClipboardList,
+  active_customers: Users,
+  pending_jobs: Wrench,
+  average_service_time: Clock,
+  customer_satisfaction: Star,
+};
+
+const statGradients = {
+  total_work_orders: "from-blue-500 to-purple-600",
+  active_customers: "from-green-500 to-teal-600",
+  pending_jobs: "from-amber-500 to-orange-600",
+  average_service_time: "from-pink-500 to-rose-600",
+  customer_satisfaction: "from-violet-500 to-purple-600",
+};
+
+const formatValue = (type: string, value: number): string => {
+  switch (type) {
+    case 'average_service_time':
+      return `${value} hrs`;
+    case 'customer_satisfaction':
+      return `${value}/5`;
+    default:
+      return value.toString();
   }
-];
+};
+
+const formatTitle = (type: string): string => {
+  return type
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
 
 export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('stats')
+        .select('*');
+      
+      if (error) throw error;
+      return data as StatData[];
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        {[...Array(5)].map((_, i) => (
+          <Card key={i} className="animate-pulse">
+            <CardHeader className="pb-2">
+              <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            </CardHeader>
+            <CardContent>
+              <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      {stats.map((stat) => (
-        <Card 
-          key={stat.title} 
-          className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
-            isModernTheme 
-              ? 'bg-gradient-to-br from-white/80 via-white/60 to-white/40 backdrop-blur-lg border border-white/20 shadow-xl hover:shadow-2xl'
-              : 'bg-gradient-to-br ' + stat.gradient + ' text-white'
-          }`}
-        >
-          <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <CardTitle className={`text-sm font-medium ${
-                isModernTheme ? 'text-gray-700' : 'text-white/90'
-              }`}>
-                {stat.title}
-              </CardTitle>
-              <stat.icon className={`h-5 w-5 ${
-                isModernTheme ? 'text-blue-500' : 'text-white/90'
-              }`} />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className={`text-2xl font-bold mb-1 ${
+      {stats?.map((stat) => {
+        const Icon = statIcons[stat.type as keyof typeof statIcons];
+        const gradient = statGradients[stat.type as keyof typeof statGradients];
+        
+        return (
+          <Card 
+            key={stat.type} 
+            className={`relative overflow-hidden transition-all duration-300 hover:scale-105 ${
               isModernTheme 
-                ? 'bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent'
-                : 'text-white'
-            }`}>
-              {stat.value}
-            </div>
-            <div className="flex items-center text-xs">
-              {stat.trendUp ? (
-                <TrendingUp className={`h-3 w-3 ${
-                  isModernTheme 
-                    ? 'text-green-500'
-                    : 'text-white/90'
-                } mr-1`} />
-              ) : (
-                <TrendingDown className={`h-3 w-3 ${
-                  isModernTheme 
-                    ? 'text-red-500'
-                    : 'text-white/90'
-                } mr-1`} />
-              )}
-              <span className={stat.trendUp ? 'text-green-500' : 'text-red-500'}>
-                {stat.trend}
-              </span>
-              <span className={`ml-1 ${
-                isModernTheme ? 'text-gray-500' : 'text-white/75'
+                ? 'bg-gradient-to-br from-white/80 via-white/60 to-white/40 backdrop-blur-lg border border-white/20 shadow-xl hover:shadow-2xl'
+                : 'bg-gradient-to-br ' + gradient + ' text-white'
+            }`}
+          >
+            <CardHeader className="pb-2">
+              <div className="flex justify-between items-center">
+                <CardTitle className={`text-sm font-medium ${
+                  isModernTheme ? 'text-gray-700' : 'text-white/90'
+                }`}>
+                  {formatTitle(stat.type)}
+                </CardTitle>
+                <Icon className={`h-5 w-5 ${
+                  isModernTheme ? 'text-blue-500' : 'text-white/90'
+                }`} />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold mb-1 ${
+                isModernTheme 
+                  ? 'bg-gradient-to-br from-blue-600 to-purple-600 bg-clip-text text-transparent'
+                  : 'text-white'
               }`}>
-                from last month
-              </span>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+                {formatValue(stat.type, stat.value)}
+              </div>
+              <div className="flex items-center text-xs">
+                {stat.trend_direction ? (
+                  <TrendingUp className={`h-3 w-3 ${
+                    isModernTheme 
+                      ? 'text-green-500'
+                      : 'text-white/90'
+                  } mr-1`} />
+                ) : (
+                  <TrendingDown className={`h-3 w-3 ${
+                    isModernTheme 
+                      ? 'text-red-500'
+                      : 'text-white/90'
+                  } mr-1`} />
+                )}
+                <span className={stat.trend_direction ? 'text-green-500' : 'text-red-500'}>
+                  {stat.trend_direction ? '+' : ''}{stat.trend}%
+                </span>
+                <span className={`ml-1 ${
+                  isModernTheme ? 'text-gray-500' : 'text-white/75'
+                }`}>
+                  from last month
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

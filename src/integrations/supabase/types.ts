@@ -3962,6 +3962,9 @@ export type Database = {
           created_at: string | null
           id: string
           organization_id: string | null
+          pagination_settings: Json | null
+          search_filters: Json | null
+          sort_preferences: Json | null
           state: Json | null
           updated_at: string | null
           user_id: string | null
@@ -3971,6 +3974,9 @@ export type Database = {
           created_at?: string | null
           id?: string
           organization_id?: string | null
+          pagination_settings?: Json | null
+          search_filters?: Json | null
+          sort_preferences?: Json | null
           state?: Json | null
           updated_at?: string | null
           user_id?: string | null
@@ -3980,6 +3986,9 @@ export type Database = {
           created_at?: string | null
           id?: string
           organization_id?: string | null
+          pagination_settings?: Json | null
+          search_filters?: Json | null
+          sort_preferences?: Json | null
           state?: Json | null
           updated_at?: string | null
           user_id?: string | null

@@ -10,17 +10,31 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useViewState } from "@/hooks/useViewState";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 export function ListView() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    viewState,
+    updateViewState,
+    isLoading: isViewStateLoading
+  } = useViewState("list");
+
+  const {
+    search_filters: { searchQuery = "" },
+    pagination_settings: { itemsPerPage = 10, currentPage = 1 },
+    sort_preferences: { field = "created_at", direction = "desc" }
+  } = viewState;
 
   const { data: appointments, isLoading, error } = useQuery({
-    queryKey: ["appointments", searchQuery],
+    queryKey: ["appointments", searchQuery, currentPage, itemsPerPage, field, direction],
     queryFn: async () => {
       const query = supabase
         .from("bookings")
         .select("*, profiles(first_name, last_name)")
-        .order("start_time", { ascending: true });
+        .order(field, { ascending: direction === "asc" })
+        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
       if (searchQuery) {
         query.textSearch("customer_name", searchQuery);
@@ -32,6 +46,12 @@ export function ListView() {
     },
   });
 
+  const handleSearchChange = (value: string) => {
+    updateViewState({
+      search_filters: { ...viewState.search_filters, searchQuery: value }
+    });
+  };
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -39,6 +59,26 @@ export function ListView() {
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>Failed to load appointments: {error.message}</AlertDescription>
       </Alert>
+    );
+  }
+
+  if (isLoading || isViewStateLoading) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6">
+          <StatsCards />
+        </Card>
+        <Card className="p-6">
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <div className="space-y-2">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          </div>
+        </Card>
+      </div>
     );
   }
 
@@ -55,7 +95,7 @@ export function ListView() {
             <Input
               placeholder="Search appointments..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10"
             />
           </div>

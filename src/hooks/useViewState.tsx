@@ -3,12 +3,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-
-interface ViewState {
-  id?: string;
-  view_type: string;
-  state: Record<string, any>;
-}
+import { ViewState } from "@/types/dashboard";
+import { useDebouncedCallback } from "use-debounce";
 
 export function useViewState(viewType: string) {
   const { user } = useAuth();
@@ -34,17 +30,18 @@ export function useViewState(viewType: string) {
 
       return data;
     },
-    enabled: !!user?.id
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const { mutate: updateViewState } = useMutation({
-    mutationFn: async (newState: Partial<Record<string, any>>) => {
+    mutationFn: async (updates: Partial<ViewState>) => {
       if (!user?.id) return null;
 
       const payload = {
         user_id: user.id,
         view_type: viewType,
-        state: newState
+        ...updates
       };
 
       if (viewState?.id) {
@@ -71,9 +68,21 @@ export function useViewState(viewType: string) {
     }
   });
 
+  const debouncedUpdateViewState = useDebouncedCallback(
+    (updates: Partial<ViewState>) => {
+      updateViewState(updates);
+    },
+    500
+  );
+
   return {
-    viewState: viewState?.state || {},
+    viewState: viewState || {
+      state: {},
+      search_filters: {},
+      sort_preferences: { field: 'created_at', direction: 'desc' },
+      pagination_settings: { itemsPerPage: 10, currentPage: 1 }
+    },
     isLoading,
-    updateViewState
+    updateViewState: debouncedUpdateViewState
   };
 }

@@ -6,21 +6,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppointmentCard } from "../components/AppointmentCard";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useViewState } from "@/hooks/useViewState";
 
 export function GridView() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    viewState,
+    updateViewState,
+    isLoading: isViewStateLoading
+  } = useViewState("grid");
+
+  const {
+    search_filters: { searchQuery = "" },
+    pagination_settings: { itemsPerPage = 12, currentPage = 1 },
+    sort_preferences: { field = "created_at", direction = "desc" }
+  } = viewState;
 
   const { data: appointments, isLoading, error } = useQuery({
-    queryKey: ["appointments", searchQuery],
+    queryKey: ["appointments", searchQuery, currentPage, itemsPerPage, field, direction],
     queryFn: async () => {
       const query = supabase
         .from("bookings")
         .select("*, profiles(first_name, last_name)")
-        .order("start_time", { ascending: true });
+        .order(field, { ascending: direction === "asc" })
+        .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 
       if (searchQuery) {
         query.textSearch("customer_name", searchQuery);
@@ -31,6 +42,12 @@ export function GridView() {
       return data;
     },
   });
+
+  const handleSearchChange = (value: string) => {
+    updateViewState({
+      search_filters: { ...viewState.search_filters, searchQuery: value }
+    });
+  };
 
   if (error) {
     return (
@@ -55,17 +72,21 @@ export function GridView() {
             <Input
               placeholder="Search appointments..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-10"
             />
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading || isViewStateLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <Skeleton key={i} className="h-[200px]" />
             ))}
+          </div>
+        ) : appointments?.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No appointments found
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

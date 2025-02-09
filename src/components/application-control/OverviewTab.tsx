@@ -3,6 +3,7 @@ import { Building2, Users, Car, Wrench, Calendar, UserSquare2, Package, Truck, D
 import { useNavigate } from "react-router-dom";
 import { ControlPanel } from "./ControlPanel";
 import { SystemStatus } from "./SystemStatus";
+import { DashboardStatsConfig } from "./dashboard/DashboardStatsConfig";
 
 export function OverviewTab() {
   const navigate = useNavigate();
@@ -71,10 +72,14 @@ export function OverviewTab() {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {controlPanels.map((panel) => (
-        <ControlPanel key={panel.title} {...panel} />
-      ))}
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {controlPanels.map((panel) => (
+          <ControlPanel key={panel.title} {...panel} />
+        ))}
+      </div>
+      
+      <DashboardStatsConfig />
       <SystemStatus />
     </div>
   );

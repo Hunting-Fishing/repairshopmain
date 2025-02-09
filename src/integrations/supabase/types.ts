@@ -3960,7 +3960,9 @@ export type Database = {
       user_view_state: {
         Row: {
           created_at: string | null
+          defaultview: string | null
           id: string
+          iscalendarexpanded: boolean | null
           organization_id: string | null
           pagination_settings: Json | null
           search_filters: Json | null
@@ -3969,10 +3971,13 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
           view_type: string
+          viewmode: string | null
         }
         Insert: {
           created_at?: string | null
+          defaultview?: string | null
           id?: string
+          iscalendarexpanded?: boolean | null
           organization_id?: string | null
           pagination_settings?: Json | null
           search_filters?: Json | null
@@ -3981,10 +3986,13 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           view_type: string
+          viewmode?: string | null
         }
         Update: {
           created_at?: string | null
+          defaultview?: string | null
           id?: string
+          iscalendarexpanded?: boolean | null
           organization_id?: string | null
           pagination_settings?: Json | null
           search_filters?: Json | null
@@ -3993,6 +4001,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           view_type?: string
+          viewmode?: string | null
         }
         Relationships: [
           {

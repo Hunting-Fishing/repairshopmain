@@ -1,7 +1,7 @@
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { InventoryListHeader } from "./InventoryListHeader";
+import { InventoryListHeader } from "../InventoryListHeader";
 import { VirtualizedList } from "./VirtualizedList";
 import { InventoryPagination } from "../InventoryPagination";
 import type { InventoryItem } from "../../types";
@@ -50,3 +50,4 @@ export function InventoryListCore({
     </div>
   );
 }
+

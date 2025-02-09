@@ -45,12 +45,17 @@ export function useProfile(userId: string | undefined) {
           skills
         `)
         .eq('id', userId)
-        .single();
+        .maybeSingle(); // Changed from single() to maybeSingle()
         
       if (error) {
         console.error("Error fetching profile:", error);
         toast.error("Failed to load user profile");
         throw error;
+      }
+
+      if (!data) {
+        console.warn("No profile found for user:", userId);
+        return null;
       }
       
       return data as ProfileRow;

@@ -1,30 +1,57 @@
+
 import { addMinutes, isSameDay, isAfter, isBefore } from "date-fns";
 import { Booking } from "@/types/calendar";
+import { supabase } from "@/integrations/supabase/client";
 
-export const WORKING_HOURS = {
-  start: 8, // 8 AM
-  end: 18, // 6 PM
-};
-
-export const TIME_SLOT_DURATION = 30; // minutes
-
-export interface TimeSlotData {
+interface TimeSlotData {
   time: Date;
   end: Date;
   bookings: Booking[];
 }
 
-export const generateTimeSlots = (date: Date, bookings: Booking[]): TimeSlotData[] => {
+interface CalendarSettings {
+  working_hours_start: number;
+  working_hours_end: number;
+  time_slot_duration: number;
+}
+
+const DEFAULT_SETTINGS: CalendarSettings = {
+  working_hours_start: 8,
+  working_hours_end: 18,
+  time_slot_duration: 30
+};
+
+async function fetchCalendarSettings(): Promise<CalendarSettings> {
+  try {
+    const { data: settings, error } = await supabase
+      .from('calendar_settings')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Error fetching calendar settings:', error);
+      return DEFAULT_SETTINGS;
+    }
+
+    return settings || DEFAULT_SETTINGS;
+  } catch (error) {
+    console.error('Error fetching calendar settings:', error);
+    return DEFAULT_SETTINGS;
+  }
+}
+
+export const generateTimeSlots = async (date: Date, bookings: Booking[]): Promise<TimeSlotData[]> => {
+  const settings = await fetchCalendarSettings();
   const timeSlots: TimeSlotData[] = [];
   const startTime = new Date(date);
-  startTime.setHours(WORKING_HOURS.start, 0, 0, 0);
+  startTime.setHours(settings.working_hours_start, 0, 0, 0);
 
   for (
     let time = startTime;
-    time.getHours() < WORKING_HOURS.end;
-    time = addMinutes(time, TIME_SLOT_DURATION)
+    time.getHours() < settings.working_hours_end;
+    time = addMinutes(time, settings.time_slot_duration)
   ) {
-    const slotEnd = addMinutes(time, TIME_SLOT_DURATION);
+    const slotEnd = addMinutes(time, settings.time_slot_duration);
     const slotBookings = bookings.filter(
       (booking) =>
         isSameDay(new Date(booking.start_time), time) &&

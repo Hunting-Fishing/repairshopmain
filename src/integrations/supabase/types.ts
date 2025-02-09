@@ -382,6 +382,36 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_settings: {
+        Row: {
+          created_at: string
+          id: string
+          time_slot_duration: number
+          updated_at: string
+          user_id: string | null
+          working_hours_end: number
+          working_hours_start: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          time_slot_duration?: number
+          updated_at?: string
+          user_id?: string | null
+          working_hours_end?: number
+          working_hours_start?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          time_slot_duration?: number
+          updated_at?: string
+          user_id?: string | null
+          working_hours_end?: number
+          working_hours_start?: number
+        }
+        Relationships: []
+      }
       chat_messages: {
         Row: {
           content: string

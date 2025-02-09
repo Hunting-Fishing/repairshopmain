@@ -1151,6 +1151,33 @@ export type Database = {
           },
         ]
       }
+      dashboard_settings: {
+        Row: {
+          created_at: string
+          enabled_stats: string[] | null
+          id: string
+          layout_config: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled_stats?: string[] | null
+          id?: string
+          layout_config?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled_stats?: string[] | null
+          id?: string
+          layout_config?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       integration_connections: {
         Row: {
           created_at: string

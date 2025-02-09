@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CalendarViewProps } from "@/types/calendar";
 import { ColorPalette, PAST_APPOINTMENT_COLORS } from "./ColorPalette";

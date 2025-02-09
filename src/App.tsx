@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { RootLayout } from "./components/layout/RootLayout";
 import AppRoutes from "./routes";
 
 const queryClient = new QueryClient({
@@ -21,13 +22,13 @@ const App = () => (
   <AuthProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
         <BrowserRouter>
           <AuthContext.Consumer>
             {({ user }) => (
               <ThemeProvider userId={user?.id}>
-                <AppRoutes />
+                <RootLayout>
+                  <AppRoutes />
+                </RootLayout>
               </ThemeProvider>
             )}
           </AuthContext.Consumer>

@@ -2,15 +2,12 @@
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { useRef } from "react";
 import type { InventoryItem } from "../types";
-import { InventoryCard } from "./InventoryCard";
-import { InventorySort } from "./InventorySort";
-import { InventoryPagination } from "./InventoryPagination";
 import { InventoryListHeader } from "./InventoryListHeader";
 import { InventoryStats } from "./InventoryStats";
+import { ListViewHeader } from "./list-view/ListViewHeader";
+import { VirtualizedList } from "./list-view/VirtualizedList";
+import { InventoryPagination } from "./InventoryPagination";
 
 interface InventoryListViewProps {
   items: (InventoryItem & {
@@ -48,8 +45,6 @@ export function InventoryListView({
   onAddItem,
   onEditItem,
 }: InventoryListViewProps) {
-  const parentRef = useRef<HTMLDivElement>(null);
-
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -68,13 +63,6 @@ export function InventoryListView({
     </Alert>
   );
 
-  const rowVirtualizer = useVirtualizer({
-    count: items.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 320,
-    overscan: 5,
-  });
-
   const allSelected = items.length > 0 && selectedItems.length === items.length;
   const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
 
@@ -85,63 +73,22 @@ export function InventoryListView({
         <InventoryStats items={items} />
       </div>
 
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={allSelected}
-            indeterminate={someSelected}
-            onCheckedChange={onSelectAll}
-          />
-          <span className="text-sm text-muted-foreground">
-            {selectedItems.length} selected
-          </span>
-        </div>
-        <InventorySort
-          sortField={sortField}
-          sortOrder={sortOrder}
-          onSort={onSort}
-        />
-      </div>
+      <ListViewHeader
+        allSelected={allSelected}
+        someSelected={someSelected}
+        selectedCount={selectedItems.length}
+        sortField={sortField}
+        sortOrder={sortOrder}
+        onSelectAll={onSelectAll}
+        onSort={onSort}
+      />
 
-      <div 
-        ref={parentRef} 
-        className="h-[800px] overflow-auto bg-white rounded-lg shadow-sm border"
-      >
-        <div
-          style={{
-            height: `${rowVirtualizer.getTotalSize()}px`,
-            width: '100%',
-            position: 'relative',
-          }}
-        >
-          <div className="grid gap-6 p-6 md:grid-cols-2 lg:grid-cols-3 absolute top-0 left-0 w-full">
-            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const item = items[virtualRow.index];
-              return (
-                <div
-                  key={virtualRow.key}
-                  data-index={virtualRow.index}
-                  className="relative"
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}
-                >
-                  <InventoryCard
-                    item={item}
-                    selected={selectedItems.includes(item.id)}
-                    onSelect={(selected) => onSelectItem(item.id, selected)}
-                    onEdit={() => onEditItem(item)}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      <VirtualizedList
+        items={items}
+        selectedItems={selectedItems}
+        onSelectItem={onSelectItem}
+        onEditItem={onEditItem}
+      />
 
       <InventoryPagination
         currentPage={currentPage}

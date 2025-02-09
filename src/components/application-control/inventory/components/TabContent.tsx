@@ -1,7 +1,7 @@
 
 import { TabsContent } from "@/components/ui/tabs";
 import { InventoryOverview } from "../InventoryOverview";
-import { InventoryList } from "../components/inventory-list/InventoryList";
+import { InventoryList } from "../InventoryList";
 import { InventoryCategories } from "../InventoryCategories";
 import { InventorySuppliers } from "../InventorySuppliers";
 import { InventoryHistory } from "../components/history/InventoryHistory";

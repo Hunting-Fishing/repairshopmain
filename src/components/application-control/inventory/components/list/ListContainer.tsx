@@ -3,11 +3,13 @@ import { useInventoryList } from "../../hooks/list/useInventoryList";
 import { InventoryListView } from "../InventoryListView";
 import { InventoryItemDialog } from "../inventory-dialog/InventoryItemDialog";
 import { useState } from "react";
+import { useInventorySubmit } from "../../hooks/form/useInventorySubmit";
 import type { InventoryItem } from "../../types";
 
 export function ListContainer() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | undefined>(undefined);
+  const { handleSubmit } = useInventorySubmit();
   
   const {
     items,
@@ -56,6 +58,7 @@ export function ListContainer() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         item={selectedItem}
+        onSubmit={handleSubmit}
       />
     </>
   );

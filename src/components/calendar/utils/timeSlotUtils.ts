@@ -33,12 +33,15 @@ async function fetchCalendarSettings(): Promise<CalendarSettings> {
       return DEFAULT_SETTINGS;
     }
 
-    // If no settings found, return defaults
     if (!settings) {
       return DEFAULT_SETTINGS;
     }
 
-    return settings;
+    return {
+      working_hours_start: settings.working_hours_start ?? DEFAULT_SETTINGS.working_hours_start,
+      working_hours_end: settings.working_hours_end ?? DEFAULT_SETTINGS.working_hours_end,
+      time_slot_duration: settings.time_slot_duration ?? DEFAULT_SETTINGS.time_slot_duration
+    };
   } catch (error) {
     console.error('Error fetching calendar settings:', error);
     return DEFAULT_SETTINGS;
@@ -46,10 +49,18 @@ async function fetchCalendarSettings(): Promise<CalendarSettings> {
 }
 
 export const generateTimeSlots = async (date: Date, bookings: Booking[]): Promise<TimeSlotData[]> => {
+  if (!date || !Array.isArray(bookings)) {
+    throw new Error('Invalid parameters provided to generateTimeSlots');
+  }
+
   const settings = await fetchCalendarSettings();
   const timeSlots: TimeSlotData[] = [];
   const startTime = new Date(date);
   startTime.setHours(settings.working_hours_start, 0, 0, 0);
+
+  if (isNaN(startTime.getTime())) {
+    throw new Error('Invalid date provided to generateTimeSlots');
+  }
 
   for (
     let time = startTime;
@@ -59,6 +70,8 @@ export const generateTimeSlots = async (date: Date, bookings: Booking[]): Promis
     const slotEnd = addMinutes(time, settings.time_slot_duration);
     const slotBookings = bookings.filter(
       (booking) =>
+        booking?.start_time &&
+        booking?.end_time &&
         isSameDay(new Date(booking.start_time), time) &&
         new Date(booking.start_time) <= time &&
         new Date(booking.end_time) > time
@@ -74,11 +87,13 @@ export const generateTimeSlots = async (date: Date, bookings: Booking[]): Promis
   return timeSlots;
 };
 
-export const isPastTimeSlot = (time: Date, currentTime: Date) => {
+export const isPastTimeSlot = (time: Date, currentTime: Date): boolean => {
+  if (!time || !currentTime) return false;
   return isBefore(time, currentTime) && isSameDay(time, currentTime);
 };
 
-export const isCurrentTimeSlot = (startTime: Date, endTime: Date, currentTime: Date) => {
+export const isCurrentTimeSlot = (startTime: Date, endTime: Date, currentTime: Date): boolean => {
+  if (!startTime || !endTime || !currentTime) return false;
   return (
     isSameDay(currentTime, startTime) &&
     isAfter(currentTime, startTime) &&

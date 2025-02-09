@@ -11,6 +11,8 @@ import {
   isCurrentTimeSlot,
   TimeSlotData 
 } from "./utils/timeSlotUtils";
+import { CalendarErrorBoundary } from "./errors/CalendarErrorBoundary";
+import { LoadingScreen } from "../dashboard/components/LoadingScreen";
 
 export function DayView({
   date,
@@ -21,6 +23,7 @@ export function DayView({
   const [currentTime, setCurrentTime] = useState(new Date());
   const [timeSlots, setTimeSlots] = useState<TimeSlotData[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,11 +35,13 @@ export function DayView({
   useEffect(() => {
     const loadTimeSlots = async () => {
       setIsLoadingSlots(true);
+      setError(null);
       try {
         const slots = await generateTimeSlots(date, bookings);
         setTimeSlots(slots);
       } catch (error) {
         console.error('Error generating time slots:', error);
+        setError(error instanceof Error ? error : new Error('Failed to load time slots'));
       } finally {
         setIsLoadingSlots(false);
       }
@@ -46,36 +51,36 @@ export function DayView({
   }, [date, bookings]);
 
   if (isLoading || isLoadingSlots) {
-    return (
-      <div className="space-y-2">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <Skeleton key={i} className="h-12 w-full" />
-        ))}
-      </div>
-    );
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    throw error; // This will be caught by the error boundary
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        {timeSlots.map((slot) => (
-          <TimeSlot
-            key={slot.time.toISOString()}
-            isPast={isPastTimeSlot(slot.time, currentTime)}
-            isCurrentTimeSlot={isCurrentTimeSlot(slot.time, slot.end, currentTime)}
-            hasBookings={slot.bookings.length > 0}
-            pastColors={[PAST_APPOINTMENT_COLORS[0], PAST_APPOINTMENT_COLORS[1]]}
-            onClick={() => onTimeSlotClick(slot.time, slot.end)}
-            className="flex min-h-[4rem] items-start gap-4 rounded-lg border p-3"
-          >
-            <TimeSlotContent
-              slot={slot}
+    <CalendarErrorBoundary>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          {timeSlots.map((slot) => (
+            <TimeSlot
+              key={slot.time.toISOString()}
               isPast={isPastTimeSlot(slot.time, currentTime)}
+              isCurrentTimeSlot={isCurrentTimeSlot(slot.time, slot.end, currentTime)}
+              hasBookings={slot.bookings.length > 0}
               pastColors={[PAST_APPOINTMENT_COLORS[0], PAST_APPOINTMENT_COLORS[1]]}
-            />
-          </TimeSlot>
-        ))}
+              onClick={() => onTimeSlotClick(slot.time, slot.end)}
+              className="flex min-h-[4rem] items-start gap-4 rounded-lg border p-3"
+            >
+              <TimeSlotContent
+                slot={slot}
+                isPast={isPastTimeSlot(slot.time, currentTime)}
+                pastColors={[PAST_APPOINTMENT_COLORS[0], PAST_APPOINTMENT_COLORS[1]]}
+              />
+            </TimeSlot>
+          ))}
+        </div>
       </div>
-    </div>
+    </CalendarErrorBoundary>
   );
 }

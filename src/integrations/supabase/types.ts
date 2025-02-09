@@ -148,16 +148,128 @@ export type Database = {
         }
         Relationships: []
       }
+      booking_history: {
+        Row: {
+          booking_id: string
+          change_type: string
+          changed_by: string
+          created_at: string | null
+          id: string
+          new_data: Json | null
+          organization_id: string
+          previous_data: Json | null
+        }
+        Insert: {
+          booking_id: string
+          change_type: string
+          changed_by: string
+          created_at?: string | null
+          id?: string
+          new_data?: Json | null
+          organization_id: string
+          previous_data?: Json | null
+        }
+        Update: {
+          booking_id?: string
+          change_type?: string
+          changed_by?: string
+          created_at?: string | null
+          id?: string
+          new_data?: Json | null
+          organization_id?: string
+          previous_data?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_history_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      booking_notifications: {
+        Row: {
+          booking_id: string
+          created_at: string | null
+          error: string | null
+          id: string
+          organization_id: string
+          sent_at: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          organization_id: string
+          sent_at?: string | null
+          status?: string
+          type: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          organization_id?: string
+          sent_at?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_notifications_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_notifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           assigned_technician_id: string | null
+          color: string | null
           created_at: string
           created_by: string
           customer_name: string
+          duration_minutes: number
+          email: string | null
           end_time: string
+          estimated_cost: number | null
           id: string
           job_description: string
+          notes: string | null
+          notification_preferences: Json | null
           organization_id: string
+          phone_number: string | null
+          priority: string | null
+          source: string | null
           start_time: string
           status: Database["public"]["Enums"]["booking_status"] | null
           updated_at: string
@@ -166,13 +278,22 @@ export type Database = {
         }
         Insert: {
           assigned_technician_id?: string | null
+          color?: string | null
           created_at?: string
           created_by: string
           customer_name: string
+          duration_minutes?: number
+          email?: string | null
           end_time: string
+          estimated_cost?: number | null
           id?: string
           job_description: string
+          notes?: string | null
+          notification_preferences?: Json | null
           organization_id: string
+          phone_number?: string | null
+          priority?: string | null
+          source?: string | null
           start_time: string
           status?: Database["public"]["Enums"]["booking_status"] | null
           updated_at?: string
@@ -181,13 +302,22 @@ export type Database = {
         }
         Update: {
           assigned_technician_id?: string | null
+          color?: string | null
           created_at?: string
           created_by?: string
           customer_name?: string
+          duration_minutes?: number
+          email?: string | null
           end_time?: string
+          estimated_cost?: number | null
           id?: string
           job_description?: string
+          notes?: string | null
+          notification_preferences?: Json | null
           organization_id?: string
+          phone_number?: string | null
+          priority?: string | null
+          source?: string | null
           start_time?: string
           status?: Database["public"]["Enums"]["booking_status"] | null
           updated_at?: string

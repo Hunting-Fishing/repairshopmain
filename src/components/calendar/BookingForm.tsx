@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
 
 interface BookingFormValues {
@@ -25,6 +27,15 @@ interface BookingFormValues {
   vehicleInfo: string;
   jobDescription: string;
   assignedTechnicianId: string;
+  phoneNumber: string;
+  email: string;
+  notes: string;
+  estimatedCost: number;
+  priority: string;
+  notificationPreferences: {
+    email: boolean;
+    sms: boolean;
+  };
 }
 
 interface BookingFormProps {
@@ -70,6 +81,36 @@ export function BookingForm({
           )}
         />
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <Input {...field} type="tel" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input {...field} type="email" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="vehicleInfo"
@@ -100,6 +141,60 @@ export function BookingForm({
 
         <FormField
           control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Additional Notes</FormLabel>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="estimatedCost"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estimated Cost</FormLabel>
+                <FormControl>
+                  <Input {...field} type="number" min="0" step="0.01" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Priority</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
           name="assignedTechnicianId"
           render={({ field }) => (
             <FormItem>
@@ -122,6 +217,46 @@ export function BookingForm({
             </FormItem>
           )}
         />
+
+        <div className="space-y-3">
+          <FormLabel>Notification Preferences</FormLabel>
+          <div className="flex flex-col gap-2">
+            <FormField
+              control={form.control}
+              name="notificationPreferences.email"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel>Email Notifications</FormLabel>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="notificationPreferences.sms"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between rounded-lg border p-3">
+                  <div className="space-y-0.5">
+                    <FormLabel>SMS Notifications</FormLabel>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel}>

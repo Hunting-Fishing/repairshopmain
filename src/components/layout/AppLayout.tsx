@@ -10,10 +10,11 @@ import { Label } from "@/components/ui/label";
 import { AuthErrorBoundary } from "@/components/auth/AuthErrorBoundary";
 import { useProfile } from "@/hooks/useProfile";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { signOut, session } = useAuth();
-  const { data: profile, isLoading } = useProfile(session?.user?.id);
+  const { data: profile, isLoading, error } = useProfile(session?.user?.id);
   const { isModernTheme, toggleTheme } = useTheme();
 
   // If not authenticated, redirect to auth page
@@ -21,7 +22,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     return <Navigate to="/auth" replace />;
   }
 
-  // Format role for display
+  if (error) {
+    throw error; // This will be caught by AuthErrorBoundary
+  }
+
   const formatRole = (role: string) => {
     return role?.split('_').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
@@ -48,7 +52,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     : 'text-muted-foreground'
                 }`}>
                   {isLoading ? (
-                    "Loading..."
+                    <Skeleton className="h-6 w-48" />
                   ) : (
                     <>
                       Welcome! {profile?.first_name} {profile?.last_name}{' '}
@@ -113,4 +117,3 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     </AuthErrorBoundary>
   );
 }
-

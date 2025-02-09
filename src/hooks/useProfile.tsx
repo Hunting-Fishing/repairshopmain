@@ -43,7 +43,8 @@ export function useProfile(userId: string | undefined) {
             preferred_working_hours,
             certifications,
             color_preferences,
-            skills
+            skills,
+            dashboard_preferences
           `)
           .eq('id', userId)
           .maybeSingle();
@@ -68,7 +69,7 @@ export function useProfile(userId: string | undefined) {
     },
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes,
+    gcTime: 1000 * 60 * 30, // 30 minutes
     retry: 3
   });
 }

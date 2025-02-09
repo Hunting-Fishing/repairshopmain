@@ -12,6 +12,7 @@ import { useUserProfile } from "./hooks/useUserProfile";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { DashboardContainer } from "./components/DashboardContainer";
 import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
+import { useViewState } from "@/hooks/useViewState";
 
 interface TimeSlot {
   start: Date;
@@ -19,12 +20,13 @@ interface TimeSlot {
 }
 
 export function DashboardLayout() {
+  const { viewState, updateViewState } = useViewState('dashboard');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [view, setView] = useState<"day" | "week" | "month">("day");
+  const [view, setView] = useState<"day" | "week" | "month">(viewState.defaultView || "day");
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
-  const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
-  const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
+  const [isCalendarExpanded, setIsCalendarExpanded] = useState(viewState.isCalendarExpanded || false);
+  const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">(viewState.viewMode || "calendar");
 
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
   const { data: bookings, isLoading: isBookingsLoading, error } = useCalendarBookings(selectedDate);
@@ -42,8 +44,20 @@ export function DashboardLayout() {
   }, []);
 
   const toggleCalendarSize = useCallback(() => {
-    setIsCalendarExpanded(prev => !prev);
-  }, []);
+    const newExpandedState = !isCalendarExpanded;
+    setIsCalendarExpanded(newExpandedState);
+    updateViewState({ isCalendarExpanded: newExpandedState });
+  }, [isCalendarExpanded, updateViewState]);
+
+  const handleViewModeChange = useCallback((newMode: "calendar" | "grid" | "list") => {
+    setViewMode(newMode);
+    updateViewState({ viewMode: newMode });
+  }, [updateViewState]);
+
+  const handleViewChange = useCallback((newView: "day" | "week" | "month") => {
+    setView(newView);
+    updateViewState({ defaultView: newView });
+  }, [updateViewState]);
 
   if (error) {
     throw error;
@@ -58,7 +72,10 @@ export function DashboardLayout() {
       <DashboardContainer isModernTheme={isModernTheme}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
-            <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
+            <DashboardHeader 
+              viewMode={viewMode} 
+              onViewChange={handleViewModeChange}
+            />
           </div>
         </div>
 
@@ -72,7 +89,7 @@ export function DashboardLayout() {
 
         <Tabs 
           value={viewMode} 
-          onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
+          onValueChange={(value) => handleViewModeChange(value as "calendar" | "grid" | "list")}
           className="space-y-6"
         >
           <TabsContent value="calendar" className="mt-0">
@@ -83,10 +100,10 @@ export function DashboardLayout() {
               isLoading={isBookingsLoading}
               isCalendarExpanded={isCalendarExpanded}
               onDateChange={(date) => date && setSelectedDate(date)}
-              onViewChange={setView}
+              onViewChange={handleViewChange}
               onTimeSlotClick={handleTimeSlotClick}
               toggleCalendarSize={toggleCalendarSize}
-              colorPreferences={{
+              colorPreferences={userProfile?.color_preferences || {
                 primary_color: "#0EA5E9",
                 secondary_color: "#EFF6FF",
                 border_color: "#0EA5E9",

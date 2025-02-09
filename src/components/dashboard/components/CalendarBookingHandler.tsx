@@ -1,5 +1,6 @@
 
 import { StatsCards } from "../StatsCards";
+import { cn } from "@/lib/utils";
 
 interface CalendarBookingHandlerProps {
   isModernTheme: boolean;
@@ -13,11 +14,12 @@ export function CalendarBookingHandler({
   isLoading 
 }: CalendarBookingHandlerProps) {
   return (
-    <div className={`rounded-xl ${
+    <div className={cn(
+      "rounded-xl p-6",
       isModernTheme 
-        ? 'bg-white/80 backdrop-blur-lg shadow-lg border border-blue-100/50'
-        : 'bg-white/30 backdrop-blur-lg shadow-xl border border-white/20'
-    } p-6`}>
+        ? "bg-white/80 backdrop-blur-lg shadow-lg border border-blue-100/50 dark:bg-background/80 dark:border-border"
+        : "bg-white/30 backdrop-blur-lg shadow-xl border border-white/20"
+    )}>
       <StatsCards isModernTheme={isModernTheme} />
     </div>
   );

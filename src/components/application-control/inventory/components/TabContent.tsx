@@ -4,8 +4,8 @@ import { InventoryOverview } from "../InventoryOverview";
 import { InventoryList } from "../InventoryList";
 import { InventoryCategories } from "../InventoryCategories";
 import { InventorySuppliers } from "../InventorySuppliers";
-import { InventoryHistory } from "../components/history/InventoryHistory";
-import { InventorySettings } from "../components/settings/InventorySettings";
+import { InventoryHistory } from "./history/InventoryHistory";
+import { InventorySettings } from "./settings/InventorySettings";
 import type { InventoryCategory, InventoryItem, InventorySupplier } from "../types";
 
 interface TabContentProps {

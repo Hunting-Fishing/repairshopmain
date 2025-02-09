@@ -6,10 +6,14 @@ import type { InventoryItem } from "../../types";
 import { InventoryListHeader } from "../InventoryListHeader";
 import { InventoryStats } from "../InventoryStats";
 import { ListViewHeader } from "./ListViewHeader";
-import { InventoryListCore } from "./InventoryListCore";
+import { VirtualizedList } from "./VirtualizedList";
+import { InventoryPagination } from "../InventoryPagination";
 
 interface InventoryListViewProps {
-  items: InventoryItem[];
+  items: (InventoryItem & {
+    category?: { name: string } | null;
+    supplier?: { name: string } | null;
+  })[];
   isLoading: boolean;
   error: Error | null;
   totalPages: number;
@@ -81,14 +85,17 @@ export function InventoryListView({
         onSort={onSort}
       />
 
-      <InventoryListCore
+      <VirtualizedList
         items={items}
-        totalPages={totalPages}
-        currentPage={currentPage}
         selectedItems={selectedItems}
         onSelectItem={onSelectItem}
-        onPageChange={onPageChange}
         onEditItem={onEditItem}
+      />
+
+      <InventoryPagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
       />
     </div>
   );

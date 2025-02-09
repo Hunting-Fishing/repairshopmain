@@ -62,7 +62,6 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
     originalData: item,
   });
 
-  // Watch for low stock
   const quantity = form.watch("quantity_in_stock");
   const reorderPoint = form.watch("reorder_point");
 
@@ -77,11 +76,11 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="h-full flex flex-col">
-        <div className="p-6 space-y-6 flex-1 bg-gradient-to-br from-background/95 via-background/50 to-background/95">
+        <div className="p-6 space-y-6 flex-1 bg-white dark:bg-gray-900 shadow-lg rounded-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm shadow-lg shadow-primary/10">
-                <PackageOpen className="h-6 w-6 text-primary animate-pulse" />
+              <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-primary/5 backdrop-blur-lg shadow-xl">
+                <PackageOpen className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h2 className="text-2xl font-semibold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
@@ -93,35 +92,35 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
               </div>
             </div>
             {quantity <= reorderPoint && (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-500/10 text-yellow-600 border border-yellow-500/20">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 shadow-lg shadow-yellow-500/5 animate-pulse">
                 <AlertCircle className="h-4 w-4" />
-                <span className="text-sm font-medium">Low Stock</span>
+                <span className="text-sm font-medium">Low Stock Alert</span>
               </div>
             )}
           </div>
 
-          <Separator className="my-6" />
+          <Separator className="my-6 opacity-50" />
 
           <ScrollArea className="h-[calc(100vh-280px)] pr-4">
             <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="w-full justify-start mb-6 bg-background/50 p-1.5 backdrop-blur-sm rounded-lg border border-border/40 sticky top-0 z-10">
-                <TabsTrigger value="basic" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-colors">
+              <TabsList className="w-full justify-start mb-6 sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-xl border shadow-lg">
+                <TabsTrigger value="basic" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-all duration-300">
                   <PackageOpen className="h-4 w-4" />
                   Basic Info
                 </TabsTrigger>
-                <TabsTrigger value="identification" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-colors">
+                <TabsTrigger value="identification" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-all duration-300">
                   <ScanLine className="h-4 w-4" />
                   Identification
                 </TabsTrigger>
-                <TabsTrigger value="details" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-colors">
+                <TabsTrigger value="details" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-all duration-300">
                   <Microscope className="h-4 w-4" />
                   Details
                 </TabsTrigger>
-                <TabsTrigger value="pricing" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-colors">
+                <TabsTrigger value="pricing" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-all duration-300">
                   <DollarSign className="h-4 w-4" />
                   Pricing
                 </TabsTrigger>
-                <TabsTrigger value="additional" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-colors">
+                <TabsTrigger value="additional" className="flex items-center gap-2 data-[state=active]:bg-primary/10 transition-all duration-300">
                   <Info className="h-4 w-4" />
                   Additional
                 </TabsTrigger>
@@ -129,33 +128,43 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
 
               <div className="space-y-6 px-1">
                 <TabsContent value="basic" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-                  <BasicInformationSection form={form} />
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <BasicInformationSection form={form} />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="identification" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-                  <ProductIdentificationSection form={form} />
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <ProductIdentificationSection form={form} />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="details" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-                  <InventoryDetailsSection form={form} />
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <InventoryDetailsSection form={form} />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="pricing" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-                  <PricingSection form={form} />
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <PricingSection form={form} />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="additional" className="mt-0 focus-visible:outline-none focus-visible:ring-0">
-                  <AdditionalInformationSection form={form} />
+                  <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border p-6">
+                    <AdditionalInformationSection form={form} />
+                  </div>
                 </TabsContent>
               </div>
             </Tabs>
           </ScrollArea>
         </div>
         
-        <div className="border-t bg-gradient-to-b from-background/50 to-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 p-4 flex justify-between items-center">
+        <div className="border-t bg-white dark:bg-gray-900 p-4 flex justify-between items-center shadow-lg rounded-b-lg">
           <div className="flex items-center gap-2">
             {changes && Object.keys(changes).length > 0 && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground bg-primary/5 px-3 py-1 rounded-full">
                 {Object.keys(changes).length} field(s) modified
               </span>
             )}
@@ -165,7 +174,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
               variant="outline" 
               type="button" 
               onClick={onCancel}
-              className="min-w-[100px] border-border/40 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors"
+              className="min-w-[100px] border-border/40 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-all duration-300"
             >
               <X className="w-4 h-4 mr-2" />
               Cancel
@@ -173,7 +182,7 @@ export function InventoryForm({ item, onSubmit, onCancel }: InventoryFormProps) 
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              className="min-w-[100px] bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-200"
+              className="min-w-[100px] bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300"
             >
               {isSubmitting ? (
                 <>

@@ -3957,6 +3957,44 @@ export type Database = {
           },
         ]
       }
+      user_view_state: {
+        Row: {
+          created_at: string | null
+          id: string
+          organization_id: string | null
+          state: Json | null
+          updated_at: string | null
+          user_id: string | null
+          view_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          state?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          view_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          state?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          view_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_view_state_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_models_reference: {
         Row: {
           created_at: string

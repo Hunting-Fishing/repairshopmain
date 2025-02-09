@@ -12,7 +12,7 @@ import { useStatsQuery } from "./hooks/useStatsQuery";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StatsCardsProps {
   isModernTheme?: boolean;

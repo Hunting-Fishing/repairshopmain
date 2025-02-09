@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,15 @@ interface BookingFormValues {
   vehicleInfo: string;
   jobDescription: string;
   assignedTechnicianId: string;
+  phoneNumber: string;
+  email: string;
+  notes: string;
+  estimatedCost: number;
+  priority: string;
+  notificationPreferences: {
+    email: boolean;
+    sms: boolean;
+  };
 }
 
 export function BookingDialog({
@@ -33,13 +43,36 @@ export function BookingDialog({
 }: BookingDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const form = useForm<BookingFormValues>();
+  const form = useForm<BookingFormValues>({
+    defaultValues: {
+      customerName: "",
+      vehicleInfo: "",
+      jobDescription: "",
+      assignedTechnicianId: "",
+      phoneNumber: "",
+      email: "",
+      notes: "",
+      estimatedCost: 0,
+      priority: "normal",
+      notificationPreferences: {
+        email: true,
+        sms: false,
+      },
+    },
+  });
 
   const onSubmit = async (values: BookingFormValues) => {
     if (!selectedTimeSlot) return;
 
     setIsSubmitting(true);
     try {
+      const user = (await supabase.auth.getUser()).data.user;
+      const profile = await supabase
+        .from("profiles")
+        .select("organization_id")
+        .eq("id", user?.id)
+        .single();
+
       const { error } = await supabase.from("bookings").insert({
         customer_name: values.customerName,
         vehicle_info: values.vehicleInfo,
@@ -47,15 +80,15 @@ export function BookingDialog({
         assigned_technician_id: values.assignedTechnicianId,
         start_time: selectedTimeSlot.start.toISOString(),
         end_time: selectedTimeSlot.end.toISOString(),
-        created_by: (await supabase.auth.getUser()).data.user?.id,
-        updated_by: (await supabase.auth.getUser()).data.user?.id,
-        organization_id: (
-          await supabase
-            .from("profiles")
-            .select("organization_id")
-            .eq("id", (await supabase.auth.getUser()).data.user?.id)
-            .single()
-        ).data?.organization_id,
+        created_by: user?.id,
+        updated_by: user?.id,
+        organization_id: profile.data?.organization_id,
+        phone_number: values.phoneNumber,
+        email: values.email,
+        notes: values.notes,
+        estimated_cost: values.estimatedCost,
+        priority: values.priority,
+        notification_preferences: values.notificationPreferences,
       });
 
       if (error) throw error;

@@ -14,10 +14,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WorkOrderForm } from "./WorkOrderForm";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useProfile } from "@/hooks/useProfile";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const workOrderSchema = z.object({
@@ -31,24 +31,9 @@ type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 
 export function NewWorkOrderDialog() {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
-  
-  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
-    queryKey: ['profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.id)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user?.id
-  });
+  const { data: profile, isLoading: profileLoading, error: profileError } = useProfile(user?.id);
 
   const form = useForm<WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
@@ -61,21 +46,15 @@ export function NewWorkOrderDialog() {
 
   const onSubmit = async (data: WorkOrderFormValues) => {
     try {
+      setIsSubmitting(true);
+
       if (!user?.id) {
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "You must be logged in to create work orders.",
-        });
+        toast.error("You must be logged in to create work orders");
         return;
       }
 
       if (!profile?.organization_id) {
-        toast({
-          variant: "destructive",
-          title: "Profile Error",
-          description: "Organization information not found. Please try again later.",
-        });
+        toast.error("Organization information not found");
         return;
       }
 
@@ -97,34 +76,23 @@ export function NewWorkOrderDialog() {
         throw insertError;
       }
 
-      toast({
-        title: "Success",
-        description: "Work order has been successfully created.",
-      });
+      toast.success("Work order created successfully");
       setOpen(false);
       form.reset();
     } catch (error: any) {
       console.error("Error in work order creation:", error);
-      toast({
-        variant: "destructive",
-        title: "Error Creating Work Order",
-        description: error.message || "An unexpected error occurred. Please try again.",
-      });
+      toast.error(error.message || "Failed to create work order");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (profileError) {
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: "Failed to load profile information. Please refresh the page.",
-    });
-  }
+  const buttonDisabled = profileLoading || !profile?.organization_id || isSubmitting;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button disabled={profileLoading}>
+        <Button disabled={buttonDisabled}>
           {profileLoading ? (
             <>
               <LoadingSpinner className="mr-2 h-4 w-4" />
@@ -142,25 +110,31 @@ export function NewWorkOrderDialog() {
         <DialogHeader>
           <DialogTitle>Create New Work Order</DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <WorkOrderForm form={form} />
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={profileLoading || !profile?.organization_id}
-            >
-              {form.formState.isSubmitting ? (
-                <>
-                  <LoadingSpinner className="mr-2 h-4 w-4" />
-                  Creating...
-                </>
-              ) : (
-                'Create Work Order'
-              )}
-            </Button>
-          </form>
-        </Form>
+        {profileError ? (
+          <div className="p-4 text-center text-red-500">
+            Failed to load profile information. Please try again.
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <WorkOrderForm form={form} />
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={buttonDisabled}
+              >
+                {isSubmitting ? (
+                  <>
+                    <LoadingSpinner className="mr-2 h-4 w-4" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create Work Order'
+                )}
+              </Button>
+            </form>
+          </Form>
+        )}
       </DialogContent>
     </Dialog>
   );

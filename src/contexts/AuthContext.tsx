@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface AuthContextType {
   session: Session | null;
@@ -33,37 +33,46 @@ export const AuthContext = React.createContext<AuthContextType | undefined>(unde
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
   const [user, setUser] = React.useState<User | null>(null);
-  const { toast } = useToast();
+  const [isInitialized, setIsInitialized] = React.useState(false);
 
   React.useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-    });
+    // Initialize auth state
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        toast.error("Failed to initialize authentication");
+      }
+    };
+
+    initializeAuth();
 
     // Set up session refresh
     const refreshSession = async () => {
-      const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
-      if (error) {
-        console.error("Error refreshing session:", error);
-        setSession(null);
-        setUser(null);
-        toast({
-          title: "Session expired",
-          description: "Please sign in again.",
-          variant: "destructive",
-        });
-      } else if (refreshedSession) {
-        setSession(refreshedSession);
-        setUser(refreshedSession.user);
+      try {
+        const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
+        if (error) {
+          console.error("Error refreshing session:", error);
+          setSession(null);
+          setUser(null);
+          toast.error("Session expired. Please sign in again.");
+        } else if (refreshedSession) {
+          setSession(refreshedSession);
+          setUser(refreshedSession.user);
+        }
+      } catch (error) {
+        console.error("Unexpected error refreshing session:", error);
       }
     };
 
     // Refresh session every 30 minutes
     const refreshInterval = setInterval(refreshSession, 1000 * 60 * 30);
 
-    // Set up the auth state listener
+    // Set up auth state listener
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
@@ -71,37 +80,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
 
-      // Handle email verification
       if (_event === 'SIGNED_IN' && session?.user.email_confirmed_at) {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
+        toast.success("Welcome back!");
+      } else if (_event === 'SIGNED_OUT') {
+        toast.info("You have been signed out");
       }
     });
 
-    // Cleanup subscriptions
+    // Cleanup
     return () => {
       clearInterval(refreshInterval);
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
+
+      if (!data.user.email_confirmed_at) {
+        toast.warning("Please verify your email address");
+      }
     } catch (error: any) {
       console.error("Sign in error:", error);
-      toast({
-        title: "Error signing in",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to sign in");
       throw error;
     }
   };
@@ -130,17 +137,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
 
-      toast({
-        title: "Account created",
-        description: "Please check your email to verify your account.",
-      });
+      toast.success("Please check your email to verify your account");
     } catch (error: any) {
       console.error("Sign up error:", error);
-      toast({
-        title: "Error signing up",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to create account");
       throw error;
     }
   };
@@ -150,20 +150,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
-      toast({
-        title: "Signed out",
-        description: "You have been successfully signed out.",
-      });
+      toast.success("You have been successfully signed out");
     } catch (error: any) {
       console.error("Sign out error:", error);
-      toast({
-        title: "Error signing out",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message || "Failed to sign out");
       throw error;
     }
   };
+
+  // Don't render until auth is initialized
+  if (!isInitialized) {
+    return null;
+  }
 
   const value = React.useMemo(
     () => ({

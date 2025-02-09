@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,11 +15,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { WorkOrderForm } from "./WorkOrderForm";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
   vehicleInfo: z.string().min(1, "Vehicle information is required"),
   jobDescription: z.string().min(1, "Job description is required"),
+  jobTemplate: z.string().optional(),
 });
 
 type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
@@ -26,6 +30,7 @@ type WorkOrderFormValues = z.infer<typeof workOrderSchema>;
 export function NewWorkOrderDialog() {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const form = useForm<WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
@@ -38,8 +43,24 @@ export function NewWorkOrderDialog() {
 
   const onSubmit = async (data: WorkOrderFormValues) => {
     try {
-      console.log("Form data:", data);
-      // TODO: Implement work order creation
+      if (!user?.id) {
+        throw new Error("User not authenticated");
+      }
+
+      const { error } = await supabase
+        .from('customer_repair_jobs')
+        .insert({
+          customer_id: data.customerId,
+          vehicle_id: data.vehicleInfo,
+          description: data.jobDescription,
+          job_type: data.jobTemplate || 'general',
+          created_by: user.id,
+          updated_by: user.id,
+          status: 'quoted'
+        });
+
+      if (error) throw error;
+
       toast({
         title: "Work Order Created",
         description: "The work order has been successfully created.",

@@ -29,11 +29,7 @@ export function DashboardLayout() {
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
   const { data: bookings, isLoading: isBookingsLoading, error } = useCalendarBookings(selectedDate);
 
-  // Memoized theme values
-  const isModernTheme = useMemo(() => 
-    userProfile?.theme_preference === 'modern', 
-    [userProfile?.theme_preference]
-  );
+  const isModernTheme = useMemo(() => true, []);
 
   const handleTimeSlotClick = useCallback((start: Date, end: Date) => {
     setSelectedTimeSlot({ start, end });
@@ -91,9 +87,9 @@ export function DashboardLayout() {
               onTimeSlotClick={handleTimeSlotClick}
               toggleCalendarSize={toggleCalendarSize}
               colorPreferences={{
-                primary_color: isModernTheme ? "#0EA5E9" : "#F97316",
-                secondary_color: isModernTheme ? "#EFF6FF" : "#FDE1D3",
-                border_color: isModernTheme ? "#0EA5E9" : "#F97316",
+                primary_color: "#0EA5E9",
+                secondary_color: "#EFF6FF",
+                border_color: "#0EA5E9",
                 background_color: "bg-background/95"
               }}
               isModernTheme={isModernTheme}

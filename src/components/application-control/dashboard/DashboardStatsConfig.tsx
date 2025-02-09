@@ -19,6 +19,8 @@ const availableStats = [
   { id: 'average_wait_time', label: 'Average Wait Time' }
 ];
 
+const defaultStats = ['total_work_orders', 'active_customers', 'pending_jobs', 'average_service_time', 'customer_satisfaction'];
+
 export function DashboardStatsConfig() {
   const queryClient = useQueryClient();
 
@@ -26,19 +28,37 @@ export function DashboardStatsConfig() {
     queryKey: ['dashboard-stats-config'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) return defaultStats;
 
       const { data, error } = await supabase
         .from('dashboard_settings')
         .select('enabled_stats')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching stats:', error);
         throw error;
       }
 
-      return data?.enabled_stats || ['total_work_orders', 'active_customers', 'pending_jobs', 'average_service_time', 'customer_satisfaction'];
+      // If no settings exist yet, create default settings
+      if (!data) {
+        const { error: insertError } = await supabase
+          .from('dashboard_settings')
+          .insert({
+            user_id: user.id,
+            enabled_stats: defaultStats
+          });
+
+        if (insertError) {
+          console.error('Error creating default settings:', insertError);
+          throw insertError;
+        }
+
+        return defaultStats;
+      }
+
+      return data.enabled_stats;
     }
   });
 

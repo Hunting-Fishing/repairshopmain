@@ -1,13 +1,7 @@
 
-import { TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ListTree, Users, Settings, List as ListIcon, History, BarChart3 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InventoryOverview } from "../InventoryOverview";
-import { InventoryList } from "../components/inventory-list/InventoryList";
-import { InventoryCategories } from "../InventoryCategories";
-import { InventorySuppliers } from "../InventorySuppliers";
-import { InventoryHistory } from "../components/history/InventoryHistory";
-import { InventorySettings } from "../components/settings/InventorySettings";
+import { TabList } from "./TabList";
+import { TabContent } from "./TabContent";
 import type { InventoryCategory, InventoryItem, InventorySupplier } from "../types";
 
 interface TabContentProps {
@@ -31,69 +25,8 @@ function Loading() {
   );
 }
 
-function TabList() {
-  return (
-    <TabsList>
-      <TabsTrigger value="overview" className="flex items-center gap-2">
-        <BarChart3 className="h-4 w-4" />
-        Overview
-      </TabsTrigger>
-      <TabsTrigger value="inventory" className="flex items-center gap-2">
-        <ListIcon className="h-4 w-4" />
-        Inventory
-      </TabsTrigger>
-      <TabsTrigger value="categories" className="flex items-center gap-2">
-        <ListTree className="h-4 w-4" />
-        Categories
-      </TabsTrigger>
-      <TabsTrigger value="suppliers" className="flex items-center gap-2">
-        <Users className="h-4 w-4" />
-        Suppliers
-      </TabsTrigger>
-      <TabsTrigger value="history" className="flex items-center gap-2">
-        <History className="h-4 w-4" />
-        History
-      </TabsTrigger>
-      <TabsTrigger value="settings" className="flex items-center gap-2">
-        <Settings className="h-4 w-4" />
-        Settings
-      </TabsTrigger>
-    </TabsList>
-  );
-}
-
-function Content({ categories, items, suppliers }: TabContentProps) {
-  return (
-    <>
-      <TabsContent value="overview" className="mt-4">
-        <InventoryOverview />
-      </TabsContent>
-
-      <TabsContent value="inventory" className="mt-4">
-        <InventoryList />
-      </TabsContent>
-      
-      <TabsContent value="categories" className="mt-4">
-        <InventoryCategories categories={categories} />
-      </TabsContent>
-      
-      <TabsContent value="suppliers" className="mt-4">
-        <InventorySuppliers initialSuppliers={suppliers} />
-      </TabsContent>
-
-      <TabsContent value="history" className="mt-4">
-        <InventoryHistory />
-      </TabsContent>
-      
-      <TabsContent value="settings" className="mt-4">
-        <InventorySettings />
-      </TabsContent>
-    </>
-  );
-}
-
 export const TabSections = {
   Loading,
   List: TabList,
-  Content,
+  Content: TabContent,
 };

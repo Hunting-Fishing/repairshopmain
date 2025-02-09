@@ -1,16 +1,16 @@
 
-import { InventoryCard } from "./InventoryCard";
-import { InventorySort } from "./InventorySort";
-import { InventoryPagination } from "./InventoryPagination";
-import { AlertCircle, Filter, Plus } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import type { InventoryItem } from "../types";
+import { InventoryCard } from "./InventoryCard";
+import { InventorySort } from "./InventorySort";
+import { InventoryPagination } from "./InventoryPagination";
+import { InventoryListHeader } from "./InventoryListHeader";
+import { InventoryStats } from "./InventoryStats";
 
 interface InventoryListViewProps {
   items: (InventoryItem & {
@@ -50,26 +50,12 @@ export function InventoryListView({
 }: InventoryListViewProps) {
   const parentRef = useRef<HTMLDivElement>(null);
 
-  const rowVirtualizer = useVirtualizer({
-    count: items.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 320,
-    overscan: 5,
-  });
-
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <div className="flex justify-end">
-          <Skeleton className="h-10 w-32" />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="space-y-4">
-              <Skeleton className="h-[280px] w-full rounded-lg" />
-            </div>
-          ))}
-        </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {[...Array(6)].map((_, i) => (
+          <Skeleton key={i} className="h-[280px]" />
+        ))}
       </div>
     );
   }
@@ -78,50 +64,25 @@ export function InventoryListView({
     <Alert variant="destructive">
       <AlertCircle className="h-4 w-4" />
       <AlertTitle>Error</AlertTitle>
-      <AlertDescription>
-        Failed to load inventory items: {error.message}
-      </AlertDescription>
+      <AlertDescription>{error.message}</AlertDescription>
     </Alert>
   );
+
+  const rowVirtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 320,
+    overscan: 5,
+  });
 
   const allSelected = items.length > 0 && selectedItems.length === items.length;
   const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="flex-1 flex items-center gap-4">
-          <Button className="gap-2 bg-green-500 hover:bg-green-600" onClick={onAddItem}>
-            <Plus className="h-4 w-4" />
-            New Item
-          </Button>
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
-          <Input
-            placeholder="Search items..."
-            className="max-w-xs"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-lg">
-            <span className="font-medium">{items.length}</span>
-            <span>items</span>
-          </div>
-          <div className="flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-lg">
-            <span className="font-medium">
-              {items.filter(item => item.status === 'needs_attention').length}
-            </span>
-            <span>urgent</span>
-          </div>
-          <div className="flex items-center gap-2 bg-orange-100 text-orange-800 px-4 py-2 rounded-lg">
-            <span className="font-medium">
-              {items.filter(item => item.quantity_in_stock <= (item.reorder_point || 5)).length}
-            </span>
-            <span>low stock</span>
-          </div>
-        </div>
+      <div className="flex items-center justify-between">
+        <InventoryListHeader onAddItem={onAddItem} />
+        <InventoryStats items={items} />
       </div>
 
       <div className="flex justify-between items-center">

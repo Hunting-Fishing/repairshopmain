@@ -1,30 +1,22 @@
 
-import { useState, useCallback, useMemo } from "react";
-import { BookingDialog } from "@/components/calendar/BookingDialog";
+import { useState, useMemo } from "react";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useCalendarBookings } from "@/hooks/useCalendarBookings";
 import { DashboardHeader } from "./DashboardHeader";
-import { CalendarView } from "./views/CalendarView";
+import { CalendarContainer } from "./calendar/CalendarContainer";
 import { GridView } from "./views/GridView";
 import { ListView } from "./views/ListView";
+import { useViewState } from "@/hooks/useViewState";
 import { useUserProfile } from "./hooks/useUserProfile";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { DashboardContainer } from "./components/DashboardContainer";
 import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
-import { useViewState } from "@/hooks/useViewState";
-
-interface TimeSlot {
-  start: Date;
-  end: Date;
-}
 
 export function DashboardLayout() {
   const { viewState, updateViewState } = useViewState('dashboard');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [view, setView] = useState<"day" | "week" | "month">(viewState.defaultView || "day");
-  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState<TimeSlot | null>(null);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(viewState.isCalendarExpanded || false);
   const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">(viewState.viewMode || "calendar");
 
@@ -33,31 +25,21 @@ export function DashboardLayout() {
 
   const isModernTheme = useMemo(() => true, []);
 
-  const handleTimeSlotClick = useCallback((start: Date, end: Date) => {
-    setSelectedTimeSlot({ start, end });
-    setIsBookingDialogOpen(true);
-  }, []);
-
-  const handleBookingCreated = useCallback(() => {
-    setIsBookingDialogOpen(false);
-    setSelectedTimeSlot(null);
-  }, []);
-
-  const toggleCalendarSize = useCallback(() => {
+  const toggleCalendarSize = () => {
     const newExpandedState = !isCalendarExpanded;
     setIsCalendarExpanded(newExpandedState);
     updateViewState({ isCalendarExpanded: newExpandedState });
-  }, [isCalendarExpanded, updateViewState]);
+  };
 
-  const handleViewModeChange = useCallback((newMode: "calendar" | "grid" | "list") => {
+  const handleViewModeChange = (newMode: "calendar" | "grid" | "list") => {
     setViewMode(newMode);
     updateViewState({ viewMode: newMode });
-  }, [updateViewState]);
+  };
 
-  const handleViewChange = useCallback((newView: "day" | "week" | "month") => {
+  const handleViewChange = (newView: "day" | "week" | "month") => {
     setView(newView);
     updateViewState({ defaultView: newView });
-  }, [updateViewState]);
+  };
 
   if (error) {
     throw error;
@@ -93,7 +75,7 @@ export function DashboardLayout() {
           className="space-y-6"
         >
           <TabsContent value="calendar" className="mt-0">
-            <CalendarView
+            <CalendarContainer
               selectedDate={selectedDate}
               view={view}
               bookings={bookings || []}
@@ -101,7 +83,6 @@ export function DashboardLayout() {
               isCalendarExpanded={isCalendarExpanded}
               onDateChange={(date) => date && setSelectedDate(date)}
               onViewChange={handleViewChange}
-              onTimeSlotClick={handleTimeSlotClick}
               toggleCalendarSize={toggleCalendarSize}
               colorPreferences={userProfile?.color_preferences || {
                 primary_color: "#0EA5E9",
@@ -121,13 +102,6 @@ export function DashboardLayout() {
             <ListView />
           </TabsContent>
         </Tabs>
-
-        <BookingDialog
-          open={isBookingDialogOpen}
-          onOpenChange={setIsBookingDialogOpen}
-          selectedTimeSlot={selectedTimeSlot}
-          onBookingCreated={handleBookingCreated}
-        />
       </DashboardContainer>
     </ErrorBoundary>
   );

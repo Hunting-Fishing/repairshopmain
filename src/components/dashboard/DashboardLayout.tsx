@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
@@ -11,6 +11,7 @@ import { ListView } from "./views/ListView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StatsCards } from "./StatsCards";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TimeSlot {
   start: Date;
@@ -25,21 +26,23 @@ export function DashboardLayout() {
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
 
-  const { data: session } = useQuery({
+  // Centralized profile data fetching with proper error handling
+  const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
       return session;
     },
   });
 
-  const { data: userProfile } = useQuery({
+  const { data: userProfile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["user-profile", session?.user.id],
     queryFn: async () => {
       if (!session?.user.id) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("theme_preference")
+        .select("theme_preference, color_preferences")
         .eq("id", session.user.id)
         .single();
       
@@ -49,27 +52,46 @@ export function DashboardLayout() {
     enabled: !!session?.user.id,
   });
 
-  const { data: bookings, isLoading, error } = useCalendarBookings(selectedDate);
+  const { data: bookings, isLoading: isBookingsLoading, error } = useCalendarBookings(selectedDate);
 
-  const handleTimeSlotClick = (start: Date, end: Date) => {
+  // Memoized theme values
+  const isModernTheme = useMemo(() => 
+    userProfile?.theme_preference === 'modern', 
+    [userProfile?.theme_preference]
+  );
+
+  const handleTimeSlotClick = useCallback((start: Date, end: Date) => {
     setSelectedTimeSlot({ start, end });
     setIsBookingDialogOpen(true);
-  };
+  }, []);
 
-  const handleBookingCreated = () => {
+  const handleBookingCreated = useCallback(() => {
     setIsBookingDialogOpen(false);
     setSelectedTimeSlot(null);
-  };
+  }, []);
 
-  const toggleCalendarSize = () => {
-    setIsCalendarExpanded(!isCalendarExpanded);
-  };
+  const toggleCalendarSize = useCallback(() => {
+    setIsCalendarExpanded(prev => !prev);
+  }, []);
 
   if (error) {
     throw error;
   }
 
-  const isModernTheme = userProfile?.theme_preference === 'modern';
+  // Loading state
+  if (isSessionLoading || isProfileLoading) {
+    return (
+      <div className="min-h-screen p-4 md:p-6 space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+        <Skeleton className="h-96" />
+      </div>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -103,7 +125,7 @@ export function DashboardLayout() {
                 selectedDate={selectedDate}
                 view={view}
                 bookings={bookings || []}
-                isLoading={isLoading}
+                isLoading={isBookingsLoading}
                 isCalendarExpanded={isCalendarExpanded}
                 onDateChange={(date) => date && setSelectedDate(date)}
                 onViewChange={setView}

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface StatsCardsProps {
   isModernTheme?: boolean;
@@ -29,7 +30,7 @@ const statIcons = {
   pending_jobs: Wrench,
   average_service_time: Clock,
   customer_satisfaction: Star,
-};
+} as const;
 
 const formatValue = (type: string, value: number): string => {
   switch (type) {
@@ -50,7 +51,7 @@ const formatTitle = (type: string): string => {
 };
 
 export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
-  const { data: stats, isLoading } = useQuery({
+  const { data: stats, isLoading, error } = useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -60,7 +61,17 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
       if (error) throw error;
       return data as StatData[];
     },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
+
+  if (error) {
+    console.error('Error fetching stats:', error);
+    return (
+      <div className="text-red-500 p-4 rounded-lg bg-red-50">
+        Failed to load statistics. Please try again later.
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -105,9 +116,11 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
                 }`}>
                   {formatTitle(stat.type)}
                 </CardTitle>
-                <Icon className={`h-5 w-5 ${
-                  isModernTheme ? 'text-blue-500' : 'text-white/90'
-                }`} />
+                {Icon && (
+                  <Icon className={`h-5 w-5 ${
+                    isModernTheme ? 'text-blue-500' : 'text-white/90'
+                  }`} />
+                )}
               </div>
             </CardHeader>
             <CardContent>

@@ -3,7 +3,7 @@ import { addMinutes, isSameDay, isAfter, isBefore } from "date-fns";
 import { Booking } from "@/types/calendar";
 import { supabase } from "@/integrations/supabase/client";
 
-interface TimeSlotData {
+export interface TimeSlotData {
   time: Date;
   end: Date;
   bookings: Booking[];

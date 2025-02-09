@@ -8,7 +8,8 @@ import { TimeSlotContent } from "./TimeSlotContent";
 import { 
   generateTimeSlots, 
   isPastTimeSlot, 
-  isCurrentTimeSlot 
+  isCurrentTimeSlot,
+  TimeSlotData 
 } from "./utils/timeSlotUtils";
 
 export function DayView({
@@ -18,6 +19,8 @@ export function DayView({
   onTimeSlotClick,
 }: CalendarViewProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [timeSlots, setTimeSlots] = useState<TimeSlotData[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(true);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -26,7 +29,23 @@ export function DayView({
     return () => clearInterval(interval);
   }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    const loadTimeSlots = async () => {
+      setIsLoadingSlots(true);
+      try {
+        const slots = await generateTimeSlots(date, bookings);
+        setTimeSlots(slots);
+      } catch (error) {
+        console.error('Error generating time slots:', error);
+      } finally {
+        setIsLoadingSlots(false);
+      }
+    };
+
+    loadTimeSlots();
+  }, [date, bookings]);
+
+  if (isLoading || isLoadingSlots) {
     return (
       <div className="space-y-2">
         {Array.from({ length: 20 }).map((_, i) => (
@@ -35,8 +54,6 @@ export function DayView({
       </div>
     );
   }
-
-  const timeSlots = generateTimeSlots(date, bookings);
 
   return (
     <div className="space-y-4">

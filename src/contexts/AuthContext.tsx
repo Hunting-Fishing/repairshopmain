@@ -36,7 +36,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isInitialized, setIsInitialized] = React.useState(false);
 
   React.useEffect(() => {
-    // Initialize auth state
     const initializeAuth = async () => {
       try {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
@@ -46,12 +45,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error("Error initializing auth:", error);
         toast.error("Failed to initialize authentication");
+        setIsInitialized(true); // Still set initialized to true even on error
       }
     };
 
     initializeAuth();
 
-    // Set up session refresh
     const refreshSession = async () => {
       try {
         const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
@@ -69,13 +68,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    // Refresh session every 30 minutes
     const refreshInterval = setInterval(refreshSession, 1000 * 60 * 30);
 
-    // Set up auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("Auth state changed:", { event: _event, session });
       setSession(session);
       setUser(session?.user ?? null);
@@ -87,14 +82,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    // Cleanup
     return () => {
       clearInterval(refreshInterval);
       subscription.unsubscribe();
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = React.useCallback(async (email: string, password: string) => {
     try {
       const { error, data } = await supabase.auth.signInWithPassword({
         email,
@@ -111,9 +105,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.error(error.message || "Failed to sign in");
       throw error;
     }
-  };
+  }, []);
 
-  const signUp = async (data: SignUpData) => {
+  const signUp = React.useCallback(async (data: SignUpData) => {
     try {
       const { error } = await supabase.auth.signUp({
         email: data.email,
@@ -143,9 +137,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.error(error.message || "Failed to create account");
       throw error;
     }
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = React.useCallback(async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
@@ -156,26 +150,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toast.error(error.message || "Failed to sign out");
       throw error;
     }
-  };
+  }, []);
 
-  // Don't render until auth is initialized
+  const contextValue = React.useMemo(() => ({
+    session,
+    user,
+    signIn,
+    signUp,
+    signOut,
+  }), [session, user, signIn, signUp, signOut]);
+
   if (!isInitialized) {
     return null;
   }
 
-  const value = React.useMemo(
-    () => ({
-      session,
-      user,
-      signIn,
-      signUp,
-      signOut,
-    }),
-    [session, user]
-  );
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

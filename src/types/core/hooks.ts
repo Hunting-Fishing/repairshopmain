@@ -22,3 +22,22 @@ export interface UseErrorState {
   error: BaseError | null;
   setError: (error: BaseError | null) => void;
 }
+
+export interface UsePaginationState extends PaginationState {
+  setCurrentPage: (page: number) => void;
+  setItemsPerPage: (items: number) => void;
+  setTotalItems: (total: number) => void;
+}
+
+export interface UseSortState extends SortState {
+  setField: (field: string) => void;
+  setDirection: (direction: 'asc' | 'desc') => void;
+  toggleDirection: () => void;
+}
+
+export interface UseFilterState {
+  filters: FilterState;
+  setFilter: (key: string, value: string | number | boolean | null) => void;
+  removeFilter: (key: string) => void;
+  clearFilters: () => void;
+}

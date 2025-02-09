@@ -38,3 +38,28 @@ export interface ViewState {
   sort: SortState;
   filters: FilterState;
 }
+
+export interface DataTableState<T> extends ViewState {
+  selectedRows: T[];
+  searchQuery: string;
+}
+
+export interface ApiResponse<T> {
+  data: T | null;
+  error: BaseError | null;
+  metadata?: {
+    pagination?: PaginationState;
+    timestamp?: string;
+  };
+}
+
+export interface AuditInfo {
+  created_by?: string;
+  updated_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface OrganizationEntity extends BaseEntity {
+  organization_id: string;
+}

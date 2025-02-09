@@ -9,38 +9,16 @@ import {
 } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { SidebarHeader } from "./sidebar/SidebarHeader";
 import { NavigationMenu } from "./sidebar/NavigationMenu";
 import { MarketingCarousel } from "./sidebar/MarketingCarousel";
+import { useProfile } from "@/hooks/useProfile";
 
 export function AppSidebar() {
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
-
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ['current-user-profile', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('first_name, last_name, role')
-        .eq('id', user.id)
-        .single();
-        
-      if (error) {
-        console.error("Error fetching profile:", error);
-        return null;
-      }
-      
-      return data;
-    },
-    enabled: !!user?.id,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
-  });
+  const { data: profile, isLoading } = useProfile(user?.id);
 
   useEffect(() => {
     const channel = supabase

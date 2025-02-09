@@ -5,9 +5,7 @@ import { AlertCircle } from "lucide-react";
 import type { InventoryItem } from "../../types";
 import { InventoryListHeader } from "../InventoryListHeader";
 import { InventoryStats } from "../InventoryStats";
-import { ListViewHeader } from "./ListViewHeader";
-import { VirtualizedList } from "./VirtualizedList";
-import { InventoryPagination } from "../InventoryPagination";
+import { InventoryListCore } from "./InventoryListCore";
 
 interface InventoryListViewProps {
   items: (InventoryItem & {
@@ -65,9 +63,6 @@ export function InventoryListView({
     );
   }
 
-  const allSelected = items.length > 0 && selectedItems.length === items.length;
-  const someSelected = selectedItems.length > 0 && selectedItems.length < items.length;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -75,27 +70,18 @@ export function InventoryListView({
         <InventoryStats items={items} />
       </div>
 
-      <ListViewHeader
-        allSelected={allSelected}
-        someSelected={someSelected}
-        selectedCount={selectedItems.length}
+      <InventoryListCore
+        items={items}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        selectedItems={selectedItems}
         sortField={sortField}
         sortOrder={sortOrder}
+        onSelectItem={onSelectItem}
         onSelectAll={onSelectAll}
         onSort={onSort}
-      />
-
-      <VirtualizedList
-        items={items}
-        selectedItems={selectedItems}
-        onSelectItem={onSelectItem}
-        onEditItem={onEditItem}
-      />
-
-      <InventoryPagination
-        currentPage={currentPage}
-        totalPages={totalPages}
         onPageChange={onPageChange}
+        onEditItem={onEditItem}
       />
     </div>
   );

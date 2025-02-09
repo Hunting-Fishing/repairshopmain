@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   ClipboardList, 
@@ -54,7 +55,7 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
 
       const { data } = await supabase
         .from('dashboard_settings')
-        .select('stats_order')
+        .select('stats_order, enabled_stats')
         .eq('user_id', user.id)
         .maybeSingle();
 
@@ -88,7 +89,20 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
     );
   }
 
-  const sortedStats = stats?.sort((a, b) => {
+  // Filter stats based on enabled_stats setting and ensure uniqueness
+  const enabledStats = settings?.enabled_stats || ['total_work_orders', 'active_customers', 'pending_jobs', 'average_service_time', 'customer_satisfaction'];
+  const uniqueStats = stats?.filter(stat => enabledStats.includes(stat.type))
+    .reduce((acc, current) => {
+      const x = acc.find(item => item.type === current.type);
+      if (!x) {
+        return acc.concat([current]);
+      } else {
+        return acc;
+      }
+    }, [] as typeof stats extends (infer U)[] ? U[] : never) || [];
+
+  // Sort stats based on stats_order
+  const sortedStats = [...uniqueStats].sort((a, b) => {
     const aOrder = settings?.stats_order?.find(item => item.id === a.type)?.order || 0;
     const bOrder = settings?.stats_order?.find(item => item.id === b.type)?.order || 0;
     return aOrder - bOrder;
@@ -96,7 +110,7 @@ export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-      {sortedStats?.map((stat, index) => {
+      {sortedStats.map((stat, index) => {
         const Icon = statIcons[stat.type as keyof typeof statIcons];
         
         return (

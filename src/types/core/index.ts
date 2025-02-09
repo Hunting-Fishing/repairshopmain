@@ -39,7 +39,6 @@ export interface SortState {
   priority?: number;
 }
 
-// Remove the index signature and explicitly define all possible properties
 export interface FilterState {
   search?: string;
   dateRange?: {
@@ -105,4 +104,3 @@ export interface Timestamps {
   updated_at: string;
   deleted_at?: string;
 }
-

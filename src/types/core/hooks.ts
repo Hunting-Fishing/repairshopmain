@@ -41,4 +41,3 @@ export interface UseFilterState {
   removeFilter: (key: string) => void;
   clearFilters: () => void;
 }
-

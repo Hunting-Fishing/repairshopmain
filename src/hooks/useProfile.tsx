@@ -45,7 +45,7 @@ export function useProfile(userId: string | undefined) {
           skills
         `)
         .eq('id', userId)
-        .maybeSingle(); // Changed from single() to maybeSingle()
+        .maybeSingle();
         
       if (error) {
         console.error("Error fetching profile:", error);

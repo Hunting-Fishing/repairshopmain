@@ -1,3 +1,4 @@
+
 import { Json } from "../shared/json"
 import { UserRole } from "../enums"
 
@@ -24,6 +25,12 @@ export interface ProfileRow {
   postal_code: string | null
   country: string | null
   phone_number: string | null
+  emergency_contact: string | null
+  preferred_working_hours: string | null
+  certifications: Json | null
+  color_preferences: Json | null
+  skills: string[] | null
+  theme_preference: string | null
 }
 
 export interface ProfileInsert extends Partial<Omit<ProfileRow, 'created_at' | 'updated_at'>> {

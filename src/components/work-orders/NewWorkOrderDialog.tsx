@@ -18,6 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -124,8 +125,17 @@ export function NewWorkOrderDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button disabled={profileLoading}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Work Order
+          {profileLoading ? (
+            <>
+              <LoadingSpinner className="mr-2 h-4 w-4" />
+              Loading...
+            </>
+          ) : (
+            <>
+              <Plus className="mr-2 h-4 w-4" />
+              New Work Order
+            </>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
@@ -140,7 +150,14 @@ export function NewWorkOrderDialog() {
               className="w-full"
               disabled={profileLoading || !profile?.organization_id}
             >
-              Create Work Order
+              {form.formState.isSubmitting ? (
+                <>
+                  <LoadingSpinner className="mr-2 h-4 w-4" />
+                  Creating...
+                </>
+              ) : (
+                'Create Work Order'
+              )}
             </Button>
           </form>
         </Form>

@@ -28,7 +28,6 @@ interface SignUpData {
   country: string;
 }
 
-// Export the context so it can be imported elsewhere
 export const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -43,20 +42,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(initialSession?.user ?? null);
     });
 
+    // Set up session refresh
+    const refreshSession = async () => {
+      const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
+      if (error) {
+        console.error("Error refreshing session:", error);
+        setSession(null);
+        setUser(null);
+        toast({
+          title: "Session expired",
+          description: "Please sign in again.",
+          variant: "destructive",
+        });
+      } else if (refreshedSession) {
+        setSession(refreshedSession);
+        setUser(refreshedSession.user);
+      }
+    };
+
+    // Refresh session every 30 minutes
+    const refreshInterval = setInterval(refreshSession, 1000 * 60 * 30);
+
     // Set up the auth state listener
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log("Auth state changed:", { event: _event, session });
       setSession(session);
       setUser(session?.user ?? null);
+
+      // Handle email verification
+      if (_event === 'SIGNED_IN' && session?.user.email_confirmed_at) {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+      }
     });
 
-    // Cleanup subscription
+    // Cleanup subscriptions
     return () => {
+      clearInterval(refreshInterval);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [toast]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -67,6 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
     } catch (error: any) {
+      console.error("Sign in error:", error);
       toast({
         title: "Error signing in",
         description: error.message,
@@ -99,7 +129,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) throw error;
+
+      toast({
+        title: "Account created",
+        description: "Please check your email to verify your account.",
+      });
     } catch (error: any) {
+      console.error("Sign up error:", error);
       toast({
         title: "Error signing up",
         description: error.message,
@@ -113,7 +149,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
     } catch (error: any) {
+      console.error("Sign out error:", error);
       toast({
         title: "Error signing out",
         description: error.message,

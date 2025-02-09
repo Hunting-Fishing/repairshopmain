@@ -17,7 +17,7 @@ export function CalendarBookingHandler({
     <div className={cn(
       "rounded-xl p-6 transition-all duration-300",
       isModernTheme 
-        ? "bg-white/80 dark:bg-gray-900/50 backdrop-blur-lg shadow-lg border border-blue-100/50 dark:border-blue-900/50"
+        ? "bg-white/80 dark:bg-gray-900/50 backdrop-blur-lg shadow-xl border border-[#E2E8F0]/50 dark:border-blue-900/50"
         : "bg-white/30 dark:bg-gray-800/30 backdrop-blur-lg shadow-xl border border-white/20 dark:border-white/10"
     )}>
       <StatsCards isModernTheme={isModernTheme} />

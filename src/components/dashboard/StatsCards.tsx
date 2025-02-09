@@ -9,19 +9,11 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useStatsQuery } from "./hooks/useStatsQuery";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface StatsCardsProps {
   isModernTheme?: boolean;
-}
-
-interface StatData {
-  type: string;
-  value: number;
-  trend: number;
-  trend_direction: boolean;
 }
 
 const statIcons = {
@@ -51,18 +43,7 @@ const formatTitle = (type: string): string => {
 };
 
 export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
-  const { data: stats, isLoading, error } = useQuery({
-    queryKey: ['stats'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('stats')
-        .select('*');
-      
-      if (error) throw error;
-      return data as StatData[];
-    },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
+  const { data: stats, isLoading, error } = useStatsQuery();
 
   if (error) {
     console.error('Error fetching stats:', error);

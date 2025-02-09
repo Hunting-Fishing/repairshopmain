@@ -8,10 +8,10 @@ import { DashboardHeader } from "./DashboardHeader";
 import { CalendarView } from "./views/CalendarView";
 import { GridView } from "./views/GridView";
 import { ListView } from "./views/ListView";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { StatsCards } from "./StatsCards";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useUserProfile } from "./hooks/useUserProfile";
+import { LoadingScreen } from "./components/LoadingScreen";
+import { DashboardContainer } from "./components/DashboardContainer";
+import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
 
 interface TimeSlot {
   start: Date;
@@ -26,32 +26,7 @@ export function DashboardLayout() {
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
   const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
 
-  // Centralized profile data fetching with proper error handling
-  const { data: session, isLoading: isSessionLoading } = useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return session;
-    },
-  });
-
-  const { data: userProfile, isLoading: isProfileLoading } = useQuery({
-    queryKey: ["user-profile", session?.user.id],
-    queryFn: async () => {
-      if (!session?.user.id) return null;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("theme_preference, color_preferences")
-        .eq("id", session.user.id)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.user.id,
-  });
-
+  const { userProfile, isLoading: isProfileLoading } = useUserProfile();
   const { data: bookings, isLoading: isBookingsLoading, error } = useCalendarBookings(selectedDate);
 
   // Memoized theme values
@@ -78,28 +53,13 @@ export function DashboardLayout() {
     throw error;
   }
 
-  // Loading state
-  if (isSessionLoading || isProfileLoading) {
-    return (
-      <div className="min-h-screen p-4 md:p-6 space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-32" />
-          ))}
-        </div>
-        <Skeleton className="h-96" />
-      </div>
-    );
+  if (isProfileLoading) {
+    return <LoadingScreen />;
   }
 
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen animate-fade-in bg-gradient-to-br ${
-        isModernTheme 
-          ? 'from-blue-50 via-white to-blue-50'
-          : 'from-background/80 via-background/50 to-background/90'
-      } p-4 md:p-6`}>
+      <DashboardContainer isModernTheme={isModernTheme}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex-1">
             <DashboardHeader viewMode={viewMode} onViewChange={setViewMode} />
@@ -107,49 +67,47 @@ export function DashboardLayout() {
         </div>
 
         <div className="mb-8">
-          <StatsCards isModernTheme={isModernTheme} />
+          <CalendarBookingHandler 
+            isModernTheme={isModernTheme}
+            bookings={bookings}
+            isLoading={isBookingsLoading}
+          />
         </div>
 
-        <div className={`rounded-xl ${
-          isModernTheme 
-            ? 'bg-white/80 backdrop-blur-lg shadow-lg border border-blue-100/50'
-            : 'bg-white/30 backdrop-blur-lg shadow-xl border border-white/20'
-        } p-6`}>
-          <Tabs 
-            value={viewMode} 
-            onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
-            className="space-y-6"
-          >
-            <TabsContent value="calendar" className="mt-0">
-              <CalendarView
-                selectedDate={selectedDate}
-                view={view}
-                bookings={bookings || []}
-                isLoading={isBookingsLoading}
-                isCalendarExpanded={isCalendarExpanded}
-                onDateChange={(date) => date && setSelectedDate(date)}
-                onViewChange={setView}
-                onTimeSlotClick={handleTimeSlotClick}
-                toggleCalendarSize={toggleCalendarSize}
-                colorPreferences={{
-                  primary_color: isModernTheme ? "#0EA5E9" : "#F97316",
-                  secondary_color: isModernTheme ? "#EFF6FF" : "#FDE1D3",
-                  border_color: isModernTheme ? "#0EA5E9" : "#F97316",
-                  background_color: "bg-background/95"
-                }}
-                isModernTheme={isModernTheme}
-              />
-            </TabsContent>
+        <Tabs 
+          value={viewMode} 
+          onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
+          className="space-y-6"
+        >
+          <TabsContent value="calendar" className="mt-0">
+            <CalendarView
+              selectedDate={selectedDate}
+              view={view}
+              bookings={bookings || []}
+              isLoading={isBookingsLoading}
+              isCalendarExpanded={isCalendarExpanded}
+              onDateChange={(date) => date && setSelectedDate(date)}
+              onViewChange={setView}
+              onTimeSlotClick={handleTimeSlotClick}
+              toggleCalendarSize={toggleCalendarSize}
+              colorPreferences={{
+                primary_color: isModernTheme ? "#0EA5E9" : "#F97316",
+                secondary_color: isModernTheme ? "#EFF6FF" : "#FDE1D3",
+                border_color: isModernTheme ? "#0EA5E9" : "#F97316",
+                background_color: "bg-background/95"
+              }}
+              isModernTheme={isModernTheme}
+            />
+          </TabsContent>
 
-            <TabsContent value="grid" className="mt-0">
-              <GridView />
-            </TabsContent>
+          <TabsContent value="grid" className="mt-0">
+            <GridView />
+          </TabsContent>
 
-            <TabsContent value="list" className="mt-0">
-              <ListView />
-            </TabsContent>
-          </Tabs>
-        </div>
+          <TabsContent value="list" className="mt-0">
+            <ListView />
+          </TabsContent>
+        </Tabs>
 
         <BookingDialog
           open={isBookingDialogOpen}
@@ -157,7 +115,7 @@ export function DashboardLayout() {
           selectedTimeSlot={selectedTimeSlot}
           onBookingCreated={handleBookingCreated}
         />
-      </div>
+      </DashboardContainer>
     </ErrorBoundary>
   );
 }

@@ -264,6 +264,8 @@ export type Database = {
           estimated_cost: number | null
           id: string
           job_description: string
+          last_status_change: string | null
+          last_updated_by: string | null
           notes: string | null
           notification_preferences: Json | null
           organization_id: string
@@ -288,6 +290,8 @@ export type Database = {
           estimated_cost?: number | null
           id?: string
           job_description: string
+          last_status_change?: string | null
+          last_updated_by?: string | null
           notes?: string | null
           notification_preferences?: Json | null
           organization_id: string
@@ -312,6 +316,8 @@ export type Database = {
           estimated_cost?: number | null
           id?: string
           job_description?: string
+          last_status_change?: string | null
+          last_updated_by?: string | null
           notes?: string | null
           notification_preferences?: Json | null
           organization_id?: string
@@ -2248,6 +2254,7 @@ export type Database = {
           invitation_token: string | null
           last_name: string | null
           notes: string | null
+          notification_preferences: Json | null
           organization_id: string | null
           phone_number: string | null
           postal_code: string | null
@@ -2279,6 +2286,7 @@ export type Database = {
           invitation_token?: string | null
           last_name?: string | null
           notes?: string | null
+          notification_preferences?: Json | null
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null
@@ -2310,6 +2318,7 @@ export type Database = {
           invitation_token?: string | null
           last_name?: string | null
           notes?: string | null
+          notification_preferences?: Json | null
           organization_id?: string | null
           phone_number?: string | null
           postal_code?: string | null

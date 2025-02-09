@@ -51,6 +51,13 @@ export interface Booking {
   start_time: string;
   end_time: string;
   status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  last_updated_by?: string;
+  last_status_change?: string;
+  notification_preferences?: {
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+  };
 }
 
 export interface TimeSlot {
@@ -69,4 +76,6 @@ export interface CalendarViewProps {
     end: number;
   };
   use24HourTime?: boolean;
+  colorPreferences?: ColorPreferences;
+  showTechnicianWorkload?: boolean;
 }

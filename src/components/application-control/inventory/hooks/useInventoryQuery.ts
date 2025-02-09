@@ -1,8 +1,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { InventoryItem } from "../types";
+import { useInventoryFilters } from "./query/useInventoryFilters";
+import { useInventorySort } from "./query/useInventorySort";
 import { logInventoryProblems } from "./utils/inventoryAnalytics";
+import type { InventoryItem } from "../types";
 
 interface UseInventoryQueryProps {
   searchQuery: string;
@@ -25,28 +27,24 @@ export function useInventoryQuery({
   sortField,
   sortOrder,
 }: UseInventoryQueryProps) {
+  const { buildQuery } = useInventoryFilters({ searchQuery, filters });
+
   return useQuery({
     queryKey: ['inventory-items', searchQuery, filters, currentPage, sortField, sortOrder],
     queryFn: async () => {
-      const query = supabase
+      let query = supabase
         .from('inventory_items')
         .select(`
           *,
           category:category_id(name),
           supplier:supplier_id(name)
-        `)
-        .order(sortField, { ascending: sortOrder === 'asc' });
+        `);
 
-      if (searchQuery) {
-        query.ilike('name', `%${searchQuery}%`);
-      }
-
-      if (filters.lowStock) query.lt('quantity_in_stock', 10);
-      if (filters.outOfStock) query.eq('quantity_in_stock', 0);
-      if (filters.needsReorder) query.lt('quantity_in_stock', 'reorder_point');
+      query = buildQuery(query);
+      query = useInventorySort(query, sortField, sortOrder);
 
       const start = (currentPage - 1) * itemsPerPage;
-      query.range(start, start + itemsPerPage - 1);
+      query = query.range(start, start + itemsPerPage - 1);
 
       const { data, error, count } = await query.throwOnError();
       

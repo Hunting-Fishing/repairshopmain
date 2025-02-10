@@ -60,7 +60,6 @@ export class ErrorBoundary extends React.Component<Props, State> {
         return this.props.fallback;
       }
 
-      // Different UI based on error boundary type
       switch (this.props.type) {
         case "auth":
           return (

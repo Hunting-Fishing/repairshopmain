@@ -8,20 +8,48 @@ import { StatsCards } from "./StatsCards";
 import { SystemStatusCard } from "./components/SystemStatusCard";
 import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
 import { useDashboard } from "@/contexts/DashboardContext";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { toast } from "sonner";
+import { LoadingScreen } from "./components/LoadingScreen";
 
 export const DashboardContent = memo(function DashboardContent() {
   const { state, actions } = useDashboard();
   const {
     view: { selectedDate, view, viewMode, isCalendarExpanded },
     data: { bookings, profile: userProfile },
-    loading: { bookings: isBookingsLoading }
+    loading: { bookings: isBookingsLoading, profile: isProfileLoading },
+    errors: { bookings: bookingsError, profile: profileError }
   } = state;
   const { setViewMode, setSelectedDate, setView, setIsCalendarExpanded } = actions;
 
   const isModernTheme = true;
+  const isLoading = isBookingsLoading || isProfileLoading;
+  const error = bookingsError || profileError;
+
+  const handleError = (error: Error) => {
+    console.error("Dashboard error:", error);
+    toast.error("An error occurred in the dashboard");
+  };
+
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          Failed to load dashboard data: {error.message}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
-    <>
+    <ErrorBoundary onError={handleError}>
       <div className="grid gap-6 mb-8">
         <StatsCards isModernTheme={isModernTheme} />
         <SystemStatusCard isModernTheme={isModernTheme} />
@@ -65,6 +93,6 @@ export const DashboardContent = memo(function DashboardContent() {
           <ListView />
         </TabsContent>
       </Tabs>
-    </>
+    </ErrorBoundary>
   );
 });

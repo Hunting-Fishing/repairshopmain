@@ -1,4 +1,5 @@
 
+import { memo, useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CalendarIcon, LayoutGrid, List } from "lucide-react";
 
@@ -7,7 +8,16 @@ interface ViewSelectorProps {
   onViewChange: (value: "calendar" | "grid" | "list") => void;
 }
 
-export function ViewSelector({ viewMode, onViewChange }: ViewSelectorProps) {
+export const ViewSelector = memo(function ViewSelector({ 
+  viewMode, 
+  onViewChange 
+}: ViewSelectorProps) {
+  const viewOptions = useMemo(() => [
+    { value: "calendar", label: "Calendar", icon: CalendarIcon },
+    { value: "grid", label: "Grid", icon: LayoutGrid },
+    { value: "list", label: "List", icon: List }
+  ], []);
+
   return (
     <Tabs 
       value={viewMode} 
@@ -15,19 +25,17 @@ export function ViewSelector({ viewMode, onViewChange }: ViewSelectorProps) {
       className="hidden md:block"
     >
       <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
-        <TabsTrigger value="calendar" className="flex items-center gap-2">
-          <CalendarIcon className="h-4 w-4" />
-          Calendar
-        </TabsTrigger>
-        <TabsTrigger value="grid" className="flex items-center gap-2">
-          <LayoutGrid className="h-4 w-4" />
-          Grid
-        </TabsTrigger>
-        <TabsTrigger value="list" className="flex items-center gap-2">
-          <List className="h-4 w-4" />
-          List
-        </TabsTrigger>
+        {viewOptions.map(({ value, label, icon: Icon }) => (
+          <TabsTrigger 
+            key={value} 
+            value={value} 
+            className="flex items-center gap-2"
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </TabsTrigger>
+        ))}
       </TabsList>
     </Tabs>
   );
-}
+});

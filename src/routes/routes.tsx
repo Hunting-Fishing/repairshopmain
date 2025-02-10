@@ -15,13 +15,13 @@ import ApplicationControl from "@/pages/ApplicationControl";
 import Inventory from "@/pages/Inventory";
 import JobTemplates from "@/pages/JobTemplates";
 import ShopItems from "@/pages/ShopItems";
+import Vehicles from "@/pages/Vehicles";
+import Shops from "@/pages/Shops";
+import Communications from "@/pages/Communications";
+import InventorySuppliers from "@/pages/InventorySuppliers";
 import { SetPassword } from "@/pages/SetPassword";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { ShopList } from "@/components/shops/ShopList";
-import { VehicleList } from "@/components/customers/vehicles/VehicleList";
 import { NotFoundPage } from "@/pages/NotFoundPage";
-import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
-import { InventorySuppliers } from "@/components/application-control/inventory/InventorySuppliers";
 
 export const router = createBrowserRouter([
   {
@@ -59,19 +59,23 @@ export const router = createBrowserRouter([
       },
       {
         path: "vehicles",
-        element: <ProtectedRoute><VehicleList /></ProtectedRoute>,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><Vehicles /></ProtectedRoute>,
       },
       {
         path: "work-orders",
-        element: <ProtectedRoute><WorkOrders /></ProtectedRoute>,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor', 'technician']}><WorkOrders /></ProtectedRoute>,
       },
       {
         path: "shop-items",
-        element: <ProtectedRoute><ShopItems /></ProtectedRoute>,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><ShopItems /></ProtectedRoute>,
       },
       {
         path: "repair-jobs/:id",
-        element: <ProtectedRoute><RepairJobDetails /></ProtectedRoute>,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor', 'technician']}><RepairJobDetails /></ProtectedRoute>,
+      },
+      {
+        path: "inventory",
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><Inventory /></ProtectedRoute>,
       },
       {
         path: "application-control",
@@ -84,16 +88,12 @@ export const router = createBrowserRouter([
             element: <ApplicationControl />,
           },
           {
-            path: "calendar-settings",
-            element: <CalendarSettings />,
-          },
-          {
             path: "communications",
-            element: <CommunicationsTab />,
+            element: <Communications />,
           },
           {
             path: "shops",
-            element: <ShopList />,
+            element: <Shops />,
           },
           {
             path: "job-templates",
@@ -104,10 +104,6 @@ export const router = createBrowserRouter([
             element: <InventorySuppliers />,
           }
         ],
-      },
-      {
-        path: "inventory",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><Inventory /></ProtectedRoute>,
       },
     ],
   },

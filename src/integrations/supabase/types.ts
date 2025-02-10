@@ -2450,6 +2450,60 @@ export type Database = {
           },
         ]
       }
+      repair_job_labor: {
+        Row: {
+          created_at: string | null
+          end_time: string | null
+          id: string
+          notes: string | null
+          organization_id: string
+          rate_per_hour: number
+          repair_job_id: string
+          start_time: string
+          technician_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_time?: string | null
+          id?: string
+          notes?: string | null
+          organization_id: string
+          rate_per_hour: number
+          repair_job_id: string
+          start_time: string
+          technician_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string
+          rate_per_hour?: number
+          repair_job_id?: string
+          start_time?: string
+          technician_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_job_labor_repair_job_id_fkey"
+            columns: ["repair_job_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_job_labor_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           created_at: string

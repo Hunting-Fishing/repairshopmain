@@ -40,7 +40,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
 
-  // Sync state changes with database
+  // Update view state when component mounts or viewState changes
   useEffect(() => {
     if (!isViewStateLoading && viewState) {
       updateViewState({
@@ -51,12 +51,18 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         },
         view_mode: viewMode,
         is_calendar_expanded: isCalendarExpanded,
-        search_filters: viewState.search_filters,
-        sort_preferences: viewState.sort_preferences,
-        pagination_settings: viewState.pagination_settings
+        search_filters: viewState.search_filters || {},
+        sort_preferences: viewState.sort_preferences || {
+          field: 'created_at',
+          direction: 'desc'
+        },
+        pagination_settings: viewState.pagination_settings || {
+          itemsPerPage: 10,
+          currentPage: 1
+        }
       });
     }
-  }, [view, viewMode, isCalendarExpanded]);
+  }, [view, viewMode, isCalendarExpanded, viewState, isViewStateLoading, updateViewState]);
 
   // Handle any booking errors
   useEffect(() => {
@@ -67,7 +73,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   }, [bookingsError]);
 
   if (!user?.id) {
-    return null; // Or a loading state
+    return null;
   }
 
   const value: DashboardContextType = {

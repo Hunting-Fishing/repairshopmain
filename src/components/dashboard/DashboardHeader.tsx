@@ -1,18 +1,17 @@
+
 import { ViewSelector } from "./ViewSelector";
+import { useDashboard } from "./DashboardProvider";
 
-interface DashboardHeaderProps {
-  viewMode: "calendar" | "grid" | "list";
-  onViewChange: (value: "calendar" | "grid" | "list") => void;
-}
+export function DashboardHeader() {
+  const { viewMode, setViewMode } = useDashboard();
 
-export function DashboardHeader({ viewMode, onViewChange }: DashboardHeaderProps) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between mb-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">Overview of your repair shop's performance</p>
       </div>
-      <ViewSelector viewMode={viewMode} onViewChange={onViewChange} />
+      <ViewSelector viewMode={viewMode} onViewChange={setViewMode} />
     </div>
   );
 }

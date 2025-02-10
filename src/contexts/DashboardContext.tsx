@@ -24,10 +24,10 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
     last_name: profile.last_name,
     role: profile.role,
     color_preferences: profile.color_preferences ? {
-      primary_color: profile.color_preferences.primary_color,
-      secondary_color: profile.color_preferences.secondary_color,
-      border_color: profile.color_preferences.border_color,
-      background_color: profile.color_preferences.background_color,
+      primary_color: String(profile.color_preferences.primary_color || "#0EA5E9"),
+      secondary_color: String(profile.color_preferences.secondary_color || "#EFF6FF"),
+      border_color: String(profile.color_preferences.border_color || "#0EA5E9"),
+      background_color: String(profile.color_preferences.background_color || "bg-background/95")
     } : null
   } : null;
 
@@ -39,7 +39,13 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
       isCalendarExpanded: viewState?.is_calendar_expanded || false,
     },
     data: {
-      bookings: bookings || [],
+      bookings: bookings?.map(booking => ({
+        ...booking,
+        notification_preferences: {
+          ...booking.notification_preferences,
+          push: false // Set a default value for the required push property
+        }
+      })) || [],
       stats: stats || [],
       profile: dashboardProfile,
     },
@@ -101,3 +107,4 @@ export function useDashboard() {
   }
   return context;
 }
+

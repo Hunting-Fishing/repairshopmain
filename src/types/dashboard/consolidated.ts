@@ -10,6 +10,12 @@ export interface DashboardViewState {
   isCalendarExpanded: boolean;
 }
 
+export interface NotificationPreferences {
+  email: boolean;
+  sms: boolean;
+  push: boolean;
+}
+
 export interface DashboardBooking {
   id: string;
   organization_id: string;
@@ -32,10 +38,7 @@ export interface DashboardBooking {
   estimated_cost: number | null;
   priority: string;
   source: string;
-  notification_preferences: {
-    email: boolean;
-    sms: boolean;
-  };
+  notification_preferences: NotificationPreferences;
   technician?: {
     id: string;
     first_name: string | null;
@@ -100,3 +103,4 @@ export interface DashboardContextValue {
   state: DashboardContextState;
   actions: DashboardContextActions;
 }
+

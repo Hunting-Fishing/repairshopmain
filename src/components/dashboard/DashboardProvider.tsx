@@ -1,34 +1,62 @@
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { useCalendarBookings } from "@/hooks/useCalendarBookings";
 import { useUserProfile } from "./hooks/useUserProfile";
-
-interface DashboardContextType {
-  selectedDate: Date;
-  setSelectedDate: (date: Date) => void;
-  view: "day" | "week" | "month";
-  setView: (view: "day" | "week" | "month") => void;
-  viewMode: "calendar" | "grid" | "list";
-  setViewMode: (mode: "calendar" | "grid" | "list") => void;
-  isCalendarExpanded: boolean;
-  setIsCalendarExpanded: (expanded: boolean) => void;
-  bookings: any[];
-  isBookingsLoading: boolean;
-  bookingsError: Error | null;
-  userProfile: any;
-  isProfileLoading: boolean;
-}
+import { useViewState } from "@/hooks/useViewState";
+import { DashboardContextType } from "@/types/dashboard/state";
+import { toast } from "sonner";
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
+  // Initialize with default values
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [view, setView] = useState<"day" | "week" | "month">("day");
-  const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">("calendar");
-  const [isCalendarExpanded, setIsCalendarExpanded] = useState(false);
+  
+  // Use the consolidated view state from database
+  const { viewState, updateViewState, isLoading: isViewStateLoading } = useViewState('dashboard');
+  
+  const [view, setView] = useState<"day" | "week" | "month">(
+    viewState?.state?.defaultView || "day"
+  );
+  
+  const [viewMode, setViewMode] = useState<"calendar" | "grid" | "list">(
+    viewState?.view_mode || "calendar"
+  );
+  
+  const [isCalendarExpanded, setIsCalendarExpanded] = useState(
+    viewState?.isCalendarExpanded || false
+  );
 
-  const { data: bookings, isLoading: isBookingsLoading, error: bookingsError } = useCalendarBookings(selectedDate);
+  // Fetch bookings and user profile
+  const { 
+    data: bookings, 
+    isLoading: isBookingsLoading, 
+    error: bookingsError 
+  } = useCalendarBookings(selectedDate);
+  
   const { userProfile, isLoading: isProfileLoading } = useUserProfile();
+
+  // Sync state changes with database
+  useEffect(() => {
+    if (!isViewStateLoading) {
+      updateViewState({
+        state: {
+          ...viewState?.state,
+          defaultView: view,
+        },
+        view_mode: viewMode,
+        isCalendarExpanded,
+      });
+    }
+  }, [view, viewMode, isCalendarExpanded]);
+
+  // Handle any booking errors
+  useEffect(() => {
+    if (bookingsError) {
+      toast.error("Failed to load bookings");
+      console.error("Booking error:", bookingsError);
+    }
+  }, [bookingsError]);
 
   const value = {
     selectedDate,

@@ -8,7 +8,7 @@ import { AlertCircle } from "lucide-react";
 import { formatStatTitle } from "../../utils/statsFormatters";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { toast } from "sonner";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 
 interface StatCardGridProps {
   isModernTheme?: boolean;
@@ -18,20 +18,19 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
   const { stats: { stats, isLoading, error } } = useAppState();
   const statIcons = useStatsIcons();
 
-  const handleStatsError = (error: Error) => {
+  const handleStatsError = useCallback((error: Error) => {
     console.error("Stats error:", error);
-    toast.error("Failed to load statistics");
-  };
+    toast("Failed to load statistics");
+  }, []);
 
   const uniqueStats = useMemo(() => {
     if (!stats) return [];
-    return stats.reduce((acc, current) => {
-      const x = acc.find(item => item.type === current.type);
-      if (!x) {
-        return acc.concat([current]);
-      }
-      return acc;
-    }, [] as typeof stats extends (infer U)[] ? U[] : never);
+    const seen = new Set();
+    return stats.filter(stat => {
+      if (seen.has(stat.type)) return false;
+      seen.add(stat.type);
+      return true;
+    });
   }, [stats]);
 
   if (error) {
@@ -56,14 +55,6 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
   return (
     <ErrorBoundary
       onError={handleStatsError}
-      fallback={
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            An error occurred while displaying statistics. Please try refreshing the page.
-          </AlertDescription>
-        </Alert>
-      }
     >
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {uniqueStats.map((stat, index) => {

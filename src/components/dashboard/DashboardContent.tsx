@@ -30,7 +30,7 @@ export const DashboardContent = memo(function DashboardContent() {
 
   const handleError = (error: Error) => {
     console.error("Dashboard error:", error);
-    toast.error("An error occurred in the dashboard");
+    toast("An error occurred in the dashboard");
   };
 
   if (error) {

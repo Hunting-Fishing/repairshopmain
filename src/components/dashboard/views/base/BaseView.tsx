@@ -1,6 +1,5 @@
 
 import { Card } from "@/components/ui/card";
-import { StatsCards } from "../../StatsCards";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -24,25 +23,19 @@ export function BaseView({ error, isLoading, children }: BaseViewProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <StatsCards />
-      </Card>
-      
-      <Card className="p-6">
-        {isLoading ? (
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-16 w-full" />
-              ))}
-            </div>
+    <Card className="p-6">
+      {isLoading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+          <div className="space-y-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
           </div>
-        ) : (
-          children
-        )}
-      </Card>
-    </div>
+        </div>
+      ) : (
+        children
+      )}
+    </Card>
   );
 }

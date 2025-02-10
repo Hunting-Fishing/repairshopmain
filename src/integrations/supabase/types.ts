@@ -4166,6 +4166,30 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_view_state: {
         Row: {
           calendar_view:
@@ -4542,6 +4566,13 @@ export type Database = {
         }
         Returns: string
       }
+      has_role: {
+        Args: {
+          user_id: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
       reset_staff_password: {
         Args: {
           staff_id: string
@@ -4550,6 +4581,12 @@ export type Database = {
       }
     }
     Enums: {
+      app_role:
+        | "owner"
+        | "management"
+        | "service_advisor"
+        | "technician"
+        | "staff"
       automotive_category:
         | "Electrical"
         | "Brakes"

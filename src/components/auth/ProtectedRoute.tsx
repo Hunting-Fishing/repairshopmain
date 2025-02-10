@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,7 +22,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -30,16 +31,25 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     console.error('Error loading profile:', error);
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <h2 className="text-lg font-semibold text-red-600">Error Loading Profile</h2>
-          <p className="text-gray-600">Please try refreshing the page</p>
-        </div>
+        <Alert variant="destructive" className="max-w-md">
+          <AlertDescription>
+            There was an error loading your profile. Please try refreshing the page or contact support if the problem persists.
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }
 
   if (allowedRoles && (!profile?.role || !allowedRoles.includes(profile.role))) {
-    return <Navigate to="/" replace />;
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Alert variant="destructive" className="max-w-md">
+          <AlertDescription>
+            You don't have permission to access this page. Please contact your administrator if you believe this is an error.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return <>{children}</>;

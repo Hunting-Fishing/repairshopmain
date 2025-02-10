@@ -35,7 +35,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "calendar",
-        element: <ProtectedRoute><Calendar /></ProtectedRoute>,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor', 'technician']}><Calendar /></ProtectedRoute>,
       },
       {
         path: "calendar/settings",
@@ -43,11 +43,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "customers",
-        element: <ProtectedRoute><Customers /></ProtectedRoute>,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><Customers /></ProtectedRoute>,
       },
       {
         path: "customers/:id",
-        element: <ProtectedRoute><CustomerDetail /></ProtectedRoute>,
+        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><CustomerDetail /></ProtectedRoute>,
       },
       {
         path: "customer-management",

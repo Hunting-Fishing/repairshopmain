@@ -6,6 +6,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ViewState } from "@/types/dashboard";
 import { useDebouncedCallback } from "use-debounce";
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
+
 export function useViewState(viewType: string) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -75,10 +78,10 @@ export function useViewState(viewType: string) {
     retry: 2,
   });
 
-  const { mutate: updateViewState } = useMutation({
-    mutationFn: async (updates: Partial<ViewState>) => {
-      if (!user?.id || !viewState?.id) return null;
+  const updateViewStateWithRetry = async (updates: Partial<ViewState>, retryCount = 0) => {
+    if (!user?.id || !viewState?.id) return null;
 
+    try {
       const payload = {
         ...updates,
         updated_at: new Date().toISOString()
@@ -90,22 +93,46 @@ export function useViewState(viewType: string) {
         .eq('id', viewState.id)
         .eq('user_id', user.id);
 
-      if (error) throw error;
-    },
+      if (error) {
+        // Check if it's a deadlock error
+        if (error.code === '40P01' && retryCount < MAX_RETRIES) {
+          console.log(`Deadlock detected, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+          // Wait before retrying
+          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY * (retryCount + 1)));
+          return updateViewStateWithRetry(updates, retryCount + 1);
+        }
+        throw error;
+      }
+
+      return true;
+    } catch (error: any) {
+      console.error("Error updating view state:", error);
+      // Only show toast error on final retry
+      if (retryCount === MAX_RETRIES) {
+        toast.error("Failed to save view preferences");
+      }
+      throw error;
+    }
+  };
+
+  const { mutate: updateViewState } = useMutation({
+    mutationFn: updateViewStateWithRetry,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['view-state', viewType, user?.id] });
     },
     onError: (error: any) => {
       console.error("Error updating view state:", error);
-      toast.error("Failed to save view preferences");
+      // Error toast is now handled in updateViewStateWithRetry
     }
   });
 
+  // Use debounce to prevent too many simultaneous updates
   const debouncedUpdateViewState = useDebouncedCallback(
     (updates: Partial<ViewState>) => {
       updateViewState(updates);
     },
-    500
+    500, // Increased debounce time to further reduce concurrent updates
+    { maxWait: 2000 } // Maximum wait time for debounced updates
   );
 
   return {

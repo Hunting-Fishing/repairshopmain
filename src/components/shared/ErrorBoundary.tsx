@@ -32,11 +32,23 @@ export class ErrorBoundary extends React.Component<Props, State> {
     console.error('Error caught by boundary:', error, errorInfo);
     
     try {
+      const errorMessage = error.message;
+      const isDeadlock = errorMessage.includes('deadlock detected');
+      
       await supabase.from('error_logs').insert({
         error_message: error.message,
         error_stack: error.stack,
         component_name: this.props.type || 'default',
         route: window.location.pathname,
+        severity: isDeadlock ? 'warning' : 'error',
+        metadata: {
+          errorInfo,
+          isDeadlock,
+          browserInfo: {
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+          }
+        }
       });
     } catch (logError) {
       console.error('Failed to log error:', logError);
@@ -59,6 +71,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
       if (this.props.fallback) {
         return this.props.fallback;
       }
+
+      const isDeadlock = this.state.error?.message.includes('deadlock detected');
 
       switch (this.props.type) {
         case "auth":
@@ -83,11 +97,19 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
         default:
           return (
-            <Alert variant="destructive" className="flex flex-col items-center p-6">
+            <Alert 
+              variant={isDeadlock ? "warning" : "destructive"} 
+              className="flex flex-col items-center p-6"
+            >
               <AlertCircle className="h-6 w-6 mb-2" />
-              <AlertTitle className="mb-2">An error occurred</AlertTitle>
+              <AlertTitle className="mb-2">
+                {isDeadlock ? "Temporary Issue" : "An error occurred"}
+              </AlertTitle>
               <AlertDescription className="text-center mb-4">
-                {this.state.error?.message || "Something went wrong. Please try again."}
+                {isDeadlock 
+                  ? "We're experiencing high load. Please try again."
+                  : this.state.error?.message || "Something went wrong. Please try again."
+                }
               </AlertDescription>
               <Button 
                 variant="outline"

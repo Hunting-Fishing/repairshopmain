@@ -56,8 +56,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadPersistedState = async () => {
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const userId = sessionData?.session?.user?.id;
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
         if (!userId) return;
 
         const { data, error } = await supabase
@@ -90,8 +90,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const persistState = async () => {
       try {
-        const { data: sessionData } = await supabase.auth.getSession();
-        const userId = sessionData?.session?.user?.id;
+        const { data: { session } } = await supabase.auth.getSession();
+        const userId = session?.user?.id;
         if (!userId) return;
 
         const state: PersistedState = {

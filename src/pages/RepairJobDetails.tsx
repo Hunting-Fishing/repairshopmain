@@ -2,15 +2,14 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { PartsTab } from "@/components/repair/PartsTab";
 import { LaborTab } from "@/components/repair/LaborTab";
 import { HistoryTab } from "@/components/repair/HistoryTab";
+import { BasicDetails } from "@/components/repair/details/BasicDetails";
 
 interface RepairJobDetails {
   id: string;
@@ -103,61 +102,7 @@ export default function RepairJobDetails() {
         </TabsList>
 
         <TabsContent value="details">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{repairJob.customer.first_name} {repairJob.customer.last_name}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Vehicle Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  {repairJob.vehicle.year} {repairJob.vehicle.make} {repairJob.vehicle.model}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Job Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p><strong>Description:</strong> {repairJob.description}</p>
-                  <p><strong>Created:</strong> {format(new Date(repairJob.created_at), 'PPp')}</p>
-                  {repairJob.technician && (
-                    <p>
-                      <strong>Technician:</strong> {repairJob.technician.first_name} {repairJob.technician.last_name}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Financial Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <p><strong>Quoted Amount:</strong> ${repairJob.quoted_amount}</p>
-                  {repairJob.approved_amount && (
-                    <p><strong>Approved Amount:</strong> ${repairJob.approved_amount}</p>
-                  )}
-                  {repairJob.actual_amount && (
-                    <p><strong>Actual Amount:</strong> ${repairJob.actual_amount}</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <BasicDetails data={repairJob} />
         </TabsContent>
 
         <TabsContent value="parts">

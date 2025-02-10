@@ -6,10 +6,13 @@ import { useViewState } from "@/hooks/useViewState";
 import { DashboardContextType } from "@/types/dashboard/state";
 import { toast } from "sonner";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export function DashboardProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+  
   // Initialize with default values
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   
@@ -63,7 +66,12 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     }
   }, [bookingsError]);
 
+  if (!user?.id) {
+    return null; // Or a loading state
+  }
+
   const value: DashboardContextType = {
+    user_id: user.id,
     selectedDate,
     setSelectedDate,
     view,
@@ -88,7 +96,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       itemsPerPage: 10,
       currentPage: 1
     },
-    view_mode: viewMode
+    view_mode: viewMode,
+    is_calendar_expanded: isCalendarExpanded
   };
 
   return (

@@ -8,11 +8,17 @@ export const formatStatTitle = (type: string): string => {
 
 export const formatStatValue = (type: string, value: number): string => {
   switch (type) {
-    case 'average_service_time':
-      return `${value} hrs`;
-    case 'customer_satisfaction':
-      return `${value}/5`;
+    case 'revenue':
+      return `$${value.toLocaleString()}`;
+    case 'customers':
+      return value.toLocaleString();
+    case 'orders':
+      return value.toLocaleString();
+    case 'average_order':
+      return `$${value.toLocaleString()}`;
+    case 'satisfaction':
+      return `${value.toFixed(1)}%`;
     default:
-      return value.toString();
+      return value.toLocaleString();
   }
 };

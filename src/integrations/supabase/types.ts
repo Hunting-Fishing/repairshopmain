@@ -1390,33 +1390,48 @@ export type Database = {
       }
       error_logs: {
         Row: {
+          browser_info: Json | null
           component_name: string | null
           created_at: string | null
           error_message: string
           error_stack: string | null
           id: string
+          metadata: Json | null
+          organization_id: string | null
           resolution_notes: string | null
           resolved_at: string | null
+          severity: string | null
+          url: string | null
           user_id: string | null
         }
         Insert: {
+          browser_info?: Json | null
           component_name?: string | null
           created_at?: string | null
           error_message: string
           error_stack?: string | null
           id?: string
+          metadata?: Json | null
+          organization_id?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          severity?: string | null
+          url?: string | null
           user_id?: string | null
         }
         Update: {
+          browser_info?: Json | null
           component_name?: string | null
           created_at?: string | null
           error_message?: string
           error_stack?: string | null
           id?: string
+          metadata?: Json | null
+          organization_id?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          severity?: string | null
+          url?: string | null
           user_id?: string | null
         }
         Relationships: [

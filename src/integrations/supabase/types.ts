@@ -4004,9 +4004,13 @@ export type Database = {
       }
       user_view_state: {
         Row: {
+          calendar_view:
+            | Database["public"]["Enums"]["calendar_view_type"]
+            | null
           created_at: string | null
           defaultview: string | null
           id: string
+          is_calendar_expanded: boolean | null
           iscalendarexpanded: boolean | null
           organization_id: string | null
           pagination_settings: Json | null
@@ -4015,13 +4019,18 @@ export type Database = {
           state: Json | null
           updated_at: string | null
           user_id: string | null
+          view_mode: Database["public"]["Enums"]["dashboard_view_mode"] | null
           view_type: string
           viewmode: string | null
         }
         Insert: {
+          calendar_view?:
+            | Database["public"]["Enums"]["calendar_view_type"]
+            | null
           created_at?: string | null
           defaultview?: string | null
           id?: string
+          is_calendar_expanded?: boolean | null
           iscalendarexpanded?: boolean | null
           organization_id?: string | null
           pagination_settings?: Json | null
@@ -4030,13 +4039,18 @@ export type Database = {
           state?: Json | null
           updated_at?: string | null
           user_id?: string | null
+          view_mode?: Database["public"]["Enums"]["dashboard_view_mode"] | null
           view_type: string
           viewmode?: string | null
         }
         Update: {
+          calendar_view?:
+            | Database["public"]["Enums"]["calendar_view_type"]
+            | null
           created_at?: string | null
           defaultview?: string | null
           id?: string
+          is_calendar_expanded?: boolean | null
           iscalendarexpanded?: boolean | null
           organization_id?: string | null
           pagination_settings?: Json | null
@@ -4045,6 +4059,7 @@ export type Database = {
           state?: Json | null
           updated_at?: string | null
           user_id?: string | null
+          view_mode?: Database["public"]["Enums"]["dashboard_view_mode"] | null
           view_type?: string
           viewmode?: string | null
         }

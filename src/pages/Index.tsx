@@ -10,15 +10,16 @@ import { AppStateProvider } from "@/contexts/AppStateContext";
 import { toast } from "sonner";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { DashboardProvider } from "@/components/dashboard/DashboardProvider";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Index() {
   const navigate = useNavigate();
+  const { session } = useAuth();
   
   const { data: profile, isLoading, error } = useQuery({
-    queryKey: ['user-profile'],
+    queryKey: ['user-profile', session?.user?.id],
     queryFn: async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id) {
           navigate('/auth');
           return null;
@@ -47,9 +48,16 @@ export default function Index() {
         throw error;
       }
     },
+    enabled: !!session?.user?.id,
     retry: 1,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+
+  // If not authenticated, redirect to auth page
+  if (!session) {
+    navigate('/auth');
+    return null;
+  }
 
   if (isLoading) {
     return <LoadingScreen />;

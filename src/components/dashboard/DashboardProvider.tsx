@@ -40,12 +40,22 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isViewStateLoading) {
       updateViewState({
+        view_type: 'dashboard',
         state: {
           ...viewState?.state,
           defaultView: view,
         },
         view_mode: viewMode,
         isCalendarExpanded,
+        search_filters: viewState?.search_filters || {},
+        sort_preferences: viewState?.sort_preferences || {
+          field: 'date',
+          direction: 'asc'
+        },
+        pagination_settings: viewState?.pagination_settings || {
+          itemsPerPage: 10,
+          currentPage: 1
+        }
       });
     }
   }, [view, viewMode, isCalendarExpanded]);
@@ -58,7 +68,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     }
   }, [bookingsError]);
 
-  const value = {
+  const value: DashboardContextType = {
     selectedDate,
     setSelectedDate,
     view,
@@ -72,6 +82,22 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     bookingsError,
     userProfile,
     isProfileLoading,
+    // Add required ViewState properties
+    view_type: 'dashboard',
+    state: {
+      defaultView: view,
+      ...viewState?.state
+    },
+    search_filters: viewState?.search_filters || {},
+    sort_preferences: viewState?.sort_preferences || {
+      field: 'date',
+      direction: 'asc'
+    },
+    pagination_settings: viewState?.pagination_settings || {
+      itemsPerPage: 10,
+      currentPage: 1
+    },
+    view_mode: viewMode
   };
 
   return (

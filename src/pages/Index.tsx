@@ -8,6 +8,7 @@ import { DashboardStateProvider } from "@/contexts/DashboardStateContext";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppStateProvider } from "@/contexts/AppStateContext";
+import { DashboardProvider } from "@/components/dashboard/DashboardProvider";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -23,13 +24,15 @@ export default function Index() {
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
         <StatsProvider>
-          <AppStateProvider>
-            <DashboardStateProvider>
-              <main className="min-h-screen">
-                <DashboardLayout />
-              </main>
-            </DashboardStateProvider>
-          </AppStateProvider>
+          <DashboardProvider>
+            <AppStateProvider>
+              <DashboardStateProvider>
+                <main className="min-h-screen">
+                  <DashboardLayout />
+                </main>
+              </DashboardStateProvider>
+            </AppStateProvider>
+          </DashboardProvider>
         </StatsProvider>
       </Suspense>
     </ErrorBoundaryWrapper>

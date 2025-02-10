@@ -2,6 +2,7 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   children: React.ReactNode;
@@ -20,6 +21,21 @@ export class CalendarErrorBoundary extends React.Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
+  }
+
+  async componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by calendar boundary:', error, errorInfo);
+    
+    try {
+      await supabase.from('error_logs').insert({
+        error_message: error.message,
+        error_stack: error.stack,
+        component_name: 'Calendar',
+        route: window.location.pathname,
+      });
+    } catch (logError) {
+      console.error('Failed to log calendar error:', logError);
+    }
   }
 
   render() {

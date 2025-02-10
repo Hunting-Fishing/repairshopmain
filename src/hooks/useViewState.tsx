@@ -17,7 +17,16 @@ export function useViewState(viewType: string) {
 
       const { data, error } = await supabase
         .from('user_view_state')
-        .select('*')
+        .select(`
+          user_id,
+          view_type,
+          state,
+          view_mode,
+          is_calendar_expanded,
+          search_filters,
+          sort_preferences,
+          pagination_settings
+        `)
         .eq('user_id', user.id)
         .eq('view_type', viewType)
         .maybeSingle();

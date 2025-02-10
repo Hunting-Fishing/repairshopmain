@@ -22,16 +22,17 @@ export default function Index() {
   return (
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
-        <AppStateProvider>
-          <StatsProvider>
+        <StatsProvider>
+          <AppStateProvider>
             <DashboardStateProvider>
               <main className="min-h-screen">
                 <DashboardLayout />
               </main>
             </DashboardStateProvider>
-          </StatsProvider>
-        </AppStateProvider>
+          </AppStateProvider>
+        </StatsProvider>
       </Suspense>
     </ErrorBoundaryWrapper>
   );
 }
+

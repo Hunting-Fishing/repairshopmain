@@ -4,11 +4,10 @@ import { Suspense } from "react";
 import { LoadingScreen } from "@/components/dashboard/components/LoadingScreen";
 import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
 import { useNavigate } from "react-router-dom";
-import { DashboardStateProvider } from "@/contexts/DashboardStateContext";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppStateProvider } from "@/contexts/AppStateContext";
-import { DashboardProvider } from "@/components/dashboard/DashboardProvider";
+import { DashboardContextProvider } from "@/contexts/DashboardContext";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -24,18 +23,15 @@ export default function Index() {
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
         <StatsProvider>
-          <DashboardProvider>
+          <DashboardContextProvider>
             <AppStateProvider>
-              <DashboardStateProvider>
-                <main className="min-h-screen">
-                  <DashboardLayout />
-                </main>
-              </DashboardStateProvider>
+              <main className="min-h-screen">
+                <DashboardLayout />
+              </main>
             </AppStateProvider>
-          </DashboardProvider>
+          </DashboardContextProvider>
         </StatsProvider>
       </Suspense>
     </ErrorBoundaryWrapper>
   );
 }
-

@@ -5,50 +5,19 @@ import { useProfile } from "@/hooks/useProfile";
 import { useViewState } from "@/hooks/useViewState";
 import { useStats } from "./StatsContext";
 import { useAuth } from "./AuthContext";
+import { DashboardContextValue } from "@/types/dashboard/consolidated";
 import { toast } from "sonner";
 
-interface DashboardState {
-  view: {
-    selectedDate: Date;
-    view: "day" | "week" | "month";
-    viewMode: "calendar" | "grid" | "list";
-    isCalendarExpanded: boolean;
-  };
-  data: {
-    bookings: any[];
-    stats: any[];
-    profile: any;
-  };
-  loading: {
-    bookings: boolean;
-    stats: boolean;
-    profile: boolean;
-  };
-  errors: {
-    bookings: Error | null;
-    stats: Error | null;
-    profile: Error | null;
-  };
-}
+const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
 
-const DashboardStateContext = createContext<{
-  state: DashboardState;
-  actions: {
-    setView: (view: "day" | "week" | "month") => void;
-    setViewMode: (mode: "calendar" | "grid" | "list") => void;
-    setSelectedDate: (date: Date) => void;
-    setIsCalendarExpanded: (expanded: boolean) => void;
-  };
-} | undefined>(undefined);
-
-export function DashboardStateProvider({ children }: { children: ReactNode }) {
+export function DashboardContextProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { viewState, updateViewState } = useViewState("dashboard");
   const { data: bookings, isLoading: bookingsLoading, error: bookingsError } = useBookings();
   const { data: profile, isLoading: profileLoading, error: profileError } = useProfile(user?.id);
   const { stats, isLoading: statsLoading, error: statsError } = useStats();
 
-  const state: DashboardState = useMemo(() => ({
+  const state = useMemo(() => ({
     view: {
       selectedDate: new Date(),
       view: viewState?.state?.defaultView || "day",
@@ -105,16 +74,16 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
   }), [viewState, updateViewState]);
 
   return (
-    <DashboardStateContext.Provider value={{ state, actions }}>
+    <DashboardContext.Provider value={{ state, actions }}>
       {children}
-    </DashboardStateContext.Provider>
+    </DashboardContext.Provider>
   );
 }
 
-export function useDashboardState() {
-  const context = useContext(DashboardStateContext);
+export function useDashboard() {
+  const context = useContext(DashboardContext);
   if (context === undefined) {
-    throw new Error("useDashboardState must be used within a DashboardStateProvider");
+    throw new Error("useDashboard must be used within a DashboardContextProvider");
   }
   return context;
 }

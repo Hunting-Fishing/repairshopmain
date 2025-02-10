@@ -7,38 +7,48 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { StatsProvider } from "@/contexts/StatsContext";
+import { toast } from "sonner";
 
 export default function Index() {
   const navigate = useNavigate();
   
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, error } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) {
-        navigate('/login');
-        return null;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) {
+          navigate('/auth');
+          return null;
+        }
+
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        
+        if (!data) {
+          navigate('/auth');
+          return null;
+        }
+
+        return data;
+      } catch (error: any) {
+        toast.error('Failed to load profile');
+        throw error;
       }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-      if (error) throw error;
-      
-      if (!data) {
-        navigate('/setup');
-        return null;
-      }
-
-      return data;
     },
   });
 
   if (isLoading) {
     return <LoadingScreen />;
+  }
+
+  if (error) {
+    throw error; // This will be caught by our ErrorBoundary
   }
 
   return (

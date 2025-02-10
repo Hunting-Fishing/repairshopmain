@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Suspense } from "react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -52,6 +53,13 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     );
   }
 
-  return <>{children}</>;
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    }>
+      {children}
+    </Suspense>
+  );
 }
-

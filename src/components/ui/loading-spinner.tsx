@@ -2,7 +2,7 @@
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface LoadingSpinnerProps {
+export interface LoadingSpinnerProps {
   className?: string;
   size?: "sm" | "md" | "lg";
 }
@@ -15,7 +15,12 @@ export function LoadingSpinner({ className, size = "md" }: LoadingSpinnerProps) 
   };
 
   return (
-    <Loader2 className={cn("animate-spin text-primary", sizeClasses[size], className)} />
+    <Loader2 
+      className={cn(
+        "animate-spin text-primary",
+        sizeClasses[size],
+        className
+      )} 
+    />
   );
 }
-

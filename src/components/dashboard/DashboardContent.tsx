@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { CalendarContainer } from "./calendar/CalendarContainer";
 import { GridView } from "./views/GridView";
@@ -8,19 +9,13 @@ import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
 import { useDashboard } from "@/contexts/DashboardContext";
 
 export function DashboardContent() {
+  const { state, actions } = useDashboard();
   const {
-    selectedDate,
-    view,
-    viewMode,
-    setViewMode,
-    isCalendarExpanded,
-    bookings,
-    isBookingsLoading,
-    userProfile,
-    setSelectedDate,
-    setView,
-    setIsCalendarExpanded
-  } = useDashboard();
+    view: { selectedDate, view, viewMode, isCalendarExpanded },
+    data: { bookings, profile: userProfile },
+    loading: { bookings: isBookingsLoading }
+  } = state;
+  const { setViewMode, setSelectedDate, setView, setIsCalendarExpanded } = actions;
 
   const isModernTheme = true;
 

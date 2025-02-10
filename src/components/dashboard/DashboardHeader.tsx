@@ -1,8 +1,11 @@
+
 import { ViewSelector } from "./ViewSelector";
 import { useDashboard } from "@/contexts/DashboardContext";
 
 export function DashboardHeader() {
-  const { viewMode, setViewMode } = useDashboard();
+  const { state, actions } = useDashboard();
+  const { view: { viewMode } } = state;
+  const { setViewMode } = actions;
 
   return (
     <div className="flex items-center justify-between mb-6">

@@ -1,4 +1,3 @@
-
 import { createContext, useContext, ReactNode, useMemo, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
 import { useStats } from "./StatsContext";
@@ -42,14 +41,10 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const dashboardContext = useDashboard();
 
   const {
-    selectedDate,
-    setSelectedDate,
-    view,
-    setView,
-    viewMode,
-    setViewMode,
-    isCalendarExpanded,
-    setIsCalendarExpanded,
+    state: {
+      view: { selectedDate, view, viewMode, isCalendarExpanded }
+    },
+    actions: { setSelectedDate, setView, setViewMode, setIsCalendarExpanded }
   } = dashboardContext;
 
   // Load persisted state

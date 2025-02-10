@@ -10,12 +10,6 @@ export interface DashboardViewState {
   isCalendarExpanded: boolean;
 }
 
-export interface DashboardData {
-  bookings: DashboardBooking[];
-  stats: StatData[];
-  profile: DashboardProfile | null;
-}
-
 export interface DashboardBooking {
   id: string;
   organization_id: string;
@@ -65,9 +59,24 @@ export interface DashboardProfile {
   color_preferences: ColorPreferences | null;
 }
 
+export interface DashboardData {
+  bookings: DashboardBooking[];
+  stats: StatData[];
+  profile: DashboardProfile | null;
+}
+
 export interface DashboardContextState {
-  view: DashboardViewState;
-  data: DashboardData;
+  view: {
+    selectedDate: Date;
+    view: "day" | "week" | "month";
+    viewMode: "calendar" | "grid" | "list";
+    isCalendarExpanded: boolean;
+  };
+  data: {
+    bookings: DashboardBooking[];
+    stats: StatData[];
+    profile: DashboardProfile | null;
+  };
   loading: {
     bookings: boolean;
     stats: boolean;

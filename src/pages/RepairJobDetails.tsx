@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { PartsTab } from "@/components/repair/PartsTab";
+import { LaborTab } from "@/components/repair/LaborTab";
+import { HistoryTab } from "@/components/repair/HistoryTab";
 
 interface RepairJobDetails {
   id: string;
@@ -158,27 +161,15 @@ export default function RepairJobDetails() {
         </TabsContent>
 
         <TabsContent value="parts">
-          <Card>
-            <CardContent>
-              Parts tracking functionality coming soon...
-            </CardContent>
-          </Card>
+          <PartsTab repairJobId={id!} />
         </TabsContent>
 
         <TabsContent value="labor">
-          <Card>
-            <CardContent>
-              Labor tracking functionality coming soon...
-            </CardContent>
-          </Card>
+          <LaborTab repairJobId={id!} />
         </TabsContent>
 
         <TabsContent value="history">
-          <Card>
-            <CardContent>
-              History tracking functionality coming soon...
-            </CardContent>
-          </Card>
+          <HistoryTab repairJobId={id!} />
         </TabsContent>
       </Tabs>
     </div>

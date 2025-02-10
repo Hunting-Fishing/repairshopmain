@@ -1,5 +1,5 @@
 
-import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { useViewState } from "@/hooks/useViewState";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardContent } from "./DashboardContent";
@@ -21,3 +21,4 @@ export function DashboardLayout() {
     </ErrorBoundary>
   );
 }
+

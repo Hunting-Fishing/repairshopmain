@@ -1,4 +1,3 @@
-
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,7 +6,7 @@ import { LogOut } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { AuthErrorBoundary } from "@/components/auth/AuthErrorBoundary";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { useProfile } from "@/hooks/useProfile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,7 +32,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthErrorBoundary>
+    <ErrorBoundary type="auth">
       <SidebarProvider>
         <div className={`min-h-screen flex w-full bg-background ${
           isModernTheme ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50' : ''
@@ -114,6 +113,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </SidebarProvider>
-    </AuthErrorBoundary>
+    </ErrorBoundary>
   );
 }

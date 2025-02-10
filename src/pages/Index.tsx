@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { DashboardStateProvider } from "@/contexts/DashboardStateContext";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { AppStateProvider } from "@/contexts/AppStateContext";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -21,13 +22,15 @@ export default function Index() {
   return (
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
-        <StatsProvider>
-          <DashboardStateProvider>
-            <main className="min-h-screen">
-              <DashboardLayout />
-            </main>
-          </DashboardStateProvider>
-        </StatsProvider>
+        <AppStateProvider>
+          <StatsProvider>
+            <DashboardStateProvider>
+              <main className="min-h-screen">
+                <DashboardLayout />
+              </main>
+            </DashboardStateProvider>
+          </StatsProvider>
+        </AppStateProvider>
       </Suspense>
     </ErrorBoundaryWrapper>
   );

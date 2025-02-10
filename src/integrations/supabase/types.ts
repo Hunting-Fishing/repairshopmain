@@ -1400,6 +1400,7 @@ export type Database = {
           organization_id: string | null
           resolution_notes: string | null
           resolved_at: string | null
+          route: string | null
           severity: string | null
           url: string | null
           user_id: string | null
@@ -1415,6 +1416,7 @@ export type Database = {
           organization_id?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          route?: string | null
           severity?: string | null
           url?: string | null
           user_id?: string | null
@@ -1430,6 +1432,7 @@ export type Database = {
           organization_id?: string | null
           resolution_notes?: string | null
           resolved_at?: string | null
+          route?: string | null
           severity?: string | null
           url?: string | null
           user_id?: string | null

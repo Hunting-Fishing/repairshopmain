@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { AppStateProvider } from "@/contexts/AppStateContext";
 import { toast } from "sonner";
 import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
+import { StatsProvider } from "@/contexts/StatsContext";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -61,11 +62,13 @@ export default function Index() {
   return (
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
-        <AppStateProvider>
-          <main className="min-h-screen">
-            <DashboardLayout />
-          </main>
-        </AppStateProvider>
+        <StatsProvider>
+          <AppStateProvider>
+            <main className="min-h-screen">
+              <DashboardLayout />
+            </main>
+          </AppStateProvider>
+        </StatsProvider>
       </Suspense>
     </ErrorBoundaryWrapper>
   );

@@ -1,6 +1,6 @@
 
 import { useAppState } from "@/contexts/AppStateContext";
-import { StatCard } from "./StatCard";
+import { StatCard } from "../StatCard";
 import { useStatsIcons } from "../../hooks/useStatsIcons";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -8,6 +8,7 @@ import { AlertCircle } from "lucide-react";
 import { formatStatTitle } from "../../utils/statsFormatters";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { toast } from "sonner";
+import { useMemo } from "react";
 
 interface StatCardGridProps {
   isModernTheme?: boolean;
@@ -21,6 +22,17 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
     console.error("Stats error:", error);
     toast.error("Failed to load statistics");
   };
+
+  const uniqueStats = useMemo(() => {
+    if (!stats) return [];
+    return stats.reduce((acc, current) => {
+      const x = acc.find(item => item.type === current.type);
+      if (!x) {
+        return acc.concat([current]);
+      }
+      return acc;
+    }, [] as typeof stats extends (infer U)[] ? U[] : never);
+  }, [stats]);
 
   if (error) {
     return (
@@ -40,14 +52,6 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
       </div>
     );
   }
-
-  const uniqueStats = stats?.reduce((acc, current) => {
-    const x = acc.find(item => item.type === current.type);
-    if (!x) {
-      return acc.concat([current]);
-    }
-    return acc;
-  }, [] as typeof stats extends (infer U)[] ? U[] : never) || [];
 
   return (
     <ErrorBoundary

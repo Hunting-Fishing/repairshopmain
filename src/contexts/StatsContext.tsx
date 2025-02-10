@@ -1,5 +1,5 @@
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useMemo } from "react";
 import { useStatsQuery, StatData } from "@/components/dashboard/hooks/useStatsQuery";
 
 interface StatsContextType {
@@ -13,8 +13,14 @@ const StatsContext = createContext<StatsContextType | undefined>(undefined);
 export function StatsProvider({ children }: { children: ReactNode }) {
   const { data: stats, isLoading, error } = useStatsQuery();
 
+  const value = useMemo(() => ({
+    stats,
+    isLoading,
+    error
+  }), [stats, isLoading, error]);
+
   return (
-    <StatsContext.Provider value={{ stats, isLoading, error }}>
+    <StatsContext.Provider value={value}>
       {children}
     </StatsContext.Provider>
   );

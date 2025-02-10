@@ -1,4 +1,5 @@
 
+import { memo } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { CalendarContainer } from "./calendar/CalendarContainer";
 import { GridView } from "./views/GridView";
@@ -8,7 +9,7 @@ import { SystemStatusCard } from "./components/SystemStatusCard";
 import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
 import { useDashboard } from "@/contexts/DashboardContext";
 
-export function DashboardContent() {
+export const DashboardContent = memo(function DashboardContent() {
   const { state, actions } = useDashboard();
   const {
     view: { selectedDate, view, viewMode, isCalendarExpanded },
@@ -66,4 +67,4 @@ export function DashboardContent() {
       </Tabs>
     </>
   );
-}
+});

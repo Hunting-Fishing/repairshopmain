@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { memo } from "react";
 
 interface StatCardProps {
   title: string;
@@ -14,7 +15,7 @@ interface StatCardProps {
   index: number;
 }
 
-export function StatCard({ 
+const StatCard = memo(function StatCard({ 
   title, 
   value, 
   type, 
@@ -108,4 +109,6 @@ export function StatCard({
       </CardContent>
     </Card>
   );
-}
+});
+
+export { StatCard };

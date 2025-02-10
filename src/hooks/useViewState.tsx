@@ -26,7 +26,9 @@ export function useViewState(viewType: string) {
           is_calendar_expanded,
           search_filters,
           sort_preferences,
-          pagination_settings
+          pagination_settings,
+          created_at,
+          updated_at
         `)
         .eq('user_id', user.id)
         .eq('view_type', viewType)
@@ -38,47 +40,57 @@ export function useViewState(viewType: string) {
         throw error;
       }
 
-      // If data exists, return it. Otherwise, return a default state with id and user_id
-      return data || {
-        id: null,
-        user_id: user.id,
-        view_type: viewType,
-        state: {},
-        view_mode: 'calendar' as const,
-        is_calendar_expanded: false,
-        search_filters: {},
-        sort_preferences: { field: 'created_at', direction: 'desc' as const },
-        pagination_settings: { itemsPerPage: 10, currentPage: 1 }
-      };
+      // If no data exists, create default state
+      if (!data) {
+        const defaultState: Partial<ViewState> = {
+          user_id: user.id,
+          view_type: viewType,
+          state: {},
+          view_mode: 'calendar',
+          is_calendar_expanded: false,
+          search_filters: {},
+          sort_preferences: { field: 'created_at', direction: 'desc' },
+          pagination_settings: { itemsPerPage: 10, currentPage: 1 }
+        };
+
+        const { data: newState, error: insertError } = await supabase
+          .from('user_view_state')
+          .insert([defaultState])
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error("Error creating view state:", insertError);
+          toast.error("Failed to initialize view preferences");
+          throw insertError;
+        }
+
+        return newState;
+      }
+
+      return data;
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 2,
   });
 
   const { mutate: updateViewState } = useMutation({
     mutationFn: async (updates: Partial<ViewState>) => {
-      if (!user?.id) return null;
+      if (!user?.id || !viewState?.id) return null;
 
       const payload = {
-        user_id: user.id,
-        view_type: viewType,
-        ...updates
+        ...updates,
+        updated_at: new Date().toISOString()
       };
 
-      if (viewState?.id) {
-        const { error } = await supabase
-          .from('user_view_state')
-          .update(payload)
-          .eq('id', viewState.id);
+      const { error } = await supabase
+        .from('user_view_state')
+        .update(payload)
+        .eq('id', viewState.id)
+        .eq('user_id', user.id);
 
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('user_view_state')
-          .insert([payload]);
-
-        if (error) throw error;
-      }
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['view-state', viewType, user?.id] });

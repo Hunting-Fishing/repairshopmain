@@ -5,6 +5,7 @@ import { useUserProfile } from "./hooks/useUserProfile";
 import { useViewState } from "@/hooks/useViewState";
 import { DashboardContextType } from "@/types/dashboard/state";
 import { toast } from "sonner";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
@@ -38,24 +39,18 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
   // Sync state changes with database
   useEffect(() => {
-    if (!isViewStateLoading) {
+    if (!isViewStateLoading && viewState) {
       updateViewState({
         view_type: 'dashboard',
         state: {
-          ...viewState?.state,
+          ...viewState.state,
           defaultView: view,
         },
         view_mode: viewMode,
         is_calendar_expanded: isCalendarExpanded,
-        search_filters: viewState?.search_filters || {},
-        sort_preferences: viewState?.sort_preferences || {
-          field: 'date',
-          direction: 'asc'
-        },
-        pagination_settings: viewState?.pagination_settings || {
-          itemsPerPage: 10,
-          currentPage: 1
-        }
+        search_filters: viewState.search_filters,
+        sort_preferences: viewState.sort_preferences,
+        pagination_settings: viewState.pagination_settings
       });
     }
   }, [view, viewMode, isCalendarExpanded]);
@@ -83,14 +78,11 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     userProfile,
     isProfileLoading,
     view_type: 'dashboard',
-    state: {
-      defaultView: view,
-      ...viewState?.state
-    },
+    state: viewState?.state || {},
     search_filters: viewState?.search_filters || {},
     sort_preferences: viewState?.sort_preferences || {
-      field: 'date',
-      direction: 'asc'
+      field: 'created_at',
+      direction: 'desc'
     },
     pagination_settings: viewState?.pagination_settings || {
       itemsPerPage: 10,
@@ -100,9 +92,11 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <DashboardContext.Provider value={value}>
-      {children}
-    </DashboardContext.Provider>
+    <ErrorBoundary>
+      <DashboardContext.Provider value={value}>
+        {children}
+      </DashboardContext.Provider>
+    </ErrorBoundary>
   );
 }
 

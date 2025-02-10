@@ -98,7 +98,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
         default:
           return (
             <Alert 
-              variant={isDeadlock ? "warning" : "destructive"} 
+              variant={isDeadlock ? "default" : "destructive"} 
               className="flex flex-col items-center p-6"
             >
               <AlertCircle className="h-6 w-6 mb-2" />

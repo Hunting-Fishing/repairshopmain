@@ -1,8 +1,10 @@
 
-import { createContext, useContext, ReactNode, useMemo } from "react";
+import { createContext, useContext, ReactNode, useMemo, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
 import { useStats } from "./StatsContext";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AppStateContextType {
   theme: {
@@ -28,6 +30,12 @@ interface AppStateContextType {
 
 const AppStateContext = createContext<AppStateContextType | undefined>(undefined);
 
+interface PersistedState {
+  lastView?: "day" | "week" | "month";
+  lastViewMode?: "calendar" | "grid" | "list";
+  isCalendarExpanded?: boolean;
+}
+
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const { isModernTheme, toggleTheme } = useTheme();
   const { stats, isLoading: statsLoading, error: statsError } = useStats();
@@ -43,6 +51,73 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     isCalendarExpanded,
     setIsCalendarExpanded,
   } = dashboardContext;
+
+  // Load persisted state
+  useEffect(() => {
+    const loadPersistedState = async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.user?.id) return;
+
+        const { data, error } = await supabase
+          .from('user_view_state')
+          .select('state')
+          .eq('user_id', session.user.id)
+          .eq('view_type', 'dashboard')
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data?.state) {
+          const state = data.state as PersistedState;
+          if (state.lastView) setView(state.lastView);
+          if (state.lastViewMode) setViewMode(state.lastViewMode);
+          if (typeof state.isCalendarExpanded === 'boolean') {
+            setIsCalendarExpanded(state.isCalendarExpanded);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading persisted state:', error);
+        toast.error('Failed to load your previous view settings');
+      }
+    };
+
+    loadPersistedState();
+  }, [setView, setViewMode, setIsCalendarExpanded]);
+
+  // Persist state changes
+  useEffect(() => {
+    const persistState = async () => {
+      try {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.user?.id) return;
+
+        const state: PersistedState = {
+          lastView: view,
+          lastViewMode: viewMode,
+          isCalendarExpanded,
+        };
+
+        const { error } = await supabase
+          .from('user_view_state')
+          .upsert({
+            user_id: session.user.id,
+            view_type: 'dashboard',
+            state,
+            updated_at: new Date().toISOString(),
+          }, {
+            onConflict: 'user_id,view_type'
+          });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error persisting state:', error);
+        // Don't show toast here to avoid spamming user
+      }
+    };
+
+    persistState();
+  }, [view, viewMode, isCalendarExpanded]);
 
   // Memoize the context value to prevent unnecessary re-renders
   const value = useMemo(() => ({
@@ -80,6 +155,18 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     isCalendarExpanded,
     setIsCalendarExpanded,
   ]);
+
+  if (process.env.NODE_ENV === 'development') {
+    // Debug logging for state changes
+    useEffect(() => {
+      console.group('AppState Update');
+      console.log('Theme:', isModernTheme);
+      console.log('View:', view);
+      console.log('ViewMode:', viewMode);
+      console.log('IsCalendarExpanded:', isCalendarExpanded);
+      console.groupEnd();
+    }, [isModernTheme, view, viewMode, isCalendarExpanded]);
+  }
 
   return (
     <AppStateContext.Provider value={value}>

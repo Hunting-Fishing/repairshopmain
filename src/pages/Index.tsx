@@ -61,17 +61,23 @@ export default function Index() {
 
   return (
     <ErrorBoundaryWrapper>
-      <DashboardProvider>
-        <StatsProvider>
-          <AppStateProvider>
-            <Suspense fallback={<LoadingScreen />}>
-              <main className="min-h-screen">
-                <DashboardLayout />
-              </main>
-            </Suspense>
-          </AppStateProvider>
-        </StatsProvider>
-      </DashboardProvider>
+      <Suspense fallback={<LoadingScreen />}>
+        <ErrorBoundaryWrapper type="dashboard">
+          <DashboardProvider>
+            <ErrorBoundaryWrapper type="stats">
+              <StatsProvider>
+                <ErrorBoundaryWrapper type="app-state">
+                  <AppStateProvider>
+                    <main className="min-h-screen">
+                      <DashboardLayout />
+                    </main>
+                  </AppStateProvider>
+                </ErrorBoundaryWrapper>
+              </StatsProvider>
+            </ErrorBoundaryWrapper>
+          </DashboardProvider>
+        </ErrorBoundaryWrapper>
+      </Suspense>
     </ErrorBoundaryWrapper>
   );
 }

@@ -9,6 +9,32 @@ import type { DatabaseFunctions } from './functions'
 export interface Database {
   public: {
     Tables: {
+      error_logs: {
+        Row: {
+          id: string
+          error_message: string | null
+          error_stack: string | null
+          component_name: string | null
+          route: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          error_message?: string | null
+          error_stack?: string | null
+          component_name?: string | null
+          route?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          error_message?: string | null
+          error_stack?: string | null
+          component_name?: string | null
+          route?: string | null
+          created_at?: string | null
+        }
+      }
       bookings: {
         Row: BookingRow
         Insert: BookingInsert

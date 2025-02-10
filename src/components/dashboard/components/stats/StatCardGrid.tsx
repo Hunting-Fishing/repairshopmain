@@ -1,5 +1,5 @@
 
-import { useStats } from "@/contexts/StatsContext";
+import { useAppState } from "@/contexts/AppStateContext";
 import { StatCard } from "./StatCard";
 import { useStatsIcons } from "../../hooks/useStatsIcons";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,7 +14,7 @@ interface StatCardGridProps {
 }
 
 export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
-  const { stats, isLoading, error } = useStats();
+  const { stats: { stats, isLoading, error } } = useAppState();
   const statIcons = useStatsIcons();
 
   const handleStatsError = (error: Error) => {

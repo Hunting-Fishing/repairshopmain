@@ -6,10 +6,9 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { StatsProvider } from "@/contexts/StatsContext";
+import { AppStateProvider } from "@/contexts/AppStateContext";
 import { toast } from "sonner";
 import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
-import { DashboardProvider } from "@/components/dashboard/DashboardProvider";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -62,13 +61,11 @@ export default function Index() {
   return (
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
-        <StatsProvider>
-          <DashboardProvider>
-            <main className="min-h-screen">
-              <DashboardLayout />
-            </main>
-          </DashboardProvider>
-        </StatsProvider>
+        <AppStateProvider>
+          <main className="min-h-screen">
+            <DashboardLayout />
+          </main>
+        </AppStateProvider>
       </Suspense>
     </ErrorBoundaryWrapper>
   );

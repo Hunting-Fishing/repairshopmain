@@ -1,5 +1,5 @@
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useMemo } from "react";
 import { useTheme } from "./ThemeContext";
 import { useStats } from "./StatsContext";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
@@ -33,7 +33,6 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const { stats, isLoading: statsLoading, error: statsError } = useStats();
   const dashboardContext = useDashboard();
 
-  // Extract only the dashboard state properties we need
   const {
     selectedDate,
     setSelectedDate,
@@ -45,7 +44,8 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     setIsCalendarExpanded,
   } = dashboardContext;
 
-  const value: AppStateContextType = {
+  // Memoize the context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
     theme: {
       isModernTheme,
       toggleTheme,
@@ -65,7 +65,21 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       isCalendarExpanded,
       setIsCalendarExpanded,
     },
-  };
+  }), [
+    isModernTheme, 
+    toggleTheme, 
+    stats, 
+    statsLoading, 
+    statsError,
+    selectedDate,
+    setSelectedDate,
+    view,
+    setView,
+    viewMode,
+    setViewMode,
+    isCalendarExpanded,
+    setIsCalendarExpanded,
+  ]);
 
   return (
     <AppStateContext.Provider value={value}>

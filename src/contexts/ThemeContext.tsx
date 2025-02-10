@@ -15,35 +15,47 @@ export function ThemeProvider({ children, userId }: { children: ReactNode; userI
 
   useEffect(() => {
     if (userId) {
-      supabase
-        .from('profiles')
-        .select('theme_preference')
-        .eq('id', userId)
-        .single()
-        .then(({ data, error }) => {
-          if (!error && data) {
+      const loadThemePreference = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('theme_preference')
+            .eq('id', userId)
+            .single();
+
+          if (error) throw error;
+          
+          if (data) {
             setIsModernTheme(data.theme_preference === 'modern');
           }
-        });
+        } catch (error) {
+          console.error('Error loading theme preference:', error);
+          toast.error('Failed to load theme preference');
+        }
+      };
+
+      loadThemePreference();
     }
   }, [userId]);
 
   const toggleTheme = async (checked: boolean) => {
     if (!userId) return;
 
-    setIsModernTheme(checked);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ theme_preference: checked ? 'modern' : 'basic' })
-      .eq('id', userId);
+    try {
+      setIsModernTheme(checked);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ theme_preference: checked ? 'modern' : 'basic' })
+        .eq('id', userId);
 
-    if (error) {
+      if (error) throw error;
+
+      toast.success("Theme preference saved");
+    } catch (error) {
+      console.error('Error saving theme preference:', error);
       toast.error("Failed to save theme preference");
       setIsModernTheme(!checked); // Revert on error
-      return;
     }
-
-    toast.success("Theme preference saved");
   };
 
   return (
@@ -60,4 +72,3 @@ export function useTheme() {
   }
   return context;
 }
-

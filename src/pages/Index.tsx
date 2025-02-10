@@ -2,13 +2,12 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Suspense } from "react";
 import { LoadingScreen } from "@/components/dashboard/components/LoadingScreen";
-import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { AppStateProvider } from "@/contexts/AppStateContext";
 import { toast } from "sonner";
-import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { DashboardProvider } from "@/components/dashboard/DashboardProvider";
 
@@ -57,13 +56,13 @@ export default function Index() {
   }
 
   if (error) {
-    throw error; // Will be caught by ErrorBoundaryWrapper
+    throw error;
   }
 
   return (
     <ErrorBoundaryWrapper>
-      <StatsProvider>
-        <DashboardProvider>
+      <DashboardProvider>
+        <StatsProvider>
           <AppStateProvider>
             <Suspense fallback={<LoadingScreen />}>
               <main className="min-h-screen">
@@ -71,8 +70,8 @@ export default function Index() {
               </main>
             </Suspense>
           </AppStateProvider>
-        </DashboardProvider>
-      </StatsProvider>
+        </StatsProvider>
+      </DashboardProvider>
     </ErrorBoundaryWrapper>
   );
 }

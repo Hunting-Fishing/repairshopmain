@@ -12,6 +12,8 @@ import { useUserProfile } from "./hooks/useUserProfile";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { DashboardContainer } from "./components/DashboardContainer";
 import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
+import { SystemStatusCard } from "./components/SystemStatusCard";
+import { StatsCards } from "./StatsCards";
 
 export function DashboardLayout() {
   const { viewState, updateViewState } = useViewState('dashboard');
@@ -61,7 +63,9 @@ export function DashboardLayout() {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="grid gap-6 mb-8">
+          <StatsCards isModernTheme={isModernTheme} />
+          <SystemStatusCard isModernTheme={isModernTheme} />
           <CalendarBookingHandler 
             isModernTheme={isModernTheme}
             bookings={bookings}
@@ -106,4 +110,3 @@ export function DashboardLayout() {
     </ErrorBoundary>
   );
 }
-

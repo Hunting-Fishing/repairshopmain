@@ -7,14 +7,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Technician } from "@/types/labor";
 
 interface LaborFormProps {
   repairJobId: string;
-  technicians: Array<{
-    id: string;
-    first_name: string;
-    last_name: string;
-  }> | undefined;
+  technicians: Technician[] | undefined;
   onSuccess?: () => void;
 }
 
@@ -43,12 +40,20 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
       end_time?: string;
       rate_per_hour: number;
       notes: string;
+      status: 'pending' | 'in_progress' | 'completed';
     }) => {
       const { error } = await supabase
         .from('repair_job_labor')
         .insert(newLabor);
 
-      if (error) throw error;
+      if (error) {
+        await supabase.from('error_logs').insert({
+          error_message: error.message,
+          error_stack: error.details,
+          component_name: 'LaborForm',
+        });
+        throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['repair-labor'] });
@@ -57,8 +62,8 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
       toast.success("Labor entry added successfully");
       onSuccess?.();
     },
-    onError: () => {
-      toast.error("Failed to add labor entry");
+    onError: (error) => {
+      toast.error(`Failed to add labor entry: ${error.message}`);
     }
   });
 
@@ -68,6 +73,8 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
       return;
     }
 
+    const status = endTime ? 'completed' : 'in_progress';
+
     addLaborMutation.mutate({
       repair_job_id: repairJobId,
       technician_id: selectedTechnician,
@@ -75,6 +82,7 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
       end_time: endTime || undefined,
       rate_per_hour: parseFloat(rate),
       notes,
+      status,
     });
   };
 
@@ -87,7 +95,10 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
         <DialogHeader>
           <DialogTitle>Add Labor Entry</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <form className="space-y-4" onSubmit={(e) => {
+          e.preventDefault();
+          handleAddLabor();
+        }}>
           <div>
             <Label htmlFor="technician">Technician</Label>
             <select
@@ -95,6 +106,7 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
               value={selectedTechnician}
               onChange={(e) => setSelectedTechnician(e.target.value)}
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+              aria-required="true"
             >
               <option value="">Select a technician...</option>
               {technicians?.map((tech) => (
@@ -111,6 +123,8 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
               type="datetime-local"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
+              required
+              aria-required="true"
             />
           </div>
           <div>
@@ -120,6 +134,7 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
               type="datetime-local"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
+              min={startTime}
             />
           </div>
           <div>
@@ -131,6 +146,8 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
               step="0.01"
               value={rate}
               onChange={(e) => setRate(e.target.value)}
+              required
+              aria-required="true"
             />
           </div>
           <div>
@@ -141,8 +158,13 @@ export function LaborForm({ repairJobId, technicians, onSuccess }: LaborFormProp
               onChange={(e) => setNotes(e.target.value)}
             />
           </div>
-          <Button onClick={handleAddLabor}>Add Labor Entry</Button>
-        </div>
+          <Button 
+            type="submit"
+            disabled={addLaborMutation.isPending}
+          >
+            {addLaborMutation.isPending ? "Adding..." : "Add Labor Entry"}
+          </Button>
+        </form>
       </DialogContent>
     </Dialog>
   );

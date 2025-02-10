@@ -1388,6 +1388,47 @@ export type Database = {
         }
         Relationships: []
       }
+      error_logs: {
+        Row: {
+          component_name: string | null
+          created_at: string | null
+          error_message: string
+          error_stack: string | null
+          id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          component_name?: string | null
+          created_at?: string | null
+          error_message: string
+          error_stack?: string | null
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          component_name?: string | null
+          created_at?: string | null
+          error_message?: string
+          error_stack?: string | null
+          id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "error_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       integration_connections: {
         Row: {
           created_at: string
@@ -2454,36 +2495,42 @@ export type Database = {
         Row: {
           created_at: string | null
           end_time: string | null
+          error_details: string | null
           id: string
           notes: string | null
           organization_id: string
           rate_per_hour: number
           repair_job_id: string
           start_time: string
+          status: string | null
           technician_id: string
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
           end_time?: string | null
+          error_details?: string | null
           id?: string
           notes?: string | null
           organization_id: string
           rate_per_hour: number
           repair_job_id: string
           start_time: string
+          status?: string | null
           technician_id: string
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
           end_time?: string | null
+          error_details?: string | null
           id?: string
           notes?: string | null
           organization_id?: string
           rate_per_hour?: number
           repair_job_id?: string
           start_time?: string
+          status?: string | null
           technician_id?: string
           updated_at?: string | null
         }

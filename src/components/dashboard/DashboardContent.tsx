@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { CalendarContainer } from "./calendar/CalendarContainer";
 import { GridView } from "./views/GridView";
@@ -6,7 +5,7 @@ import { ListView } from "./views/ListView";
 import { StatsCards } from "./StatsCards";
 import { SystemStatusCard } from "./components/SystemStatusCard";
 import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
-import { useDashboard } from "./DashboardProvider";
+import { useDashboard } from "@/contexts/DashboardContext";
 
 export function DashboardContent() {
   const {

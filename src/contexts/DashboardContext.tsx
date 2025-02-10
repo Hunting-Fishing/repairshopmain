@@ -5,7 +5,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useViewState } from "@/hooks/useViewState";
 import { useStats } from "./StatsContext";
 import { useAuth } from "./AuthContext";
-import { DashboardContextValue } from "@/types/dashboard/consolidated";
+import { DashboardContextValue, DashboardProfile } from "@/types/dashboard/consolidated";
 import { toast } from "sonner";
 
 const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
@@ -17,6 +17,20 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
   const { data: profile, isLoading: profileLoading, error: profileError } = useProfile(user?.id);
   const { stats, isLoading: statsLoading, error: statsError } = useStats();
 
+  const dashboardProfile: DashboardProfile | null = profile ? {
+    id: profile.id,
+    organization_id: profile.organization_id,
+    first_name: profile.first_name,
+    last_name: profile.last_name,
+    role: profile.role,
+    color_preferences: profile.color_preferences ? {
+      primary_color: profile.color_preferences.primary_color,
+      secondary_color: profile.color_preferences.secondary_color,
+      border_color: profile.color_preferences.border_color,
+      background_color: profile.color_preferences.background_color,
+    } : null
+  } : null;
+
   const state = useMemo(() => ({
     view: {
       selectedDate: new Date(),
@@ -27,7 +41,7 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
     data: {
       bookings: bookings || [],
       stats: stats || [],
-      profile,
+      profile: dashboardProfile,
     },
     loading: {
       bookings: bookingsLoading,
@@ -42,7 +56,7 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
   }), [
     bookings, bookingsLoading, bookingsError,
     stats, statsLoading, statsError,
-    profile, profileLoading, profileError,
+    dashboardProfile, profileLoading, profileError,
     viewState
   ]);
 

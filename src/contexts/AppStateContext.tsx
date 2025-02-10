@@ -2,7 +2,7 @@
 import { createContext, useContext, ReactNode, useMemo, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
 import { useStats } from "./StatsContext";
-import { useDashboard } from "@/components/dashboard/DashboardProvider";
+import { useDashboard } from "./DashboardContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 

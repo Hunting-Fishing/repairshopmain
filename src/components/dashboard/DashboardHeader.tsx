@@ -1,6 +1,5 @@
-
 import { ViewSelector } from "./ViewSelector";
-import { useDashboard } from "./DashboardProvider";
+import { useDashboard } from "@/contexts/DashboardContext";
 
 export function DashboardHeader() {
   const { viewMode, setViewMode } = useDashboard();

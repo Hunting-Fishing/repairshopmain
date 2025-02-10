@@ -1,6 +1,7 @@
 
 import { StatData } from "@/components/dashboard/hooks/useStatsQuery";
-import { BookingStatus } from "./database/enums";
+import { BookingStatus } from "@/types/database/enums";
+import { Json } from "@/types/database/shared/json";
 
 export interface DashboardViewState {
   selectedDate: Date;
@@ -48,18 +49,20 @@ export interface DashboardBooking {
   } | null;
 }
 
+export interface ColorPreferences {
+  primary_color: string;
+  secondary_color: string;
+  border_color: string;
+  background_color: string;
+}
+
 export interface DashboardProfile {
   id: string;
   organization_id: string | null;
   first_name: string | null;
   last_name: string | null;
   role: string;
-  color_preferences: {
-    primary_color: string;
-    secondary_color: string;
-    border_color: string;
-    background_color: string;
-  } | null;
+  color_preferences: ColorPreferences | null;
 }
 
 export interface DashboardContextState {

@@ -2,7 +2,6 @@
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ErrorBoundaryWrapperProps {
   children: React.ReactNode;
@@ -10,16 +9,7 @@ interface ErrorBoundaryWrapperProps {
 
 export function ErrorBoundaryWrapper({ children }: ErrorBoundaryWrapperProps) {
   const handleError = async (error: Error) => {
-    try {
-      await supabase.from('error_logs').insert({
-        error_message: error.message,
-        error_stack: error.stack,
-        component_name: 'Global',
-        route: window.location.pathname,
-      });
-    } catch (logError) {
-      console.error('Failed to log error:', logError);
-    }
+    console.error('Global error:', error);
   };
 
   const errorFallback = (
@@ -36,6 +26,7 @@ export function ErrorBoundaryWrapper({ children }: ErrorBoundaryWrapperProps) {
     <ErrorBoundary 
       fallback={errorFallback}
       onError={handleError}
+      type="default"
     >
       {children}
     </ErrorBoundary>

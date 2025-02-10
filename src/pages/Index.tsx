@@ -11,7 +11,6 @@ import { StatsProvider } from "@/contexts/StatsContext";
 export default function Index() {
   const navigate = useNavigate();
   
-  // Check if user has completed initial setup
   const { data: profile, isLoading } = useQuery({
     queryKey: ['user-profile'],
     queryFn: async () => {
@@ -29,7 +28,6 @@ export default function Index() {
 
       if (error) throw error;
       
-      // If no profile exists, redirect to setup
       if (!data) {
         navigate('/setup');
         return null;
@@ -44,7 +42,7 @@ export default function Index() {
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary type="default">
       <Suspense fallback={<LoadingScreen />}>
         <StatsProvider>
           <main className="min-h-screen">

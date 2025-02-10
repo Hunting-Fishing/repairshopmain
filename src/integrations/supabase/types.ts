@@ -4611,6 +4611,13 @@ export type Database = {
         }
         Returns: string
       }
+      has_custom_role: {
+        Args: {
+          user_uuid: string
+          org_uuid: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           user_id: string

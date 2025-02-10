@@ -1,6 +1,7 @@
 
 export interface ViewState {
   id?: string;
+  user_id?: string;
   view_type: string;
   state: Record<string, any>;
   search_filters?: Record<string, any>;
@@ -12,7 +13,7 @@ export interface ViewState {
     itemsPerPage: number;
     currentPage: number;
   };
-  isCalendarExpanded?: boolean;
+  is_calendar_expanded?: boolean;
   view_mode: 'calendar' | 'grid' | 'list';
 }
 

@@ -24,7 +24,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   );
   
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(
-    viewState?.isCalendarExpanded || false
+    viewState?.is_calendar_expanded || false
   );
 
   // Fetch bookings and user profile
@@ -46,7 +46,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
           defaultView: view,
         },
         view_mode: viewMode,
-        isCalendarExpanded,
+        is_calendar_expanded: isCalendarExpanded,
         search_filters: viewState?.search_filters || {},
         sort_preferences: viewState?.sort_preferences || {
           field: 'date',
@@ -82,7 +82,6 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     bookingsError,
     userProfile,
     isProfileLoading,
-    // Add required ViewState properties
     view_type: 'dashboard',
     state: {
       defaultView: view,

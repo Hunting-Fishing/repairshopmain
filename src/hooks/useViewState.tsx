@@ -18,6 +18,7 @@ export function useViewState(viewType: string) {
       const { data, error } = await supabase
         .from('user_view_state')
         .select(`
+          id,
           user_id,
           view_type,
           state,
@@ -37,7 +38,14 @@ export function useViewState(viewType: string) {
         throw error;
       }
 
-      return data;
+      return data || {
+        state: {},
+        view_mode: 'calendar' as const,
+        is_calendar_expanded: false,
+        search_filters: {},
+        sort_preferences: { field: 'created_at', direction: 'desc' as const },
+        pagination_settings: { itemsPerPage: 10, currentPage: 1 }
+      };
     },
     enabled: !!user?.id,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -85,12 +93,7 @@ export function useViewState(viewType: string) {
   );
 
   return {
-    viewState: viewState || {
-      state: {},
-      search_filters: {},
-      sort_preferences: { field: 'created_at', direction: 'desc' },
-      pagination_settings: { itemsPerPage: 10, currentPage: 1 }
-    },
+    viewState,
     isLoading,
     updateViewState: debouncedUpdateViewState
   };

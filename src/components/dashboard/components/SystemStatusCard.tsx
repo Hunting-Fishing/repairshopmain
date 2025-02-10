@@ -17,11 +17,27 @@ export function SystemStatusCard({ isModernTheme = false }: SystemStatusCardProp
       const { data, error } = await supabase
         .from('system_configuration')
         .select('status, last_check')
-        .single();
+        .maybeSingle();
 
       if (error) {
         toast.error('Failed to fetch system status');
         throw error;
+      }
+
+      // If no data exists, insert a default record
+      if (!data) {
+        const { data: newData, error: insertError } = await supabase
+          .from('system_configuration')
+          .insert({ status: 'healthy' })
+          .select()
+          .single();
+
+        if (insertError) {
+          toast.error('Failed to initialize system status');
+          throw insertError;
+        }
+
+        return newData;
       }
 
       return data;

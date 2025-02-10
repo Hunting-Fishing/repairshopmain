@@ -58,7 +58,10 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         const userId = session?.user?.id;
-        if (!userId) return;
+        if (!userId) {
+          console.log('No user ID available, skipping state load');
+          return;
+        }
 
         const { data, error } = await supabase
           .from('user_view_state')
@@ -94,7 +97,10 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         const userId = session?.user?.id;
-        if (!userId) return;
+        if (!userId) {
+          console.log('No user ID available, skipping state persistence');
+          return;
+        }
 
         const state: PersistedState = {
           lastView: view,
@@ -115,9 +121,11 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
         if (error) {
           console.error('Error persisting state:', error);
+          throw error;
         }
       } catch (error) {
         console.error('Error persisting state:', error);
+        toast.error('Failed to save view preferences');
       }
     };
 

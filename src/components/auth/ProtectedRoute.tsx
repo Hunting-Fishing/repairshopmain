@@ -5,6 +5,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Suspense } from "react";
+import { toast } from "sonner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -17,19 +18,21 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   const { data: profile, isLoading, error } = useProfile(session?.user?.id);
 
   if (!session) {
+    toast.error('Please sign in to access this page');
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <LoadingSpinner size="lg" className="text-primary" />
       </div>
     );
   }
 
   if (error) {
     console.error('Error loading profile:', error);
+    toast.error('Failed to load your profile');
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
@@ -42,6 +45,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   }
 
   if (allowedRoles && (!profile?.role || !allowedRoles.includes(profile.role))) {
+    toast.error('You don\'t have permission to access this page');
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Alert variant="destructive" className="max-w-md">
@@ -56,7 +60,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <LoadingSpinner size="lg" className="text-primary" />
       </div>
     }>
       {children}

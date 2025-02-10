@@ -17,7 +17,7 @@ export function LoadingSpinner({ className, size = "md" }: LoadingSpinnerProps) 
   return (
     <Loader2 
       className={cn(
-        "animate-spin text-primary",
+        "animate-spin",
         sizeClasses[size],
         className
       )} 

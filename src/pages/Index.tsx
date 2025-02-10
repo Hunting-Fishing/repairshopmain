@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { toast } from "sonner";
+import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -28,7 +29,10 @@ export default function Index() {
           .eq('id', session.user.id)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          toast.error('Failed to load profile');
+          throw error;
+        }
         
         if (!data) {
           navigate('/auth');
@@ -37,10 +41,13 @@ export default function Index() {
 
         return data;
       } catch (error: any) {
-        toast.error('Failed to load profile');
+        console.error('Profile loading error:', error);
+        toast.error('Failed to load profile. Please try again.');
         throw error;
       }
     },
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   if (isLoading) {
@@ -48,11 +55,11 @@ export default function Index() {
   }
 
   if (error) {
-    throw error; // This will be caught by our ErrorBoundary
+    throw error; // Will be caught by ErrorBoundaryWrapper
   }
 
   return (
-    <ErrorBoundary type="default">
+    <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
         <StatsProvider>
           <main className="min-h-screen">
@@ -60,6 +67,6 @@ export default function Index() {
           </main>
         </StatsProvider>
       </Suspense>
-    </ErrorBoundary>
+    </ErrorBoundaryWrapper>
   );
 }

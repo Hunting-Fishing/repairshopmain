@@ -67,7 +67,10 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
           .eq('view_type', 'dashboard')
           .maybeSingle();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error loading persisted state:', error);
+          return;
+        }
 
         if (data?.state) {
           const state = data.state as PersistedState;
@@ -79,7 +82,6 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error('Error loading persisted state:', error);
-        toast.error('Failed to load your previous view settings');
       }
     };
 
@@ -111,14 +113,17 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
             onConflict: 'user_id,view_type'
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error persisting state:', error);
+        }
       } catch (error) {
         console.error('Error persisting state:', error);
-        // Don't show toast here to avoid spamming user
       }
     };
 
-    persistState();
+    // Debounce the persistState call to avoid too frequent updates
+    const timeoutId = setTimeout(persistState, 1000);
+    return () => clearTimeout(timeoutId);
   }, [view, viewMode, isCalendarExpanded]);
 
   // Memoize the context value to prevent unnecessary re-renders

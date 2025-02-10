@@ -3,7 +3,6 @@ import { createContext, useContext, ReactNode } from "react";
 import { useTheme } from "./ThemeContext";
 import { useStats } from "./StatsContext";
 import { useDashboard } from "@/components/dashboard/DashboardProvider";
-import { useAuth } from "./AuthContext";
 
 interface AppStateContextType {
   theme: {
@@ -32,6 +31,9 @@ const AppStateContext = createContext<AppStateContextType | undefined>(undefined
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const { isModernTheme, toggleTheme } = useTheme();
   const { stats, isLoading: statsLoading, error: statsError } = useStats();
+  const dashboardContext = useDashboard();
+
+  // Extract only the dashboard state properties we need
   const {
     selectedDate,
     setSelectedDate,
@@ -41,7 +43,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     setViewMode,
     isCalendarExpanded,
     setIsCalendarExpanded,
-  } = useDashboard();
+  } = dashboardContext;
 
   const value: AppStateContextType = {
     theme: {

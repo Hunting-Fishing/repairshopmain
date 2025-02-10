@@ -14,28 +14,35 @@ export function useCalendarBookings(selectedDate: Date) {
   const result = useQuery({
     queryKey: queryKeys.bookings.byDate(format(selectedDate, "yyyy-MM-dd")),
     queryFn: async () => {
-      const startOfDay = new Date(selectedDate);
-      startOfDay.setHours(0, 0, 0, 0);
-      const endOfDay = new Date(selectedDate);
-      endOfDay.setHours(23, 59, 59, 999);
+      try {
+        const startOfDay = new Date(selectedDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(selectedDate);
+        endOfDay.setHours(23, 59, 59, 999);
 
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .gte('start_time', startOfDay.toISOString())
-        .lte('start_time', endOfDay.toISOString())
-        .order("start_time");
+        const { data, error } = await supabase
+          .from("bookings")
+          .select("*")
+          .gte('start_time', startOfDay.toISOString())
+          .lte('start_time', endOfDay.toISOString())
+          .order("start_time");
 
-      if (error) {
-        console.error("Error fetching bookings:", error);
-        toast.error("Error fetching bookings");
+        if (error) {
+          console.error("Error fetching bookings:", error);
+          toast.error("Error fetching bookings");
+          throw error;
+        }
+
+        return data as Booking[];
+      } catch (error) {
+        console.error("Calendar query error:", error);
+        toast.error("Failed to load calendar data");
         throw error;
       }
-
-      return data as Booking[];
     },
     staleTime: 30 * 1000, // Consider data fresh for 30 seconds
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    retry: 2,
   });
 
   // Set up real-time subscription for booking updates
@@ -56,7 +63,19 @@ export function useCalendarBookings(selectedDate: Date) {
             queryClient.invalidateQueries({ 
               queryKey: queryKeys.bookings.byDate(date)
             });
-            toast.info("Bookings updated");
+            
+            // Show appropriate toast based on the event type
+            switch (payload.eventType) {
+              case 'INSERT':
+                toast.success('New booking added');
+                break;
+              case 'UPDATE':
+                toast.success('Booking updated');
+                break;
+              case 'DELETE':
+                toast.info('Booking removed');
+                break;
+            }
           } else {
             // If no new data, invalidate the current selected date
             queryClient.invalidateQueries({ 

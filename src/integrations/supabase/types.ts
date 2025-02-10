@@ -3770,6 +3770,8 @@ export type Database = {
           description: string | null
           id: string
           key: string
+          last_check: string | null
+          status: string
           updated_at: string
           value: string
         }
@@ -3778,6 +3780,8 @@ export type Database = {
           description?: string | null
           id?: string
           key: string
+          last_check?: string | null
+          status?: string
           updated_at?: string
           value: string
         }
@@ -3786,6 +3790,8 @@ export type Database = {
           description?: string | null
           id?: string
           key?: string
+          last_check?: string | null
+          status?: string
           updated_at?: string
           value?: string
         }

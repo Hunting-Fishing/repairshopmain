@@ -251,6 +251,36 @@ export type Database = {
           },
         ]
       }
+      booking_types: {
+        Row: {
+          color: string
+          created_at: string | null
+          description: string | null
+          duration: unknown | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          color: string
+          created_at?: string | null
+          description?: string | null
+          duration?: unknown | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          description?: string | null
+          duration?: unknown | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           assigned_technician_id: string | null

@@ -62,11 +62,11 @@ export default function Index() {
   return (
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
-        <ErrorBoundaryWrapper type="dashboard">
+        <ErrorBoundaryWrapper>
           <DashboardProvider>
-            <ErrorBoundaryWrapper type="stats">
+            <ErrorBoundaryWrapper>
               <StatsProvider>
-                <ErrorBoundaryWrapper type="app-state">
+                <ErrorBoundaryWrapper>
                   <AppStateProvider>
                     <main className="min-h-screen">
                       <DashboardLayout />

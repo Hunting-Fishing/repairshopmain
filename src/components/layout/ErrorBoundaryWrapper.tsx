@@ -36,7 +36,6 @@ export function ErrorBoundaryWrapper({ children }: ErrorBoundaryWrapperProps) {
     <ErrorBoundary 
       fallback={errorFallback}
       onError={handleError}
-      type="default"
     >
       <Suspense fallback={loadingFallback}>
         {children}

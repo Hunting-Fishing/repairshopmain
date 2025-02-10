@@ -56,13 +56,14 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadPersistedState = async () => {
       try {
-        const { data: session } = await supabase.auth.getSession();
-        if (!session?.user?.id) return;
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData?.session?.user?.id;
+        if (!userId) return;
 
         const { data, error } = await supabase
           .from('user_view_state')
           .select('state')
-          .eq('user_id', session.user.id)
+          .eq('user_id', userId)
           .eq('view_type', 'dashboard')
           .maybeSingle();
 
@@ -89,8 +90,9 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const persistState = async () => {
       try {
-        const { data: session } = await supabase.auth.getSession();
-        if (!session?.user?.id) return;
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData?.session?.user?.id;
+        if (!userId) return;
 
         const state: PersistedState = {
           lastView: view,
@@ -101,7 +103,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
         const { error } = await supabase
           .from('user_view_state')
           .upsert({
-            user_id: session.user.id,
+            user_id: userId,
             view_type: 'dashboard',
             state,
             updated_at: new Date().toISOString(),

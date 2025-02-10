@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 interface WorkOrder {
   id: string;
@@ -24,6 +25,8 @@ interface WorkOrderTableProps {
 }
 
 export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
+  const navigate = useNavigate();
+  
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -35,6 +38,10 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const handleRowClick = (id: string) => {
+    navigate(`/repair-jobs/${id}`);
   };
 
   return (
@@ -65,7 +72,11 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
             </TableRow>
           ) : (
             workOrders.map((order) => (
-              <TableRow key={order.id}>
+              <TableRow 
+                key={order.id}
+                onClick={() => handleRowClick(order.id)}
+                className="cursor-pointer hover:bg-muted/50"
+              >
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{order.customer}</TableCell>
                 <TableCell>{order.vehicle}</TableCell>

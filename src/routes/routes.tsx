@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "@/pages/Auth";
@@ -10,6 +9,7 @@ import CustomerDetail from "@/pages/CustomerDetail";
 import CustomerManagement from "@/pages/CustomerManagement";
 import Staff from "@/pages/Staff";
 import WorkOrders from "@/pages/WorkOrders";
+import RepairJobDetails from "@/pages/RepairJobDetails";
 import ApplicationControl from "@/pages/ApplicationControl";
 import Inventory from "@/pages/Inventory";
 import JobTemplates from "@/pages/JobTemplates";
@@ -107,6 +107,10 @@ export const router = createBrowserRouter([
       {
         path: "inventory/suppliers",
         element: <InventorySuppliers />,
+      },
+      {
+        path: "repair-jobs/:id",
+        element: <RepairJobDetails />,
       },
     ],
   },

@@ -4397,6 +4397,7 @@ export type Database = {
         | "Tools"
         | "Other"
       booking_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      calendar_view_type: "day" | "week" | "month"
       chat_room_type:
         | "general"
         | "support"
@@ -4413,6 +4414,7 @@ export type Database = {
         | "it"
         | "training"
         | "events"
+      dashboard_view_mode: "calendar" | "grid" | "list"
       inventory_change_type:
         | "create"
         | "update"

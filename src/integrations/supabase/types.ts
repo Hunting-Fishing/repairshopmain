@@ -259,6 +259,7 @@ export type Database = {
           duration: unknown | null
           id: string
           name: string
+          organization_id: string
           updated_at: string | null
         }
         Insert: {
@@ -268,6 +269,7 @@ export type Database = {
           duration?: unknown | null
           id?: string
           name: string
+          organization_id: string
           updated_at?: string | null
         }
         Update: {
@@ -277,9 +279,18 @@ export type Database = {
           duration?: unknown | null
           id?: string
           name?: string
+          organization_id?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "booking_types_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bookings: {
         Row: {

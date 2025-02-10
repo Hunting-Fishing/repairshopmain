@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { StatsProvider } from "@/contexts/StatsContext";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -45,9 +46,11 @@ export default function Index() {
   return (
     <ErrorBoundary>
       <Suspense fallback={<LoadingScreen />}>
-        <main className="min-h-screen">
-          <DashboardLayout />
-        </main>
+        <StatsProvider>
+          <main className="min-h-screen">
+            <DashboardLayout />
+          </main>
+        </StatsProvider>
       </Suspense>
     </ErrorBoundary>
   );

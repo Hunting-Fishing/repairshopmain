@@ -38,7 +38,11 @@ export function useViewState(viewType: string) {
         throw error;
       }
 
+      // If data exists, return it. Otherwise, return a default state with id and user_id
       return data || {
+        id: null,
+        user_id: user.id,
+        view_type: viewType,
         state: {},
         view_mode: 'calendar' as const,
         is_calendar_expanded: false,

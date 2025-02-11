@@ -30,12 +30,14 @@ export function useCustomerSegments(customerId: string) {
 
       if (error) throw error;
       
-      return (data || []).map((item: any) => ({
+      if (!data) return [];
+
+      return data.map((row: SegmentResponse) => ({
         segment: {
-          id: item.segment.id,
-          name: item.segment.name,
-          description: item.segment.description,
-          criteria: item.segment.criteria
+          id: row.segment.id,
+          name: row.segment.name,
+          description: row.segment.description,
+          criteria: row.segment.criteria
         }
       }));
     },

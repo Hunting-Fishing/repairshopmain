@@ -30,12 +30,14 @@ export function useCustomerTags(customerId: string) {
 
       if (error) throw error;
       
-      return (data || []).map((item: any) => ({
+      if (!data) return [];
+
+      return data.map((row: TagResponse) => ({
         tag: {
-          id: item.tag.id,
-          name: item.tag.name,
-          color: item.tag.color,
-          description: item.tag.description
+          id: row.tag.id,
+          name: row.tag.name,
+          color: row.tag.color,
+          description: row.tag.description
         }
       }));
     },

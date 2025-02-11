@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -80,6 +79,15 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-8 animate-fade-in ${themeClass}`}>
+        {mode === "edit" && (
+          <div className="flex items-center gap-2 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="text-yellow-700">
+              <p className="text-sm font-medium">Edit Mode</p>
+              <p className="text-xs">You are currently editing this customer's information.</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-end gap-2 mb-6">
           <Label htmlFor="theme-toggle" className="text-sm font-medium">
             {isModernTheme ? "Modern" : "Basic"} Theme

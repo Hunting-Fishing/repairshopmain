@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
 import { JobTemplateUploadSection } from "./JobTemplateUploadSection";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -41,3 +41,4 @@ export function JobTemplatesTab() {
     </Card>
   );
 }
+

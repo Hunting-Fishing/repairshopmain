@@ -9,13 +9,15 @@ import { UseFormReturn } from "react-hook-form";
 interface VehicleSelectionSectionProps {
   form: UseFormReturn<any>;
   customerId: string | null;
+  onVehicleSelect?: (vehicleInfo: string) => void;
 }
 
-export function VehicleSelectionSection({ form, customerId }: VehicleSelectionSectionProps) {
+export function VehicleSelectionSection({ form, customerId, onVehicleSelect }: VehicleSelectionSectionProps) {
   const [showVehicleDialog, setShowVehicleDialog] = useState(false);
 
   const handleVehicleSelect = (customerId: string, vehicleInfo: string) => {
     form.setValue('vehicleInfo', vehicleInfo);
+    onVehicleSelect?.(vehicleInfo);
   };
 
   return (
@@ -37,7 +39,7 @@ export function VehicleSelectionSection({ form, customerId }: VehicleSelectionSe
                 {field.value || "Select Vehicle"}
               </Button>
 
-              {customerId && (
+              {customerId && showVehicleDialog && (
                 <CustomerVehicleDialog
                   customerId={customerId}
                   onClose={() => setShowVehicleDialog(false)}

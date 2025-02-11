@@ -1,7 +1,6 @@
 
 import { z } from "zod";
 import { UseFormReturn } from "react-hook-form";
-import { CustomerVehicleDialog } from "@/components/customers/vehicles/CustomerVehicleDialog";
 import { useState } from "react";
 import { CustomerSelectionSection } from "./components/CustomerSelectionSection";
 import { VehicleSelectionSection } from "./components/VehicleSelectionSection";
@@ -22,7 +21,6 @@ interface WorkOrderFormProps {
 }
 
 export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
-  const [showVehicleDialog, setShowVehicleDialog] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
 
   const handleCustomerSelect = (customerId: string) => {
@@ -31,8 +29,8 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
   };
 
   const handleVehicleSelect = (vehicleInfo: string) => {
-    if (selectedCustomerId) {
-      onCustomerSelect?.(selectedCustomerId, vehicleInfo);
+    if (selectedCustomerId && onCustomerSelect) {
+      onCustomerSelect(selectedCustomerId, vehicleInfo);
     }
   };
 
@@ -45,20 +43,11 @@ export function WorkOrderForm({ form, onCustomerSelect }: WorkOrderFormProps) {
 
       <VehicleSelectionSection 
         form={form}
+        customerId={selectedCustomerId}
         onVehicleSelect={handleVehicleSelect}
       />
 
       <JobTemplateSection form={form} />
-
-      <CustomerVehicleDialog
-        customerId={selectedCustomerId}
-        onClose={() => setShowVehicleDialog(false)}
-        onSelect={(customerId, vehicleInfo) => {
-          form.setValue('customerId', customerId);
-          form.setValue('vehicleInfo', vehicleInfo);
-          onCustomerSelect?.(customerId, vehicleInfo);
-        }}
-      />
     </div>
   );
 }

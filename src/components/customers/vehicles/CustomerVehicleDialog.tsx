@@ -33,14 +33,13 @@ export function CustomerVehicleDialog({ customerId, onClose, onSelect }: Custome
         vehicle.body_class || ''
       ].filter(Boolean).join(' ').trim();
 
-      console.log('Selected vehicle info:', vehicleInfo); // Debug log
       onSelect(customerId, vehicleInfo);
       onClose();
     }
   };
 
   return (
-    <Dialog open={!!customerId} onOpenChange={() => onClose()}>
+    <Dialog open={!!customerId} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Select Vehicle for Work Order</DialogTitle>

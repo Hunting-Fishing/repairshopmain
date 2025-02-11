@@ -1,3 +1,4 @@
+
 import { Car, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Vehicle } from "./types";
@@ -56,8 +57,9 @@ export const VehicleCard = ({
     }
   };
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     if (selectable && onVehicleSelect) {
+      e.stopPropagation();
       onVehicleSelect(vehicle);
     }
   };
@@ -72,9 +74,8 @@ export const VehicleCard = ({
             ? 'cursor-pointer hover:bg-secondary/50 transition-colors'
             : ''
         }`}
-        onClick={handleClick}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between" onClick={handleClick}>
           <div className="flex items-center gap-4">
             <Car className="h-5 w-5 text-muted-foreground" />
             <div>

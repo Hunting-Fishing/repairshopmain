@@ -27,7 +27,7 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: templates, isLoading } = useJobTemplates();
+  const { data: templates = [], isLoading } = useJobTemplates();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -37,11 +37,8 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     setOpen(false);
   };
 
-  // Ensure templates is an array and handle undefined case
-  const safeTemplates = templates || [];
-  
   // Create a filtered templates array with null safety
-  const filteredTemplates = safeTemplates.filter((template): template is JobTemplate => {
+  const filteredTemplates = templates.filter((template): template is JobTemplate => {
     if (!template?.name) return false;
     return template.name.toLowerCase().includes(searchValue.toLowerCase());
   });
@@ -157,4 +154,3 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     </>
   );
 }
-

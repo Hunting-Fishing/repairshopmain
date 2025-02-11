@@ -3,9 +3,9 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/comp
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
-import { useJobTemplates, JobTemplate } from "@/hooks/use-job-templates";
+import { useJobTemplates, useTemplateCategories } from "@/hooks/use-job-templates";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Check, FileQuestion, Folder, Search } from "lucide-react";
+import { AlertCircle, Check, ChevronRight, FileQuestion, Folder, Search, Star, Tool, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,9 @@ import { useState, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useDebounce } from "use-debounce";
+import { Badge } from "@/components/ui/badge";
+import type { JobTemplate } from "@/types/job-templates";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -28,7 +31,8 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: templates = [], isLoading, error } = useJobTemplates();
+  const { data: templates = [], isLoading: isLoadingTemplates, error: templatesError } = useJobTemplates();
+  const { data: categories = [], isLoading: isLoadingCategories } = useTemplateCategories();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearch] = useDebounce(searchValue, 300);
@@ -39,13 +43,42 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     setOpen(false);
   };
 
-  // Memoize filtered templates to prevent unnecessary re-filtering
+  const getDifficultyColor = (level?: number) => {
+    if (!level) return "bg-gray-100 text-gray-800";
+    const colors = {
+      1: "bg-green-100 text-green-800",
+      2: "bg-blue-100 text-blue-800",
+      3: "bg-yellow-100 text-yellow-800",
+      4: "bg-orange-100 text-orange-800",
+      5: "bg-red-100 text-red-800"
+    };
+    return colors[level as keyof typeof colors] || colors[3];
+  };
+
+  // Memoize filtered templates
   const filteredTemplates = useMemo(() => {
     return templates.filter((template): template is JobTemplate => {
       if (!template?.name) return false;
-      return template.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+      const searchLower = debouncedSearch.toLowerCase();
+      return (
+        template.name.toLowerCase().includes(searchLower) ||
+        template.description?.toLowerCase().includes(searchLower) ||
+        template.category?.toLowerCase().includes(searchLower)
+      );
     });
   }, [templates, debouncedSearch]);
+
+  // Group templates by category
+  const groupedTemplates = useMemo(() => {
+    return filteredTemplates.reduce((acc, template) => {
+      const categoryName = categories.find(c => c.id === template.category_id)?.name || 'Uncategorized';
+      if (!acc[categoryName]) {
+        acc[categoryName] = [];
+      }
+      acc[categoryName].push(template);
+      return acc;
+    }, {} as Record<string, JobTemplate[]>);
+  }, [filteredTemplates, categories]);
 
   return (
     <>
@@ -65,14 +98,14 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                       "w-full justify-between",
                       !field.value && "text-muted-foreground"
                     )}
-                    disabled={isLoading}
+                    disabled={isLoadingTemplates}
                   >
-                    {isLoading ? (
+                    {isLoadingTemplates ? (
                       <div className="flex items-center gap-2">
                         <LoadingSpinner className="h-4 w-4" />
                         Loading templates...
                       </div>
-                    ) : error ? (
+                    ) : templatesError ? (
                       <div className="flex items-center gap-2 text-destructive">
                         <FileQuestion className="h-4 w-4" />
                         Error loading templates
@@ -96,59 +129,95 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                     value={searchValue}
                     onValueChange={setSearchValue}
                   />
-                  <ScrollArea className="h-[200px]">
-                    {isLoading ? (
+                  <ScrollArea className="h-[300px]">
+                    {isLoadingTemplates ? (
                       <div className="p-4 text-center">
                         <LoadingSpinner className="mx-auto h-4 w-4" />
                         <p className="text-sm text-muted-foreground mt-2">
                           Loading templates...
                         </p>
                       </div>
-                    ) : error ? (
+                    ) : templatesError ? (
                       <div className="p-4 text-center text-destructive">
-                        <FileQuestion className="mx-auto h-8 w-8 mb-2" />
+                        <AlertCircle className="mx-auto h-8 w-8 mb-2" />
                         <p>Failed to load templates</p>
                         <p className="text-sm text-muted-foreground mt-1">
                           Please try again later
                         </p>
                       </div>
-                    ) : templates.length === 0 ? (
-                      <div className="p-4 text-center">
-                        <Folder className="mx-auto h-8 w-8 mb-2 text-muted-foreground" />
-                        <p className="text-sm text-muted-foreground">
-                          No templates available
-                        </p>
-                      </div>
-                    ) : filteredTemplates.length === 0 ? (
-                      <CommandEmpty>No matching templates found.</CommandEmpty>
+                    ) : Object.keys(groupedTemplates).length === 0 ? (
+                      <CommandEmpty>No templates found</CommandEmpty>
                     ) : (
-                      <CommandGroup>
-                        {filteredTemplates.map((template) => (
-                          <CommandItem
-                            key={template.id}
-                            value={template.name}
-                            onSelect={() => handleTemplateSelect(template)}
-                            className="flex items-center gap-2"
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                template.name === field.value ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            <div className="flex flex-col">
-                              <span className="font-medium">{template.name}</span>
+                      Object.entries(groupedTemplates).map(([category, items]) => (
+                        <CommandGroup key={category} heading={category}>
+                          {items.map((template) => (
+                            <CommandItem
+                              key={template.id}
+                              value={template.name}
+                              onSelect={() => handleTemplateSelect(template)}
+                              className="flex flex-col gap-1 p-2"
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-2">
+                                  <Check
+                                    className={cn(
+                                      "h-4 w-4",
+                                      template.name === field.value ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  <span className="font-medium">{template.name}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {template.difficulty_level && (
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <Badge variant="secondary" className={getDifficultyColor(template.difficulty_level)}>
+                                          Level {template.difficulty_level}
+                                        </Badge>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        Difficulty Level {template.difficulty_level}
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                  {template.usage_stats?.success_rate && (
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <Badge variant="outline" className="flex items-center gap-1">
+                                          <Star className="h-3 w-3" />
+                                          {Math.round(template.usage_stats.success_rate)}%
+                                        </Badge>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        Success Rate
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </div>
+                              </div>
                               {template.description && (
-                                <span className="text-sm text-muted-foreground">
-                                  {template.description.length > 50
-                                    ? `${template.description.slice(0, 50)}...`
-                                    : template.description}
-                                </span>
+                                <p className="text-sm text-muted-foreground pl-6">
+                                  {template.description}
+                                </p>
                               )}
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
+                              <div className="flex items-center gap-4 pl-6 mt-1">
+                                {template.estimated_duration_range && (
+                                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                    <Clock className="h-3 w-3" />
+                                    {template.estimated_duration_range.min}-{template.estimated_duration_range.max} min
+                                  </div>
+                                )}
+                                {template.required_tools && template.required_tools.length > 0 && (
+                                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                    <Tool className="h-3 w-3" />
+                                    {template.required_tools.length} tools required
+                                  </div>
+                                )}
+                              </div>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      ))
                     )}
                   </ScrollArea>
                 </Command>

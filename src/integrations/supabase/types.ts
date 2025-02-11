@@ -2268,9 +2268,12 @@ export type Database = {
       job_templates: {
         Row: {
           category: Database["public"]["Enums"]["job_category"]
+          category_id: string | null
           created_at: string
           created_by: string | null
           description: string | null
+          difficulty_level: number | null
+          estimated_duration_range: Json | null
           estimated_hours: number | null
           id: string
           is_active: boolean | null
@@ -2278,17 +2281,24 @@ export type Database = {
           name: string
           organization_id: string | null
           parts_required: Json | null
+          required_certifications: Json | null
+          required_tools: Json | null
           status: Database["public"]["Enums"]["job_status"] | null
           sub_tasks: Json | null
           timeline: Json | null
+          typical_parts: Json | null
           updated_at: string
           updated_by: string | null
+          version: number | null
         }
         Insert: {
           category: Database["public"]["Enums"]["job_category"]
+          category_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          difficulty_level?: number | null
+          estimated_duration_range?: Json | null
           estimated_hours?: number | null
           id?: string
           is_active?: boolean | null
@@ -2296,17 +2306,24 @@ export type Database = {
           name: string
           organization_id?: string | null
           parts_required?: Json | null
+          required_certifications?: Json | null
+          required_tools?: Json | null
           status?: Database["public"]["Enums"]["job_status"] | null
           sub_tasks?: Json | null
           timeline?: Json | null
+          typical_parts?: Json | null
           updated_at?: string
           updated_by?: string | null
+          version?: number | null
         }
         Update: {
           category?: Database["public"]["Enums"]["job_category"]
+          category_id?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
+          difficulty_level?: number | null
+          estimated_duration_range?: Json | null
           estimated_hours?: number | null
           id?: string
           is_active?: boolean | null
@@ -2314,13 +2331,24 @@ export type Database = {
           name?: string
           organization_id?: string | null
           parts_required?: Json | null
+          required_certifications?: Json | null
+          required_tools?: Json | null
           status?: Database["public"]["Enums"]["job_status"] | null
           sub_tasks?: Json | null
           timeline?: Json | null
+          typical_parts?: Json | null
           updated_at?: string
           updated_by?: string | null
+          version?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "job_templates_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "template_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "job_templates_created_by_fkey"
             columns: ["created_by"]
@@ -4217,6 +4245,199 @@ export type Database = {
             columns: ["technician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          parent_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "template_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_feedback: {
+        Row: {
+          comments: string | null
+          created_at: string | null
+          id: string
+          organization_id: string
+          rating: number | null
+          technician_id: string | null
+          template_id: string | null
+        }
+        Insert: {
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          organization_id: string
+          rating?: number | null
+          technician_id?: string | null
+          template_id?: string | null
+        }
+        Update: {
+          comments?: string | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string
+          rating?: number | null
+          technician_id?: string | null
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_feedback_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "job_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_usage_stats: {
+        Row: {
+          avg_completion_time: number | null
+          id: string
+          last_updated: string | null
+          organization_id: string
+          success_rate: number | null
+          template_id: string | null
+          use_count: number | null
+        }
+        Insert: {
+          avg_completion_time?: number | null
+          id?: string
+          last_updated?: string | null
+          organization_id: string
+          success_rate?: number | null
+          template_id?: string | null
+          use_count?: number | null
+        }
+        Update: {
+          avg_completion_time?: number | null
+          id?: string
+          last_updated?: string | null
+          organization_id?: string
+          success_rate?: number | null
+          template_id?: string | null
+          use_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_usage_stats_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "job_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_vehicle_compatibility: {
+        Row: {
+          created_at: string | null
+          id: string
+          make: string | null
+          model: string | null
+          organization_id: string
+          template_id: string | null
+          year_end: number | null
+          year_start: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          organization_id: string
+          template_id?: string | null
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          organization_id?: string
+          template_id?: string | null
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_vehicle_compatibility_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "job_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_versions: {
+        Row: {
+          changes: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          organization_id: string
+          template_id: string | null
+          version_number: number
+        }
+        Insert: {
+          changes?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          template_id?: string | null
+          version_number: number
+        }
+        Update: {
+          changes?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          template_id?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_versions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "job_templates"
             referencedColumns: ["id"]
           },
         ]

@@ -27,6 +27,8 @@ export function DayView({
   const [isLoadingSlots, setIsLoadingSlots] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
+  const parentRef = React.useRef<HTMLDivElement>(null);
+
   // Memoize time slots generation
   const generateTimeSlotsCallback = useCallback(async () => {
     setIsLoadingSlots(true);
@@ -59,13 +61,13 @@ export function DayView({
     generateTimeSlotsCallback();
   }, [generateTimeSlotsCallback]);
 
-  const parentRef = React.useRef<HTMLDivElement>(null);
+  // Memoize virtualizer configuration
+  const estimateSize = useCallback(() => 64, []);
   
-  // Memoize virtualizer to prevent unnecessary re-renders
   const virtualizer = useVirtualizer({
     count: timeSlots.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: useCallback(() => 64, []),
+    estimateSize,
     overscan: 5,
   });
 
@@ -83,7 +85,13 @@ export function DayView({
   }, []);
 
   if (isLoading || isLoadingSlots) {
-    return <LoadingScreen />;
+    return (
+      <div className="space-y-4 transition-all duration-300 ease-in-out animate-fade-in">
+        <div className="h-[calc(100vh-320px)] min-h-[500px] max-h-[800px] overflow-hidden rounded-lg border">
+          <LoadingScreen />
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -96,6 +104,7 @@ export function DayView({
         <div 
           ref={parentRef}
           className="h-[calc(100vh-320px)] min-h-[500px] max-h-[800px] overflow-y-auto backdrop-blur-sm bg-background/95 rounded-lg border shadow-sm transition-all duration-300"
+          style={{ willChange: 'transform' }}
         >
           <div
             style={{
@@ -118,6 +127,7 @@ export function DayView({
                     width: '100%',
                     height: `${virtualItem.size}px`,
                     transform: `translateY(${virtualItem.start}px)`,
+                    willChange: 'transform',
                   }}
                   className="transition-transform duration-300 ease-in-out animate-fade-in"
                 >

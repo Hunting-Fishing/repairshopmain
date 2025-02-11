@@ -1,4 +1,3 @@
-
 import { useAppState } from "@/contexts/AppStateContext";
 import { StatCard } from "../StatCard";
 import { useStatsIcons } from "../../hooks/useStatsIcons";
@@ -9,28 +8,34 @@ import { formatStatTitle } from "../../utils/statsFormatters";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { toast } from "sonner";
 import { useMemo, useCallback } from "react";
+import { useStats } from "@/contexts/StatsContext";
 
 interface StatCardGridProps {
   isModernTheme?: boolean;
 }
 
 export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
-  const { stats: { stats, isLoading, error } } = useAppState();
+  const { stats, isLoading, error } = useStats();
   const statIcons = useStatsIcons();
 
   const handleStatsError = useCallback((error: Error) => {
     console.error("Stats error:", error);
-    toast("Failed to load statistics");
+    toast.error("Failed to load statistics");
   }, []);
 
   const uniqueStats = useMemo(() => {
     if (!stats) return [];
-    const seen = new Set();
-    return stats.filter(stat => {
-      if (seen.has(stat.type)) return false;
-      seen.add(stat.type);
-      return true;
+    const statsMap = new Map();
+    
+    stats.forEach(stat => {
+      // Only keep the most recent stat for each type
+      if (!statsMap.has(stat.type) || 
+          new Date(stat.created_at) > new Date(statsMap.get(stat.type).created_at)) {
+        statsMap.set(stat.type, stat);
+      }
     });
+    
+    return Array.from(statsMap.values());
   }, [stats]);
 
   if (error) {
@@ -53,15 +58,13 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
   }
 
   return (
-    <ErrorBoundary
-      onError={handleStatsError}
-    >
+    <ErrorBoundary onError={handleStatsError}>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {uniqueStats.map((stat, index) => {
           const Icon = statIcons[stat.type];
           return (
             <StatCard
-              key={stat.type}
+              key={`${stat.type}-${stat.created_at}`}
               title={formatStatTitle(stat.type)}
               value={stat.value}
               type={stat.type}

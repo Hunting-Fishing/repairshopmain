@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +11,7 @@ import { useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { JobTemplate } from "@/types/job-templates";
+import { TemplateActions } from "./TemplateActions";
 
 interface TemplateDropdownProps {
   category: string;
@@ -72,12 +72,18 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
                 className="flex flex-col items-start gap-2 p-3"
               >
                 <div className="flex items-center justify-between w-full">
-                  <span className="font-medium">{template.name}</span>
-                  {template.status && (
-                    <Badge variant="secondary" className={getStatusColor(template.status)}>
-                      {template.status.replace('_', ' ')}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{template.name}</span>
+                    {template.status && (
+                      <Badge variant="secondary" className={getStatusColor(template.status)}>
+                        {template.status.replace('_', ' ')}
+                      </Badge>
+                    )}
+                  </div>
+                  <TemplateActions 
+                    template={template}
+                    onDuplicate={() => window.location.reload()}
+                  />
                 </div>
                 
                 {template.description && (

@@ -5,13 +5,14 @@ import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { useJobTemplates, JobTemplate } from "@/hooks/use-job-templates";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { Check, Folder, Search } from "lucide-react";
+import { Check, FileQuestion, Folder, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useDebounce } from "use-debounce";
 
 const workOrderSchema = z.object({
   customerId: z.string().min(1, "Customer selection is required"),
@@ -27,9 +28,10 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: templates = [], isLoading } = useJobTemplates();
+  const { data: templates = [], isLoading, error } = useJobTemplates();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [debouncedSearch] = useDebounce(searchValue, 300);
 
   const handleTemplateSelect = (template: JobTemplate) => {
     form.setValue('jobTemplate', template.name);
@@ -37,11 +39,13 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     setOpen(false);
   };
 
-  // Create a filtered templates array with null safety
-  const filteredTemplates = templates.filter((template): template is JobTemplate => {
-    if (!template?.name) return false;
-    return template.name.toLowerCase().includes(searchValue.toLowerCase());
-  });
+  // Memoize filtered templates to prevent unnecessary re-filtering
+  const filteredTemplates = useMemo(() => {
+    return templates.filter((template): template is JobTemplate => {
+      if (!template?.name) return false;
+      return template.name.toLowerCase().includes(debouncedSearch.toLowerCase());
+    });
+  }, [templates, debouncedSearch]);
 
   return (
     <>
@@ -67,6 +71,11 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                       <div className="flex items-center gap-2">
                         <LoadingSpinner className="h-4 w-4" />
                         Loading templates...
+                      </div>
+                    ) : error ? (
+                      <div className="flex items-center gap-2 text-destructive">
+                        <FileQuestion className="h-4 w-4" />
+                        Error loading templates
                       </div>
                     ) : (
                       <>
@@ -95,8 +104,23 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                           Loading templates...
                         </p>
                       </div>
+                    ) : error ? (
+                      <div className="p-4 text-center text-destructive">
+                        <FileQuestion className="mx-auto h-8 w-8 mb-2" />
+                        <p>Failed to load templates</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Please try again later
+                        </p>
+                      </div>
+                    ) : templates.length === 0 ? (
+                      <div className="p-4 text-center">
+                        <Folder className="mx-auto h-8 w-8 mb-2 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">
+                          No templates available
+                        </p>
+                      </div>
                     ) : filteredTemplates.length === 0 ? (
-                      <CommandEmpty>No templates found.</CommandEmpty>
+                      <CommandEmpty>No matching templates found.</CommandEmpty>
                     ) : (
                       <CommandGroup>
                         {filteredTemplates.map((template) => (

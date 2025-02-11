@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { BusinessHours } from "@/types/bookings";
 
 export interface ScheduleWorkOrderParams {
   workOrderId: string;
@@ -20,7 +20,7 @@ export async function scheduleWorkOrder({
     const endTime = new Date(startTime);
     endTime.setMinutes(endTime.getMinutes() + estimatedDurationMinutes);
 
-    // Check technician availability using our new database function
+    // Check technician availability using our database function
     const { data: isAvailable, error: availabilityError } = await supabase.rpc(
       'check_technician_availability',
       {
@@ -35,7 +35,7 @@ export async function scheduleWorkOrder({
     }
 
     if (!isAvailable) {
-      throw new Error('Technician is not available during this time slot');
+      throw new Error('Technician is not available during this time slot or it is outside business hours');
     }
 
     // Begin transaction
@@ -66,7 +66,9 @@ export async function scheduleWorkOrder({
         status: 'scheduled',
         duration_minutes: estimatedDurationMinutes,
         created_by: (await supabase.auth.getUser()).data.user?.id,
-        updated_by: (await supabase.auth.getUser()).data.user?.id
+        updated_by: (await supabase.auth.getUser()).data.user?.id,
+        required_parts: workOrder.required_parts,
+        parts_status: workOrder.parts_status
       });
 
     if (bookingError) throw bookingError;
@@ -160,6 +162,40 @@ export async function unscheduleWorkOrder(workOrderId: string) {
   } catch (error: any) {
     console.error('Error unscheduling work order:', error);
     toast.error(error.message || 'Failed to unschedule work order');
+    return false;
+  }
+}
+
+export async function getBusinessHours(organizationId: string): Promise<BusinessHours | null> {
+  try {
+    const { data, error } = await supabase
+      .from('calendar_settings')
+      .select('business_hours')
+      .eq('organization_id', organizationId)
+      .single();
+
+    if (error) throw error;
+    return data?.business_hours;
+  } catch (error) {
+    console.error('Error fetching business hours:', error);
+    return null;
+  }
+}
+
+export async function checkBusinessHours(organizationId: string, startTime: Date): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.rpc(
+      'check_business_hours',
+      {
+        p_organization_id: organizationId,
+        p_start_time: startTime.toISOString()
+      }
+    );
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error checking business hours:', error);
     return false;
   }
 }

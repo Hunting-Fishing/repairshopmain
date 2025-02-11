@@ -28,6 +28,8 @@ export interface BookingBase {
     email: boolean;
     sms: boolean;
   };
+  required_parts?: Json[];
+  parts_status?: string;
 }
 
 export interface BookingFormValues {
@@ -45,6 +47,7 @@ export interface BookingFormValues {
     email: boolean;
     sms: boolean;
   };
+  required_parts?: Json[];
 }
 
 export interface BookingDialogProps {
@@ -62,4 +65,26 @@ export interface BookingQueryResult extends BookingBase {
     first_name: string | null;
     last_name: string | null;
   } | null;
+}
+
+export interface BusinessHours {
+  [key: string]: {
+    start: string;
+    end: string;
+  } | null;
+}
+
+export interface SchedulingNotification {
+  id: string;
+  organization_id: string;
+  booking_id: string;
+  repair_job_id: string;
+  notification_type: string;
+  recipient_type: string;
+  recipient_id: string;
+  status: string;
+  sent_at: string | null;
+  created_at: string;
+  message: string;
+  error: string | null;
 }

@@ -10,6 +10,10 @@ type DatabaseSegment = {
   criteria: any;
 }
 
+interface SegmentRow {
+  segment: DatabaseSegment;
+}
+
 export function useCustomerSegments(customerId: string) {
   return useQuery<SegmentAssignment[]>({
     queryKey: ["customer-segments", customerId],
@@ -30,8 +34,9 @@ export function useCustomerSegments(customerId: string) {
       
       if (!data) return [];
 
-      return data.map((row) => ({
-        segment: row.segment as DatabaseSegment
+      // Ensure we handle the response data correctly
+      return (data as SegmentRow[]).map((row) => ({
+        segment: row.segment
       }));
     },
   });

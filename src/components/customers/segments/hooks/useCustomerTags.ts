@@ -10,6 +10,10 @@ type DatabaseTag = {
   description: string | null;
 }
 
+interface TagRow {
+  tag: DatabaseTag;
+}
+
 export function useCustomerTags(customerId: string) {
   return useQuery<TagAssignment[]>({
     queryKey: ["customer-tags", customerId],
@@ -30,8 +34,9 @@ export function useCustomerTags(customerId: string) {
       
       if (!data) return [];
 
-      return data.map((row) => ({
-        tag: row.tag as DatabaseTag
+      // Ensure we handle the response data correctly
+      return (data as TagRow[]).map((row) => ({
+        tag: row.tag
       }));
     },
   });

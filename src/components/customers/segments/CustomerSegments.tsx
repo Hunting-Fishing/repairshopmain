@@ -5,12 +5,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Layers } from "lucide-react";
 
+interface Segment {
+  id: string;
+  name: string;
+  description: string | null;
+  criteria: any;
+}
+
+interface Tag {
+  id: string;
+  name: string;
+  color: string | null;
+  description: string | null;
+}
+
+interface SegmentAssignment {
+  segment: Segment;
+}
+
+interface TagAssignment {
+  tag: Tag;
+}
+
 interface CustomerSegmentsProps {
   customerId: string;
 }
 
 export function CustomerSegments({ customerId }: CustomerSegmentsProps) {
-  const { data: segments } = useQuery({
+  const { data: segments } = useQuery<SegmentAssignment[]>({
     queryKey: ["customer-segments", customerId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -30,7 +52,7 @@ export function CustomerSegments({ customerId }: CustomerSegmentsProps) {
     },
   });
 
-  const { data: tags } = useQuery({
+  const { data: tags } = useQuery<TagAssignment[]>({
     queryKey: ["customer-tags", customerId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -88,7 +110,7 @@ export function CustomerSegments({ customerId }: CustomerSegmentsProps) {
                   key={assignment.tag.id}
                   variant="outline"
                   style={{
-                    backgroundColor: assignment.tag.color,
+                    backgroundColor: assignment.tag.color || undefined,
                     color: '#fff'
                   }}
                 >

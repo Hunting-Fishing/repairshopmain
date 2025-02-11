@@ -9,6 +9,7 @@ import { DashboardContextProvider } from "@/contexts/DashboardContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { StatsProvider } from "@/contexts/StatsContext";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -67,25 +68,27 @@ export default function Index() {
   return (
     <ErrorBoundaryWrapper>
       <Suspense fallback={<LoadingScreen />}>
-        <DashboardContextProvider>
-          <main className="min-h-screen">
-            <div className="fixed bottom-4 right-4 z-50 flex gap-2">
-              <Button 
-                variant="outline"
-                onClick={handleGenerateDemoData}
-              >
-                Generate Demo Data
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={handleCleanupDemoData}
-              >
-                Clean Up Demo Data
-              </Button>
-            </div>
-            <DashboardLayout />
-          </main>
-        </DashboardContextProvider>
+        <StatsProvider>
+          <DashboardContextProvider>
+            <main className="min-h-screen">
+              <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={handleGenerateDemoData}
+                >
+                  Generate Demo Data
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleCleanupDemoData}
+                >
+                  Clean Up Demo Data
+                </Button>
+              </div>
+              <DashboardLayout />
+            </main>
+          </DashboardContextProvider>
+        </StatsProvider>
       </Suspense>
     </ErrorBoundaryWrapper>
   );

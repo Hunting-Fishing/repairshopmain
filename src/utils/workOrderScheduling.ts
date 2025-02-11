@@ -20,7 +20,7 @@ async function calculateWorkDayEndTime(organizationId: string, date: Date): Prom
     throw new Error('Business hours not configured');
   }
 
-  const dayName = date.toLocaleLowerCase().split(',')[0];
+  const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
   const dayHours = settings.business_hours[dayName];
   
   if (!dayHours) {

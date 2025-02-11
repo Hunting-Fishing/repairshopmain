@@ -1,4 +1,5 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TierSettings } from "./TierSettings";
@@ -8,6 +9,21 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export function LoyaltyTab() {
   const { settings, isLoading, updateSettings } = useLoyaltySettings();
+
+  const [tierSettings, setTierSettings] = useState(
+    settings?.tier_settings || {
+      bronze: { min: 0, max: 1000 },
+      silver: { min: 1001, max: 5000 },
+      gold: { min: 5001, max: null }
+    }
+  );
+
+  const [pointsSettings, setPointsSettings] = useState(
+    settings?.point_settings || {
+      earning: { dollars: 1, points: 1 },
+      redeeming: { points: 100, dollars: 5 }
+    }
+  );
 
   const handleSaveSettings = () => {
     updateSettings.mutate({
@@ -43,21 +59,6 @@ export function LoyaltyTab() {
       </Card>
     );
   }
-
-  const [tierSettings, setTierSettings] = useState(
-    settings?.tier_settings || {
-      bronze: { min: 0, max: 1000 },
-      silver: { min: 1001, max: 5000 },
-      gold: { min: 5001, max: null }
-    }
-  );
-
-  const [pointsSettings, setPointsSettings] = useState(
-    settings?.point_settings || {
-      earning: { dollars: 1, points: 1 },
-      redeeming: { points: 100, dollars: 5 }
-    }
-  );
 
   return (
     <Card>

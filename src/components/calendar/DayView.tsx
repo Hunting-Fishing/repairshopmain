@@ -42,20 +42,24 @@ export function DayView({
     }
   }, [date, bookings]);
 
-  // Update current time every minute
+  // Update current time every minute with debounce
   useEffect(() => {
-    const updateCurrentTime = () => setCurrentTime(new Date());
+    const updateCurrentTime = () => {
+      const now = new Date();
+      if (Math.abs(now.getTime() - currentTime.getTime()) >= 60000) {
+        setCurrentTime(now);
+      }
+    };
     const interval = setInterval(updateCurrentTime, 60000);
-    updateCurrentTime();
     return () => clearInterval(interval);
-  }, []);
+  }, [currentTime]);
 
   // Generate time slots when date or bookings change
   useEffect(() => {
     generateTimeSlotsCallback();
   }, [generateTimeSlotsCallback]);
 
-  // Virtual list setup for better performance
+  // Memoize virtualizer configuration
   const parentRef = React.useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
     count: timeSlots.length,
@@ -64,18 +68,18 @@ export function DayView({
     overscan: 5,
   });
 
-  const renderMultiDayIndicator = (booking: any) => {
+  const renderMultiDayIndicator = useCallback((booking: any) => {
     if (!booking.is_multi_day) return null;
     return (
       <Badge 
         variant="secondary" 
-        className="ml-2 text-xs"
+        className="ml-2 text-xs animate-fade-in"
       >
         {booking.sequence_number > 1 ? 'Continued' : 'Multi-day'} 
         {booking.remaining_minutes ? ` (${Math.ceil(booking.remaining_minutes / 60)}h remaining)` : ''}
       </Badge>
     );
-  };
+  }, []);
 
   if (isLoading || isLoadingSlots) {
     return <LoadingScreen />;
@@ -87,10 +91,10 @@ export function DayView({
 
   return (
     <ErrorBoundary>
-      <div className="space-y-4">
+      <div className="space-y-4 transition-all duration-300 ease-in-out">
         <div 
           ref={parentRef}
-          className="h-[calc(100vh-200px)] overflow-auto"
+          className="h-[calc(100vh-200px)] overflow-auto backdrop-blur-sm bg-background/95 rounded-lg border shadow-sm transition-all duration-300"
         >
           <div
             style={{
@@ -98,6 +102,7 @@ export function DayView({
               width: '100%',
               position: 'relative',
             }}
+            className="transition-all duration-300"
           >
             {virtualizer.getVirtualItems().map((virtualItem) => {
               const slot = timeSlots[virtualItem.index];
@@ -112,6 +117,7 @@ export function DayView({
                     height: `${virtualItem.size}px`,
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
+                  className="transition-transform duration-300 ease-in-out animate-fade-in"
                 >
                   <TimeSlot
                     isPast={isPastTimeSlot(slot.time, currentTime)}
@@ -119,7 +125,7 @@ export function DayView({
                     hasBookings={slot.bookings.length > 0}
                     pastColors={[PAST_APPOINTMENT_COLORS[0], PAST_APPOINTMENT_COLORS[1]]}
                     onClick={() => onTimeSlotClick(slot.time, slot.end)}
-                    className="flex min-h-[4rem] items-start gap-4 rounded-lg border p-3 m-1"
+                    className="flex min-h-[4rem] items-start gap-4 rounded-lg border p-3 m-1 transition-all duration-300 hover:shadow-md"
                   >
                     <TimeSlotContent
                       slot={slot}

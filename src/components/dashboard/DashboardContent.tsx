@@ -47,9 +47,10 @@ export const DashboardContent = memo(function DashboardContent() {
 
   return (
     <ErrorBoundary onError={handleError}>
-      <div className="flex flex-col space-y-6">
-        <StatsCards isModernTheme={isModernTheme} />
-        <SystemStatusCard isModernTheme={isModernTheme} />
+      <div className="flex flex-col space-y-6 animate-fade-in">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <StatsCards isModernTheme={isModernTheme} />
+        </div>
         
         <Tabs 
           value={viewMode} 
@@ -84,6 +85,10 @@ export const DashboardContent = memo(function DashboardContent() {
             <ListView />
           </TabsContent>
         </Tabs>
+
+        <div className="mt-auto pt-6">
+          <SystemStatusCard isModernTheme={isModernTheme} />
+        </div>
       </div>
     </ErrorBoundary>
   );

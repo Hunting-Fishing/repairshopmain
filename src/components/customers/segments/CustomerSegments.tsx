@@ -48,7 +48,11 @@ export function CustomerSegments({ customerId }: CustomerSegmentsProps) {
         .eq("customer_id", customerId);
 
       if (error) throw error;
-      return data;
+      
+      // Transform the data to match our type
+      return (data || []).map(item => ({
+        segment: item.segment as Segment
+      }));
     },
   });
 
@@ -68,7 +72,11 @@ export function CustomerSegments({ customerId }: CustomerSegmentsProps) {
         .eq("customer_id", customerId);
 
       if (error) throw error;
-      return data;
+      
+      // Transform the data to match our type
+      return (data || []).map(item => ({
+        tag: item.tag as Tag
+      }));
     },
   });
 

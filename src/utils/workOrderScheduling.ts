@@ -1,85 +1,9 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { BusinessHours } from "@/types/bookings";
-
-export interface ScheduleWorkOrderParams {
-  workOrderId: string;
-  technicianId: string;
-  startTime: Date;
-  estimatedDurationMinutes: number;
-}
-
-async function calculateWorkDayEndTime(organizationId: string, date: Date): Promise<Date> {
-  const { data: settings } = await supabase
-    .from('calendar_settings')
-    .select('business_hours')
-    .eq('organization_id', organizationId)
-    .single();
-
-  if (!settings?.business_hours) {
-    throw new Error('Business hours not configured');
-  }
-
-  const dayName = date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
-  const dayHours = settings.business_hours[dayName];
-  
-  if (!dayHours) {
-    throw new Error('No business hours set for this day');
-  }
-
-  const endTime = new Date(date);
-  const [hours, minutes] = dayHours.end.split(':');
-  endTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-  
-  return endTime;
-}
-
-async function createBooking(
-  workOrderId: string,
-  technicianId: string,
-  startTime: Date,
-  endTime: Date,
-  organizationId: string,
-  estimatedDurationMinutes: number,
-  isMultiDay: boolean = false,
-  parentBookingId?: string,
-  sequenceNumber: number = 1,
-  remainingMinutes?: number,
-  totalDurationMinutes?: number
-) {
-  const user = (await supabase.auth.getUser()).data.user;
-  
-  const { data: workOrder, error: workOrderError } = await supabase
-    .from('customer_repair_jobs')
-    .select('*')
-    .eq('id', workOrderId)
-    .single();
-
-  if (workOrderError) throw workOrderError;
-
-  const { error: bookingError } = await supabase
-    .from('bookings')
-    .insert({
-      repair_job_id: workOrderId,
-      assigned_technician_id: technicianId,
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
-      customer_name: workOrder.customer_name || 'Customer',
-      job_description: workOrder.description,
-      organization_id: organizationId,
-      status: 'scheduled',
-      duration_minutes: estimatedDurationMinutes,
-      created_by: user?.id,
-      updated_by: user?.id,
-      is_multi_day: isMultiDay,
-      parent_booking_id: parentBookingId,
-      sequence_number: sequenceNumber,
-      remaining_minutes: remainingMinutes,
-      total_duration_minutes: totalDurationMinutes
-    });
-
-  if (bookingError) throw bookingError;
-}
+import { calculateWorkDayEndTime } from "./scheduling/businessHours";
+import { createBooking, updateWorkOrderSchedule, unscheduleWorkOrder } from "./scheduling/bookingOperations";
+import type { ScheduleWorkOrderParams } from "./scheduling/types";
 
 export async function scheduleWorkOrder({
   workOrderId,
@@ -114,19 +38,18 @@ export async function scheduleWorkOrder({
 
       // Create first day's booking
       const firstDayEndTime = new Date(workDayEnd);
-      await createBooking(
+      await createBooking({
         workOrderId,
         technicianId,
         startTime,
-        firstDayEndTime,
-        profile.organization_id,
-        minutesUntilDayEnd,
-        true,
-        undefined,
-        1,
+        endTime: firstDayEndTime,
+        organizationId: profile.organization_id,
+        estimatedDurationMinutes: minutesUntilDayEnd,
+        isMultiDay: true,
+        sequenceNumber: 1,
         remainingMinutes,
-        estimatedDurationMinutes
-      );
+        totalDurationMinutes: estimatedDurationMinutes
+      });
 
       // Get next working day
       const { data: nextDay } = await supabase.rpc('get_next_working_day', {
@@ -154,19 +77,18 @@ export async function scheduleWorkOrder({
         const bookingEnd = new Date(dayStart);
         bookingEnd.setMinutes(bookingEnd.getMinutes() + bookingDuration);
 
-        await createBooking(
+        await createBooking({
           workOrderId,
           technicianId,
-          dayStart,
-          bookingEnd,
-          profile.organization_id,
-          bookingDuration,
-          true,
-          undefined,
-          sequence,
-          remainingMins - bookingDuration,
-          estimatedDurationMinutes
-        );
+          startTime: dayStart,
+          endTime: bookingEnd,
+          organizationId: profile.organization_id,
+          estimatedDurationMinutes: bookingDuration,
+          isMultiDay: true,
+          sequenceNumber: sequence,
+          remainingMinutes: remainingMins - bookingDuration,
+          totalDurationMinutes: estimatedDurationMinutes
+        });
 
         remainingMins -= bookingDuration;
         sequence++;
@@ -195,15 +117,15 @@ export async function scheduleWorkOrder({
       if (availabilityError) throw new Error('Failed to check technician availability');
       if (!isAvailable) throw new Error('Technician is not available during this time slot');
 
-      await createBooking(
+      await createBooking({
         workOrderId,
         technicianId,
         startTime,
         endTime,
-        profile.organization_id,
+        organizationId: profile.organization_id,
         estimatedDurationMinutes,
-        false
-      );
+        isMultiDay: false
+      });
     }
 
     // Update work order status
@@ -227,120 +149,5 @@ export async function scheduleWorkOrder({
   }
 }
 
-export async function updateWorkOrderSchedule({
-  workOrderId,
-  technicianId,
-  startTime,
-  estimatedDurationMinutes,
-}: ScheduleWorkOrderParams) {
-  try {
-    const endTime = new Date(startTime);
-    endTime.setMinutes(endTime.getMinutes() + estimatedDurationMinutes);
-
-    // Check technician availability
-    const { data: isAvailable, error: availabilityError } = await supabase.rpc(
-      'check_technician_availability',
-      {
-        p_technician_id: technicianId,
-        p_start_time: startTime.toISOString(),
-        p_end_time: endTime.toISOString()
-      }
-    );
-
-    if (availabilityError) throw new Error('Failed to check technician availability');
-    if (!isAvailable) throw new Error('Technician is not available during this time slot');
-
-    // Update work order
-    const { error: workOrderError } = await supabase
-      .from('customer_repair_jobs')
-      .update({
-        estimated_duration_minutes: estimatedDurationMinutes
-      })
-      .eq('id', workOrderId);
-
-    if (workOrderError) throw workOrderError;
-
-    // Update calendar booking
-    const { error: bookingError } = await supabase
-      .from('bookings')
-      .update({
-        start_time: startTime.toISOString(),
-        end_time: endTime.toISOString(),
-        duration_minutes: estimatedDurationMinutes,
-        updated_by: (await supabase.auth.getUser()).data.user?.id
-      })
-      .eq('repair_job_id', workOrderId);
-
-    if (bookingError) throw bookingError;
-
-    toast.success('Work order schedule updated successfully');
-    return true;
-  } catch (error: any) {
-    console.error('Error updating work order schedule:', error);
-    toast.error(error.message || 'Failed to update work order schedule');
-    return false;
-  }
-}
-
-export async function unscheduleWorkOrder(workOrderId: string) {
-  try {
-    // Update work order status
-    const { error: workOrderError } = await supabase
-      .from('customer_repair_jobs')
-      .update({
-        scheduling_status: 'unscheduled'
-      })
-      .eq('id', workOrderId);
-
-    if (workOrderError) throw workOrderError;
-
-    // Delete calendar booking
-    const { error: bookingError } = await supabase
-      .from('bookings')
-      .delete()
-      .eq('repair_job_id', workOrderId);
-
-    if (bookingError) throw bookingError;
-
-    toast.success('Work order unscheduled successfully');
-    return true;
-  } catch (error: any) {
-    console.error('Error unscheduling work order:', error);
-    toast.error(error.message || 'Failed to unschedule work order');
-    return false;
-  }
-}
-
-export async function getBusinessHours(organizationId: string): Promise<BusinessHours | null> {
-  try {
-    const { data, error } = await supabase
-      .from('calendar_settings')
-      .select('business_hours')
-      .eq('organization_id', organizationId)
-      .single();
-
-    if (error) throw error;
-    return data?.business_hours;
-  } catch (error) {
-    console.error('Error fetching business hours:', error);
-    return null;
-  }
-}
-
-export async function checkBusinessHours(organizationId: string, startTime: Date): Promise<boolean> {
-  try {
-    const { data, error } = await supabase.rpc(
-      'check_business_hours',
-      {
-        p_organization_id: organizationId,
-        p_start_time: startTime.toISOString()
-      }
-    );
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error checking business hours:', error);
-    return false;
-  }
-}
+export { updateWorkOrderSchedule, unscheduleWorkOrder } from './scheduling/bookingOperations';
+export { getBusinessHours, checkBusinessHours } from './scheduling/businessHours';

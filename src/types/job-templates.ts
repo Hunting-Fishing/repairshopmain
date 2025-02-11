@@ -59,4 +59,5 @@ export interface JobTemplate {
     avg_completion_time?: number;
     success_rate?: number;
   };
+  created_at: string;
 }

@@ -17,6 +17,7 @@ interface WorkOrder {
   description: string;
   status: string;
   date: string;
+  is_demo?: boolean;
 }
 
 interface WorkOrderTableProps {
@@ -55,18 +56,19 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
             <TableHead>Description</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Date</TableHead>
+            <TableHead>Type</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 Loading work orders...
               </TableCell>
             </TableRow>
           ) : workOrders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-4">
+              <TableCell colSpan={7} className="text-center py-4">
                 No work orders found
               </TableCell>
             </TableRow>
@@ -87,6 +89,13 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
                   </Badge>
                 </TableCell>
                 <TableCell>{order.date}</TableCell>
+                <TableCell>
+                  {order.is_demo && (
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                      Demo
+                    </Badge>
+                  )}
+                </TableCell>
               </TableRow>
             ))
           )}

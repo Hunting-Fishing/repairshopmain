@@ -304,6 +304,7 @@ export type Database = {
           end_time: string
           estimated_cost: number | null
           id: string
+          is_demo: boolean | null
           is_multi_day: boolean | null
           job_description: string
           last_status_change: string | null
@@ -336,6 +337,7 @@ export type Database = {
           end_time: string
           estimated_cost?: number | null
           id?: string
+          is_demo?: boolean | null
           is_multi_day?: boolean | null
           job_description: string
           last_status_change?: string | null
@@ -368,6 +370,7 @@ export type Database = {
           end_time?: string
           estimated_cost?: number | null
           id?: string
+          is_demo?: boolean | null
           is_multi_day?: boolean | null
           job_description?: string
           last_status_change?: string | null
@@ -1193,6 +1196,7 @@ export type Database = {
           description: string
           estimated_duration_minutes: number | null
           id: string
+          is_demo: boolean | null
           job_type: string
           organization_id: string
           quoted_amount: number | null
@@ -1215,6 +1219,7 @@ export type Database = {
           description: string
           estimated_duration_minutes?: number | null
           id?: string
+          is_demo?: boolean | null
           job_type: string
           organization_id: string
           quoted_amount?: number | null
@@ -1237,6 +1242,7 @@ export type Database = {
           description?: string
           estimated_duration_minutes?: number | null
           id?: string
+          is_demo?: boolean | null
           job_type?: string
           organization_id?: string
           quoted_amount?: number | null
@@ -1446,6 +1452,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      demo_data: {
+        Row: {
+          created_at: string | null
+          data_type: Database["public"]["Enums"]["demo_data_type"]
+          id: string
+          organization_id: string
+          reference_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data_type: Database["public"]["Enums"]["demo_data_type"]
+          id?: string
+          organization_id: string
+          reference_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data_type?: Database["public"]["Enums"]["demo_data_type"]
+          id?: string
+          organization_id?: string
+          reference_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "demo_data_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       error_logs: {
         Row: {
@@ -4641,6 +4679,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      cleanup_demo_data: {
+        Args: {
+          org_id: string
+        }
+        Returns: undefined
+      }
+      generate_demo_work_orders: {
+        Args: {
+          org_id: string
+          count?: number
+        }
+        Returns: undefined
+      }
       get_next_working_day: {
         Args: {
           p_organization_id: string
@@ -4734,6 +4785,7 @@ export type Database = {
         | "training"
         | "events"
       dashboard_view_mode: "calendar" | "grid" | "list"
+      demo_data_type: "work_order" | "booking" | "customer" | "vehicle"
       inventory_change_type:
         | "create"
         | "update"

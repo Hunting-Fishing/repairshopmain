@@ -18,8 +18,17 @@ export default function Index() {
   
   const handleGenerateDemoData = async () => {
     try {
+      // First get the organization_id for the current user
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', session?.user?.id)
+        .single();
+      
+      if (!profile?.organization_id) throw new Error('Organization not found');
+      
       const { error } = await supabase.rpc('generate_demo_work_orders', {
-        org_id: session?.user?.id,
+        org_id: profile.organization_id,
         count: 5
       });
       
@@ -33,8 +42,17 @@ export default function Index() {
 
   const handleCleanupDemoData = async () => {
     try {
+      // First get the organization_id for the current user
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', session?.user?.id)
+        .single();
+      
+      if (!profile?.organization_id) throw new Error('Organization not found');
+      
       const { error } = await supabase.rpc('cleanup_demo_data', {
-        org_id: session?.user?.id
+        org_id: profile.organization_id
       });
       
       if (error) throw error;

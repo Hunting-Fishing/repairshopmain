@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown } from "lucide-react";
-import { JobTemplate } from "@/hooks/use-job-templates";
+import { JobTemplate } from "@/types/job-templates";
 import { useState } from "react";
 
 interface TemplateDropdownProps {

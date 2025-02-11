@@ -7,7 +7,7 @@ import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
-import { JobTemplate } from "@/hooks/use-job-templates";
+import { JobTemplate } from "@/types/job-templates";
 
 interface TemplateGridProps {
   templates: Record<string, JobTemplate[]>;

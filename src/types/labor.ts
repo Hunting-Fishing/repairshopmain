@@ -12,6 +12,14 @@ export interface LaborEntry {
     first_name: string;
     last_name: string;
   };
+  labor_rate_source: 'manual' | 'default' | 'technician' | 'template';
+  estimated_duration_minutes?: number;
+  actual_duration_minutes?: number;
+  is_timer_running: boolean;
+  timer_started_at?: string;
+  last_timer_update?: string;
+  labor_rate_type: 'default' | 'overtime' | 'holiday' | 'custom';
+  efficiency_score?: number;
 }
 
 export interface Technician {

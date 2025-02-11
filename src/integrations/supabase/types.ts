@@ -2629,10 +2629,17 @@ export type Database = {
       }
       repair_job_labor: {
         Row: {
+          actual_duration_minutes: number | null
           created_at: string | null
+          efficiency_score: number | null
           end_time: string | null
           error_details: string | null
+          estimated_duration_minutes: number | null
           id: string
+          is_timer_running: boolean | null
+          labor_rate_source: string | null
+          labor_rate_type: string | null
+          last_timer_update: string | null
           notes: string | null
           organization_id: string
           rate_per_hour: number
@@ -2640,13 +2647,21 @@ export type Database = {
           start_time: string
           status: string | null
           technician_id: string
+          timer_started_at: string | null
           updated_at: string | null
         }
         Insert: {
+          actual_duration_minutes?: number | null
           created_at?: string | null
+          efficiency_score?: number | null
           end_time?: string | null
           error_details?: string | null
+          estimated_duration_minutes?: number | null
           id?: string
+          is_timer_running?: boolean | null
+          labor_rate_source?: string | null
+          labor_rate_type?: string | null
+          last_timer_update?: string | null
           notes?: string | null
           organization_id: string
           rate_per_hour: number
@@ -2654,13 +2669,21 @@ export type Database = {
           start_time: string
           status?: string | null
           technician_id: string
+          timer_started_at?: string | null
           updated_at?: string | null
         }
         Update: {
+          actual_duration_minutes?: number | null
           created_at?: string | null
+          efficiency_score?: number | null
           end_time?: string | null
           error_details?: string | null
+          estimated_duration_minutes?: number | null
           id?: string
+          is_timer_running?: boolean | null
+          labor_rate_source?: string | null
+          labor_rate_type?: string | null
+          last_timer_update?: string | null
           notes?: string | null
           organization_id?: string
           rate_per_hour?: number
@@ -2668,6 +2691,7 @@ export type Database = {
           start_time?: string
           status?: string | null
           technician_id?: string
+          timer_started_at?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -4663,6 +4687,15 @@ export type Database = {
           p_date: string
         }
         Returns: unknown
+      }
+      check_labor_time_conflicts: {
+        Args: {
+          p_technician_id: string
+          p_start_time: string
+          p_end_time: string
+          p_current_labor_id?: string
+        }
+        Returns: boolean
       }
       check_organization_membership: {
         Args: {

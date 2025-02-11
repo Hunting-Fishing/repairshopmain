@@ -6,12 +6,10 @@ import { GridView } from "./views/GridView";
 import { ListView } from "./views/ListView";
 import { StatsCards } from "./StatsCards";
 import { SystemStatusCard } from "./components/SystemStatusCard";
-import { CalendarBookingHandler } from "./components/CalendarBookingHandler";
 import { useDashboard } from "@/contexts/DashboardContext";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { toast } from "sonner";
 import { LoadingScreen } from "./components/LoadingScreen";
 
 export const DashboardContent = memo(function DashboardContent() {
@@ -30,7 +28,6 @@ export const DashboardContent = memo(function DashboardContent() {
 
   const handleError = (error: Error) => {
     console.error("Dashboard error:", error);
-    toast("An error occurred in the dashboard");
   };
 
   if (error) {
@@ -50,10 +47,10 @@ export const DashboardContent = memo(function DashboardContent() {
 
   return (
     <ErrorBoundary onError={handleError}>
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <StatsCards isModernTheme={isModernTheme} />
         <SystemStatusCard isModernTheme={isModernTheme} />
-
+        
         <Tabs 
           value={viewMode} 
           onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}

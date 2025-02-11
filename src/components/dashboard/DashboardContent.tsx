@@ -51,13 +51,15 @@ export const DashboardContent = memo(function DashboardContent() {
   return (
     <ErrorBoundary onError={handleError}>
       <div className="grid gap-6 mb-8">
-        <StatsCards isModernTheme={isModernTheme} />
-        <SystemStatusCard isModernTheme={isModernTheme} />
-        <CalendarBookingHandler 
-          isModernTheme={isModernTheme}
-          bookings={bookings}
-          isLoading={isBookingsLoading}
-        />
+        <div className="space-y-4">
+          <StatsCards isModernTheme={isModernTheme} />
+          <SystemStatusCard isModernTheme={isModernTheme} />
+          <CalendarBookingHandler 
+            isModernTheme={isModernTheme}
+            bookings={bookings}
+            isLoading={isBookingsLoading}
+          />
+        </div>
       </div>
 
       <Tabs 

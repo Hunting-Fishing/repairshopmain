@@ -1,5 +1,4 @@
 
-import { StatsCards } from "../StatsCards";
 import { cn } from "@/lib/utils";
 
 interface CalendarBookingHandlerProps {
@@ -20,7 +19,7 @@ export function CalendarBookingHandler({
         ? "bg-white/80 dark:bg-gray-900/50 backdrop-blur-lg shadow-xl border border-[#E2E8F0]/50 dark:border-blue-900/50"
         : "bg-white/30 dark:bg-gray-800/30 backdrop-blur-lg shadow-xl border border-white/20 dark:border-white/10"
     )}>
-      <StatsCards isModernTheme={isModernTheme} />
+      {/* Calendar booking content will go here */}
     </div>
   );
 }

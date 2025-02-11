@@ -51,7 +51,12 @@ export function CustomerSegments({ customerId }: CustomerSegmentsProps) {
       
       // Transform the data to match our type
       return (data || []).map(item => ({
-        segment: item.segment as Segment
+        segment: {
+          id: item.segment.id,
+          name: item.segment.name,
+          description: item.segment.description,
+          criteria: item.segment.criteria
+        }
       }));
     },
   });
@@ -75,7 +80,12 @@ export function CustomerSegments({ customerId }: CustomerSegmentsProps) {
       
       // Transform the data to match our type
       return (data || []).map(item => ({
-        tag: item.tag as Tag
+        tag: {
+          id: item.tag.id,
+          name: item.tag.name,
+          color: item.tag.color,
+          description: item.tag.description
+        }
       }));
     },
   });

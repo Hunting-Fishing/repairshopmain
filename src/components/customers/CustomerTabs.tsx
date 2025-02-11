@@ -1,10 +1,10 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VehicleList } from "./vehicles/VehicleList";
 import { RepairJobsList } from "./repair-jobs/RepairJobsList";
 import { CustomerCommunications } from "./communications/CustomerCommunications";
 import { CustomerPayments } from "./payments/CustomerPayments";
 import { CustomerInspections } from "./inspections/CustomerInspections";
+import { LoyaltyTab } from "./loyalty/LoyaltyTab";
 import { CustomerForm } from "./CustomerForm";
 import { useState } from "react";
 import { Vehicle } from "./vehicles/types";
@@ -23,7 +23,6 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
 
   const handleVehicleSelect = (vehicle: Vehicle | null) => {
     setSelectedVehicle(vehicle);
-    // Auto switch to repair jobs tab when a vehicle is selected
     if (vehicle) {
       setActiveTab("repair-jobs");
     }
@@ -33,12 +32,22 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
     <div className="space-y-4">
       {/* Quick Contact Actions */}
       <div className="flex items-center gap-4 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm">
-        <h2 className="text-lg font-semibold">
-          {customer.first_name} {customer.last_name}
-          <Badge variant="outline" className="ml-2">
-            {customer.customer_type}
-          </Badge>
-        </h2>
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            {customer.first_name} {customer.last_name}
+            <Badge variant="outline">{customer.customer_type}</Badge>
+          </h2>
+          {customer.loyalty_tier && (
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="capitalize">
+                {customer.loyalty_tier} Tier
+              </Badge>
+              <span className="text-sm text-muted-foreground">
+                {customer.loyalty_points} points
+              </span>
+            </div>
+          )}
+        </div>
         <div className="flex items-center gap-4 ml-auto">
           {customer.phone_number && (
             <a 
@@ -62,13 +71,14 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
           <TabsTrigger value="repair-jobs">Repair Jobs</TabsTrigger>
           <TabsTrigger value="communications">Communications</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
+          <TabsTrigger value="loyalty">Loyalty</TabsTrigger>
         </TabsList>
 
         <TabsContent value="details">
@@ -104,6 +114,12 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
         <TabsContent value="inspections">
           <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
             <CustomerInspections customerId={customerId} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="loyalty">
+          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
+            <LoyaltyTab />
           </div>
         </TabsContent>
       </Tabs>

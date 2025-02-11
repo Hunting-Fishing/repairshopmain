@@ -1309,6 +1309,7 @@ export type Database = {
         Row: {
           auth_id: string | null
           city: string | null
+          communication_preferences: Json | null
           country: string | null
           created_at: string
           created_by: string
@@ -1327,6 +1328,7 @@ export type Database = {
           phone_number: string | null
           portal_access_enabled: boolean | null
           postal_code: string | null
+          preferred_contact_time: string | null
           state_province: string | null
           street_address: string | null
           total_spend: number | null
@@ -1340,6 +1342,7 @@ export type Database = {
         Insert: {
           auth_id?: string | null
           city?: string | null
+          communication_preferences?: Json | null
           country?: string | null
           created_at?: string
           created_by: string
@@ -1358,6 +1361,7 @@ export type Database = {
           phone_number?: string | null
           portal_access_enabled?: boolean | null
           postal_code?: string | null
+          preferred_contact_time?: string | null
           state_province?: string | null
           street_address?: string | null
           total_spend?: number | null
@@ -1371,6 +1375,7 @@ export type Database = {
         Update: {
           auth_id?: string | null
           city?: string | null
+          communication_preferences?: Json | null
           country?: string | null
           created_at?: string
           created_by?: string
@@ -1389,6 +1394,7 @@ export type Database = {
           phone_number?: string | null
           portal_access_enabled?: boolean | null
           postal_code?: string | null
+          preferred_contact_time?: string | null
           state_province?: string | null
           street_address?: string | null
           total_spend?: number | null

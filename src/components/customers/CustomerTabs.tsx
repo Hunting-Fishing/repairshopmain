@@ -1,9 +1,13 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VehicleList } from "./vehicles/VehicleList";
 import { RepairJobsList } from "./repair-jobs/RepairJobsList";
 import { CustomerCommunications } from "./communications/CustomerCommunications";
 import { CustomerPayments } from "./payments/CustomerPayments";
 import { CustomerInspections } from "./inspections/CustomerInspections";
+import { CustomerDocuments } from "./documents/CustomerDocuments";
+import { CustomerFeedback } from "./feedback/CustomerFeedback";
+import { CustomerSegments } from "./segments/CustomerSegments";
 import { LoyaltyTab } from "./loyalty/LoyaltyTab";
 import { CustomerForm } from "./CustomerForm";
 import { useState } from "react";
@@ -71,11 +75,14 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
           <TabsTrigger value="repair-jobs">Repair Jobs</TabsTrigger>
           <TabsTrigger value="communications">Communications</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback</TabsTrigger>
+          <TabsTrigger value="segments">Segments</TabsTrigger>
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
           <TabsTrigger value="loyalty">Loyalty</TabsTrigger>
@@ -102,6 +109,24 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
         <TabsContent value="communications">
           <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
             <CustomerCommunications customerId={customerId} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="documents">
+          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
+            <CustomerDocuments customerId={customerId} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="feedback">
+          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
+            <CustomerFeedback customerId={customerId} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="segments">
+          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
+            <CustomerSegments customerId={customerId} />
           </div>
         </TabsContent>
 

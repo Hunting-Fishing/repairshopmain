@@ -3,6 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { TagAssignment } from "../types";
 
+interface TagResponse {
+  tag: {
+    id: string;
+    name: string;
+    color: string | null;
+    description: string | null;
+  }
+}
+
 export function useCustomerTags(customerId: string) {
   return useQuery<TagAssignment[]>({
     queryKey: ["customer-tags", customerId],
@@ -21,7 +30,8 @@ export function useCustomerTags(customerId: string) {
 
       if (error) throw error;
       
-      return (data || []).map(item => ({
+      const typedData = data as TagResponse[];
+      return typedData.map(item => ({
         tag: {
           id: item.tag.id,
           name: item.tag.name,

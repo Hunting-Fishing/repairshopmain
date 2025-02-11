@@ -3,6 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SegmentAssignment } from "../types";
 
+interface SegmentResponse {
+  segment: {
+    id: string;
+    name: string;
+    description: string | null;
+    criteria: any;
+  }
+}
+
 export function useCustomerSegments(customerId: string) {
   return useQuery<SegmentAssignment[]>({
     queryKey: ["customer-segments", customerId],
@@ -21,7 +30,8 @@ export function useCustomerSegments(customerId: string) {
 
       if (error) throw error;
       
-      return (data || []).map(item => ({
+      const typedData = data as SegmentResponse[];
+      return typedData.map(item => ({
         segment: {
           id: item.segment.id,
           name: item.segment.name,

@@ -47,7 +47,7 @@ export const DashboardContent = memo(function DashboardContent() {
 
   return (
     <ErrorBoundary onError={handleError}>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col space-y-6">
         <StatsCards isModernTheme={isModernTheme} />
         <SystemStatusCard isModernTheme={isModernTheme} />
         

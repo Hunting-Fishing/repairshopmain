@@ -1,5 +1,6 @@
 
 import { Users } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface CustomerHeaderProps {
   isModernTheme?: boolean;

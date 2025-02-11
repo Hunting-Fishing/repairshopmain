@@ -19,12 +19,14 @@ import { CustomerHeader } from "@/components/customers/page/CustomerHeader";
 import { CustomerSearchBar } from "@/components/customers/page/CustomerSearchBar";
 import { CustomerViewToggle } from "@/components/customers/page/CustomerViewToggle";
 import { CustomerGrid } from "@/components/customers/page/CustomerGrid";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const { toast } = useToast();
+  const { isModernTheme } = useTheme();
 
   const { data: userProfile } = useQuery({
     queryKey: ["user-profile"],
@@ -102,14 +104,12 @@ export default function Customers() {
     customer.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const isModernTheme = userProfile?.theme_preference === 'modern';
-
   return (
     <div className="space-y-8 animate-fade-in p-6">
       <div className={`rounded-xl p-8 shadow-lg ${
         isModernTheme 
           ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50'
-          : 'bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3]'
+          : 'bg-white'
       }`}>
         <CustomerHeader isModernTheme={isModernTheme} />
         
@@ -141,14 +141,10 @@ export default function Customers() {
             <DialogContent className={`sm:max-w-[800px] max-h-[90vh] ${
               isModernTheme
                 ? 'bg-gradient-to-b from-white to-blue-50/10 border-blue-100/20'
-                : 'bg-gradient-to-b from-white to-[#FDE1D3]/10 border-[#FEC6A1]/20'
+                : 'bg-white'
             }`}>
               <ScrollArea className="max-h-[85vh]">
-                <DialogHeader className={`${
-                  isModernTheme
-                    ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50'
-                    : 'bg-gradient-to-r from-[#FEC6A1] to-[#FDE1D3]'
-                } p-8 rounded-t-lg`}>
+                <DialogHeader className="p-8 rounded-t-lg">
                   <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
                     Add New Customer
                   </DialogTitle>

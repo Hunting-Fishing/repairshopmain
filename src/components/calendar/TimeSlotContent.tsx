@@ -7,9 +7,15 @@ interface TimeSlotContentProps {
   slot: TimeSlotData;
   isPast: boolean;
   pastColors: [string, string];
+  renderExtra?: (booking: any) => React.ReactNode;
 }
 
-export function TimeSlotContent({ slot, isPast, pastColors }: TimeSlotContentProps) {
+export function TimeSlotContent({ 
+  slot, 
+  isPast, 
+  pastColors,
+  renderExtra 
+}: TimeSlotContentProps) {
   const [primaryColor] = pastColors;
   
   return (
@@ -20,11 +26,14 @@ export function TimeSlotContent({ slot, isPast, pastColors }: TimeSlotContentPro
       <div className="flex flex-1 flex-wrap gap-2">
         {slot.bookings.map((booking) => (
           <div key={booking.id} className="flex-1">
-            <BookingCard 
-              booking={booking} 
-              isPast={isPast}
-              pastColor={primaryColor}
-            />
+            <div className="flex items-center">
+              <BookingCard 
+                booking={booking} 
+                isPast={isPast}
+                pastColor={primaryColor}
+              />
+              {renderExtra && renderExtra(booking)}
+            </div>
           </div>
         ))}
       </div>

@@ -16,38 +16,57 @@ export async function createBooking({
   remainingMinutes,
   totalDurationMinutes
 }: CreateBookingParams) {
-  const user = (await supabase.auth.getUser()).data.user;
-  
-  const { data: workOrder, error: workOrderError } = await supabase
-    .from('customer_repair_jobs')
-    .select('*')
-    .eq('id', workOrderId)
-    .single();
+  try {
+    const user = (await supabase.auth.getUser()).data.user;
+    
+    const { data: workOrder, error: workOrderError } = await supabase
+      .from('customer_repair_jobs')
+      .select('*')
+      .eq('id', workOrderId)
+      .single();
 
-  if (workOrderError) throw workOrderError;
+    if (workOrderError) throw workOrderError;
 
-  const { error: bookingError } = await supabase
-    .from('bookings')
-    .insert({
-      repair_job_id: workOrderId,
-      assigned_technician_id: technicianId,
-      start_time: startTime.toISOString(),
-      end_time: endTime.toISOString(),
-      customer_name: workOrder.customer_name || 'Customer',
-      job_description: workOrder.description,
-      organization_id: organizationId,
-      status: 'scheduled',
-      duration_minutes: estimatedDurationMinutes,
-      created_by: user?.id,
-      updated_by: user?.id,
-      is_multi_day: isMultiDay,
-      parent_booking_id: parentBookingId,
-      sequence_number: sequenceNumber,
-      remaining_minutes: remainingMinutes,
-      total_duration_minutes: totalDurationMinutes
+    console.log(`Creating ${isMultiDay ? 'multi-day' : 'single-day'} booking:`, {
+      workOrderId,
+      technicianId,
+      startTime,
+      endTime,
+      sequenceNumber,
+      remainingMinutes
     });
 
-  if (bookingError) throw bookingError;
+    const { data: booking, error: bookingError } = await supabase
+      .from('bookings')
+      .insert({
+        repair_job_id: workOrderId,
+        assigned_technician_id: technicianId,
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
+        customer_name: workOrder.customer_name || 'Customer',
+        job_description: workOrder.description,
+        organization_id: organizationId,
+        status: 'scheduled',
+        duration_minutes: estimatedDurationMinutes,
+        created_by: user?.id,
+        updated_by: user?.id,
+        is_multi_day: isMultiDay,
+        parent_booking_id: parentBookingId,
+        sequence_number: sequenceNumber,
+        remaining_minutes: remainingMinutes,
+        total_duration_minutes: totalDurationMinutes
+      })
+      .select()
+      .single();
+
+    if (bookingError) throw bookingError;
+
+    console.log('Booking created successfully:', booking);
+    return booking;
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    throw error;
+  }
 }
 
 export async function updateWorkOrderSchedule({
@@ -133,3 +152,4 @@ export async function unscheduleWorkOrder(workOrderId: string) {
     return false;
   }
 }
+

@@ -14,6 +14,7 @@ import {
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import { LoadingScreen } from "../dashboard/components/LoadingScreen";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { Badge } from "../ui/badge";
 
 export function DayView({
   date,
@@ -45,7 +46,7 @@ export function DayView({
   useEffect(() => {
     const updateCurrentTime = () => setCurrentTime(new Date());
     const interval = setInterval(updateCurrentTime, 60000);
-    updateCurrentTime(); // Initial update
+    updateCurrentTime();
     return () => clearInterval(interval);
   }, []);
 
@@ -59,16 +60,29 @@ export function DayView({
   const virtualizer = useVirtualizer({
     count: timeSlots.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 64, // Estimated height of each time slot
+    estimateSize: () => 64,
     overscan: 5,
   });
+
+  const renderMultiDayIndicator = (booking: any) => {
+    if (!booking.is_multi_day) return null;
+    return (
+      <Badge 
+        variant="secondary" 
+        className="ml-2 text-xs"
+      >
+        {booking.sequence_number > 1 ? 'Continued' : 'Multi-day'} 
+        {booking.remaining_minutes ? ` (${Math.ceil(booking.remaining_minutes / 60)}h remaining)` : ''}
+      </Badge>
+    );
+  };
 
   if (isLoading || isLoadingSlots) {
     return <LoadingScreen />;
   }
 
   if (error) {
-    throw error; // This will be caught by the error boundary
+    throw error;
   }
 
   return (
@@ -111,6 +125,7 @@ export function DayView({
                       slot={slot}
                       isPast={isPastTimeSlot(slot.time, currentTime)}
                       pastColors={[PAST_APPOINTMENT_COLORS[0], PAST_APPOINTMENT_COLORS[1]]}
+                      renderExtra={(booking) => renderMultiDayIndicator(booking)}
                     />
                   </TimeSlot>
                 </div>

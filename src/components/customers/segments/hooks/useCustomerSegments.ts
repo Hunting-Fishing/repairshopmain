@@ -30,8 +30,7 @@ export function useCustomerSegments(customerId: string) {
 
       if (error) throw error;
       
-      const typedData = data as SegmentResponse[];
-      return typedData.map(item => ({
+      return (data || []).map((item: any) => ({
         segment: {
           id: item.segment.id,
           name: item.segment.name,

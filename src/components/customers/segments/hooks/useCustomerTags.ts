@@ -30,8 +30,7 @@ export function useCustomerTags(customerId: string) {
 
       if (error) throw error;
       
-      const typedData = data as TagResponse[];
-      return typedData.map(item => ({
+      return (data || []).map((item: any) => ({
         tag: {
           id: item.tag.id,
           name: item.tag.name,

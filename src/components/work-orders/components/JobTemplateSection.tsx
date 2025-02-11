@@ -27,7 +27,7 @@ interface JobTemplateSectionProps {
 }
 
 export function JobTemplateSection({ form }: JobTemplateSectionProps) {
-  const { data: templates = [], isLoading } = useJobTemplates();
+  const { data: templates, isLoading } = useJobTemplates();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -37,10 +37,14 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     setOpen(false);
   };
 
-  // Create a filtered and safe templates array
-  const filteredTemplates = templates?.filter((template) =>
-    template?.name?.toLowerCase().includes(searchValue.toLowerCase())
-  ) ?? [];
+  // Ensure templates is an array and handle undefined case
+  const safeTemplates = templates || [];
+  
+  // Create a filtered templates array with null safety
+  const filteredTemplates = safeTemplates.filter((template): template is JobTemplate => {
+    if (!template?.name) return false;
+    return template.name.toLowerCase().includes(searchValue.toLowerCase());
+  });
 
   return (
     <>
@@ -99,31 +103,29 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                     ) : (
                       <CommandGroup>
                         {filteredTemplates.map((template) => (
-                          template && (
-                            <CommandItem
-                              key={template.id}
-                              value={template.name}
-                              onSelect={() => handleTemplateSelect(template)}
-                              className="flex items-center gap-2"
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  template.name === field.value ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                              <div className="flex flex-col">
-                                <span className="font-medium">{template.name}</span>
-                                {template.description && (
-                                  <span className="text-sm text-muted-foreground">
-                                    {template.description.length > 50
-                                      ? `${template.description.slice(0, 50)}...`
-                                      : template.description}
-                                  </span>
-                                )}
-                              </div>
-                            </CommandItem>
-                          )
+                          <CommandItem
+                            key={template.id}
+                            value={template.name}
+                            onSelect={() => handleTemplateSelect(template)}
+                            className="flex items-center gap-2"
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                template.name === field.value ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            <div className="flex flex-col">
+                              <span className="font-medium">{template.name}</span>
+                              {template.description && (
+                                <span className="text-sm text-muted-foreground">
+                                  {template.description.length > 50
+                                    ? `${template.description.slice(0, 50)}...`
+                                    : template.description}
+                                </span>
+                              )}
+                            </div>
+                          </CommandItem>
                         ))}
                       </CommandGroup>
                     )}
@@ -155,3 +157,4 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
     </>
   );
 }
+

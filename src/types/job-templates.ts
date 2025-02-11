@@ -1,6 +1,18 @@
 
 export type JobStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
 
+export interface TemplateVersion {
+  id: string;
+  template_id: string;
+  version_number: number;
+  changes: string;
+  created_at: string;
+  created_by: {
+    first_name: string;
+    last_name: string;
+  };
+}
+
 export interface TemplateCategory {
   id: string;
   name: string;
@@ -60,4 +72,6 @@ export interface JobTemplate {
     success_rate?: number;
   };
   created_at: string;
+  version_history?: TemplateVersion[];
+  is_archived?: boolean;
 }

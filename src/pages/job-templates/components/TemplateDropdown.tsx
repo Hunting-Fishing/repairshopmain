@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, Clock, Star, TrendingUp, Users } from "lucide-react";
-import { JobTemplate } from "@/types/job-templates";
 import { useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { JobTemplate } from "@/types/job-templates";
 
 interface TemplateDropdownProps {
   category: string;

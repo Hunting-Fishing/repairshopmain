@@ -2277,6 +2277,7 @@ export type Database = {
           estimated_hours: number | null
           id: string
           is_active: boolean | null
+          is_archived: boolean | null
           job_number: string | null
           name: string
           organization_id: string | null
@@ -2302,6 +2303,7 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           is_active?: boolean | null
+          is_archived?: boolean | null
           job_number?: string | null
           name: string
           organization_id?: string | null
@@ -2327,6 +2329,7 @@ export type Database = {
           estimated_hours?: number | null
           id?: string
           is_active?: boolean | null
+          is_archived?: boolean | null
           job_number?: string | null
           name?: string
           organization_id?: string | null
@@ -4938,6 +4941,13 @@ export type Database = {
           org_id: string
         }
         Returns: undefined
+      }
+      duplicate_template: {
+        Args: {
+          template_id: string
+          new_name?: string
+        }
+        Returns: string
       }
       generate_demo_work_orders: {
         Args: {

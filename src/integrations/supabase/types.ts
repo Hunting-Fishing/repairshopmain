@@ -2381,6 +2381,41 @@ export type Database = {
           },
         ]
       }
+      loyalty_program_settings: {
+        Row: {
+          created_at: string
+          id: string
+          organization_id: string
+          point_settings: Json
+          tier_settings: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organization_id: string
+          point_settings?: Json
+          tier_settings?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organization_id?: string
+          point_settings?: Json
+          tier_settings?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_organization"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string

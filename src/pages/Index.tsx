@@ -6,7 +6,6 @@ import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
 import { useNavigate } from "react-router-dom";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { AppStateProvider } from "@/contexts/AppStateContext";
 import { DashboardContextProvider } from "@/contexts/DashboardContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +17,6 @@ export default function Index() {
   
   const handleGenerateDemoData = async () => {
     try {
-      // First get the organization_id for the current user
       const { data: profile } = await supabase
         .from('profiles')
         .select('organization_id')
@@ -42,7 +40,6 @@ export default function Index() {
 
   const handleCleanupDemoData = async () => {
     try {
-      // First get the organization_id for the current user
       const { data: profile } = await supabase
         .from('profiles')
         .select('organization_id')
@@ -63,7 +60,6 @@ export default function Index() {
     }
   };
 
-  // If not authenticated, redirect to auth page
   if (!session) {
     navigate('/auth');
     return null;
@@ -74,25 +70,23 @@ export default function Index() {
       <Suspense fallback={<LoadingScreen />}>
         <StatsProvider>
           <DashboardContextProvider>
-            <AppStateProvider>
-              <main className="min-h-screen">
-                <div className="fixed bottom-4 right-4 z-50 flex gap-2">
-                  <Button 
-                    variant="outline"
-                    onClick={handleGenerateDemoData}
-                  >
-                    Generate Demo Data
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={handleCleanupDemoData}
-                  >
-                    Clean Up Demo Data
-                  </Button>
-                </div>
-                <DashboardLayout />
-              </main>
-            </AppStateProvider>
+            <main className="min-h-screen">
+              <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+                <Button 
+                  variant="outline"
+                  onClick={handleGenerateDemoData}
+                >
+                  Generate Demo Data
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={handleCleanupDemoData}
+                >
+                  Clean Up Demo Data
+                </Button>
+              </div>
+              <DashboardLayout />
+            </main>
           </DashboardContextProvider>
         </StatsProvider>
       </Suspense>

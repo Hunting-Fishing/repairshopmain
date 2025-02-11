@@ -1,4 +1,5 @@
-import { useAppState } from "@/contexts/AppStateContext";
+
+import { useStats } from "@/contexts/StatsContext";
 import { StatCard } from "../StatCard";
 import { useStatsIcons } from "../../hooks/useStatsIcons";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -8,7 +9,6 @@ import { formatStatTitle } from "../../utils/statsFormatters";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { toast } from "sonner";
 import { useMemo, useCallback } from "react";
-import { useStats } from "@/contexts/StatsContext";
 
 interface StatCardGridProps {
   isModernTheme?: boolean;
@@ -25,17 +25,29 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
 
   const uniqueStats = useMemo(() => {
     if (!stats) return [];
-    const statsMap = new Map();
     
+    // Define the order of stats we want to display
+    const statOrder = [
+      'total_work_orders',
+      'active_customers',
+      'pending_jobs',
+      'average_service_time',
+      'customer_satisfaction'
+    ];
+    
+    // Create a map of the most recent stat for each type
+    const statsMap = new Map();
     stats.forEach(stat => {
-      // Only keep the most recent stat for each type
       if (!statsMap.has(stat.type) || 
           new Date(stat.created_at) > new Date(statsMap.get(stat.type).created_at)) {
         statsMap.set(stat.type, stat);
       }
     });
     
-    return Array.from(statsMap.values());
+    // Return stats in the specified order
+    return statOrder
+      .map(type => statsMap.get(type))
+      .filter(Boolean); // Remove any undefined entries
   }, [stats]);
 
   if (error) {

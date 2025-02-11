@@ -312,6 +312,7 @@ export type Database = {
           organization_id: string
           phone_number: string | null
           priority: string | null
+          repair_job_id: string | null
           source: string | null
           start_time: string
           status: Database["public"]["Enums"]["booking_status"] | null
@@ -338,6 +339,7 @@ export type Database = {
           organization_id: string
           phone_number?: string | null
           priority?: string | null
+          repair_job_id?: string | null
           source?: string | null
           start_time: string
           status?: Database["public"]["Enums"]["booking_status"] | null
@@ -364,6 +366,7 @@ export type Database = {
           organization_id?: string
           phone_number?: string | null
           priority?: string | null
+          repair_job_id?: string | null
           source?: string | null
           start_time?: string
           status?: Database["public"]["Enums"]["booking_status"] | null
@@ -391,6 +394,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_repair_job_id_fkey"
+            columns: ["repair_job_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -1159,11 +1169,13 @@ export type Database = {
           created_by: string
           customer_id: string | null
           description: string
+          estimated_duration_minutes: number | null
           id: string
           job_type: string
           organization_id: string
           quoted_amount: number | null
           quoted_at: string | null
+          scheduling_status: string | null
           status: string
           updated_at: string
           updated_by: string
@@ -1179,11 +1191,13 @@ export type Database = {
           created_by: string
           customer_id?: string | null
           description: string
+          estimated_duration_minutes?: number | null
           id?: string
           job_type: string
           organization_id: string
           quoted_amount?: number | null
           quoted_at?: string | null
+          scheduling_status?: string | null
           status?: string
           updated_at?: string
           updated_by: string
@@ -1199,11 +1213,13 @@ export type Database = {
           created_by?: string
           customer_id?: string | null
           description?: string
+          estimated_duration_minutes?: number | null
           id?: string
           job_type?: string
           organization_id?: string
           quoted_amount?: number | null
           quoted_at?: string | null
+          scheduling_status?: string | null
           status?: string
           updated_at?: string
           updated_by?: string
@@ -4585,6 +4601,14 @@ export type Database = {
         Args: {
           user_id: string
           org_id: string
+        }
+        Returns: boolean
+      }
+      check_technician_availability: {
+        Args: {
+          p_technician_id: string
+          p_start_time: string
+          p_end_time: string
         }
         Returns: boolean
       }

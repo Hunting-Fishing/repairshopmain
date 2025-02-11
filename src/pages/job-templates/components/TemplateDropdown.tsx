@@ -7,9 +7,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Clock, Star, TrendingUp, Users } from "lucide-react";
 import { JobTemplate } from "@/types/job-templates";
 import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface TemplateDropdownProps {
   category: string;
@@ -35,6 +37,13 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
     }
   };
 
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins ? `${hours}h ${mins}m` : `${hours}h`;
+  };
+
   return (
     <div className="flex flex-col space-y-2 group hover:bg-accent/5 p-2 rounded-lg transition-colors">
       <h3 className="font-semibold text-sm">{displayName}</h3>
@@ -50,7 +59,7 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
         </DropdownMenuTrigger>
         <DropdownMenuContent 
           align="start" 
-          className="w-[300px] max-h-[300px] overflow-y-auto"
+          className="w-[350px] max-h-[400px] overflow-y-auto"
         >
           {items.length === 0 ? (
             <div className="px-2 py-4 text-sm text-muted-foreground text-center">
@@ -60,7 +69,7 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
             items.map((template) => (
               <DropdownMenuItem 
                 key={template.id}
-                className="flex flex-col items-start gap-1 p-2"
+                className="flex flex-col items-start gap-2 p-3"
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="font-medium">{template.name}</span>
@@ -70,20 +79,59 @@ export function TemplateDropdown({ category, displayName, items }: TemplateDropd
                     </Badge>
                   )}
                 </div>
-                {template.job_number && (
-                  <span className="text-xs text-muted-foreground">
-                    Job #{template.job_number}
-                  </span>
-                )}
+                
                 {template.description && (
                   <span className="text-xs text-muted-foreground">
                     {template.description}
                   </span>
                 )}
-                {template.sub_tasks && template.sub_tasks.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                    {template.sub_tasks.length} sub-tasks
-                  </span>
+
+                <div className="flex items-center gap-3 w-full text-xs text-muted-foreground">
+                  {template.estimated_duration_range && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {formatDuration(template.estimated_duration_range.min)} - {formatDuration(template.estimated_duration_range.max)}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>Estimated duration range</TooltipContent>
+                    </Tooltip>
+                  )}
+                  
+                  {template.usage_stats?.success_rate !== undefined && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="h-3 w-3" />
+                          {Math.round(template.usage_stats.success_rate * 100)}% success
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>Success rate</TooltipContent>
+                    </Tooltip>
+                  )}
+
+                  {template.usage_stats?.use_count !== undefined && (
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <div className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          {template.usage_stats.use_count} uses
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>Number of times used</TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+
+                {template.difficulty_level && (
+                  <div className="w-full">
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Difficulty</span>
+                      <span>{template.difficulty_level}/5</span>
+                    </div>
+                    <Progress value={template.difficulty_level * 20} className="h-1" />
+                  </div>
                 )}
               </DropdownMenuItem>
             ))

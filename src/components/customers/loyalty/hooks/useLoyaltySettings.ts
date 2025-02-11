@@ -21,28 +21,27 @@ export function useLoyaltySettings() {
 
       if (!profile?.organization_id) throw new Error("No organization found");
 
+      // First try to get existing settings
       const { data, error } = await supabase
         .from("loyalty_program_settings")
-        .select("*")
+        .select()
         .eq("organization_id", profile.organization_id)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to avoid 406 error
 
-      if (error) {
-        // If settings don't exist yet, create them
-        if (error.code === 'PGRST116') {
-          const { data: newSettings, error: createError } = await supabase
-            .from("loyalty_program_settings")
-            .insert({
-              organization_id: profile.organization_id,
-              created_by: session.user.id
-            })
-            .select()
-            .single();
+      if (error) throw error;
+      
+      // If no settings exist, create them
+      if (!data) {
+        const { data: newSettings, error: createError } = await supabase
+          .from("loyalty_program_settings")
+          .insert({
+            organization_id: profile.organization_id
+          })
+          .select()
+          .single();
 
-          if (createError) throw createError;
-          return newSettings;
-        }
-        throw error;
+        if (createError) throw createError;
+        return newSettings;
       }
 
       return data;
@@ -88,4 +87,3 @@ export function useLoyaltySettings() {
     updateSettings,
   };
 }
-

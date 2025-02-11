@@ -19,7 +19,6 @@ export function DurationInput({ form }: DurationInputProps) {
     <FormField
       control={form.control}
       name="duration_minutes"
-      defaultValue={60}
       render={({ field }) => (
         <FormItem>
           <FormLabel>Duration (minutes)</FormLabel>
@@ -29,6 +28,7 @@ export function DurationInput({ form }: DurationInputProps) {
               min={15}
               step={15}
               {...field}
+              value={field.value || 60}
               onChange={(e) => field.onChange(parseInt(e.target.value))}
             />
           </FormControl>

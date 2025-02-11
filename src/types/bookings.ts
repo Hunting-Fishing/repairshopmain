@@ -40,6 +40,7 @@ export interface BookingFormValues {
   notes: string;
   estimatedCost: number;
   priority: string;
+  duration_minutes: number;
   notificationPreferences: {
     email: boolean;
     sms: boolean;
@@ -51,6 +52,8 @@ export interface BookingDialogProps {
   onOpenChange: (open: boolean) => void;
   selectedTimeSlot: { start: Date; end: Date } | null;
   onBookingCreated: () => void;
+  workOrderId?: string;
+  technicianId?: string;
 }
 
 export interface BookingQueryResult extends BookingBase {

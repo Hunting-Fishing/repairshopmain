@@ -304,18 +304,23 @@ export type Database = {
           end_time: string
           estimated_cost: number | null
           id: string
+          is_multi_day: boolean | null
           job_description: string
           last_status_change: string | null
           last_updated_by: string | null
           notes: string | null
           notification_preferences: Json | null
           organization_id: string
+          parent_booking_id: string | null
           phone_number: string | null
           priority: string | null
+          remaining_minutes: number | null
           repair_job_id: string | null
+          sequence_number: number | null
           source: string | null
           start_time: string
           status: Database["public"]["Enums"]["booking_status"] | null
+          total_duration_minutes: number | null
           updated_at: string
           updated_by: string
           vehicle_info: string
@@ -331,18 +336,23 @@ export type Database = {
           end_time: string
           estimated_cost?: number | null
           id?: string
+          is_multi_day?: boolean | null
           job_description: string
           last_status_change?: string | null
           last_updated_by?: string | null
           notes?: string | null
           notification_preferences?: Json | null
           organization_id: string
+          parent_booking_id?: string | null
           phone_number?: string | null
           priority?: string | null
+          remaining_minutes?: number | null
           repair_job_id?: string | null
+          sequence_number?: number | null
           source?: string | null
           start_time: string
           status?: Database["public"]["Enums"]["booking_status"] | null
+          total_duration_minutes?: number | null
           updated_at?: string
           updated_by: string
           vehicle_info: string
@@ -358,18 +368,23 @@ export type Database = {
           end_time?: string
           estimated_cost?: number | null
           id?: string
+          is_multi_day?: boolean | null
           job_description?: string
           last_status_change?: string | null
           last_updated_by?: string | null
           notes?: string | null
           notification_preferences?: Json | null
           organization_id?: string
+          parent_booking_id?: string | null
           phone_number?: string | null
           priority?: string | null
+          remaining_minutes?: number | null
           repair_job_id?: string | null
+          sequence_number?: number | null
           source?: string | null
           start_time?: string
           status?: Database["public"]["Enums"]["booking_status"] | null
+          total_duration_minutes?: number | null
           updated_at?: string
           updated_by?: string
           vehicle_info?: string
@@ -394,6 +409,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_parent_booking_id_fkey"
+            columns: ["parent_booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
           {
@@ -4597,6 +4619,13 @@ export type Database = {
         }
         Returns: string
       }
+      calculate_workday_duration: {
+        Args: {
+          p_organization_id: string
+          p_date: string
+        }
+        Returns: unknown
+      }
       check_organization_membership: {
         Args: {
           user_id: string
@@ -4611,6 +4640,13 @@ export type Database = {
           p_end_time: string
         }
         Returns: boolean
+      }
+      get_next_working_day: {
+        Args: {
+          p_organization_id: string
+          p_start_date: string
+        }
+        Returns: string
       }
       get_organization_user_emails: {
         Args: {

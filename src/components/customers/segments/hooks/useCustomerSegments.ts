@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SegmentAssignment } from "../types";
 
-interface SegmentResponse {
+type RawSegmentResponse = {
   segment: {
     id: string;
     name: string;
@@ -32,7 +32,7 @@ export function useCustomerSegments(customerId: string) {
       
       if (!data) return [];
 
-      return data.map((row: SegmentResponse) => ({
+      return (data as RawSegmentResponse[]).map((row) => ({
         segment: {
           id: row.segment.id,
           name: row.segment.name,

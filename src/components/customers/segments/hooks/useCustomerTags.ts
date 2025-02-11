@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { TagAssignment } from "../types";
 
-interface TagResponse {
+type RawTagResponse = {
   tag: {
     id: string;
     name: string;
@@ -32,7 +32,7 @@ export function useCustomerTags(customerId: string) {
       
       if (!data) return [];
 
-      return data.map((row: TagResponse) => ({
+      return (data as RawTagResponse[]).map((row) => ({
         tag: {
           id: row.tag.id,
           name: row.tag.name,

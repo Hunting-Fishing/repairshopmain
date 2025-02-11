@@ -1,11 +1,10 @@
-
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Textarea } from "@/components/ui/textarea";
 import { useJobTemplates, useTemplateCategories } from "@/hooks/use-job-templates";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
-import { AlertCircle, Check, ChevronRight, FileQuestion, Folder, Search, Star, Tool, Clock } from "lucide-react";
+import { AlertCircle, Check, ChevronRight, FileQuestion, Folder, Search, Star, Wrench, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
@@ -209,7 +208,7 @@ export function JobTemplateSection({ form }: JobTemplateSectionProps) {
                                 )}
                                 {template.required_tools && template.required_tools.length > 0 && (
                                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                    <Tool className="h-3 w-3" />
+                                    <Wrench className="h-3 w-3" />
                                     {template.required_tools.length} tools required
                                   </div>
                                 )}

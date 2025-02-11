@@ -3,13 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { TagAssignment } from "../types";
 
-type RawTagResponse = {
-  tag: {
-    id: string;
-    name: string;
-    color: string | null;
-    description: string | null;
-  }
+type DatabaseTag = {
+  id: string;
+  name: string;
+  color: string | null;
+  description: string | null;
 }
 
 export function useCustomerTags(customerId: string) {
@@ -32,13 +30,8 @@ export function useCustomerTags(customerId: string) {
       
       if (!data) return [];
 
-      return (data as RawTagResponse[]).map((row) => ({
-        tag: {
-          id: row.tag.id,
-          name: row.tag.name,
-          color: row.tag.color,
-          description: row.tag.description
-        }
+      return data.map((row) => ({
+        tag: row.tag as DatabaseTag
       }));
     },
   });

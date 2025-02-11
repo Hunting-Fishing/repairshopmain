@@ -12,6 +12,8 @@ export function CalendarBookingHandler({
   bookings,
   isLoading 
 }: CalendarBookingHandlerProps) {
+  if (!bookings || bookings.length === 0) return null;
+
   return (
     <div className={cn(
       "rounded-xl p-6 transition-all duration-300",

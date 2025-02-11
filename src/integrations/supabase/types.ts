@@ -752,6 +752,62 @@ export type Database = {
           },
         ]
       }
+      communication_templates: {
+        Row: {
+          category: string | null
+          content: string
+          created_at: string | null
+          created_by: string
+          id: string
+          last_used_at: string | null
+          name: string
+          organization_id: string
+          status: string | null
+          subject: string | null
+          type: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          category?: string | null
+          content: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          last_used_at?: string | null
+          name: string
+          organization_id: string
+          status?: string | null
+          subject?: string | null
+          type: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          category?: string | null
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          last_used_at?: string | null
+          name?: string
+          organization_id?: string
+          status?: string | null
+          subject?: string | null
+          type?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       countries: {
         Row: {
           id: string
@@ -838,6 +894,13 @@ export type Database = {
             foreignKeyName: "customer_attachments_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_attachments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
@@ -853,6 +916,54 @@ export type Database = {
             columns: ["original_message_id"]
             isOneToOne: false
             referencedRelation: "work_order_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_communication_preferences: {
+        Row: {
+          channel: string
+          customer_id: string
+          frequency: string | null
+          id: string
+          last_updated: string | null
+          opted_in: boolean | null
+          preferred_time_end: string | null
+          preferred_time_start: string | null
+        }
+        Insert: {
+          channel: string
+          customer_id: string
+          frequency?: string | null
+          id?: string
+          last_updated?: string | null
+          opted_in?: boolean | null
+          preferred_time_end?: string | null
+          preferred_time_start?: string | null
+        }
+        Update: {
+          channel?: string
+          customer_id?: string
+          frequency?: string | null
+          id?: string
+          last_updated?: string | null
+          opted_in?: boolean | null
+          preferred_time_end?: string | null
+          preferred_time_start?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_communication_preferences_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_communication_preferences_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
@@ -896,6 +1007,13 @@ export type Database = {
             foreignKeyName: "customer_communications_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_communications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
@@ -915,6 +1033,196 @@ export type Database = {
           },
           {
             foreignKeyName: "fk_customer_communications_organization"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_document_versions: {
+        Row: {
+          changes_description: string | null
+          created_at: string | null
+          created_by: string
+          document_id: string
+          file_url: string
+          id: string
+          version: number
+        }
+        Insert: {
+          changes_description?: string | null
+          created_at?: string | null
+          created_by: string
+          document_id: string
+          file_url: string
+          id?: string
+          version: number
+        }
+        Update: {
+          changes_description?: string | null
+          created_at?: string | null
+          created_by?: string
+          document_id?: string
+          file_url?: string
+          id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "customer_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_documents: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          customer_id: string
+          description: string | null
+          file_size: number | null
+          file_type: string
+          file_url: string
+          id: string
+          metadata: Json | null
+          name: string
+          organization_id: string
+          status: string | null
+          tags: string[] | null
+          updated_at: string | null
+          updated_by: string | null
+          version: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          customer_id: string
+          description?: string | null
+          file_size?: number | null
+          file_type: string
+          file_url: string
+          id?: string
+          metadata?: Json | null
+          name: string
+          organization_id: string
+          status?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          updated_by?: string | null
+          version?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          customer_id?: string
+          description?: string | null
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          id?: string
+          metadata?: Json | null
+          name?: string
+          organization_id?: string
+          status?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          updated_by?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_organization"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_feedback: {
+        Row: {
+          category: string | null
+          content: string | null
+          created_at: string | null
+          customer_id: string
+          id: string
+          metadata: Json | null
+          organization_id: string
+          rating: number | null
+          resolved_at: string | null
+          resolved_by: string | null
+          sentiment: string | null
+          source: string | null
+          status: string | null
+          type: string
+        }
+        Insert: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          rating?: number | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sentiment?: string | null
+          source?: string | null
+          status?: string | null
+          type: string
+        }
+        Update: {
+          category?: string | null
+          content?: string | null
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          rating?: number | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          sentiment?: string | null
+          source?: string | null
+          status?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_feedback_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_feedback_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_feedback_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -963,6 +1271,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_history_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "customer_history_customer_id_fkey"
@@ -1017,6 +1332,13 @@ export type Database = {
           vehicle_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "customer_inspections_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
           {
             foreignKeyName: "customer_inspections_customer_id_fkey"
             columns: ["customer_id"]
@@ -1100,6 +1422,13 @@ export type Database = {
             foreignKeyName: "customer_loyalty_activities_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_loyalty_activities_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
@@ -1159,6 +1488,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_payments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "customer_payments_customer_id_fkey"
@@ -1272,6 +1608,13 @@ export type Database = {
             foreignKeyName: "customer_repair_jobs_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_repair_jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
@@ -1298,6 +1641,177 @@ export type Database = {
           },
           {
             foreignKeyName: "fk_repair_jobs_organization"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_segment_assignments: {
+        Row: {
+          assigned_at: string | null
+          customer_id: string
+          id: string
+          segment_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          customer_id: string
+          id?: string
+          segment_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          customer_id?: string
+          id?: string
+          segment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_segment_assignments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_segment_assignments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_segment_assignments_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "customer_segments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_segments: {
+        Row: {
+          created_at: string | null
+          criteria: Json
+          customer_count: number | null
+          description: string | null
+          id: string
+          last_run_at: string | null
+          name: string
+          organization_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          criteria: Json
+          customer_count?: number | null
+          description?: string | null
+          id?: string
+          last_run_at?: string | null
+          name: string
+          organization_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          criteria?: Json
+          customer_count?: number | null
+          description?: string | null
+          id?: string
+          last_run_at?: string | null
+          name?: string
+          organization_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_segments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_tag_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string
+          customer_id: string
+          tag_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by: string
+          customer_id: string
+          tag_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string
+          customer_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_tag_assignments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_tag_assignments_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "customer_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_tags: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_tags_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -4758,6 +5272,13 @@ export type Database = {
             foreignKeyName: "vehicles_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "vehicles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
@@ -4882,6 +5403,35 @@ export type Database = {
       }
     }
     Views: {
+      customer_analytics: {
+        Row: {
+          average_rating: number | null
+          customer_id: string | null
+          customer_since: string | null
+          email: string | null
+          first_name: string | null
+          last_feedback_date: string | null
+          last_name: string | null
+          last_repair_date: string | null
+          loyalty_activities: number | null
+          loyalty_points: number | null
+          organization_id: string | null
+          tags: string[] | null
+          total_documents: number | null
+          total_feedback: number | null
+          total_repair_jobs: number | null
+          total_spend: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       work_order_messages: {
         Row: {
           content: string | null

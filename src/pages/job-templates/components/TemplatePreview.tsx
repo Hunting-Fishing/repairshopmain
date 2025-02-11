@@ -2,7 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { JobTemplate } from "@/types/job-templates";
-import { Clock, Tool, Package } from "lucide-react";
+import { Clock, Wrench, Package } from "lucide-react";
 
 interface TemplatePreviewProps {
   template: JobTemplate;
@@ -37,7 +37,7 @@ export function TemplatePreview({ template }: TemplatePreviewProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-2 mb-4">
-              <Tool className="h-4 w-4" />
+              <Wrench className="h-4 w-4" />
               <h4 className="font-medium">Required Tools</h4>
             </div>
             <div className="flex flex-wrap gap-2">

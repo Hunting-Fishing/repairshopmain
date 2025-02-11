@@ -6,5 +6,9 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ isModernTheme = false }: StatsCardsProps) {
-  return <StatCardGrid isModernTheme={isModernTheme} />;
+  return (
+    <div className="w-full animate-fade-in">
+      <StatCardGrid isModernTheme={isModernTheme} />
+    </div>
+  );
 }

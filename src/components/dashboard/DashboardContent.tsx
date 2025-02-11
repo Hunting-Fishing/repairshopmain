@@ -47,17 +47,15 @@ export const DashboardContent = memo(function DashboardContent() {
 
   return (
     <ErrorBoundary onError={handleError}>
-      <div className="flex flex-col space-y-6 animate-fade-in">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <StatsCards isModernTheme={isModernTheme} />
-        </div>
+      <div className="flex flex-col min-h-screen space-y-6 animate-fade-in">
+        <StatsCards isModernTheme={isModernTheme} />
         
         <Tabs 
           value={viewMode} 
           onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
-          className="space-y-6"
+          className="space-y-6 flex-1"
         >
-          <TabsContent value="calendar" className="mt-0">
+          <TabsContent value="calendar" className="mt-0 h-full">
             <CalendarContainer
               selectedDate={selectedDate}
               view={view}

@@ -59,12 +59,13 @@ export function DayView({
     generateTimeSlotsCallback();
   }, [generateTimeSlotsCallback]);
 
-  // Memoize virtualizer configuration
   const parentRef = React.useRef<HTMLDivElement>(null);
+  
+  // Memoize virtualizer to prevent unnecessary re-renders
   const virtualizer = useVirtualizer({
     count: timeSlots.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 64,
+    estimateSize: useCallback(() => 64, []),
     overscan: 5,
   });
 
@@ -94,7 +95,7 @@ export function DayView({
       <div className="space-y-4 transition-all duration-300 ease-in-out">
         <div 
           ref={parentRef}
-          className="h-[calc(100vh-200px)] overflow-auto backdrop-blur-sm bg-background/95 rounded-lg border shadow-sm transition-all duration-300"
+          className="h-[calc(100vh-320px)] min-h-[500px] max-h-[800px] overflow-y-auto backdrop-blur-sm bg-background/95 rounded-lg border shadow-sm transition-all duration-300"
         >
           <div
             style={{
@@ -109,6 +110,7 @@ export function DayView({
               return (
                 <div
                   key={virtualItem.key}
+                  data-index={virtualItem.index}
                   style={{
                     position: 'absolute',
                     top: 0,

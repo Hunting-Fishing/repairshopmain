@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
@@ -8,7 +9,7 @@ import { CustomerHeader } from "@/components/customers/customer-management/Custo
 import { CustomerToolbar } from "@/components/customers/customer-management/CustomerToolbar";
 import { CustomerTable, Customer } from "@/components/customers/customer-management/CustomerTable";
 
-export default function CustomerManagement() {
+export function CustomerManagement() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);

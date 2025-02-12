@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { DatePickerWithRange } from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
-import { Search, SlidersHorizontal, Calendar, Archive } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { type TemplateFilters } from "../../types/template-system";
 
 interface TemplateFiltersProps {
@@ -127,9 +127,10 @@ export function TemplateFilters({
 
         {filters.dateRange && (
           <Badge variant="outline" className="gap-2">
-            <Calendar className="h-3 w-3" />
-            {filters.dateRange.from.toLocaleDateString()} -{" "}
-            {filters.dateRange.to.toLocaleDateString()}
+            <DatePickerWithRange
+              date={filters.dateRange}
+              onChange={(range) => onFiltersChange({ ...filters, dateRange: range })}
+            />
           </Badge>
         )}
       </div>

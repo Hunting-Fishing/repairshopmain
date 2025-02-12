@@ -51,6 +51,8 @@ export interface EmailTemplate {
     notify_on_error: boolean;
   };
   notification_recipients: any[]; // Changed to match JSONB database type
+  is_archived: boolean;
+  last_archive_date?: string;
 }
 
 export interface EmailTemplateVersion {

@@ -69,7 +69,12 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
           />
           <Select
             value={schedule.frequency}
-            onValueChange={(value) => setSchedule({ ...schedule, frequency: value })}
+            onValueChange={(value: string) => 
+              setSchedule({ 
+                ...schedule, 
+                frequency: value as 'daily' | 'weekly' | 'monthly'
+              })
+            }
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -85,7 +90,7 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
               />
               <Select
                 value={recipientType}
-                onValueChange={(value) => setRecipientType(value as 'to' | 'cc' | 'bcc')}
+                onValueChange={(value: string) => setRecipientType(value as 'to' | 'cc' | 'bcc')}
               >
                 <option value="to">To</option>
                 <option value="cc">CC</option>

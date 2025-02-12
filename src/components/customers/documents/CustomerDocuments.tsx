@@ -3,13 +3,10 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { FileText, Upload, Download, Trash2 } from "lucide-react";
-import { formatFileSize, formatDate } from "@/lib/utils";
+import { FileText } from "lucide-react";
+import { DocumentUploadForm } from "./components/DocumentUploadForm";
+import { DocumentList } from "./components/DocumentList";
 
 interface CustomerDocumentsProps {
   customerId: string;
@@ -145,81 +142,17 @@ export function CustomerDocuments({ customerId }: CustomerDocumentsProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="space-y-4">
-            <div>
-              <Label>Document Notes</Label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add notes about this document..."
-                className="mt-1"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full"
-                disabled={uploading}
-                onClick={() => document.getElementById("file-upload")?.click()}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Document
-              </Button>
-              <Input
-                id="file-upload"
-                type="file"
-                className="hidden"
-                onChange={handleFileUpload}
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            {documents?.map((doc) => (
-              <div
-                key={doc.id}
-                className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-primary" />
-                    <span className="font-medium">{doc.name}</span>
-                  </div>
-                  {doc.notes && (
-                    <p className="text-sm text-muted-foreground mt-1">{doc.notes}</p>
-                  )}
-                  <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                    <span>{formatFileSize(doc.file_size || 0)}</span>
-                    <span>{formatDate(doc.created_at)}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDownload(doc.file_url, doc.name)}
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(doc.id, doc.file_url)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-            {!documents?.length && (
-              <div className="text-sm text-muted-foreground text-center py-4">
-                No documents uploaded yet
-              </div>
-            )}
-          </div>
+          <DocumentUploadForm
+            notes={notes}
+            uploading={uploading}
+            onNotesChange={setNotes}
+            onFileSelect={handleFileUpload}
+          />
+          <DocumentList
+            documents={documents || []}
+            onDownload={handleDownload}
+            onDelete={handleDelete}
+          />
         </div>
       </CardContent>
     </Card>

@@ -26,7 +26,7 @@ export function useCommunications({
         .select(`
           *,
           sender:profiles(first_name, last_name)
-        `)
+        `, { count: 'exact' })
         .eq("customer_id", customerId);
 
       // Apply filters
@@ -49,7 +49,7 @@ export function useCommunications({
       query = query
         .range((page - 1) * pageSize, page * pageSize - 1);
 
-      const { data, error, count } = await query.select('*', { count: 'exact' });
+      const { data, error, count } = await query;
 
       if (error) throw error;
 

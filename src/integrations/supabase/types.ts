@@ -2258,6 +2258,11 @@ export type Database = {
       }
       email_templates: {
         Row: {
+          approval_denied_reason: string | null
+          approval_required: boolean
+          approval_status: string
+          approved_at: string | null
+          approved_by: string | null
           archived_by: string | null
           category_id: string | null
           content: string
@@ -2273,6 +2278,8 @@ export type Database = {
           notification_recipients: Json | null
           notification_settings: Json | null
           organization_id: string
+          review_requested_at: string | null
+          review_requested_by: string | null
           search_tags: string[] | null
           status: string | null
           subject: string
@@ -2282,6 +2289,11 @@ export type Database = {
           version: number | null
         }
         Insert: {
+          approval_denied_reason?: string | null
+          approval_required?: boolean
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           archived_by?: string | null
           category_id?: string | null
           content: string
@@ -2297,6 +2309,8 @@ export type Database = {
           notification_recipients?: Json | null
           notification_settings?: Json | null
           organization_id: string
+          review_requested_at?: string | null
+          review_requested_by?: string | null
           search_tags?: string[] | null
           status?: string | null
           subject: string
@@ -2306,6 +2320,11 @@ export type Database = {
           version?: number | null
         }
         Update: {
+          approval_denied_reason?: string | null
+          approval_required?: boolean
+          approval_status?: string
+          approved_at?: string | null
+          approved_by?: string | null
           archived_by?: string | null
           category_id?: string | null
           content?: string
@@ -2321,6 +2340,8 @@ export type Database = {
           notification_recipients?: Json | null
           notification_settings?: Json | null
           organization_id?: string
+          review_requested_at?: string | null
+          review_requested_by?: string | null
           search_tags?: string[] | null
           status?: string | null
           subject?: string
@@ -5424,6 +5445,95 @@ export type Database = {
           },
         ]
       }
+      template_approval_history: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          notes: string | null
+          organization_id: string
+          performed_by: string
+          status: string
+          template_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          organization_id: string
+          performed_by: string
+          status: string
+          template_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          organization_id?: string
+          performed_by?: string
+          status?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_approval_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_approval_history_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_approvers: {
+        Row: {
+          can_approve_all: boolean
+          category_ids: string[] | null
+          created_at: string
+          id: string
+          organization_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          can_approve_all?: boolean
+          category_ids?: string[] | null
+          created_at?: string
+          id?: string
+          organization_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          can_approve_all?: boolean
+          category_ids?: string[] | null
+          created_at?: string
+          id?: string
+          organization_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_approvers_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       template_categories: {
         Row: {
           created_at: string | null
@@ -6184,6 +6294,13 @@ export type Database = {
           p_date: string
         }
         Returns: unknown
+      }
+      can_approve_template: {
+        Args: {
+          template_id: string
+          user_id: string
+        }
+        Returns: boolean
       }
       check_labor_time_conflicts: {
         Args: {

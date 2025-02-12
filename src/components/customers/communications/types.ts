@@ -53,6 +53,14 @@ export interface EmailTemplate {
   notification_recipients: any[]; // Changed to match JSONB database type
   is_archived: boolean;
   last_archive_date?: string;
+  // New approval fields
+  approval_status: 'draft' | 'pending_review' | 'approved' | 'rejected';
+  approval_required: boolean;
+  approved_by?: string;
+  approved_at?: string;
+  approval_denied_reason?: string;
+  review_requested_at?: string;
+  review_requested_by?: string;
 }
 
 export interface EmailTemplateVersion {

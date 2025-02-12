@@ -1,6 +1,8 @@
 
 import type { EmailTemplate } from "../types";
 
+export type ApprovalStatus = 'draft' | 'pending_review' | 'approved' | 'rejected';
+
 export interface TemplateVersion {
   id: string;
   template_id: string;
@@ -42,6 +44,28 @@ export interface TemplateTagAssignment {
   created_at: string;
 }
 
+export interface TemplateApprover {
+  id: string;
+  organization_id: string;
+  user_id: string;
+  can_approve_all: boolean;
+  category_ids: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TemplateApprovalHistory {
+  id: string;
+  organization_id: string;
+  template_id: string;
+  action: string;
+  status: ApprovalStatus;
+  performed_by: string;
+  notes?: string;
+  created_at: string;
+  metadata: Record<string, any>;
+}
+
 export interface TemplateFilters {
   searchQuery: string;
   categories: string[];
@@ -49,8 +73,9 @@ export interface TemplateFilters {
   status: 'all' | 'active' | 'archived';
   dateRange?: {
     from: Date;
-    to?: Date;  // Make 'to' optional to match DateRange type
+    to?: Date;
   };
   sortBy: 'name' | 'created_at' | 'updated_at' | 'last_used';
   sortOrder: 'asc' | 'desc';
 }
+

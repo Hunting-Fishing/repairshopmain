@@ -34,7 +34,10 @@ export function useTemplateVersions(templateId: string) {
         metadata: {
           subject: version.subject,
           name: '', // Will be populated from the template if needed
-          notification_settings: {} // Default empty settings
+          notification_settings: {
+            notify_on_send: false,
+            notify_on_error: true
+          }
         }
       })) as TemplateVersion[];
     },

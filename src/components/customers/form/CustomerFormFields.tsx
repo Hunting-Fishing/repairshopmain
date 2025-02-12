@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useLocationData } from "@/hooks/useLocationData";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -22,6 +23,8 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
   const selectTriggerClasses = isModernTheme
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg data-[placeholder]:text-gray-400"
     : "bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-colors";
+
+  const { countries } = useLocationData(form.watch("country") || "");
 
   return (
     <div className="space-y-4">
@@ -100,6 +103,31 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
             <FormControl>
               <Input {...field} className={inputClasses} />
             </FormControl>
+            <FormMessage className="text-[#F97316]" />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="country"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className={labelClasses}>Country</FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger className={selectTriggerClasses}>
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {countries?.map((country) => (
+                  <SelectItem key={country.id} value={country.id}>
+                    {country.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FormMessage className="text-[#F97316]" />
           </FormItem>
         )}

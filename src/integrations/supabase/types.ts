@@ -444,6 +444,27 @@ export type Database = {
           },
         ]
       }
+      business_classifications: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       business_types: {
         Row: {
           created_at: string
@@ -1230,6 +1251,47 @@ export type Database = {
           },
         ]
       }
+      customer_form_fields: {
+        Row: {
+          created_at: string | null
+          customer_type: string
+          field_name: string
+          field_type: string
+          id: string
+          label: string
+          organization_id: string
+          required: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_type: string
+          field_name: string
+          field_type: string
+          id?: string
+          label: string
+          organization_id: string
+          required?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_type?: string
+          field_name?: string
+          field_type?: string
+          id?: string
+          label?: string
+          organization_id?: string
+          required?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_organization"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_history: {
         Row: {
           change_type: string
@@ -1819,11 +1881,69 @@ export type Database = {
           },
         ]
       }
+      customer_tax_info: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          id: string
+          organization_id: string
+          tax_id: string | null
+          tax_type: string | null
+          verification_status: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          organization_id: string
+          tax_id?: string | null
+          tax_type?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          organization_id?: string
+          tax_id?: string | null
+          tax_type?: string | null
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "fk_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_organization"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
+          address_book: Json | null
           auth_id: string | null
+          business_classification_id: string | null
           city: string | null
           communication_preferences: Json | null
+          company_size: string | null
           country: string | null
           created_at: string
           created_by: string
@@ -1831,20 +1951,24 @@ export type Database = {
           email: string | null
           first_name: string
           id: string
+          language_preference: string | null
           last_login: string | null
           last_name: string
           lifetime_points: number | null
           loyalty_join_date: string | null
           loyalty_points: number | null
           loyalty_tier: string | null
+          marketing_preferences: Json | null
           notes: string | null
           organization_id: string
           phone_number: string | null
           portal_access_enabled: boolean | null
           postal_code: string | null
           preferred_contact_time: string | null
+          secondary_contact: Json | null
           state_province: string | null
           street_address: string | null
+          timezone: string | null
           total_spend: number | null
           updated_at: string
           updated_by: string
@@ -1854,9 +1978,12 @@ export type Database = {
           vehicle_year: string | null
         }
         Insert: {
+          address_book?: Json | null
           auth_id?: string | null
+          business_classification_id?: string | null
           city?: string | null
           communication_preferences?: Json | null
+          company_size?: string | null
           country?: string | null
           created_at?: string
           created_by: string
@@ -1864,20 +1991,24 @@ export type Database = {
           email?: string | null
           first_name: string
           id?: string
+          language_preference?: string | null
           last_login?: string | null
           last_name: string
           lifetime_points?: number | null
           loyalty_join_date?: string | null
           loyalty_points?: number | null
           loyalty_tier?: string | null
+          marketing_preferences?: Json | null
           notes?: string | null
           organization_id: string
           phone_number?: string | null
           portal_access_enabled?: boolean | null
           postal_code?: string | null
           preferred_contact_time?: string | null
+          secondary_contact?: Json | null
           state_province?: string | null
           street_address?: string | null
+          timezone?: string | null
           total_spend?: number | null
           updated_at?: string
           updated_by: string
@@ -1887,9 +2018,12 @@ export type Database = {
           vehicle_year?: string | null
         }
         Update: {
+          address_book?: Json | null
           auth_id?: string | null
+          business_classification_id?: string | null
           city?: string | null
           communication_preferences?: Json | null
+          company_size?: string | null
           country?: string | null
           created_at?: string
           created_by?: string
@@ -1897,20 +2031,24 @@ export type Database = {
           email?: string | null
           first_name?: string
           id?: string
+          language_preference?: string | null
           last_login?: string | null
           last_name?: string
           lifetime_points?: number | null
           loyalty_join_date?: string | null
           loyalty_points?: number | null
           loyalty_tier?: string | null
+          marketing_preferences?: Json | null
           notes?: string | null
           organization_id?: string
           phone_number?: string | null
           portal_access_enabled?: boolean | null
           postal_code?: string | null
           preferred_contact_time?: string | null
+          secondary_contact?: Json | null
           state_province?: string | null
           street_address?: string | null
+          timezone?: string | null
           total_spend?: number | null
           updated_at?: string
           updated_by?: string
@@ -1920,6 +2058,13 @@ export type Database = {
           vehicle_year?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "customers_business_classification_id_fkey"
+            columns: ["business_classification_id"]
+            isOneToOne: false
+            referencedRelation: "business_classifications"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "customers_created_by_fkey"
             columns: ["created_by"]

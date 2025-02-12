@@ -12,6 +12,7 @@ interface CustomerCommunicationsProps {
 
 export function CustomerCommunications({ customerId }: CustomerCommunicationsProps) {
   const [isSMSDialogOpen, setIsSMSDialogOpen] = useState(false);
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<CommunicationsFilter>({});
   const [sort, setSort] = useState<CommunicationSort>({ field: 'sent_at', direction: 'desc' });
@@ -30,9 +31,12 @@ export function CustomerCommunications({ customerId }: CustomerCommunicationsPro
     <div className="space-y-4">
       <CommunicationHeader
         customerId={customerId}
+        customerEmail={customer?.email}
         customerPhoneNumber={customer?.phone_number}
         isSMSDialogOpen={isSMSDialogOpen}
         setIsSMSDialogOpen={setIsSMSDialogOpen}
+        isEmailDialogOpen={isEmailDialogOpen}
+        setIsEmailDialogOpen={setIsEmailDialogOpen}
       />
       <CommunicationList
         communications={communications?.communications ?? []}

@@ -2259,6 +2259,7 @@ export type Database = {
       email_templates: {
         Row: {
           approval_denied_reason: string | null
+          approval_level: string | null
           approval_required: boolean
           approval_status: string
           approved_at: string | null
@@ -2290,6 +2291,7 @@ export type Database = {
         }
         Insert: {
           approval_denied_reason?: string | null
+          approval_level?: string | null
           approval_required?: boolean
           approval_status?: string
           approved_at?: string | null
@@ -2321,6 +2323,7 @@ export type Database = {
         }
         Update: {
           approval_denied_reason?: string | null
+          approval_level?: string | null
           approval_required?: boolean
           approval_status?: string
           approved_at?: string | null
@@ -5448,6 +5451,7 @@ export type Database = {
       template_approval_history: {
         Row: {
           action: string
+          approval_level: string | null
           created_at: string
           id: string
           metadata: Json | null
@@ -5459,6 +5463,7 @@ export type Database = {
         }
         Insert: {
           action: string
+          approval_level?: string | null
           created_at?: string
           id?: string
           metadata?: Json | null
@@ -5470,6 +5475,7 @@ export type Database = {
         }
         Update: {
           action?: string
+          approval_level?: string | null
           created_at?: string
           id?: string
           metadata?: Json | null
@@ -5498,6 +5504,7 @@ export type Database = {
       }
       template_approvers: {
         Row: {
+          allowed_approval_levels: string[] | null
           can_approve_all: boolean
           category_ids: string[] | null
           created_at: string
@@ -5507,6 +5514,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          allowed_approval_levels?: string[] | null
           can_approve_all?: boolean
           category_ids?: string[] | null
           created_at?: string
@@ -5516,6 +5524,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          allowed_approval_levels?: string[] | null
           can_approve_all?: boolean
           category_ids?: string[] | null
           created_at?: string

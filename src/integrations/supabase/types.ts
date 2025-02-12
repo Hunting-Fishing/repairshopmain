@@ -949,6 +949,7 @@ export type Database = {
           id: string
           last_updated: string | null
           opted_in: boolean | null
+          organization_id: string
           preferred_time_end: string | null
           preferred_time_start: string | null
         }
@@ -959,6 +960,7 @@ export type Database = {
           id?: string
           last_updated?: string | null
           opted_in?: boolean | null
+          organization_id: string
           preferred_time_end?: string | null
           preferred_time_start?: string | null
         }
@@ -969,6 +971,7 @@ export type Database = {
           id?: string
           last_updated?: string | null
           opted_in?: boolean | null
+          organization_id?: string
           preferred_time_end?: string | null
           preferred_time_start?: string | null
         }
@@ -985,6 +988,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_communication_preferences_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ReportSchedule } from './types';
+import { ReportSchedule, ReportProcessingQueueItem, RealtimePostgresChangesPayload } from './types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartWidget } from './widgets/ChartWidget';
 import { useToast } from '@/hooks/use-toast';
@@ -55,7 +55,7 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
           table: 'report_processing_queue',
           filter: `template_id=eq.${templateId}`
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<ReportProcessingQueueItem>) => {
           if (payload.new) {
             toast({
               title: 'Report Status Update',

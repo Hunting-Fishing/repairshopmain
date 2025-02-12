@@ -50,7 +50,7 @@ export interface EmailTemplate {
     notify_on_send: boolean;
     notify_on_error: boolean;
   };
-  notification_recipients: string[];
+  notification_recipients: any[]; // Changed to match JSONB database type
 }
 
 export interface EmailTemplateVersion {

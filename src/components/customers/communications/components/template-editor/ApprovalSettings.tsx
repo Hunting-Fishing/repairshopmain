@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ApproverManagement } from "./ApproverManagement";
+import { ApprovalHistory } from "./ApprovalHistory";
 
 interface ApprovalSettingsProps {
   templateId: string;
@@ -96,70 +97,77 @@ export function ApprovalSettings({
         </div>
 
         {approvalRequired && (
-          <div className="space-y-2 border-t pt-2">
-            <Label htmlFor="approval_level">Approval Level Required</Label>
-            <Select 
-              value={approvalLevel} 
-              onValueChange={onApprovalLevelChange}
-            >
-              <SelectTrigger id="approval_level" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="primary">
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-2" />
-                    Primary Approval
-                  </div>
-                </SelectItem>
-                <SelectItem value="secondary">
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-2" />
-                    Secondary Approval
-                  </div>
-                </SelectItem>
-                <SelectItem value="final">
-                  <div className="flex items-center">
-                    <Users className="w-4 h-4 mr-2" />
-                    Final Approval
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <>
+            <div className="space-y-2 border-t pt-2">
+              <Label htmlFor="approval_level">Approval Level Required</Label>
+              <Select 
+                value={approvalLevel} 
+                onValueChange={onApprovalLevelChange}
+              >
+                <SelectTrigger id="approval_level" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="primary">
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 mr-2" />
+                      Primary Approval
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="secondary">
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 mr-2" />
+                      Secondary Approval
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="final">
+                    <div className="flex items-center">
+                      <Users className="w-4 h-4 mr-2" />
+                      Final Approval
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Current Status</span>
+                {getStatusBadge()}
+              </div>
+
+              {approvalStatus === "draft" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={onRequestApproval}
+                >
+                  Request Approval
+                </Button>
+              )}
+
+              {approvalStatus === "pending_review" && reviewRequestedBy && reviewRequestedAt && (
+                <div className="text-sm text-muted-foreground">
+                  Review requested by {reviewRequestedBy} on{" "}
+                  {new Date(reviewRequestedAt).toLocaleDateString()}
+                </div>
+              )}
+
+              {approvalStatus === "approved" && approvedBy && approvedAt && (
+                <div className="text-sm text-muted-foreground">
+                  Approved by {approvedBy} on{" "}
+                  {new Date(approvedAt).toLocaleDateString()}
+                </div>
+              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <h4 className="font-medium text-sm mb-4">Approval History</h4>
+              <ApprovalHistory templateId={templateId} />
+            </div>
+          </>
         )}
-
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Current Status</span>
-            {getStatusBadge()}
-          </div>
-
-          {approvalStatus === "draft" && approvalRequired && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={onRequestApproval}
-            >
-              Request Approval
-            </Button>
-          )}
-
-          {approvalStatus === "pending_review" && reviewRequestedBy && reviewRequestedAt && (
-            <div className="text-sm text-muted-foreground">
-              Review requested by {reviewRequestedBy} on{" "}
-              {new Date(reviewRequestedAt).toLocaleDateString()}
-            </div>
-          )}
-
-          {approvalStatus === "approved" && approvedBy && approvedAt && (
-            <div className="text-sm text-muted-foreground">
-              Approved by {approvedBy} on{" "}
-              {new Date(approvedAt).toLocaleDateString()}
-            </div>
-          )}
-        </div>
       </div>
 
       {approvalRequired && (

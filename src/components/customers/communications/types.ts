@@ -1,4 +1,12 @@
 
+export interface Customer {
+  id: string;
+  phone_number?: string;
+  first_name: string;
+  last_name: string;
+  email?: string;
+}
+
 export interface Communication {
   id: string;
   type: 'email' | 'sms' | 'docusign' | 'notification';
@@ -10,14 +18,6 @@ export interface Communication {
     last_name: string;
   };
   metadata?: Record<string, any>;
-}
-
-export interface Customer {
-  id: string;
-  phone_number?: string;
-  first_name: string;
-  last_name: string;
-  email?: string;
 }
 
 export interface CommunicationsFilter {

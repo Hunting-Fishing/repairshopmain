@@ -1,5 +1,5 @@
 
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { parsePhoneNumberFromString, CountryCode } from 'libphonenumber-js';
 import validator from 'validator';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -8,7 +8,7 @@ export interface ValidationResult {
   message?: string;
 }
 
-export async function validatePhone(phone: string, countryCode = 'US'): Promise<ValidationResult> {
+export async function validatePhone(phone: string, countryCode: CountryCode = 'US'): Promise<ValidationResult> {
   try {
     const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
     if (!phoneNumber) {

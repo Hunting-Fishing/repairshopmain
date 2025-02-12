@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { DashboardConfig } from './types';
+import { ChartWidget } from './widgets/ChartWidget';
 
 export function CustomerDashboard() {
   const { data: dashboardConfig } = useQuery({
@@ -21,6 +22,18 @@ export function CustomerDashboard() {
     }
   });
 
+  // Mock data for demonstration
+  const mockData = {
+    chart: [
+      { name: 'Jan', value: 100 },
+      { name: 'Feb', value: 200 },
+      { name: 'Mar', value: 150 },
+      { name: 'Apr', value: 300 },
+    ],
+    metric: 42,
+    list: ['Item 1', 'Item 2', 'Item 3'],
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -32,16 +45,37 @@ export function CustomerDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {dashboardConfig?.layout.map((widget) => (
-          <Card key={widget.id}>
-            <CardHeader>
-              <CardTitle>{widget.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Widget content will be implemented based on type */}
-            </CardContent>
-          </Card>
-        ))}
+        {dashboardConfig?.layout.map((widget) => {
+          if (widget.type === 'chart') {
+            return (
+              <ChartWidget
+                key={widget.id}
+                widget={widget}
+                data={mockData.chart}
+              />
+            );
+          }
+
+          return (
+            <Card key={widget.id}>
+              <CardHeader>
+                <CardTitle>{widget.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {widget.type === 'metric' && (
+                  <div className="text-4xl font-bold">{mockData.metric}</div>
+                )}
+                {widget.type === 'list' && (
+                  <ul className="space-y-2">
+                    {mockData.list.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

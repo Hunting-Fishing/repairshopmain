@@ -8,6 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ReportTemplate, ReportType } from './types';
+import { ChartWidget } from './widgets/ChartWidget';
+import { ReportScheduleDialog } from './ReportScheduleDialog';
+import { ReportExport } from './ReportExport';
+import { useToast } from '@/hooks/use-toast';
 
 export function ReportBuilder() {
   const [activeTab, setActiveTab] = useState<string>('fields');
@@ -18,7 +22,9 @@ export function ReportBuilder() {
     sortOptions: []
   });
 
-  const { data: templates } = useQuery({
+  const { toast } = useToast();
+
+  const { data: templates, refetch } = useQuery({
     queryKey: ['report-templates'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -40,14 +46,43 @@ export function ReportBuilder() {
       });
 
     if (error) {
-      console.error('Error saving template:', error);
+      toast({
+        title: "Error Saving Template",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Template Saved",
+        description: "Report template has been saved successfully",
+      });
+      refetch();
     }
   };
 
+  const handleSchedule = async (schedule: any) => {
+    toast({
+      title: "Report Scheduled",
+      description: "The report has been scheduled successfully",
+    });
+  };
+
+  // Mock data for preview
+  const previewData = [
+    { name: 'Jan', value: 100 },
+    { name: 'Feb', value: 200 },
+    { name: 'Mar', value: 150 },
+    { name: 'Apr', value: 300 },
+  ];
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Report Builder</CardTitle>
+        <div className="flex items-center gap-2">
+          <ReportExport templateId={template.id || ''} data={previewData} />
+          <ReportScheduleDialog templateId={template.id || ''} onSchedule={handleSchedule} />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -88,7 +123,22 @@ export function ReportBuilder() {
             </TabsContent>
 
             <TabsContent value="preview">
-              {/* Report preview will be implemented here */}
+              {template.type === 'chart' && (
+                <ChartWidget
+                  widget={{
+                    id: 'preview',
+                    type: 'chart',
+                    title: template.name || 'Preview',
+                    config: {
+                      chartType: 'bar',
+                      xAxis: 'name',
+                      yAxis: 'value'
+                    },
+                    position: { x: 0, y: 0, w: 12, h: 4 }
+                  }}
+                  data={previewData}
+                />
+              )}
             </TabsContent>
           </Tabs>
 

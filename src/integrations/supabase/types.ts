@@ -6386,50 +6386,18 @@ export type Database = {
           last_feedback_date: string | null
           last_name: string | null
           last_repair_date: string | null
+          last_validation_date: string | null
           loyalty_activities: number | null
           loyalty_points: number | null
           organization_id: string | null
+          pending_validations: number | null
           tags: string[] | null
           total_documents: number | null
           total_feedback: number | null
           total_repair_jobs: number | null
           total_spend: number | null
-        }
-        Insert: {
-          average_rating?: never
-          customer_id?: string | null
-          customer_since?: string | null
-          email?: string | null
-          first_name?: string | null
-          last_feedback_date?: never
-          last_name?: string | null
-          last_repair_date?: never
-          loyalty_activities?: never
-          loyalty_points?: never
-          organization_id?: string | null
-          tags?: string[] | null
-          total_documents?: never
-          total_feedback?: never
-          total_repair_jobs?: never
-          total_spend?: number | null
-        }
-        Update: {
-          average_rating?: never
-          customer_id?: string | null
-          customer_since?: string | null
-          email?: string | null
-          first_name?: string | null
-          last_feedback_date?: never
-          last_name?: string | null
-          last_repair_date?: never
-          loyalty_activities?: never
-          loyalty_points?: never
-          organization_id?: string | null
-          tags?: string[] | null
-          total_documents?: never
-          total_feedback?: never
-          total_repair_jobs?: never
-          total_spend?: number | null
+          total_validations: number | null
+          validation_success_rate: number | null
         }
         Relationships: [
           {

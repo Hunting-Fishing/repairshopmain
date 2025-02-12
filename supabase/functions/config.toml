@@ -6,3 +6,6 @@ verify_jwt = true
 [functions.amazon-product-search]
 verify_jwt = true
 
+[functions.send-sms]
+verify_jwt = true
+

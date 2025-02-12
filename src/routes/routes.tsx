@@ -7,7 +7,7 @@ import Calendar from "@/pages/Calendar";
 import CalendarSettings from "@/pages/Calendar-Settings";
 import Customers from "@/pages/Customers";
 import CustomerDetail from "@/pages/CustomerDetail";
-import CustomerManagement from "@/pages/CustomerManagement";
+import { CustomerManagement } from "@/pages/CustomerManagement";
 import Staff from "@/pages/Staff";
 import WorkOrders from "@/pages/WorkOrders";
 import RepairJobDetails from "@/pages/RepairJobDetails";

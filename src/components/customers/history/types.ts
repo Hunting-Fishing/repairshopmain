@@ -1,4 +1,8 @@
 
+export interface CustomerHistoryListProps {
+  customerId: string;
+}
+
 export interface HistoryRecord {
   id: string;
   changed_by: string;
@@ -12,10 +16,6 @@ export interface HistoryRecord {
     first_name: string | null;
     last_name: string | null;
   };
-}
-
-export interface CustomerHistoryListProps {
-  customerId: string;
 }
 
 export interface HistoryFiltersProps {

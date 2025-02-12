@@ -1,104 +1,40 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { History } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { HistoryEntry, useCustomerHistory } from "../hooks/useCustomerHistory";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState, useMemo } from "react";
-import { toast } from "sonner";
-import { HistoryFilters } from "./components/HistoryFilters";
-import { HistoryStatistics } from "./components/HistoryStatistics";
-import { HistoryTable } from "./components/HistoryTable";
-import { type CustomerHistoryListProps, type HistoryRecord } from "./types";
+
+interface CustomerHistoryListProps {
+  customerId: string;
+}
+
+function getChangeDescription(entry: HistoryEntry) {
+  const oldValue = entry.old_value || "(empty)";
+  const newValue = entry.new_value || "(empty)";
+
+  if (entry.change_type === "create") {
+    return <span className="text-green-600">Created</span>;
+  }
+
+  return (
+    <div className="text-sm">
+      <div className="text-red-600 line-through">{oldValue}</div>
+      <div className="text-green-600">{newValue}</div>
+    </div>
+  );
+}
 
 export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
-  const [filterField, setFilterField] = useState<string>("all");
-  const [filterType, setFilterType] = useState<string>("all");
-
-  const { data: historyRecords, isLoading } = useQuery({
-    queryKey: ["customer-history", customerId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("customer_history")
-        .select(`
-          *,
-          profiles:changed_by (
-            first_name,
-            last_name
-          )
-        `)
-        .eq("customer_id", customerId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as HistoryRecord[];
-    },
-  });
-
-  const filteredRecords = useMemo(() => {
-    if (!historyRecords) return [];
-    
-    return historyRecords.filter(record => {
-      const fieldMatch = filterField === "all" || record.field_name === filterField;
-      const typeMatch = filterType === "all" || record.change_type === filterType;
-      return fieldMatch && typeMatch;
-    });
-  }, [historyRecords, filterField, filterType]);
-
-  const uniqueFields = useMemo(() => {
-    if (!historyRecords) return [];
-    return Array.from(new Set(historyRecords.map(r => r.field_name)));
-  }, [historyRecords]);
-
-  const uniqueTypes = useMemo(() => {
-    if (!historyRecords) return [];
-    return Array.from(new Set(historyRecords.map(r => r.change_type)));
-  }, [historyRecords]);
-
-  const statistics = useMemo(() => {
-    if (!historyRecords) return null;
-    
-    const byType = historyRecords.reduce((acc, record) => {
-      acc[record.change_type] = (acc[record.change_type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const byField = historyRecords.reduce((acc, record) => {
-      acc[record.field_name] = (acc[record.field_name] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    return { byType, byField };
-  }, [historyRecords]);
-
-  const handleExport = () => {
-    if (!filteredRecords.length) return;
-
-    const csv = [
-      ["Date", "Changed By", "Field", "Change Type", "Old Value", "New Value", "Notes"].join(","),
-      ...filteredRecords.map(record => [
-        format(new Date(record.created_at), "yyyy-MM-dd HH:mm:ss"),
-        `${record.profiles.first_name} ${record.profiles.last_name}`,
-        record.field_name,
-        record.change_type,
-        record.old_value || "",
-        record.new_value || "",
-        record.notes || ""
-      ].map(value => `"${value}"`).join(","))
-    ].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `customer-history-${format(new Date(), "yyyy-MM-dd")}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    toast.success("History exported successfully");
-  };
+  const { historyEntries, isLoading } = useCustomerHistory(customerId);
 
   if (isLoading) {
     return (
@@ -116,7 +52,7 @@ export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
     );
   }
 
-  if (!historyRecords?.length) {
+  if (!historyEntries?.length) {
     return (
       <Alert>
         <AlertDescription className="flex items-center justify-center py-4 text-muted-foreground">
@@ -127,30 +63,55 @@ export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
   }
 
   // Group records by date
-  const groupedRecords = filteredRecords.reduce((groups, record) => {
-    const date = format(parseISO(record.created_at), "MMMM d, yyyy");
+  const groupedRecords = historyEntries.reduce((groups, record) => {
+    const date = format(new Date(record.created_at), "MMMM d, yyyy");
     if (!groups[date]) {
       groups[date] = [];
     }
     groups[date].push(record);
     return groups;
-  }, {} as Record<string, HistoryRecord[]>);
+  }, {} as Record<string, HistoryEntry[]>);
 
   return (
     <div className="space-y-6">
-      <HistoryFilters
-        filterField={filterField}
-        filterType={filterType}
-        uniqueFields={uniqueFields}
-        uniqueTypes={uniqueTypes}
-        onFilterFieldChange={setFilterField}
-        onFilterTypeChange={setFilterType}
-        onExport={handleExport}
-      />
-
-      {statistics && <HistoryStatistics statistics={statistics} />}
-
-      <HistoryTable groupedRecords={groupedRecords} />
+      {Object.entries(groupedRecords).map(([date, records]) => (
+        <div key={date} className="space-y-2">
+          <h3 className="font-medium text-muted-foreground">{date}</h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Time</TableHead>
+                <TableHead>Changed By</TableHead>
+                <TableHead>Field</TableHead>
+                <TableHead>Change</TableHead>
+                <TableHead>Notes</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {records.map((record) => (
+                <TableRow key={record.id}>
+                  <TableCell>
+                    {format(new Date(record.created_at), "h:mm a")}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <History className="h-4 w-4" />
+                      <span>
+                        {record.profiles?.first_name} {record.profiles?.last_name}
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="capitalize">
+                    {record.field_name.replace(/_/g, " ")}
+                  </TableCell>
+                  <TableCell>{getChangeDescription(record)}</TableCell>
+                  <TableCell>{record.notes || "-"}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ))}
     </div>
   );
 }

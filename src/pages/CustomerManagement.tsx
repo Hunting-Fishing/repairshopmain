@@ -24,7 +24,15 @@ export function CustomerManagement() {
 
       let query = supabase
         .from("customers")
-        .select("*")
+        .select(`
+          *,
+          customer_analytics (
+            total_spend,
+            total_repair_jobs,
+            average_rating,
+            loyalty_points
+          )
+        `)
         .order("created_at", { ascending: false });
 
       if (searchQuery) {
@@ -52,9 +60,9 @@ export function CustomerManagement() {
     }
 
     const csvContent = "data:text/csv;charset=utf-8," + 
-      "First Name,Last Name,Email,Phone,Address\n" +
+      "First Name,Last Name,Email,Phone,Address,Status,Total Spend,Loyalty Points\n" +
       customers.map(c => 
-        `${c.first_name},${c.last_name},${c.email},${c.phone_number},"${c.street_address}, ${c.city}, ${c.state_province}"`
+        `${c.first_name},${c.last_name},${c.email},${c.phone_number},"${c.street_address}, ${c.city}, ${c.state_province}",${c.status},${c.customer_analytics?.[0]?.total_spend || 0},${c.customer_analytics?.[0]?.loyalty_points || 0}`
       ).join("\n");
 
     const encodedUri = encodeURI(csvContent);
@@ -94,7 +102,9 @@ export function CustomerManagement() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space
+
+-y-6">
       <CustomerHeader onNavigateToControl={() => navigate("/customer-management")} />
       <CustomerToolbar
         searchQuery={searchQuery}

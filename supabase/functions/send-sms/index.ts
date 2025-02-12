@@ -73,18 +73,19 @@ serve(async (req) => {
 
     // Record the SMS in the database
     const { data: smsRecord, error: insertError } = await supabaseClient
-      .from('sms_messages')
+      .from('unified_communications')
       .insert({
         organization_id: profile.organization_id,
         customer_id: customerId,
-        template_id: templateId,
-        phone_number: to,
+        type: 'sms',
         content,
-        status: 'sent',
+        status: 'delivered',
         sent_at: new Date().toISOString(),
-        twilio_message_sid: message.sid,
-        metadata,
-        created_by: user.id,
+        metadata: {
+          ...metadata,
+          twilio_message_sid: message.sid
+        },
+        sender_id: user.id,
       })
       .select()
       .single();

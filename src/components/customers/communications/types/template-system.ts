@@ -1,4 +1,6 @@
 
+import type { EmailTemplate } from "../types";
+
 export interface TemplateVersion {
   id: string;
   template_id: string;

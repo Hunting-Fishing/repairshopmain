@@ -3662,14 +3662,19 @@ export type Database = {
       }
       scheduled_communications: {
         Row: {
+          analytics_data: Json | null
+          batch_id: string | null
           content: string
           created_at: string | null
           created_by: string
           customer_id: string
           error_message: string | null
           id: string
+          last_run_date: string | null
           metadata: Json | null
+          next_scheduled_date: string | null
           organization_id: string
+          recurrence_pattern: Json | null
           scheduled_for: string
           sent_at: string | null
           status:
@@ -3680,14 +3685,19 @@ export type Database = {
           type: string
         }
         Insert: {
+          analytics_data?: Json | null
+          batch_id?: string | null
           content: string
           created_at?: string | null
           created_by: string
           customer_id: string
           error_message?: string | null
           id?: string
+          last_run_date?: string | null
           metadata?: Json | null
+          next_scheduled_date?: string | null
           organization_id: string
+          recurrence_pattern?: Json | null
           scheduled_for: string
           sent_at?: string | null
           status?:
@@ -3698,14 +3708,19 @@ export type Database = {
           type: string
         }
         Update: {
+          analytics_data?: Json | null
+          batch_id?: string | null
           content?: string
           created_at?: string | null
           created_by?: string
           customer_id?: string
           error_message?: string | null
           id?: string
+          last_run_date?: string | null
           metadata?: Json | null
+          next_scheduled_date?: string | null
           organization_id?: string
+          recurrence_pattern?: Json | null
           scheduled_for?: string
           sent_at?: string | null
           status?:

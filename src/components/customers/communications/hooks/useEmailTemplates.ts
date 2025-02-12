@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { EmailTemplate } from "../types";
+import type { EmailTemplate, EmailTemplateCategory } from "../types";
 import { toast } from "sonner";
 
 export function useEmailTemplates() {
@@ -17,6 +17,19 @@ export function useEmailTemplates() {
 
       if (error) throw error;
       return data as EmailTemplate[];
+    },
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['email-template-categories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('email_template_categories')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+      return data as EmailTemplateCategory[];
     },
   });
 
@@ -65,6 +78,7 @@ export function useEmailTemplates() {
 
   return {
     templates,
+    categories,
     isLoading,
     createTemplate,
     updateTemplate,

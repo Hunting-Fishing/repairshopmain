@@ -66,3 +66,12 @@ export interface TemplateVariable {
   description: string;
   example: string;
 }
+
+export interface EmailTemplateCategory {
+  id: string;
+  name: string;
+  description?: string;
+  organization_id: string;
+  created_at: string;
+  updated_at: string;
+}

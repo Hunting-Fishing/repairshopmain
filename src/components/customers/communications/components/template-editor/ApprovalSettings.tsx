@@ -3,8 +3,15 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, AlertCircle, Users } from "lucide-react";
 import type { ApprovalStatus } from "../../types/template-system";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ApprovalSettingsProps {
   approvalRequired: boolean;
@@ -15,6 +22,8 @@ interface ApprovalSettingsProps {
   approvedAt?: string;
   reviewRequestedBy?: string;
   reviewRequestedAt?: string;
+  approvalLevel?: "primary" | "secondary" | "final";
+  onApprovalLevelChange?: (level: "primary" | "secondary" | "final") => void;
 }
 
 export function ApprovalSettings({
@@ -26,6 +35,8 @@ export function ApprovalSettings({
   approvedAt,
   reviewRequestedBy,
   reviewRequestedAt,
+  approvalLevel = "primary",
+  onApprovalLevelChange,
 }: ApprovalSettingsProps) {
   const getStatusBadge = () => {
     switch (approvalStatus) {
@@ -78,6 +89,40 @@ export function ApprovalSettings({
         />
       </div>
 
+      {approvalRequired && (
+        <div className="space-y-2 border-t pt-2">
+          <Label htmlFor="approval_level">Approval Level Required</Label>
+          <Select 
+            value={approvalLevel} 
+            onValueChange={onApprovalLevelChange}
+          >
+            <SelectTrigger id="approval_level" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="primary">
+                <div className="flex items-center">
+                  <Users className="w-4 h-4 mr-2" />
+                  Primary Approval
+                </div>
+              </SelectItem>
+              <SelectItem value="secondary">
+                <div className="flex items-center">
+                  <Users className="w-4 h-4 mr-2" />
+                  Secondary Approval
+                </div>
+              </SelectItem>
+              <SelectItem value="final">
+                <div className="flex items-center">
+                  <Users className="w-4 h-4 mr-2" />
+                  Final Approval
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Current Status</span>
@@ -95,17 +140,17 @@ export function ApprovalSettings({
           </Button>
         )}
 
-        {approvalStatus === "pending_review" && (
+        {approvalStatus === "pending_review" && reviewRequestedBy && reviewRequestedAt && (
           <div className="text-sm text-muted-foreground">
             Review requested by {reviewRequestedBy} on{" "}
-            {new Date(reviewRequestedAt!).toLocaleDateString()}
+            {new Date(reviewRequestedAt).toLocaleDateString()}
           </div>
         )}
 
-        {approvalStatus === "approved" && (
+        {approvalStatus === "approved" && approvedBy && approvedAt && (
           <div className="text-sm text-muted-foreground">
             Approved by {approvedBy} on{" "}
-            {new Date(approvedAt!).toLocaleDateString()}
+            {new Date(approvedAt).toLocaleDateString()}
           </div>
         )}
       </div>

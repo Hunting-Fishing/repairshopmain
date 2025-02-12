@@ -3696,6 +3696,115 @@ export type Database = {
           },
         ]
       }
+      sms_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          customer_id: string | null
+          delivered_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          organization_id: string
+          phone_number: string
+          sent_at: string | null
+          status: Database["public"]["Enums"]["sms_status"] | null
+          template_id: string | null
+          twilio_message_sid: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          phone_number: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["sms_status"] | null
+          template_id?: string | null
+          twilio_message_sid?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          phone_number?: string
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["sms_status"] | null
+          template_id?: string | null
+          twilio_message_sid?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_messages_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_messages_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "sms_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sms_templates: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          organization_id: string
+          updated_at: string | null
+          variables: Json | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          organization_id: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          organization_id?: string
+          updated_at?: string | null
+          variables?: Json | null
+        }
+        Relationships: []
+      }
       staff_certification_reminders: {
         Row: {
           certification_id: string | null
@@ -5810,6 +5919,7 @@ export type Database = {
         | "diagnostic"
         | "inspection"
         | "custom"
+      sms_status: "pending" | "sent" | "failed" | "delivered"
       time_off_status: "pending" | "approved" | "rejected"
       time_off_type: "vacation" | "sick" | "personal" | "training"
       unit_of_measure:

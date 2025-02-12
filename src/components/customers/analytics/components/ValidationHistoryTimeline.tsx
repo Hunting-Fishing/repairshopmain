@@ -10,6 +10,20 @@ interface ValidationHistoryTimelineProps {
 }
 
 export function ValidationHistoryTimeline({ customerId }: ValidationHistoryTimelineProps) {
+  const { data: analytics } = useQuery({
+    queryKey: ['customer-analytics', customerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('customer_analytics')
+        .select('*')
+        .eq('customer_id', customerId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
   const { data: validationLogs } = useQuery({
     queryKey: ['validation-logs', customerId],
     queryFn: async () => {
@@ -28,6 +42,28 @@ export function ValidationHistoryTimeline({ customerId }: ValidationHistoryTimel
     <Card>
       <CardHeader>
         <CardTitle className="text-lg font-semibold">Validation History</CardTitle>
+        {analytics && (
+          <div className="grid grid-cols-2 gap-4 mt-2 text-sm">
+            <div>
+              <p className="text-muted-foreground">Success Rate</p>
+              <p className="font-medium">{analytics.validation_success_rate?.toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Total Validations</p>
+              <p className="font-medium">{analytics.total_validations}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Pending Validations</p>
+              <p className="font-medium">{analytics.pending_validations}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Last Validation</p>
+              <p className="font-medium">
+                {analytics.last_validation_date ? new Date(analytics.last_validation_date).toLocaleDateString() : 'Never'}
+              </p>
+            </div>
+          </div>
+        )}
       </CardHeader>
       <CardContent className="space-y-4">
         {validationLogs?.map((log) => (

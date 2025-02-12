@@ -14,11 +14,13 @@ export function useCustomerFormData({ initialData }: { initialData?: any }) {
       state_province: "",
       postal_code: "",
       country: "",
-      notes: "",
-      vehicle_make: "",
-      vehicle_model: "",
-      vehicle_year: "",
       customer_type: "Personal",
+      language_preference: "en",
+      marketing_preferences: {
+        email: false,
+        sms: false,
+        phone: false
+      }
     },
   });
 

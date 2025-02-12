@@ -6,6 +6,7 @@ import { CustomerFormValues } from "../types/customerTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BusinessFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -21,7 +22,7 @@ export const BusinessFormFields = ({ form, isModernTheme = false }: BusinessForm
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700 font-medium";
 
-  const { data: classifications } = useQuery({
+  const { data: classifications, isLoading } = useQuery({
     queryKey: ['business-classifications'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -41,6 +42,15 @@ export const BusinessFormFields = ({ form, isModernTheme = false }: BusinessForm
     "201-500 employees",
     "501+ employees"
   ];
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

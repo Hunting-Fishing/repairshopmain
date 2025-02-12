@@ -5,6 +5,11 @@ import { CustomerFormValues } from "../types/customerTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { useState } from "react";
 
 interface CommunicationPreferencesProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -12,6 +17,7 @@ interface CommunicationPreferencesProps {
 }
 
 export const CommunicationPreferences = ({ form, isModernTheme = false }: CommunicationPreferencesProps) => {
+  const [open, setOpen] = useState(false);
   const labelClasses = isModernTheme
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700 font-medium";
@@ -79,20 +85,52 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
         render={({ field }) => (
           <FormItem>
             <FormLabel className={labelClasses}>Timezone</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select timezone" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {timezones.map((tz) => (
-                  <SelectItem key={tz} value={tz}>
-                    {tz}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className={cn(
+                      "w-full justify-between",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value
+                      ? timezones.find((timezone) => timezone === field.value)
+                      : "Select timezone..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-[400px] p-0">
+                <Command>
+                  <CommandInput placeholder="Search timezone..." />
+                  <CommandEmpty>No timezone found.</CommandEmpty>
+                  <CommandGroup className="max-h-[300px] overflow-y-auto">
+                    {timezones.map((timezone) => (
+                      <CommandItem
+                        value={timezone}
+                        key={timezone}
+                        onSelect={() => {
+                          field.onChange(timezone);
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            field.value === timezone ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {timezone}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
             <FormMessage />
           </FormItem>
         )}

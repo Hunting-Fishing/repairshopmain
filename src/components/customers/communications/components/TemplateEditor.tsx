@@ -151,6 +151,8 @@ export function TemplateEditor({
           />
 
           <ApprovalSettings
+            templateId={template?.id || ""}
+            categoryId={categoryId}
             approvalRequired={approvalRequired}
             setApprovalRequired={setApprovalRequired}
             approvalStatus={approvalStatus}

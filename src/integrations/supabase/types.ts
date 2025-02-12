@@ -2288,6 +2288,7 @@ export type Database = {
           updated_by: string | null
           variables: Json | null
           version: number | null
+          version_number: number | null
         }
         Insert: {
           approval_denied_reason?: string | null
@@ -2320,6 +2321,7 @@ export type Database = {
           updated_by?: string | null
           variables?: Json | null
           version?: number | null
+          version_number?: number | null
         }
         Update: {
           approval_denied_reason?: string | null
@@ -2352,6 +2354,7 @@ export type Database = {
           updated_by?: string | null
           variables?: Json | null
           version?: number | null
+          version_number?: number | null
         }
         Relationships: [
           {

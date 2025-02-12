@@ -11,7 +11,7 @@ export function useTemplateVersions(templateId: string) {
     queryKey: ["template-versions", templateId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("template_versions")
+        .from("email_template_versions")
         .select("*")
         .eq("template_id", templateId)
         .order("version_number", { ascending: false });

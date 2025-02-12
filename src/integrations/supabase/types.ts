@@ -2264,6 +2264,8 @@ export type Database = {
           created_by: string
           id: string
           is_default: boolean | null
+          last_modified_at: string | null
+          last_modified_by: string | null
           name: string
           organization_id: string
           status: string | null
@@ -2271,6 +2273,7 @@ export type Database = {
           updated_at: string | null
           updated_by: string | null
           variables: Json | null
+          version: number | null
         }
         Insert: {
           category_id?: string | null
@@ -2279,6 +2282,8 @@ export type Database = {
           created_by: string
           id?: string
           is_default?: boolean | null
+          last_modified_at?: string | null
+          last_modified_by?: string | null
           name: string
           organization_id: string
           status?: string | null
@@ -2286,6 +2291,7 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           variables?: Json | null
+          version?: number | null
         }
         Update: {
           category_id?: string | null
@@ -2294,6 +2300,8 @@ export type Database = {
           created_by?: string
           id?: string
           is_default?: boolean | null
+          last_modified_at?: string | null
+          last_modified_by?: string | null
           name?: string
           organization_id?: string
           status?: string | null
@@ -2301,6 +2309,7 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           variables?: Json | null
+          version?: number | null
         }
         Relationships: [
           {
@@ -2313,6 +2322,13 @@ export type Database = {
           {
             foreignKeyName: "email_templates_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_templates_last_modified_by_fkey"
+            columns: ["last_modified_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]

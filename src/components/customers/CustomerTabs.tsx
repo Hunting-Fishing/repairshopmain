@@ -11,6 +11,7 @@ import { CustomerSegments } from "./segments/CustomerSegments";
 import { LoyaltyTab } from "./loyalty/LoyaltyTab";
 import { CustomerForm } from "./CustomerForm";
 import { HistoryTab } from "./settings/HistoryTab";
+import { CustomerAnalyticsDashboard } from "./analytics/CustomerAnalyticsDashboard";
 import { useState } from "react";
 import { Vehicle } from "./vehicles/types";
 import { Badge } from "@/components/ui/badge";
@@ -76,7 +77,7 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-11">
+        <TabsList className="grid w-full grid-cols-12">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
           <TabsTrigger value="repair-jobs">Repair Jobs</TabsTrigger>
@@ -87,6 +88,7 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
           <TabsTrigger value="payments">Payments</TabsTrigger>
           <TabsTrigger value="inspections">Inspections</TabsTrigger>
           <TabsTrigger value="loyalty">Loyalty</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
@@ -147,6 +149,12 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
         <TabsContent value="loyalty">
           <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
             <LoyaltyTab />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm p-6">
+            <CustomerAnalyticsDashboard customerId={customerId} />
           </div>
         </TabsContent>
 

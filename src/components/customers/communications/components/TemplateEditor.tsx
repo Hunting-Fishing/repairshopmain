@@ -15,6 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { TemplateBasicInfo } from "./template-editor/TemplateBasicInfo";
 import { ContentEditor } from "./template-editor/ContentEditor";
 import { NotificationSettings } from "./template-editor/NotificationSettings";
+import { ApprovalSettings } from "./template-editor/ApprovalSettings";
+import { toast } from "sonner";
 
 interface TemplateEditorProps {
   open: boolean;
@@ -41,8 +43,37 @@ export function TemplateEditor({
   const [selectedRecipients, setSelectedRecipients] = useState<string[]>(
     template?.notification_recipients?.map((r) => r.recipient_id) || []
   );
+  const [approvalRequired, setApprovalRequired] = useState(
+    template?.approval_required || false
+  );
+  const [approvalStatus, setApprovalStatus] = useState(
+    template?.approval_status || "draft"
+  );
   const { session } = useAuth();
   const { categories, createTemplate, updateTemplate } = useEmailTemplates();
+
+  const handleRequestApproval = async () => {
+    if (!template?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('email_templates')
+        .update({
+          approval_status: 'pending_review',
+          review_requested_at: new Date().toISOString(),
+          review_requested_by: session?.user?.id,
+        })
+        .eq('id', template.id);
+
+      if (error) throw error;
+      
+      setApprovalStatus('pending_review');
+      toast.success("Approval request submitted successfully");
+    } catch (error) {
+      console.error("Error requesting approval:", error);
+      toast.error("Failed to request approval");
+    }
+  };
 
   const handleSubmit = async () => {
     try {
@@ -68,9 +99,8 @@ export function TemplateEditor({
         organization_id: profile.organization_id,
         notification_settings: notificationSettings,
         notification_recipients: selectedRecipients.map(id => ({ recipient_id: id })),
-        // Add the required approval fields
-        approval_status: 'draft' as const,
-        approval_required: false,
+        approval_status: approvalStatus,
+        approval_required: approvalRequired,
       };
 
       if (template) {
@@ -119,6 +149,17 @@ export function TemplateEditor({
             notificationSettings={notificationSettings}
             setNotificationSettings={setNotificationSettings}
           />
+
+          <ApprovalSettings
+            approvalRequired={approvalRequired}
+            setApprovalRequired={setApprovalRequired}
+            approvalStatus={approvalStatus}
+            onRequestApproval={handleRequestApproval}
+            approvedBy={template?.approved_by}
+            approvedAt={template?.approved_at}
+            reviewRequestedBy={template?.review_requested_by}
+            reviewRequestedAt={template?.review_requested_at}
+          />
         </div>
 
         <DialogFooter className="gap-2">
@@ -136,7 +177,7 @@ export function TemplateEditor({
               setStatus("active");
               handleSubmit();
             }}
-            disabled={!name || !subject || !content}
+            disabled={!name || !subject || !content || (approvalRequired && approvalStatus !== 'approved')}
           >
             {template ? "Update" : "Create"} Template
           </Button>

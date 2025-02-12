@@ -41,3 +41,17 @@ export interface TemplateTagAssignment {
   tag_id: string;
   created_at: string;
 }
+
+export interface TemplateFilters {
+  searchQuery: string;
+  categories: string[];
+  tags: string[];
+  status: 'all' | 'active' | 'archived';
+  dateRange?: {
+    from: Date;
+    to: Date;
+  };
+  sortBy: 'name' | 'created_at' | 'updated_at' | 'last_used';
+  sortOrder: 'asc' | 'desc';
+}
+

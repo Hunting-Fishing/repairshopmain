@@ -2258,18 +2258,22 @@ export type Database = {
       }
       email_templates: {
         Row: {
+          archived_by: string | null
           category_id: string | null
           content: string
           created_at: string | null
           created_by: string
           id: string
+          is_archived: boolean | null
           is_default: boolean | null
+          last_archive_date: string | null
           last_modified_at: string | null
           last_modified_by: string | null
           name: string
           notification_recipients: Json | null
           notification_settings: Json | null
           organization_id: string
+          search_tags: string[] | null
           status: string | null
           subject: string
           updated_at: string | null
@@ -2278,18 +2282,22 @@ export type Database = {
           version: number | null
         }
         Insert: {
+          archived_by?: string | null
           category_id?: string | null
           content: string
           created_at?: string | null
           created_by: string
           id?: string
+          is_archived?: boolean | null
           is_default?: boolean | null
+          last_archive_date?: string | null
           last_modified_at?: string | null
           last_modified_by?: string | null
           name: string
           notification_recipients?: Json | null
           notification_settings?: Json | null
           organization_id: string
+          search_tags?: string[] | null
           status?: string | null
           subject: string
           updated_at?: string | null
@@ -2298,18 +2306,22 @@ export type Database = {
           version?: number | null
         }
         Update: {
+          archived_by?: string | null
           category_id?: string | null
           content?: string
           created_at?: string | null
           created_by?: string
           id?: string
+          is_archived?: boolean | null
           is_default?: boolean | null
+          last_archive_date?: string | null
           last_modified_at?: string | null
           last_modified_by?: string | null
           name?: string
           notification_recipients?: Json | null
           notification_settings?: Json | null
           organization_id?: string
+          search_tags?: string[] | null
           status?: string | null
           subject?: string
           updated_at?: string | null
@@ -6399,6 +6411,7 @@ export type Database = {
         | "failed"
         | "cancelled"
       sms_status: "pending" | "sent" | "failed" | "delivered"
+      template_sort_option: "name" | "created_at" | "updated_at" | "last_used"
       time_off_status: "pending" | "approved" | "rejected"
       time_off_type: "vacation" | "sick" | "personal" | "training"
       unit_of_measure:

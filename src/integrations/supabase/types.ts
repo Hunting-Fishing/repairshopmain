@@ -3625,6 +3625,85 @@ export type Database = {
           },
         ]
       }
+      scheduled_communications: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string
+          customer_id: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          organization_id: string
+          scheduled_for: string
+          sent_at: string | null
+          status:
+            | Database["public"]["Enums"]["scheduled_communication_status"]
+            | null
+          subject: string | null
+          template_id: string | null
+          type: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by: string
+          customer_id: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          scheduled_for: string
+          sent_at?: string | null
+          status?:
+            | Database["public"]["Enums"]["scheduled_communication_status"]
+            | null
+          subject?: string | null
+          template_id?: string | null
+          type: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          customer_id?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?:
+            | Database["public"]["Enums"]["scheduled_communication_status"]
+            | null
+          subject?: string | null
+          template_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "fk_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_communications_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       skill_assessment_history: {
         Row: {
           assessment_id: string | null
@@ -6084,6 +6163,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      process_scheduled_communications: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       reset_staff_password: {
         Args: {
           staff_id: string
@@ -6176,6 +6259,11 @@ export type Database = {
         | "diagnostic"
         | "inspection"
         | "custom"
+      scheduled_communication_status:
+        | "pending"
+        | "sent"
+        | "failed"
+        | "cancelled"
       sms_status: "pending" | "sent" | "failed" | "delivered"
       time_off_status: "pending" | "approved" | "rejected"
       time_off_type: "vacation" | "sick" | "personal" | "training"

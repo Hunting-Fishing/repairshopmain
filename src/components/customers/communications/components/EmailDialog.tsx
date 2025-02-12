@@ -3,6 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+import { CalendarIcon } from "lucide-react";
 import { Mail } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -11,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { RichTextEditor } from "./RichTextEditor";
 import { TemplateSelectionDialog } from "./TemplateSelectionDialog";
 import { useState } from "react";
+import { format } from "date-fns";
 import type { EmailTemplate } from "../types";
 
 interface EmailDialogProps {
@@ -30,36 +35,61 @@ export function EmailDialog({ customerId, customerEmail, isOpen, onOpenChange }:
   const queryClient = useQueryClient();
   const form = useForm<SendEmailFormData>();
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  const [isScheduled, setIsScheduled] = useState(false);
+  const [scheduledDate, setScheduledDate] = useState<Date>();
 
   const sendEmailMutation = useMutation({
     mutationFn: async (data: SendEmailFormData) => {
-      const response = await supabase.functions.invoke('send-email', {
-        body: {
-          to: data.to,
-          subject: data.subject,
-          content: data.content,
-          customerId,
-        },
-      });
+      if (isScheduled && scheduledDate) {
+        // Schedule the email
+        const { error } = await supabase
+          .from('scheduled_communications')
+          .insert({
+            customer_id: customerId,
+            type: 'email',
+            subject: data.subject,
+            content: data.content,
+            scheduled_for: scheduledDate.toISOString(),
+            created_by: (await supabase.auth.getUser()).data.user?.id,
+          });
 
-      if (response.error) {
-        throw new Error(response.error.message);
+        if (error) throw error;
+        return { scheduled: true };
+      } else {
+        // Send immediately
+        const response = await supabase.functions.invoke('send-email', {
+          body: {
+            to: data.to,
+            subject: data.subject,
+            content: data.content,
+            customerId,
+          },
+        });
+
+        if (response.error) throw response.error;
+        return response.data;
       }
-
-      return response.data;
     },
-    onSuccess: () => {
-      toast.success("Email sent successfully");
+    onSuccess: (data) => {
+      if (data.scheduled) {
+        toast.success("Email scheduled successfully");
+      } else {
+        toast.success("Email sent successfully");
+      }
       onOpenChange(false);
       form.reset();
       queryClient.invalidateQueries({ queryKey: ["communications", customerId] });
     },
     onError: (error) => {
-      toast.error(`Failed to send email: ${error.message}`);
+      toast.error(`Failed to ${isScheduled ? 'schedule' : 'send'} email: ${error.message}`);
     },
   });
 
   const handleSendEmail = form.handleSubmit((data) => {
+    if (isScheduled && !scheduledDate) {
+      toast.error("Please select a date to schedule the email");
+      return;
+    }
     sendEmailMutation.mutate(data);
   });
 
@@ -81,7 +111,7 @@ export function EmailDialog({ customerId, customerEmail, isOpen, onOpenChange }:
           <DialogTitle>Send Email</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSendEmail} className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
             <Button
               type="button"
               variant="outline"
@@ -89,7 +119,41 @@ export function EmailDialog({ customerId, customerEmail, isOpen, onOpenChange }:
             >
               Use Template
             </Button>
+            <div className="flex items-center space-x-2">
+              <Switch
+                checked={isScheduled}
+                onCheckedChange={setIsScheduled}
+                id="schedule-email"
+              />
+              <Label htmlFor="schedule-email">Schedule Email</Label>
+            </div>
           </div>
+
+          {isScheduled && (
+            <div className="flex flex-col space-y-2">
+              <Label>Schedule Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={`w-full justify-start text-left font-normal ${!scheduledDate && "text-muted-foreground"}`}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {scheduledDate ? format(scheduledDate, "PPP") : "Pick a date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={scheduledDate}
+                    onSelect={setScheduledDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="to">To</Label>
             <Input
@@ -126,7 +190,9 @@ export function EmailDialog({ customerId, customerEmail, isOpen, onOpenChange }:
             className="w-full"
             disabled={sendEmailMutation.isPending}
           >
-            {sendEmailMutation.isPending ? "Sending..." : "Send Email"}
+            {sendEmailMutation.isPending 
+              ? (isScheduled ? "Scheduling..." : "Sending...") 
+              : (isScheduled ? "Schedule Email" : "Send Email")}
           </Button>
         </form>
       </DialogContent>

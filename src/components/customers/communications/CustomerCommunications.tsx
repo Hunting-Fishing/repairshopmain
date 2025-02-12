@@ -4,6 +4,7 @@ import { CommunicationHeader } from "./components/CommunicationHeader";
 import { CommunicationList } from "./components/CommunicationList";
 import { useCommunications } from "./hooks/useCommunications";
 import { useCustomer } from "./hooks/useCustomer";
+import type { CommunicationsFilter, CommunicationSort } from "./types";
 
 interface CustomerCommunicationsProps {
   customerId: string;
@@ -11,10 +12,19 @@ interface CustomerCommunicationsProps {
 
 export function CustomerCommunications({ customerId }: CustomerCommunicationsProps) {
   const [isSMSDialogOpen, setIsSMSDialogOpen] = useState(false);
-  const { data: communications, isLoading } = useCommunications(customerId);
-  const { data: customer } = useCustomer(customerId);
+  const [page, setPage] = useState(1);
+  const [filter, setFilter] = useState<CommunicationsFilter>({});
+  const [sort, setSort] = useState<CommunicationSort>({ field: 'sent_at', direction: 'desc' });
 
-  if (isLoading) return <div>Loading communications...</div>;
+  const { data: communications, isLoading } = useCommunications({
+    customerId,
+    filter,
+    sort,
+    page,
+    pageSize: 10
+  });
+
+  const { data: customer } = useCustomer(customerId);
 
   return (
     <div className="space-y-4">
@@ -24,7 +34,16 @@ export function CustomerCommunications({ customerId }: CustomerCommunicationsPro
         isSMSDialogOpen={isSMSDialogOpen}
         setIsSMSDialogOpen={setIsSMSDialogOpen}
       />
-      <CommunicationList communications={communications!} />
+      <CommunicationList
+        communications={communications?.communications ?? []}
+        isLoading={isLoading}
+        total={communications?.total ?? 0}
+        page={page}
+        pageSize={10}
+        onPageChange={setPage}
+        onFilterChange={setFilter}
+        onSortChange={setSort}
+      />
     </div>
   );
 }

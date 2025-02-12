@@ -4,11 +4,12 @@ export interface Communication {
   type: 'email' | 'sms' | 'docusign' | 'notification';
   content: string;
   sent_at: string;
-  status?: 'delivered' | 'failed' | 'pending';
+  status: 'delivered' | 'failed' | 'pending';
   sender?: {
     first_name: string;
     last_name: string;
   };
+  metadata?: Record<string, any>;
 }
 
 export interface Customer {
@@ -17,4 +18,18 @@ export interface Customer {
   first_name: string;
   last_name: string;
   email?: string;
+}
+
+export interface CommunicationsFilter {
+  type?: Communication['type'];
+  status?: Communication['status'];
+  dateRange?: {
+    from: Date;
+    to: Date;
+  };
+}
+
+export interface CommunicationSort {
+  field: 'sent_at' | 'type' | 'status';
+  direction: 'asc' | 'desc';
 }

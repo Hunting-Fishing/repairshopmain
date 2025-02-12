@@ -1,34 +1,62 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { Communication } from "../types";
+import type { Communication, CommunicationsFilter, CommunicationSort } from "../types";
 
-export function useCommunications(customerId: string) {
+interface UseCommunicationsProps {
+  customerId: string;
+  filter?: CommunicationsFilter;
+  sort?: CommunicationSort;
+  page?: number;
+  pageSize?: number;
+}
+
+export function useCommunications({ 
+  customerId,
+  filter,
+  sort = { field: 'sent_at', direction: 'desc' },
+  page = 1,
+  pageSize = 10
+}: UseCommunicationsProps) {
   return useQuery({
-    queryKey: ["communications", customerId],
+    queryKey: ["communications", customerId, filter, sort, page, pageSize],
     queryFn: async () => {
-      const [messagesResponse, smsResponse] = await Promise.all([
-        supabase
-          .from("customer_communications")
-          .select(`
-            *,
-            sender:profiles(first_name, last_name)
-          `)
-          .eq("customer_id", customerId)
-          .order("sent_at", { ascending: false }),
-        supabase
-          .from("sms_messages")
-          .select("*")
-          .eq("customer_id", customerId)
-          .order("sent_at", { ascending: false })
-      ]);
+      let query = supabase
+        .from("unified_communications")
+        .select(`
+          *,
+          sender:profiles(first_name, last_name)
+        `)
+        .eq("customer_id", customerId);
 
-      if (messagesResponse.error) throw messagesResponse.error;
-      if (smsResponse.error) throw smsResponse.error;
+      // Apply filters
+      if (filter?.type) {
+        query = query.eq("type", filter.type);
+      }
+      if (filter?.status) {
+        query = query.eq("status", filter.status);
+      }
+      if (filter?.dateRange) {
+        query = query
+          .gte("sent_at", filter.dateRange.from.toISOString())
+          .lte("sent_at", filter.dateRange.to.toISOString());
+      }
+
+      // Apply sorting
+      query = query.order(sort.field, { ascending: sort.direction === 'asc' });
+
+      // Apply pagination
+      query = query
+        .range((page - 1) * pageSize, page * pageSize - 1);
+
+      const { data, error, count } = await query.select('*', { count: 'exact' });
+
+      if (error) throw error;
 
       return {
-        messages: messagesResponse.data as Communication[],
-        sms: smsResponse.data as Communication[]
+        communications: data as Communication[],
+        total: count ?? 0,
+        pageCount: Math.ceil((count ?? 0) / pageSize)
       };
     },
   });

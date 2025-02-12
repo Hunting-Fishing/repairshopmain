@@ -5337,6 +5337,77 @@ export type Database = {
           },
         ]
       }
+      unified_communications: {
+        Row: {
+          content: string
+          created_at: string | null
+          customer_id: string
+          id: string
+          metadata: Json | null
+          organization_id: string
+          sender_id: string | null
+          sent_at: string
+          status: Database["public"]["Enums"]["communication_status"]
+          type: Database["public"]["Enums"]["communication_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          sender_id?: string | null
+          sent_at?: string
+          status?: Database["public"]["Enums"]["communication_status"]
+          type: Database["public"]["Enums"]["communication_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          sender_id?: string | null
+          sent_at?: string
+          status?: Database["public"]["Enums"]["communication_status"]
+          type?: Database["public"]["Enums"]["communication_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unified_communications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "unified_communications_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unified_communications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unified_communications_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -5893,6 +5964,8 @@ export type Database = {
         | "it"
         | "training"
         | "events"
+      communication_status: "delivered" | "failed" | "pending"
+      communication_type: "email" | "sms" | "docusign" | "notification"
       dashboard_view_mode: "calendar" | "grid" | "list"
       demo_data_type: "work_order" | "booking" | "customer" | "vehicle"
       inventory_change_type:

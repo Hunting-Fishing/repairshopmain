@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -43,7 +44,23 @@ export function useTemplateApprovers() {
         `);
 
       if (error) throw error;
-      return data as TemplateApprover[];
+      
+      // Transform the data to match our interface
+      return (data || []).map((item: any) => ({
+        id: item.id,
+        user_id: item.user_id,
+        organization_id: item.organization_id,
+        can_approve_all: Boolean(item.can_approve_all),
+        category_ids: Array.isArray(item.category_ids) ? item.category_ids : [],
+        allowed_approval_levels: Array.isArray(item.allowed_approval_levels) ? item.allowed_approval_levels : [],
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        profiles: item.profiles ? {
+          first_name: String(item.profiles.first_name || ''),
+          last_name: String(item.profiles.last_name || ''),
+          email: String(item.profiles.email || '')
+        } : undefined
+      })) as TemplateApprover[];
     },
   });
 

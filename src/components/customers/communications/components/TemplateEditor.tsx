@@ -38,6 +38,9 @@ export function TemplateEditor({
       notify_on_error: true,
     }
   );
+  const [selectedRecipients, setSelectedRecipients] = useState<string[]>(
+    template?.notification_recipients?.map((r) => r.recipient_id) || []
+  );
   const { session } = useAuth();
   const { categories, createTemplate, updateTemplate } = useEmailTemplates();
 
@@ -63,7 +66,7 @@ export function TemplateEditor({
         is_default: false,
         organization_id: profile.organization_id,
         notification_settings: notificationSettings,
-        notification_recipients: [],
+        notification_recipients: selectedRecipients.map(id => ({ recipient_id: id })),
       };
 
       if (template) {
@@ -103,6 +106,9 @@ export function TemplateEditor({
           <ContentEditor
             content={content}
             setContent={setContent}
+            templateId={template?.id}
+            selectedRecipients={selectedRecipients}
+            onRecipientsChange={setSelectedRecipients}
           />
 
           <NotificationSettings

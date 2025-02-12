@@ -64,6 +64,7 @@ export function TemplateEditor({
         status,
         variables: [],
         is_default: false,
+        is_archived: false, // Add the missing property
         organization_id: profile.organization_id,
         notification_settings: notificationSettings,
         notification_recipients: selectedRecipients.map(id => ({ recipient_id: id })),

@@ -1,6 +1,4 @@
 
-import type { EmailTemplate } from "../types";
-
 export interface TemplateVersion {
   id: string;
   template_id: string;
@@ -49,9 +47,8 @@ export interface TemplateFilters {
   status: 'all' | 'active' | 'archived';
   dateRange?: {
     from: Date;
-    to: Date;
+    to?: Date;  // Make 'to' optional to match DateRange type
   };
   sortBy: 'name' | 'created_at' | 'updated_at' | 'last_used';
   sortOrder: 'asc' | 'desc';
 }
-

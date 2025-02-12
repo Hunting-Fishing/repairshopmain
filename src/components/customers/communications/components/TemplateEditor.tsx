@@ -64,10 +64,13 @@ export function TemplateEditor({
         status,
         variables: [],
         is_default: false,
-        is_archived: false, // Add the missing property
+        is_archived: false,
         organization_id: profile.organization_id,
         notification_settings: notificationSettings,
         notification_recipients: selectedRecipients.map(id => ({ recipient_id: id })),
+        // Add the required approval fields
+        approval_status: 'draft' as const,
+        approval_required: false,
       };
 
       if (template) {

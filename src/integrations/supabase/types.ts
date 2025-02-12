@@ -5710,8 +5710,6 @@ export type Database = {
           organization_id: string
           sender_id: string | null
           sent_at: string
-          status: Database["public"]["Enums"]["communication_status"]
-          type: Database["public"]["Enums"]["communication_type"]
           updated_at: string | null
         }
         Insert: {
@@ -5723,8 +5721,6 @@ export type Database = {
           organization_id: string
           sender_id?: string | null
           sent_at?: string
-          status?: Database["public"]["Enums"]["communication_status"]
-          type: Database["public"]["Enums"]["communication_type"]
           updated_at?: string | null
         }
         Update: {
@@ -5736,8 +5732,6 @@ export type Database = {
           organization_id?: string
           sender_id?: string | null
           sent_at?: string
-          status?: Database["public"]["Enums"]["communication_status"]
-          type?: Database["public"]["Enums"]["communication_type"]
           updated_at?: string | null
         }
         Relationships: [
@@ -6377,8 +6371,13 @@ export type Database = {
         | "it"
         | "training"
         | "events"
-      communication_status: "delivered" | "failed" | "pending"
-      communication_type: "email" | "sms" | "docusign" | "notification"
+      communication_status:
+        | "draft"
+        | "scheduled"
+        | "sent"
+        | "failed"
+        | "cancelled"
+      communication_type: "email" | "sms"
       dashboard_view_mode: "calendar" | "grid" | "list"
       demo_data_type: "work_order" | "booking" | "customer" | "vehicle"
       inventory_change_type:

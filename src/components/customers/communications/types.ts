@@ -33,3 +33,36 @@ export interface CommunicationSort {
   field: 'sent_at' | 'type' | 'status';
   direction: 'asc' | 'desc';
 }
+
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  content: string;
+  variables: string[];
+  category_id?: string;
+  status: 'draft' | 'active' | 'archived';
+  is_default: boolean;
+  created_at: string;
+  updated_at: string;
+  organization_id: string;
+}
+
+export interface EmailTemplateVersion {
+  id: string;
+  template_id: string;
+  version: number;
+  content: string;
+  subject: string;
+  variables: string[];
+  changes_description?: string;
+  created_at: string;
+  created_by: string;
+  organization_id: string;
+}
+
+export interface TemplateVariable {
+  name: string;
+  description: string;
+  example: string;
+}

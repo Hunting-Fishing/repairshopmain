@@ -2150,6 +2150,144 @@ export type Database = {
           },
         ]
       }
+      email_template_versions: {
+        Row: {
+          changes_description: string | null
+          content: string
+          created_at: string | null
+          created_by: string
+          id: string
+          organization_id: string
+          subject: string
+          template_id: string
+          variables: Json | null
+          version: number
+        }
+        Insert: {
+          changes_description?: string | null
+          content: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          organization_id: string
+          subject: string
+          template_id: string
+          variables?: Json | null
+          version: number
+        }
+        Update: {
+          changes_description?: string | null
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          organization_id?: string
+          subject?: string
+          template_id?: string
+          variables?: Json | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_template_versions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_template_versions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_template_versions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          category_id: string | null
+          content: string
+          created_at: string | null
+          created_by: string
+          id: string
+          is_default: boolean | null
+          name: string
+          organization_id: string
+          status: string | null
+          subject: string
+          updated_at: string | null
+          updated_by: string | null
+          variables: Json | null
+        }
+        Insert: {
+          category_id?: string | null
+          content: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_default?: boolean | null
+          name: string
+          organization_id: string
+          status?: string | null
+          subject: string
+          updated_at?: string | null
+          updated_by?: string | null
+          variables?: Json | null
+        }
+        Update: {
+          category_id?: string | null
+          content?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          organization_id?: string
+          status?: string | null
+          subject?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_templates_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "template_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_templates_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_templates_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_templates_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       error_logs: {
         Row: {
           browser_info: Json | null

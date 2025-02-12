@@ -1,6 +1,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Communication } from "../types";
 
 export function useCommunications(customerId: string) {
   return useQuery({
@@ -26,8 +27,8 @@ export function useCommunications(customerId: string) {
       if (smsResponse.error) throw smsResponse.error;
 
       return {
-        messages: messagesResponse.data,
-        sms: smsResponse.data
+        messages: messagesResponse.data as Communication[],
+        sms: smsResponse.data as Communication[]
       };
     },
   });

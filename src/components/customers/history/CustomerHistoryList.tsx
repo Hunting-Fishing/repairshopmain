@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { History, User } from "lucide-react";
@@ -10,6 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface HistoryRecord {
   id: string;
@@ -52,16 +55,47 @@ export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
   });
 
   if (isLoading) {
-    return <div className="text-center py-4">Loading history...</div>;
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <History className="h-4 w-4" />
+          <span>Change History</span>
+        </div>
+        <div className="space-y-2">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (!historyRecords?.length) {
     return (
-      <div className="text-center py-4 text-muted-foreground">
-        No history records found
-      </div>
+      <Alert>
+        <AlertDescription className="flex items-center justify-center py-4 text-muted-foreground">
+          No history records found
+        </AlertDescription>
+      </Alert>
     );
   }
+
+  const getChangeDescription = (record: HistoryRecord) => {
+    if (record.change_type === "create") {
+      return <span className="text-green-600">Created</span>;
+    }
+
+    return (
+      <div className="text-sm">
+        <div className="text-red-600 line-through">
+          {record.old_value || "(empty)"}
+        </div>
+        <div className="text-green-600">
+          {record.new_value || "(empty)"}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -96,22 +130,7 @@ export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
               <TableCell className="capitalize">
                 {record.field_name.replace(/_/g, " ")}
               </TableCell>
-              <TableCell>
-                <div className="text-sm">
-                  {record.change_type === "create" ? (
-                    <span className="text-green-600">Created</span>
-                  ) : (
-                    <>
-                      <div className="text-red-600 line-through">
-                        {record.old_value || "(empty)"}
-                      </div>
-                      <div className="text-green-600">
-                        {record.new_value || "(empty)"}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </TableCell>
+              <TableCell>{getChangeDescription(record)}</TableCell>
               <TableCell>{record.notes || "-"}</TableCell>
             </TableRow>
           ))}

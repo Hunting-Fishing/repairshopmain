@@ -12,12 +12,31 @@ export function useTemplateVersions(templateId: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("email_template_versions")
-        .select("*")
+        .select(`
+          id,
+          template_id,
+          version_number,
+          content,
+          subject,
+          variables,
+          created_at,
+          created_by,
+          organization_id
+        `)
         .eq("template_id", templateId)
         .order("version_number", { ascending: false });
 
       if (error) throw error;
-      return data as TemplateVersion[];
+
+      // Transform the data to match TemplateVersion interface
+      return data.map(version => ({
+        ...version,
+        metadata: {
+          subject: version.subject,
+          name: '', // Will be populated from the template if needed
+          notification_settings: {} // Default empty settings
+        }
+      })) as TemplateVersion[];
     },
     enabled: !!templateId,
   });
@@ -29,9 +48,7 @@ export function useTemplateVersions(templateId: string) {
         .update({
           content: version.content,
           subject: version.metadata.subject,
-          name: version.metadata.name,
-          category_id: version.metadata.category_id,
-          notification_settings: version.metadata.notification_settings,
+          version_number: version.version_number,
         })
         .eq("id", version.template_id)
         .select()

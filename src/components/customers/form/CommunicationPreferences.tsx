@@ -22,7 +22,27 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
     { code: "fr", name: "French" }
   ];
 
-  const timezones = Intl.supportedValuesOf('timeZone');
+  const timezones = [
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "America/Phoenix",
+    "America/Anchorage",
+    "America/Honolulu",
+    "America/Toronto",
+    "America/Vancouver",
+    "Europe/London",
+    "Europe/Paris",
+    "Europe/Berlin",
+    "Europe/Rome",
+    "Europe/Madrid",
+    "Asia/Tokyo",
+    "Asia/Shanghai",
+    "Asia/Singapore",
+    "Australia/Sydney",
+    "Pacific/Auckland"
+  ];
 
   return (
     <div className="space-y-6">

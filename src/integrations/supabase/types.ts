@@ -1513,6 +1513,64 @@ export type Database = {
           },
         ]
       }
+      customer_notes: {
+        Row: {
+          content: string
+          created_at: string | null
+          created_by: string | null
+          customer_id: string | null
+          id: string
+          is_private: boolean | null
+          organization_id: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          id?: string
+          is_private?: boolean | null
+          organization_id?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string | null
+          id?: string
+          is_private?: boolean | null
+          organization_id?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_notes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_notes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_notes_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_payments: {
         Row: {
           amount: number
@@ -1957,6 +2015,7 @@ export type Database = {
           country: string | null
           created_at: string
           created_by: string
+          customer_since: string | null
           customer_type: string
           email: string | null
           first_name: string
@@ -1964,7 +2023,9 @@ export type Database = {
           language_preference: string | null
           last_login: string | null
           last_name: string
+          last_visit_date: string | null
           lifetime_points: number | null
+          lifetime_value: number | null
           loyalty_join_date: string | null
           loyalty_points: number | null
           loyalty_tier: string | null
@@ -1977,7 +2038,9 @@ export type Database = {
           preferred_contact_time: string | null
           secondary_contact: Json | null
           state_province: string | null
+          status: string
           street_address: string | null
+          tags: string[] | null
           timezone: string | null
           total_spend: number | null
           updated_at: string
@@ -1986,6 +2049,7 @@ export type Database = {
           vehicle_model: string | null
           vehicle_vin: string | null
           vehicle_year: string | null
+          visit_count: number | null
         }
         Insert: {
           address_book?: Json | null
@@ -1997,6 +2061,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by: string
+          customer_since?: string | null
           customer_type?: string
           email?: string | null
           first_name: string
@@ -2004,7 +2069,9 @@ export type Database = {
           language_preference?: string | null
           last_login?: string | null
           last_name: string
+          last_visit_date?: string | null
           lifetime_points?: number | null
+          lifetime_value?: number | null
           loyalty_join_date?: string | null
           loyalty_points?: number | null
           loyalty_tier?: string | null
@@ -2017,7 +2084,9 @@ export type Database = {
           preferred_contact_time?: string | null
           secondary_contact?: Json | null
           state_province?: string | null
+          status?: string
           street_address?: string | null
+          tags?: string[] | null
           timezone?: string | null
           total_spend?: number | null
           updated_at?: string
@@ -2026,6 +2095,7 @@ export type Database = {
           vehicle_model?: string | null
           vehicle_vin?: string | null
           vehicle_year?: string | null
+          visit_count?: number | null
         }
         Update: {
           address_book?: Json | null
@@ -2037,6 +2107,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           created_by?: string
+          customer_since?: string | null
           customer_type?: string
           email?: string | null
           first_name?: string
@@ -2044,7 +2115,9 @@ export type Database = {
           language_preference?: string | null
           last_login?: string | null
           last_name?: string
+          last_visit_date?: string | null
           lifetime_points?: number | null
+          lifetime_value?: number | null
           loyalty_join_date?: string | null
           loyalty_points?: number | null
           loyalty_tier?: string | null
@@ -2057,7 +2130,9 @@ export type Database = {
           preferred_contact_time?: string | null
           secondary_contact?: Json | null
           state_province?: string | null
+          status?: string
           street_address?: string | null
+          tags?: string[] | null
           timezone?: string | null
           total_spend?: number | null
           updated_at?: string
@@ -2066,6 +2141,7 @@ export type Database = {
           vehicle_model?: string | null
           vehicle_vin?: string | null
           vehicle_year?: string | null
+          visit_count?: number | null
         }
         Relationships: [
           {
@@ -6231,6 +6307,42 @@ export type Database = {
           total_feedback: number | null
           total_repair_jobs: number | null
           total_spend: number | null
+        }
+        Insert: {
+          average_rating?: never
+          customer_id?: string | null
+          customer_since?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_feedback_date?: never
+          last_name?: string | null
+          last_repair_date?: never
+          loyalty_activities?: never
+          loyalty_points?: never
+          organization_id?: string | null
+          tags?: string[] | null
+          total_documents?: never
+          total_feedback?: never
+          total_repair_jobs?: never
+          total_spend?: number | null
+        }
+        Update: {
+          average_rating?: never
+          customer_id?: string | null
+          customer_since?: string | null
+          email?: string | null
+          first_name?: string | null
+          last_feedback_date?: never
+          last_name?: string | null
+          last_repair_date?: never
+          loyalty_activities?: never
+          loyalty_points?: never
+          organization_id?: string | null
+          tags?: string[] | null
+          total_documents?: never
+          total_feedback?: never
+          total_repair_jobs?: never
+          total_spend?: number | null
         }
         Relationships: [
           {

@@ -2267,6 +2267,8 @@ export type Database = {
           last_modified_at: string | null
           last_modified_by: string | null
           name: string
+          notification_recipients: Json | null
+          notification_settings: Json | null
           organization_id: string
           status: string | null
           subject: string
@@ -2285,6 +2287,8 @@ export type Database = {
           last_modified_at?: string | null
           last_modified_by?: string | null
           name: string
+          notification_recipients?: Json | null
+          notification_settings?: Json | null
           organization_id: string
           status?: string | null
           subject: string
@@ -2303,6 +2307,8 @@ export type Database = {
           last_modified_at?: string | null
           last_modified_by?: string | null
           name?: string
+          notification_recipients?: Json | null
+          notification_settings?: Json | null
           organization_id?: string
           status?: string | null
           subject?: string

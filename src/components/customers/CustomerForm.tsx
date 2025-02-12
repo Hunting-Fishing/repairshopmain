@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormContainer } from "./form/CustomerFormContainer";
 import { CustomerFormValues } from "./types/customerTypes";
 import { useToast } from "@/hooks/use-toast";
+import { validatePhone, validateEmail, validateAddress, logValidationAttempt } from "@/utils/validation";
 
 const formSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
@@ -72,11 +73,78 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
 
   const onSubmit = async (values: CustomerFormValues) => {
     try {
-      const { error } = await supabase
+      // Validate email
+      const emailValidation = await validateEmail(values.email);
+      if (!emailValidation.isValid) {
+        toast({
+          title: "Validation Error",
+          description: emailValidation.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate phone if provided
+      if (values.phone_number) {
+        const phoneValidation = await validatePhone(values.phone_number);
+        if (!phoneValidation.isValid) {
+          toast({
+            title: "Validation Error",
+            description: phoneValidation.message,
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      // Validate address if all fields are provided
+      if (values.street_address && values.city && values.state_province && values.postal_code && values.country) {
+        const addressValidation = await validateAddress(
+          values.street_address,
+          values.city,
+          values.state_province,
+          values.postal_code,
+          values.country
+        );
+        if (!addressValidation.isValid) {
+          toast({
+            title: "Validation Error",
+            description: addressValidation.message,
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      const { data: newCustomer, error } = await supabase
         .from("customers")
-        .insert([values]);
+        .insert([{
+          ...values,
+          email_validation_status: emailValidation.isValid ? 'valid' : 'invalid',
+          phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
+          address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending'
+        }])
+        .select()
+        .single();
 
       if (error) throw error;
+
+      // Log validation attempts
+      await logValidationAttempt(newCustomer.id, 'email', emailValidation.isValid ? 'valid' : 'invalid', emailValidation.message);
+      if (values.phone_number) {
+        const phoneValidation = await validatePhone(values.phone_number);
+        await logValidationAttempt(newCustomer.id, 'phone', phoneValidation.isValid ? 'valid' : 'invalid', phoneValidation.message);
+      }
+      if (values.street_address) {
+        const addressValidation = await validateAddress(
+          values.street_address,
+          values.city,
+          values.state_province,
+          values.postal_code,
+          values.country
+        );
+        await logValidationAttempt(newCustomer.id, 'address', addressValidation.isValid ? 'valid' : 'invalid', addressValidation.message);
+      }
 
       onSuccess();
       toast({

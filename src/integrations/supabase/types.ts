@@ -2004,9 +2004,61 @@ export type Database = {
           },
         ]
       }
+      customer_validation_logs: {
+        Row: {
+          created_at: string | null
+          customer_id: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          organization_id: string
+          status: Database["public"]["Enums"]["validation_status"]
+          validation_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          status: Database["public"]["Enums"]["validation_status"]
+          validation_type: string
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          status?: Database["public"]["Enums"]["validation_status"]
+          validation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_validation_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_validation_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address_book: Json | null
+          address_validation_status:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          address_verified: boolean | null
           auth_id: string | null
           business_classification_id: string | null
           city: string | null
@@ -2018,6 +2070,10 @@ export type Database = {
           customer_since: string | null
           customer_type: string
           email: string | null
+          email_validation_status:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          email_verified: boolean | null
           first_name: string
           id: string
           language_preference: string | null
@@ -2033,6 +2089,10 @@ export type Database = {
           notes: string | null
           organization_id: string
           phone_number: string | null
+          phone_validation_status:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          phone_verified: boolean | null
           portal_access_enabled: boolean | null
           postal_code: string | null
           preferred_contact_time: string | null
@@ -2045,6 +2105,7 @@ export type Database = {
           total_spend: number | null
           updated_at: string
           updated_by: string
+          validation_errors: Json | null
           vehicle_make: string | null
           vehicle_model: string | null
           vehicle_vin: string | null
@@ -2053,6 +2114,10 @@ export type Database = {
         }
         Insert: {
           address_book?: Json | null
+          address_validation_status?:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          address_verified?: boolean | null
           auth_id?: string | null
           business_classification_id?: string | null
           city?: string | null
@@ -2064,6 +2129,10 @@ export type Database = {
           customer_since?: string | null
           customer_type?: string
           email?: string | null
+          email_validation_status?:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          email_verified?: boolean | null
           first_name: string
           id?: string
           language_preference?: string | null
@@ -2079,6 +2148,10 @@ export type Database = {
           notes?: string | null
           organization_id: string
           phone_number?: string | null
+          phone_validation_status?:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          phone_verified?: boolean | null
           portal_access_enabled?: boolean | null
           postal_code?: string | null
           preferred_contact_time?: string | null
@@ -2091,6 +2164,7 @@ export type Database = {
           total_spend?: number | null
           updated_at?: string
           updated_by: string
+          validation_errors?: Json | null
           vehicle_make?: string | null
           vehicle_model?: string | null
           vehicle_vin?: string | null
@@ -2099,6 +2173,10 @@ export type Database = {
         }
         Update: {
           address_book?: Json | null
+          address_validation_status?:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          address_verified?: boolean | null
           auth_id?: string | null
           business_classification_id?: string | null
           city?: string | null
@@ -2110,6 +2188,10 @@ export type Database = {
           customer_since?: string | null
           customer_type?: string
           email?: string | null
+          email_validation_status?:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          email_verified?: boolean | null
           first_name?: string
           id?: string
           language_preference?: string | null
@@ -2125,6 +2207,10 @@ export type Database = {
           notes?: string | null
           organization_id?: string
           phone_number?: string | null
+          phone_validation_status?:
+            | Database["public"]["Enums"]["validation_status"]
+            | null
+          phone_verified?: boolean | null
           portal_access_enabled?: boolean | null
           postal_code?: string | null
           preferred_contact_time?: string | null
@@ -2137,6 +2223,7 @@ export type Database = {
           total_spend?: number | null
           updated_at?: string
           updated_by?: string
+          validation_errors?: Json | null
           vehicle_make?: string | null
           vehicle_model?: string | null
           vehicle_vin?: string | null
@@ -6688,6 +6775,7 @@ export type Database = {
         | "parts"
         | "hr"
         | "custom"
+      validation_status: "pending" | "valid" | "invalid"
     }
     CompositeTypes: {
       [_ in never]: never

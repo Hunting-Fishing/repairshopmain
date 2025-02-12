@@ -6454,6 +6454,7 @@ export type Database = {
         | "service_advisor"
         | "technician"
         | "staff"
+      approver_level: "primary" | "secondary" | "final"
       automotive_category:
         | "Electrical"
         | "Brakes"

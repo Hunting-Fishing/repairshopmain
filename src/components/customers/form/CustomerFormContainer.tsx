@@ -9,6 +9,7 @@ import { CustomerFormFields } from "./CustomerFormFields";
 import { CustomerAddressFields } from "./CustomerAddressFields";
 import { BusinessFormFields } from "./BusinessFormFields";
 import { CommunicationPreferences } from "./CommunicationPreferences";
+import { FormSection } from "./FormSection"; // Add this import
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 import { EditModeAlert } from "./EditModeAlert";

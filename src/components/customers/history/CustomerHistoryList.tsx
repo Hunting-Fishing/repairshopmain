@@ -1,48 +1,16 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { format, parseISO, isSameDay } from "date-fns";
-import { Download, Filter, History, PieChart, User } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { History } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-
-interface HistoryRecord {
-  id: string;
-  changed_by: string;
-  change_type: string;
-  field_name: string;
-  old_value: string | null;
-  new_value: string | null;
-  notes: string | null;
-  created_at: string;
-  profiles: {
-    first_name: string | null;
-    last_name: string | null;
-  };
-}
-
-interface CustomerHistoryListProps {
-  customerId: string;
-}
+import { HistoryFilters } from "./components/HistoryFilters";
+import { HistoryStatistics } from "./components/HistoryStatistics";
+import { HistoryTable } from "./components/HistoryTable";
+import { type CustomerHistoryListProps, type HistoryRecord } from "./types";
 
 export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
   const [filterField, setFilterField] = useState<string>("all");
@@ -132,23 +100,6 @@ export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
     toast.success("History exported successfully");
   };
 
-  const getChangeDescription = (record: HistoryRecord) => {
-    if (record.change_type === "create") {
-      return <span className="text-green-600">Created</span>;
-    }
-
-    return (
-      <div className="text-sm">
-        <div className="text-red-600 line-through">
-          {record.old_value || "(empty)"}
-        </div>
-        <div className="text-green-600">
-          {record.new_value || "(empty)"}
-        </div>
-      </div>
-    );
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -187,121 +138,19 @@ export function CustomerHistoryList({ customerId }: CustomerHistoryListProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <History className="h-4 w-4" />
-          <span>Change History</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <Select value={filterField} onValueChange={setFilterField}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by field" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Fields</SelectItem>
-              {uniqueFields.map(field => (
-                <SelectItem key={field} value={field}>
-                  {field.replace(/_/g, " ")}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              {uniqueTypes.map(type => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-        </div>
-      </div>
+      <HistoryFilters
+        filterField={filterField}
+        filterType={filterType}
+        uniqueFields={uniqueFields}
+        uniqueTypes={uniqueTypes}
+        onFilterFieldChange={setFilterField}
+        onFilterTypeChange={setFilterType}
+        onExport={handleExport}
+      />
 
-      {statistics && (
-        <div className="grid grid-cols-2 gap-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Changes by Type</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {Object.entries(statistics.byType).map(([type, count]) => (
-                  <div key={type} className="flex justify-between items-center">
-                    <span className="capitalize">{type}</span>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">Most Changed Fields</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {Object.entries(statistics.byField)
-                  .sort(([,a], [,b]) => b - a)
-                  .slice(0, 5)
-                  .map(([field, count]) => (
-                    <div key={field} className="flex justify-between items-center">
-                      <span className="capitalize">{field.replace(/_/g, " ")}</span>
-                      <span className="font-medium">{count}</span>
-                    </div>
-                  ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      {statistics && <HistoryStatistics statistics={statistics} />}
 
-      {Object.entries(groupedRecords).map(([date, records]) => (
-        <div key={date} className="space-y-2">
-          <h3 className="font-medium text-muted-foreground">{date}</h3>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Time</TableHead>
-                <TableHead>Changed By</TableHead>
-                <TableHead>Field</TableHead>
-                <TableHead>Change</TableHead>
-                <TableHead>Notes</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {records.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>
-                    {format(new Date(record.created_at), "h:mm a")}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      <span>
-                        {record.profiles.first_name} {record.profiles.last_name}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="capitalize">
-                    {record.field_name.replace(/_/g, " ")}
-                  </TableCell>
-                  <TableCell>{getChangeDescription(record)}</TableCell>
-                  <TableCell>{record.notes || "-"}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      ))}
+      <HistoryTable groupedRecords={groupedRecords} />
     </div>
   );
 }

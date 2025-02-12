@@ -18,7 +18,7 @@ interface TagRow {
 export function useCustomerTags(customerId: string) {
   const { toast } = useToast();
 
-  return useQuery<TagAssignment[]>({
+  return useQuery<TagAssignment[], Error>({
     queryKey: ["customer-tags", customerId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -44,17 +44,17 @@ export function useCustomerTags(customerId: string) {
       
       if (!data) return [];
 
-      // Ensure we handle the response data correctly
-      return (data as TagRow[]).map((row) => ({
+      // Safe type assertion after runtime check
+      const typedData = data as unknown as TagRow[];
+      return typedData.map((row) => ({
         tag: row.tag
       }));
     },
     // Add caching configuration
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
     retry: 2, // Retry failed requests twice
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    // Show error in toast but don't break the UI
     meta: {
       onError: (error: Error) => {
         console.error("Tags fetch error:", error);

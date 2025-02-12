@@ -1,76 +1,190 @@
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, PieChart, Pie } from 'recharts';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
+  LineChart, Line, PieChart, Pie, ResponsiveContainer 
+} from 'recharts';
 import { DashboardWidget } from '../types';
+import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 interface ChartWidgetProps {
   widget: DashboardWidget;
   data: any[];
+  onConfigChange?: (newConfig: any) => void;
+  isEditable?: boolean;
 }
 
-export function ChartWidget({ widget, data }: ChartWidgetProps) {
+const CHART_COLORS = [
+  '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#0088fe',
+  '#00c49f', '#ffbb28', '#ff8042', '#a4de6c', '#d0ed57'
+];
+
+export function ChartWidget({ 
+  widget, 
+  data, 
+  onConfigChange,
+  isEditable = false 
+}: ChartWidgetProps) {
+  const [showConfig, setShowConfig] = useState(false);
+  const [localConfig, setLocalConfig] = useState(widget.config);
+  
   const chartHeight = useMemo(() => widget.position.h * 100, [widget.position.h]);
 
-  if (widget.config.chartType === 'bar') {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{widget.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div style={{ height: chartHeight }}>
-            <BarChart width={400} height={chartHeight} data={data}>
+  const handleConfigChange = (key: string, value: any) => {
+    const newConfig = { ...localConfig, [key]: value };
+    setLocalConfig(newConfig);
+    onConfigChange?.(newConfig);
+  };
+
+  const renderChart = () => {
+    switch (localConfig.chartType) {
+      case 'bar':
+        return (
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <BarChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={widget.config.xAxis} />
+              <XAxis dataKey={localConfig.xAxis} />
               <YAxis />
               <Tooltip />
-              <Bar dataKey={widget.config.yAxis} fill="#8884d8" />
+              <Bar 
+                dataKey={localConfig.yAxis} 
+                fill={localConfig.color || CHART_COLORS[0]} 
+              />
             </BarChart>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+          </ResponsiveContainer>
+        );
 
-  if (widget.config.chartType === 'line') {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{widget.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div style={{ height: chartHeight }}>
-            <LineChart width={400} height={chartHeight} data={data}>
+      case 'line':
+        return (
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey={widget.config.xAxis} />
+              <XAxis dataKey={localConfig.xAxis} />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey={widget.config.yAxis} stroke="#8884d8" />
+              <Line 
+                type="monotone" 
+                dataKey={localConfig.yAxis} 
+                stroke={localConfig.color || CHART_COLORS[0]} 
+              />
             </LineChart>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+          </ResponsiveContainer>
+        );
 
-  if (widget.config.chartType === 'pie') {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{widget.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div style={{ height: chartHeight }}>
-            <PieChart width={400} height={chartHeight}>
-              <Pie data={data} dataKey={widget.config.value} nameKey={widget.config.label} />
+      case 'pie':
+        return (
+          <ResponsiveContainer width="100%" height={chartHeight}>
+            <PieChart>
+              <Pie 
+                data={data} 
+                dataKey={localConfig.value} 
+                nameKey={localConfig.label} 
+                fill={localConfig.color || CHART_COLORS[0]}
+              />
               <Tooltip />
             </PieChart>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+          </ResponsiveContainer>
+        );
 
-  return null;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Card className="relative">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>{widget.title}</CardTitle>
+        {isEditable && (
+          <Popover open={showConfig} onOpenChange={setShowConfig}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Chart Type</Label>
+                  <Select
+                    value={localConfig.chartType}
+                    onValueChange={(value) => handleConfigChange('chartType', value)}
+                  >
+                    <option value="bar">Bar Chart</option>
+                    <option value="line">Line Chart</option>
+                    <option value="pie">Pie Chart</option>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Color</Label>
+                  <div className="grid grid-cols-5 gap-2">
+                    {CHART_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        className="w-6 h-6 rounded-full"
+                        style={{ backgroundColor: color }}
+                        onClick={() => handleConfigChange('color', color)}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {localConfig.chartType !== 'pie' && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>X-Axis Field</Label>
+                      <Input
+                        value={localConfig.xAxis}
+                        onChange={(e) => handleConfigChange('xAxis', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Y-Axis Field</Label>
+                      <Input
+                        value={localConfig.yAxis}
+                        onChange={(e) => handleConfigChange('yAxis', e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {localConfig.chartType === 'pie' && (
+                  <>
+                    <div className="space-y-2">
+                      <Label>Value Field</Label>
+                      <Input
+                        value={localConfig.value}
+                        onChange={(e) => handleConfigChange('value', e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Label Field</Label>
+                      <Input
+                        value={localConfig.label}
+                        onChange={(e) => handleConfigChange('label', e.target.value)}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+      </CardHeader>
+      <CardContent>
+        {renderChart()}
+      </CardContent>
+    </Card>
+  );
 }

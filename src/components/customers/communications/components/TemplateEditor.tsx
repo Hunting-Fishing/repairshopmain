@@ -14,6 +14,8 @@ import { RichTextEditor } from "./RichTextEditor";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEmailTemplates } from "../hooks/useEmailTemplates";
 import type { EmailTemplate } from "../types";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TemplateEditorProps {
   open: boolean;
@@ -31,21 +33,33 @@ export function TemplateEditor({
   const [content, setContent] = useState(template?.content || "");
   const [categoryId, setCategoryId] = useState(template?.category_id || "");
   const [status, setStatus] = useState<EmailTemplate["status"]>(template?.status || "draft");
-
+  const { session } = useAuth();
   const { categories, createTemplate, updateTemplate } = useEmailTemplates();
 
   const handleSubmit = async () => {
-    const templateData = {
-      name,
-      subject,
-      content,
-      category_id: categoryId || null,
-      status,
-      variables: [],
-      is_default: false,
-    };
-
     try {
+      // Get the organization_id from the user's profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', session?.user?.id)
+        .single();
+
+      if (!profile?.organization_id) {
+        throw new Error('Organization not found');
+      }
+
+      const templateData = {
+        name,
+        subject,
+        content,
+        category_id: categoryId || null,
+        status,
+        variables: [],
+        is_default: false,
+        organization_id: profile.organization_id
+      };
+
       if (template) {
         await updateTemplate.mutateAsync({
           id: template.id,

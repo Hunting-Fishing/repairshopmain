@@ -46,6 +46,11 @@ export interface EmailTemplate {
   created_at: string;
   updated_at: string;
   organization_id: string;
+  notification_settings: {
+    notify_on_send: boolean;
+    notify_on_error: boolean;
+  };
+  notification_recipients: string[];
 }
 
 export interface EmailTemplateVersion {

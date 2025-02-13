@@ -1,5 +1,7 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { StaffMember, CustomRole } from "./types";
+import { roles } from "./types";
 
 interface RoleDistributionTableProps {
   staffMembers: StaffMember[];
@@ -8,12 +10,26 @@ interface RoleDistributionTableProps {
 
 export function RoleDistributionTable({ staffMembers, customRoles }: RoleDistributionTableProps) {
   const getRoleCounts = () => {
-    const counts = new Map<string, number>();
+    // Initialize counts with 0 for all standard roles
+    const counts = new Map<string, number>(
+      roles.map(role => [role, 0])
+    );
+    
+    // Add custom roles with 0 count
+    customRoles.forEach(customRole => {
+      counts.set(customRole.name, 0);
+    });
+    
+    // Count actual staff members
     staffMembers.forEach(member => {
-      const roleKey = member.role === 'custom' && member.custom_role_id && customRoles
-        ? customRoles.find(r => r.id === member.custom_role_id)?.name || 'Custom Role'
-        : member.role;
-      counts.set(roleKey, (counts.get(roleKey) || 0) + 1);
+      if (member.role === 'custom' && member.custom_role_id) {
+        const customRoleName = customRoles.find(r => r.id === member.custom_role_id)?.name;
+        if (customRoleName) {
+          counts.set(customRoleName, (counts.get(customRoleName) || 0) + 1);
+        }
+      } else {
+        counts.set(member.role, (counts.get(member.role) || 0) + 1);
+      }
     });
     
     return Array.from(counts.entries()).map(([role, count]) => ({

@@ -1,6 +1,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useEffect, useState } from 'react';
+import { supabase } from "@/integrations/supabase/client";
 
 interface CustomerEngagementChartProps {
   activities: Array<{
@@ -8,9 +10,43 @@ interface CustomerEngagementChartProps {
     date: string;
     data: Record<string, any>;
   }>;
+  customerId: string;
 }
 
-export function CustomerEngagementChart({ activities }: CustomerEngagementChartProps) {
+export function CustomerEngagementChart({ activities: initialActivities, customerId }: CustomerEngagementChartProps) {
+  const [activities, setActivities] = useState(initialActivities);
+
+  useEffect(() => {
+    setActivities(initialActivities);
+  }, [initialActivities]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('customer-engagement')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'customer_engagement_events',
+          filter: `customer_id=eq.${customerId}`
+        },
+        (payload) => {
+          console.log('New engagement event:', payload);
+          setActivities(current => [...current, {
+            type: payload.new.event_type,
+            date: payload.new.created_at,
+            data: payload.new.event_data
+          }]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [customerId]);
+
   // Process activities into chart data
   const chartData = activities.reduce((acc, activity) => {
     const type = activity.type.replace('_', ' ');
@@ -22,7 +58,6 @@ export function CustomerEngagementChart({ activities }: CustomerEngagementChartP
       acc.push({ 
         name: type, 
         value: 1,
-        // Assign different colors based on engagement type
         color: getActivityColor(activity.type)
       });
     }
@@ -77,14 +112,14 @@ export function CustomerEngagementChart({ activities }: CustomerEngagementChartP
 
 function getActivityColor(type: string): string {
   const colors = {
-    repair: '#3b82f6',         // Blue
-    feedback: '#10b981',       // Green
-    loyalty_redemption: '#6366f1', // Indigo
-    communication: '#f59e0b',  // Amber
-    document_upload: '#8b5cf6', // Purple
-    appointment_booking: '#ec4899', // Pink
-    payment: '#14b8a6',        // Teal
-    default: '#6b7280'         // Gray
+    repair: '#3b82f6',
+    feedback: '#10b981',
+    loyalty_redemption: '#6366f1',
+    communication: '#f59e0b',
+    document_upload: '#8b5cf6',
+    appointment_booking: '#ec4899',
+    payment: '#14b8a6',
+    default: '#6b7280'
   };
 
   return colors[type as keyof typeof colors] || colors.default;

@@ -10,12 +10,16 @@ import { ValidationHistoryTimeline } from "./components/ValidationHistoryTimelin
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AnalyticsLoadingSkeleton } from "./components/AnalyticsLoadingSkeleton";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface CustomerAnalyticsDashboardProps {
   customerId: string;
 }
 
 export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDashboardProps) {
+  const [realTimeScore, setRealTimeScore] = useState<number | null>(null);
+
   const { data: analytics, isLoading, error } = useQuery({
     queryKey: ["customer-analytics", customerId],
     queryFn: async () => {
@@ -40,8 +44,38 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
 
       if (error) throw error;
       return data;
+    },
+    onSuccess: (data) => {
+      setRealTimeScore(data);
     }
   });
+
+  useEffect(() => {
+    // Subscribe to engagement score updates
+    const channel = supabase
+      .channel('customer-engagement-score')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'customer_engagement_scores',
+          filter: `customer_id=eq.${customerId}`
+        },
+        (payload) => {
+          console.log('Engagement score updated:', payload);
+          if (payload.new) {
+            setRealTimeScore(payload.new.total_score);
+            toast.info("Engagement score updated");
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [customerId]);
 
   if (error) {
     return (
@@ -76,7 +110,8 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
     return { label: "Very Low Engagement", variant: "destructive" as const };
   };
 
-  const engagementInfo = engagementScore ? getEngagementLabel(engagementScore) : null;
+  const currentScore = realTimeScore ?? engagementScore;
+  const engagementInfo = currentScore ? getEngagementLabel(currentScore) : null;
 
   return (
     <div className="space-y-6">
@@ -111,7 +146,7 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
         />
         <MetricCard
           title="Engagement Score"
-          value={engagementScore?.toFixed(1) || analytics.engagement_score.toFixed(1)}
+          value={currentScore?.toFixed(1) || analytics.engagement_score.toFixed(1)}
           subtitle="Out of 100"
         />
         <MetricCard
@@ -135,6 +170,7 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
 
       <CustomerEngagementChart
         activities={analytics.recent_activities || []}
+        customerId={customerId}
       />
     </div>
   );

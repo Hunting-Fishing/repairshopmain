@@ -8,14 +8,16 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ReportBuilder } from './ReportBuilder';
 import { CustomerDashboard } from './CustomerDashboard';
 import { Badge } from '@/components/ui/badge';
-import { Download, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format } from 'date-fns';
 import { ReportExport } from './ReportExport';
 import { ReportScheduleDialog } from './ReportScheduleDialog';
+import { ReportOutputViewer } from './ReportOutputViewer';
 
 export function CustomerReports() {
   const [activeView, setActiveView] = useState('dashboard');
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ['report-templates'],
@@ -54,6 +56,7 @@ export function CustomerReports() {
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="builder">Report Builder</TabsTrigger>
+          <TabsTrigger value="outputs">Outputs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="dashboard">
@@ -126,6 +129,10 @@ export function CustomerReports() {
 
         <TabsContent value="builder">
           <ReportBuilder />
+        </TabsContent>
+
+        <TabsContent value="outputs">
+          <ReportOutputViewer templateId={selectedTemplate} />
         </TabsContent>
       </Tabs>
     </div>

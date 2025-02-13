@@ -49,6 +49,11 @@ export function CustomerReports() {
     // Implementation will be added when needed
   };
 
+  const handleTemplateSelect = (templateId: string) => {
+    setSelectedTemplate(templateId);
+    setActiveView('outputs');
+  };
+
   return (
     <div className="space-y-6">
       <Tabs value={activeView} onValueChange={setActiveView}>
@@ -109,6 +114,13 @@ export function CustomerReports() {
                               templateId={report.id}
                               onSchedule={handleSchedule}
                             />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTemplateSelect(report.id)}
+                            >
+                              View Outputs
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

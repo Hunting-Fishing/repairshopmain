@@ -1513,6 +1513,60 @@ export type Database = {
           },
         ]
       }
+      customer_metrics: {
+        Row: {
+          calculated_at: string | null
+          change_percentage: number | null
+          customer_id: string
+          id: string
+          metadata: Json | null
+          metric_type: string
+          organization_id: string
+          previous_value: number | null
+          trend_direction: string | null
+          value: number
+        }
+        Insert: {
+          calculated_at?: string | null
+          change_percentage?: number | null
+          customer_id: string
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          organization_id: string
+          previous_value?: number | null
+          trend_direction?: string | null
+          value?: number
+        }
+        Update: {
+          calculated_at?: string | null
+          change_percentage?: number | null
+          customer_id?: string
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          organization_id?: string
+          previous_value?: number | null
+          trend_direction?: string | null
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_metrics_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_metrics_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_notes: {
         Row: {
           content: string

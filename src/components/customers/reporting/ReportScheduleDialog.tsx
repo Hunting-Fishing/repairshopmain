@@ -89,14 +89,39 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
         name: schedule.name,
         frequency: schedule.frequency,
         recipients: schedule.recipients,
-        created_by: user.id
+        created_by: user.id,
+        status: 'pending_approval' // Set initial status to pending approval
       });
 
     if (!error) {
       onSchedule(schedule);
       toast({
         title: 'Schedule Created',
-        description: 'Your report has been scheduled successfully.',
+        description: 'Your report schedule has been submitted for approval.',
+      });
+    } else {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleSubmitForApproval = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('report_schedules')
+      .update({ status: 'pending_approval' })
+      .eq('template_id', templateId)
+      .eq('created_by', user.id);
+
+    if (!error) {
+      toast({
+        title: 'Submitted for Approval',
+        description: 'Your report has been submitted for approval.',
       });
     } else {
       toast({
@@ -151,7 +176,10 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
           <DialogTrigger asChild>
             <Button variant="outline">Cancel</Button>
           </DialogTrigger>
-          <Button onClick={handleSave}>Save Schedule</Button>
+          <Button onClick={handleSave}>Save as Draft</Button>
+          <Button onClick={handleSubmitForApproval} variant="default">
+            Submit for Approval
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

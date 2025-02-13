@@ -12,6 +12,9 @@ import { ChartWidget } from './widgets/ChartWidget';
 import { ReportScheduleDialog } from './ReportScheduleDialog';
 import { ReportExport } from './ReportExport';
 import { useToast } from '@/hooks/use-toast';
+import { FieldSelector } from './components/FieldSelector';
+import { FilterBuilder } from './components/FilterBuilder';
+import { SortConfig } from './components/SortConfig';
 
 export function ReportBuilder() {
   const [activeTab, setActiveTab] = useState<string>('fields');
@@ -111,15 +114,26 @@ export function ReportBuilder() {
             </TabsList>
 
             <TabsContent value="fields">
-              {/* Field selection will be implemented here */}
+              <FieldSelector
+                fields={template.fields || []}
+                onFieldsChange={(fields) => setTemplate({ ...template, fields })}
+              />
             </TabsContent>
 
             <TabsContent value="filters">
-              {/* Filter configuration will be implemented here */}
+              <FilterBuilder
+                filters={template.filters || []}
+                fields={template.fields || []}
+                onFiltersChange={(filters) => setTemplate({ ...template, filters })}
+              />
             </TabsContent>
 
             <TabsContent value="sort">
-              {/* Sort configuration will be implemented here */}
+              <SortConfig
+                sortOptions={template.sortOptions || []}
+                fields={template.fields || []}
+                onSortOptionsChange={(sortOptions) => setTemplate({ ...template, sortOptions })}
+              />
             </TabsContent>
 
             <TabsContent value="preview">

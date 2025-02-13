@@ -24,11 +24,9 @@ interface EngagementScore {
   last_calculated_at: string;
 }
 
-interface RealtimeEngagementScorePayload {
-  new: {
-    total_score: number;
-    customer_id: string;
-  };
+interface RealtimeEngagementScore {
+  total_score: number;
+  customer_id: string;
 }
 
 export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDashboardProps) {
@@ -77,10 +75,11 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
           table: 'customer_engagement_scores',
           filter: `customer_id=eq.${customerId}`
         },
-        (payload: RealtimePostgresChangesPayload<RealtimeEngagementScorePayload>) => {
+        (payload: RealtimePostgresChangesPayload<{ new: RealtimeEngagementScore }>) => {
           console.log('Engagement score updated:', payload);
-          if (payload.new && typeof payload.new.total_score === 'number') {
-            setRealTimeScore(payload.new.total_score);
+          const newScore = payload.new;
+          if (newScore && typeof newScore.total_score === 'number') {
+            setRealTimeScore(newScore.total_score);
             toast.info("Engagement score updated");
           }
         }

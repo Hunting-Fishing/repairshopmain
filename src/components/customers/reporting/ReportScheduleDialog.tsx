@@ -25,6 +25,7 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
   const [email, setEmail] = useState('');
   const [recipientType, setRecipientType] = useState<'to' | 'cc' | 'bcc'>('to');
   const [activeTab, setActiveTab] = useState('schedule');
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   const { data: template } = useQuery({
@@ -68,17 +69,59 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
     };
   }, [templateId, toast]);
 
-  const addRecipient = () => {
-    if (email) {
-      setSchedule({
-        ...schedule,
-        recipients: [...(schedule.recipients || []), { email, type: recipientType }]
-      });
-      setEmail('');
+  const validateSchedule = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!schedule.name?.trim()) {
+      newErrors.name = 'Schedule name is required';
     }
+
+    if (!schedule.frequency) {
+      newErrors.frequency = 'Frequency is required';
+    }
+
+    if (!schedule.recipients || schedule.recipients.length === 0) {
+      newErrors.recipients = 'At least one recipient is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const addRecipient = () => {
+    if (!email) {
+      setErrors(prev => ({ ...prev, email: 'Email is required' }));
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrors(prev => ({ ...prev, email: 'Invalid email format' }));
+      return;
+    }
+
+    setSchedule({
+      ...schedule,
+      recipients: [...(schedule.recipients || []), { email, type: recipientType }]
+    });
+    setEmail('');
+    setErrors(prev => {
+      const { recipients, ...rest } = prev;
+      return rest;
+    });
   };
 
   const handleSave = async () => {
+    if (!validateSchedule()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -90,7 +133,7 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
         frequency: schedule.frequency,
         recipients: schedule.recipients,
         created_by: user.id,
-        status: 'pending_approval' // Set initial status to pending approval
+        status: 'pending_approval'
       });
 
     if (!error) {
@@ -109,6 +152,15 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
   };
 
   const handleSubmitForApproval = async () => {
+    if (!validateSchedule()) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -164,6 +216,7 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
               onRecipientTypeChange={setRecipientType}
               onScheduleChange={setSchedule}
               onAddRecipient={addRecipient}
+              errors={errors}
             />
           </TabsContent>
 

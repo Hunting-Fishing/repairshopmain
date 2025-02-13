@@ -1268,6 +1268,68 @@ export type Database = {
           },
         ]
       }
+      customer_engagement_scores: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          id: string
+          interaction_counts: Json | null
+          last_calculated_at: string | null
+          organization_id: string
+          total_score: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          interaction_counts?: Json | null
+          last_calculated_at?: string | null
+          organization_id: string
+          total_score?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          interaction_counts?: Json | null
+          last_calculated_at?: string | null
+          organization_id?: string
+          total_score?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_engagement_scores_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_engagement_scores_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics_dashboard"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_engagement_scores_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_engagement_scores_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_feedback: {
         Row: {
           category: string | null
@@ -2900,6 +2962,56 @@ export type Database = {
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engagement_scoring_rules: {
+        Row: {
+          conditions: Json | null
+          cooldown_hours: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          interaction_type: string
+          is_active: boolean | null
+          name: string
+          organization_id: string
+          points: number
+          updated_at: string | null
+        }
+        Insert: {
+          conditions?: Json | null
+          cooldown_hours?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          interaction_type: string
+          is_active?: boolean | null
+          name: string
+          organization_id: string
+          points?: number
+          updated_at?: string | null
+        }
+        Update: {
+          conditions?: Json | null
+          cooldown_hours?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          interaction_type?: string
+          is_active?: boolean | null
+          name?: string
+          organization_id?: string
+          points?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_scoring_rules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -7370,6 +7482,12 @@ export type Database = {
           required_specialties?: string[]
         }
         Returns: string
+      }
+      calculate_customer_engagement_score: {
+        Args: {
+          customer_id: string
+        }
+        Returns: number
       }
       calculate_workday_duration: {
         Args: {

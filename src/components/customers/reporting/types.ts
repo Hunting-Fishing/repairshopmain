@@ -53,6 +53,17 @@ export interface ReportTemplate {
   config: Record<string, any>;
 }
 
+export interface ReportOutput {
+  id: string;
+  templateId: string;
+  scheduleId?: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize?: number;
+  metadata: Record<string, any>;
+  createdAt: string;
+}
+
 export interface DashboardWidget {
   id: string;
   type: 'chart' | 'metric' | 'list' | 'table';

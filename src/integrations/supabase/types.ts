@@ -1549,6 +1549,135 @@ export type Database = {
           },
         ]
       }
+      customer_interaction_logs: {
+        Row: {
+          channel: string
+          context: Json | null
+          created_at: string | null
+          created_by: string | null
+          customer_id: string
+          duration_seconds: number | null
+          id: string
+          interaction_type: string
+          journey_stage_id: string | null
+          metadata: Json | null
+          organization_id: string
+          outcome: string | null
+          sentiment: string | null
+        }
+        Insert: {
+          channel: string
+          context?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id: string
+          duration_seconds?: number | null
+          id?: string
+          interaction_type: string
+          journey_stage_id?: string | null
+          metadata?: Json | null
+          organization_id: string
+          outcome?: string | null
+          sentiment?: string | null
+        }
+        Update: {
+          channel?: string
+          context?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          customer_id?: string
+          duration_seconds?: number | null
+          id?: string
+          interaction_type?: string
+          journey_stage_id?: string | null
+          metadata?: Json | null
+          organization_id?: string
+          outcome?: string | null
+          sentiment?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_interaction_logs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_interaction_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_interaction_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics_dashboard"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_interaction_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_interaction_logs_journey_stage_id_fkey"
+            columns: ["journey_stage_id"]
+            isOneToOne: false
+            referencedRelation: "customer_journey_stages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_interaction_logs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_journey_stages: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          order_index: number
+          organization_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          order_index: number
+          organization_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          organization_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_journey_stages_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_loyalty_activities: {
         Row: {
           activity_type: string

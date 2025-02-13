@@ -1,3 +1,4 @@
+
 import { Json } from "../shared/json"
 import { BookingStatus } from "../enums"
 
@@ -15,6 +16,10 @@ export interface BookingRow {
   updated_at: string
   created_by: string
   updated_by: string
+  buffer_before_minutes: number
+  buffer_after_minutes: number
+  has_conflicts: boolean
+  conflict_details: Json
 }
 
 export interface BookingInsert extends Partial<Omit<BookingRow, 'id' | 'created_at' | 'updated_at'>> {

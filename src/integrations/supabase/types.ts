@@ -295,7 +295,10 @@ export type Database = {
       bookings: {
         Row: {
           assigned_technician_id: string | null
+          buffer_after_minutes: number | null
+          buffer_before_minutes: number | null
           color: string | null
+          conflict_details: Json | null
           created_at: string
           created_by: string
           customer_name: string
@@ -303,6 +306,7 @@ export type Database = {
           email: string | null
           end_time: string
           estimated_cost: number | null
+          has_conflicts: boolean | null
           id: string
           is_demo: boolean | null
           is_multi_day: boolean | null
@@ -328,7 +332,10 @@ export type Database = {
         }
         Insert: {
           assigned_technician_id?: string | null
+          buffer_after_minutes?: number | null
+          buffer_before_minutes?: number | null
           color?: string | null
+          conflict_details?: Json | null
           created_at?: string
           created_by: string
           customer_name: string
@@ -336,6 +343,7 @@ export type Database = {
           email?: string | null
           end_time: string
           estimated_cost?: number | null
+          has_conflicts?: boolean | null
           id?: string
           is_demo?: boolean | null
           is_multi_day?: boolean | null
@@ -361,7 +369,10 @@ export type Database = {
         }
         Update: {
           assigned_technician_id?: string | null
+          buffer_after_minutes?: number | null
+          buffer_before_minutes?: number | null
           color?: string | null
+          conflict_details?: Json | null
           created_at?: string
           created_by?: string
           customer_name?: string
@@ -369,6 +380,7 @@ export type Database = {
           email?: string | null
           end_time?: string
           estimated_cost?: number | null
+          has_conflicts?: boolean | null
           id?: string
           is_demo?: boolean | null
           is_multi_day?: boolean | null
@@ -5366,6 +5378,120 @@ export type Database = {
           },
         ]
       }
+      scheduling_rule_violations: {
+        Row: {
+          booking_id: string
+          created_at: string | null
+          id: string
+          organization_id: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          status: string | null
+          technician_id: string | null
+          violation_details: Json | null
+          violation_type: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string | null
+          id?: string
+          organization_id: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          technician_id?: string | null
+          violation_details?: Json | null
+          violation_type: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string | null
+          id?: string
+          organization_id?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          technician_id?: string | null
+          violation_details?: Json | null
+          violation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduling_rule_violations_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduling_rule_violations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduling_rule_violations_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduling_rules: {
+        Row: {
+          allow_overlapping_bookings: boolean | null
+          auto_assign_enabled: boolean | null
+          buffer_after_minutes: number | null
+          buffer_before_minutes: number | null
+          conflict_handling: string | null
+          created_at: string | null
+          id: string
+          max_daily_bookings: number | null
+          min_break_minutes: number | null
+          organization_id: string
+          updated_at: string | null
+          working_hours: Json | null
+        }
+        Insert: {
+          allow_overlapping_bookings?: boolean | null
+          auto_assign_enabled?: boolean | null
+          buffer_after_minutes?: number | null
+          buffer_before_minutes?: number | null
+          conflict_handling?: string | null
+          created_at?: string | null
+          id?: string
+          max_daily_bookings?: number | null
+          min_break_minutes?: number | null
+          organization_id: string
+          updated_at?: string | null
+          working_hours?: Json | null
+        }
+        Update: {
+          allow_overlapping_bookings?: boolean | null
+          auto_assign_enabled?: boolean | null
+          buffer_after_minutes?: number | null
+          buffer_before_minutes?: number | null
+          conflict_handling?: string | null
+          created_at?: string | null
+          id?: string
+          max_daily_bookings?: number | null
+          min_break_minutes?: number | null
+          organization_id?: string
+          updated_at?: string | null
+          working_hours?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduling_rules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       skill_assessment_history: {
         Row: {
           assessment_id: string | null
@@ -8136,6 +8262,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_scheduling_rules: {
+        Args: {
+          p_organization_id: string
+          p_technician_id: string
+          p_start_time: string
+          p_end_time: string
+          p_booking_id?: string
+        }
+        Returns: {
+          allowed: boolean
+          violation_type: string
+          violation_details: Json
+        }[]
+      }
       check_technician_availability: {
         Args: {
           p_technician_id: string
@@ -8223,6 +8363,14 @@ export type Database = {
           "": unknown
         }
         Returns: unknown
+      }
+      handle_scheduling_conflict: {
+        Args: {
+          p_booking_id: string
+          p_violation_type: string
+          p_violation_details: Json
+        }
+        Returns: boolean
       }
       has_custom_role: {
         Args: {

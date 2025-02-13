@@ -30,6 +30,19 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
     }
   });
 
+  const { data: engagementScore } = useQuery({
+    queryKey: ["customer-engagement-score", customerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('calculate_customer_engagement_score', {
+          customer_id: customerId
+        });
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
   if (error) {
     return (
       <Alert variant="destructive">
@@ -55,6 +68,16 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
     );
   }
 
+  const getEngagementLabel = (score: number) => {
+    if (score >= 80) return { label: "Highly Engaged", variant: "default" as const };
+    if (score >= 60) return { label: "Engaged", variant: "secondary" as const };
+    if (score >= 40) return { label: "Moderately Engaged", variant: "outline" as const };
+    if (score >= 20) return { label: "Low Engagement", variant: "destructive" as const };
+    return { label: "Very Low Engagement", variant: "destructive" as const };
+  };
+
+  const engagementInfo = engagementScore ? getEngagementLabel(engagementScore) : null;
+
   return (
     <div className="space-y-6">
       <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -71,8 +94,8 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
                 {analytics.churn_risk > 50 && (
                   <Badge variant="destructive">High Churn Risk</Badge>
                 )}
-                {analytics.engagement_score > 75 && (
-                  <Badge variant="secondary">Highly Engaged</Badge>
+                {engagementInfo && (
+                  <Badge variant={engagementInfo.variant}>{engagementInfo.label}</Badge>
                 )}
               </div>
             </div>
@@ -88,7 +111,7 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
         />
         <MetricCard
           title="Engagement Score"
-          value={analytics.engagement_score.toFixed(1)}
+          value={engagementScore?.toFixed(1) || analytics.engagement_score.toFixed(1)}
           subtitle="Out of 100"
         />
         <MetricCard

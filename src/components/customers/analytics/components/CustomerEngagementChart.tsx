@@ -1,47 +1,39 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer 
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface CustomerEngagementChartProps {
-  totalRepairJobs: number;
-  totalFeedback: number;
-  totalDocuments: number;
-  loyaltyActivities: number;
+  activities: Array<{
+    type: string;
+    date: string;
+    data: Record<string, any>;
+  }>;
 }
 
-export function CustomerEngagementChart({
-  totalRepairJobs,
-  totalFeedback,
-  totalDocuments,
-  loyaltyActivities
-}: CustomerEngagementChartProps) {
-  const data = [
-    { name: 'Repair Jobs', value: totalRepairJobs },
-    { name: 'Feedback', value: totalFeedback },
-    { name: 'Documents', value: totalDocuments },
-    { name: 'Loyalty Activities', value: loyaltyActivities },
-  ];
+export function CustomerEngagementChart({ activities }: CustomerEngagementChartProps) {
+  // Process activities into chart data
+  const chartData = activities.reduce((acc, activity) => {
+    const type = activity.type.replace('_', ' ');
+    const existingType = acc.find(item => item.name === type);
+    
+    if (existingType) {
+      existingType.value += 1;
+    } else {
+      acc.push({ name: type, value: 1 });
+    }
+    
+    return acc;
+  }, [] as Array<{ name: string; value: number }>);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Customer Engagement</CardTitle>
+        <CardTitle>Engagement Distribution</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
+            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />

@@ -6,7 +6,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { MetricCard } from "./components/MetricCard";
 import { CustomerActivityTimeline } from "./components/CustomerActivityTimeline";
 import { CustomerEngagementChart } from "./components/CustomerEngagementChart";
-import { CustomerTags } from "./components/CustomerTags";
+import { ValidationHistoryTimeline } from "./components/ValidationHistoryTimeline";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { AnalyticsLoadingSkeleton } from "./components/AnalyticsLoadingSkeleton";
 
 interface CustomerAnalyticsDashboardProps {
@@ -18,14 +20,14 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
     queryKey: ["customer-analytics", customerId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("customer_analytics")
+        .from("customer_analytics_dashboard")
         .select("*")
         .eq("customer_id", customerId)
         .single();
 
       if (error) throw error;
       return data;
-    },
+    }
   });
 
   if (error) {
@@ -55,38 +57,62 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-2xl">Customer Overview</CardTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                Customer since {new Date(analytics.customer_since).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="space-y-1 text-right">
+              <div className="flex items-center gap-2">
+                {analytics.churn_risk > 50 && (
+                  <Badge variant="destructive">High Churn Risk</Badge>
+                )}
+                {analytics.engagement_score > 75 && (
+                  <Badge variant="secondary">Highly Engaged</Badge>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <MetricCard
           title="Total Spend"
           value={`$${analytics.total_spend.toFixed(2)}`}
           subtitle="Lifetime value"
         />
         <MetricCard
+          title="Engagement Score"
+          value={analytics.engagement_score.toFixed(1)}
+          subtitle="Out of 100"
+        />
+        <MetricCard
+          title="Satisfaction Score"
+          value={analytics.satisfaction_score.toFixed(1)}
+          subtitle="Out of 5"
+        />
+        <MetricCard
           title="Loyalty Points"
           value={analytics.loyalty_points}
           subtitle="Current balance"
         />
-        <MetricCard
-          title="Total Jobs"
-          value={analytics.total_repair_jobs}
-          subtitle="Completed repairs"
-        />
       </div>
 
-      <CustomerActivityTimeline
-        lastRepairDate={analytics.last_repair_date}
-        lastFeedbackDate={analytics.last_feedback_date}
-        customerSince={analytics.customer_since}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CustomerActivityTimeline 
+          activities={analytics.recent_activities || []}
+        />
+        <ValidationHistoryTimeline customerId={customerId} />
+      </div>
 
       <CustomerEngagementChart
-        totalRepairJobs={analytics.total_repair_jobs}
-        totalFeedback={analytics.total_feedback}
-        totalDocuments={analytics.total_documents}
-        loyaltyActivities={analytics.loyalty_activities}
+        activities={analytics.recent_activities || []}
       />
-
-      {analytics.tags && <CustomerTags tags={analytics.tags} />}
     </div>
   );
 }

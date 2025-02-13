@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle } from "lucide-react";
@@ -11,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { AnalyticsLoadingSkeleton } from "./components/AnalyticsLoadingSkeleton";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { RealtimeChannel, RealtimePostgresChangesPayload } from "@supabase/supabase-js";
 
 interface CustomerAnalyticsDashboardProps {
   customerId: string;
@@ -68,14 +69,15 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
   useEffect(() => {
     // Subscribe to engagement score updates
     const channel = supabase.channel('customer-engagement-score')
-      .on('postgres_changes' as const, 
+      .on(
+        'postgres_changes' as const, 
         {
           event: '*',
           schema: 'public',
           table: 'customer_engagement_scores',
           filter: `customer_id=eq.${customerId}`
         },
-        (payload: RealtimeEngagementScorePayload) => {
+        (payload: RealtimePostgresChangesPayload<RealtimeEngagementScorePayload>) => {
           console.log('Engagement score updated:', payload);
           if (payload.new && typeof payload.new.total_score === 'number') {
             setRealTimeScore(payload.new.total_score);

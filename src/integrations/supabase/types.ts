@@ -1188,6 +1188,51 @@ export type Database = {
           },
         ]
       }
+      customer_engagement_events: {
+        Row: {
+          customer_id: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          occurred_at: string | null
+          organization_id: string
+          score: number | null
+        }
+        Insert: {
+          customer_id: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          occurred_at?: string | null
+          organization_id: string
+          score?: number | null
+        }
+        Update: {
+          customer_id?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          occurred_at?: string | null
+          organization_id?: string
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_engagement_events_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_engagement_events_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_feedback: {
         Row: {
           category: string | null

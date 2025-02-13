@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { FieldSelector } from './components/FieldSelector';
 import { FilterBuilder } from './components/FilterBuilder';
 import { SortConfig } from './components/SortConfig';
+import { LayoutSelector } from './components/LayoutSelector';
+import { ReportGenerateButton } from './components/ReportGenerateButton';
 
 export function ReportBuilder() {
   const [activeTab, setActiveTab] = useState<string>('fields');
@@ -137,22 +138,50 @@ export function ReportBuilder() {
             </TabsContent>
 
             <TabsContent value="preview">
-              {template.type === 'chart' && (
-                <ChartWidget
-                  widget={{
-                    id: 'preview',
-                    type: 'chart',
-                    title: template.name || 'Preview',
-                    config: {
-                      chartType: 'bar',
-                      xAxis: 'name',
-                      yAxis: 'value'
-                    },
-                    position: { x: 0, y: 0, w: 12, h: 4 }
-                  }}
-                  data={previewData}
-                />
-              )}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Preview & Generate</CardTitle>
+                  <div className="flex gap-2">
+                    <LayoutSelector
+                      templateId={template.id || ''}
+                      value={template.layout_id}
+                      onChange={(layoutId) => setTemplate({ ...template, layout_id: layoutId })}
+                    />
+                    {template.id && (
+                      <ReportGenerateButton
+                        templateId={template.id}
+                        parameters={{
+                          fields: template.fields,
+                          filters: template.filters,
+                          sortOptions: template.sortOptions
+                        }}
+                        onComplete={(outputUrl) => {
+                          // Handle the generated report
+                          window.open(outputUrl, '_blank');
+                        }}
+                      />
+                    )}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {template.type === 'chart' && (
+                    <ChartWidget
+                      widget={{
+                        id: 'preview',
+                        type: 'chart',
+                        title: template.name || 'Preview',
+                        config: template.config || {
+                          chartType: 'bar',
+                          xAxis: 'name',
+                          yAxis: 'value'
+                        },
+                        position: { x: 0, y: 0, w: 12, h: 4 }
+                      }}
+                      data={previewData}
+                    />
+                  )}
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
 

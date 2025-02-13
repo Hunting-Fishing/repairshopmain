@@ -3901,6 +3901,137 @@ export type Database = {
           },
         ]
       }
+      report_data_sources: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          parameters: Json | null
+          query_template: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          parameters?: Json | null
+          query_template: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          parameters?: Json | null
+          query_template?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_data_sources_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_data_sources_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_generation_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          created_by: string
+          error_message: string | null
+          id: string
+          organization_id: string
+          output_size: number | null
+          output_url: string | null
+          parameters: Json | null
+          processing_stats: Json | null
+          schedule_id: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["report_processing_status"]
+          template_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by: string
+          error_message?: string | null
+          id?: string
+          organization_id: string
+          output_size?: number | null
+          output_url?: string | null
+          parameters?: Json | null
+          processing_stats?: Json | null
+          schedule_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["report_processing_status"]
+          template_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string
+          error_message?: string | null
+          id?: string
+          organization_id?: string
+          output_size?: number | null
+          output_url?: string | null
+          parameters?: Json | null
+          processing_stats?: Json | null
+          schedule_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["report_processing_status"]
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_generation_jobs_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_generation_jobs_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_generation_jobs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "report_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_generation_jobs_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "report_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_outputs: {
         Row: {
           created_at: string
@@ -4097,18 +4228,77 @@ export type Database = {
           },
         ]
       }
+      report_template_layouts: {
+        Row: {
+          created_at: string | null
+          footer_template: string | null
+          header_template: string | null
+          id: string
+          layout_config: Json
+          name: string
+          organization_id: string
+          page_settings: Json | null
+          template_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          footer_template?: string | null
+          header_template?: string | null
+          id?: string
+          layout_config?: Json
+          name: string
+          organization_id: string
+          page_settings?: Json | null
+          template_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          footer_template?: string | null
+          header_template?: string | null
+          id?: string
+          layout_config?: Json
+          name?: string
+          organization_id?: string
+          page_settings?: Json | null
+          template_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_template_layouts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_template_layouts_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "report_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       report_templates: {
         Row: {
           config: Json
           created_at: string
           created_by: string
+          data_source_id: string | null
           description: string | null
           fields: Json
           filters: Json
+          generation_settings: Json | null
           id: string
+          last_generated_at: string | null
+          layout_id: string | null
           name: string
           organization_id: string
           sort_options: Json
+          total_generations: number | null
           type: Database["public"]["Enums"]["report_type"]
           updated_at: string
         }
@@ -4116,13 +4306,18 @@ export type Database = {
           config?: Json
           created_at?: string
           created_by: string
+          data_source_id?: string | null
           description?: string | null
           fields?: Json
           filters?: Json
+          generation_settings?: Json | null
           id?: string
+          last_generated_at?: string | null
+          layout_id?: string | null
           name: string
           organization_id: string
           sort_options?: Json
+          total_generations?: number | null
           type: Database["public"]["Enums"]["report_type"]
           updated_at?: string
         }
@@ -4130,13 +4325,18 @@ export type Database = {
           config?: Json
           created_at?: string
           created_by?: string
+          data_source_id?: string | null
           description?: string | null
           fields?: Json
           filters?: Json
+          generation_settings?: Json | null
           id?: string
+          last_generated_at?: string | null
+          layout_id?: string | null
           name?: string
           organization_id?: string
           sort_options?: Json
+          total_generations?: number | null
           type?: Database["public"]["Enums"]["report_type"]
           updated_at?: string
         }
@@ -4146,6 +4346,20 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_templates_data_source_id_fkey"
+            columns: ["data_source_id"]
+            isOneToOne: false
+            referencedRelation: "report_data_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_templates_layout_id_fkey"
+            columns: ["layout_id"]
+            isOneToOne: false
+            referencedRelation: "report_template_layouts"
             referencedColumns: ["id"]
           },
           {
@@ -6963,6 +7177,18 @@ export type Database = {
         | "diagnostic"
         | "inspection"
         | "custom"
+      report_data_type:
+        | "string"
+        | "number"
+        | "date"
+        | "boolean"
+        | "currency"
+        | "percentage"
+      report_processing_status:
+        | "pending"
+        | "processing"
+        | "completed"
+        | "failed"
       report_type: "tabular" | "summary" | "chart"
       scheduled_communication_status:
         | "pending"

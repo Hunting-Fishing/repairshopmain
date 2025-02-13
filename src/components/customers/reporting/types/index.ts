@@ -4,14 +4,15 @@ export type ReportType = 'tabular' | 'summary' | 'chart';
 export interface ReportField {
   name: string;
   label: string;
-  type: 'string' | 'number' | 'date' | 'boolean';
+  type: 'string' | 'number' | 'date' | 'boolean' | 'currency' | 'percentage' | 'email' | 'phone' | 'url';
   format?: string;
-  aggregate?: 'sum' | 'avg' | 'count' | 'min' | 'max';
+  aggregate?: 'sum' | 'avg' | 'count' | 'min' | 'max' | 'median' | 'mode';
 }
 
 export interface ReportFilter {
   field: string;
-  operator: 'equals' | 'contains' | 'gt' | 'lt' | 'between' | 'in';
+  operator: 'equals' | 'contains' | 'gt' | 'lt' | 'between' | 'in' | 'startsWith' | 'endsWith' | 
+            'notEquals' | 'notContains' | 'gte' | 'lte' | 'isNull' | 'isNotNull' | 'regex';
   value: any;
 }
 
@@ -24,31 +25,4 @@ export interface ReportTemplate {
   filters: ReportFilter[];
   sortOptions: Array<{field: string; direction: 'asc' | 'desc'}>;
   config: Record<string, any>;
-}
-
-export interface ReportSchedule {
-  id: string;
-  templateId: string;
-  name: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
-  recipients: Array<{email: string; type: 'to' | 'cc' | 'bcc'}>;
-  nextRun?: string;
-  lastRun?: string;
-  status: 'active' | 'paused' | 'error';
-}
-
-export interface DashboardWidget {
-  id: string;
-  type: 'chart' | 'metric' | 'list' | 'table';
-  title: string;
-  config: Record<string, any>;
-  position: {x: number; y: number; w: number; h: number};
-}
-
-export interface DashboardConfig {
-  id: string;
-  name: string;
-  description?: string;
-  layout: DashboardWidget[];
-  isDefault: boolean;
 }

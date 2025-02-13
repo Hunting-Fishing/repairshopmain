@@ -10,6 +10,25 @@ interface ReportPreviewProps {
 }
 
 export function ReportPreview({ template, previewData }: ReportPreviewProps) {
+  const formatValue = (value: any, type: string) => {
+    if (value == null) return '';
+    
+    switch (type) {
+      case 'number':
+        return new Intl.NumberFormat().format(value);
+      case 'currency':
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+      case 'percentage':
+        return new Intl.NumberFormat('en-US', { style: 'percent' }).format(value / 100);
+      case 'date':
+        return new Date(value).toLocaleDateString();
+      case 'boolean':
+        return value ? 'Yes' : 'No';
+      default:
+        return value;
+    }
+  };
+
   const renderTabularPreview = () => (
     <Table>
       <TableHeader>
@@ -24,9 +43,7 @@ export function ReportPreview({ template, previewData }: ReportPreviewProps) {
           <TableRow key={rowIndex}>
             {template?.fields.map((field, colIndex) => (
               <TableCell key={colIndex}>
-                {field.type === 'number' ? 
-                  new Intl.NumberFormat().format(row[field.name]) :
-                  row[field.name]}
+                {formatValue(row[field.name], field.type)}
               </TableCell>
             ))}
           </TableRow>

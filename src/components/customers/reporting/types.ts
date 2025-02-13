@@ -25,3 +25,46 @@ export interface RealtimePostgresChangesPayload<T = any> {
   old: T | null;
   errors: null | any[];
 }
+
+export type ReportType = 'tabular' | 'summary' | 'chart';
+
+export interface ReportField {
+  name: string;
+  label: string;
+  type: 'string' | 'number' | 'date' | 'boolean';
+  format?: string;
+  aggregate?: 'sum' | 'avg' | 'count' | 'min' | 'max';
+}
+
+export interface ReportFilter {
+  field: string;
+  operator: 'equals' | 'contains' | 'gt' | 'lt' | 'between' | 'in';
+  value: any;
+}
+
+export interface ReportTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  type: ReportType;
+  fields: ReportField[];
+  filters: ReportFilter[];
+  sortOptions: Array<{field: string; direction: 'asc' | 'desc'}>;
+  config: Record<string, any>;
+}
+
+export interface DashboardWidget {
+  id: string;
+  type: 'chart' | 'metric' | 'list' | 'table';
+  title: string;
+  config: Record<string, any>;
+  position: {x: number; y: number; w: number; h: number};
+}
+
+export interface DashboardConfig {
+  id: string;
+  name: string;
+  description?: string;
+  layout: DashboardWidget[];
+  isDefault: boolean;
+}

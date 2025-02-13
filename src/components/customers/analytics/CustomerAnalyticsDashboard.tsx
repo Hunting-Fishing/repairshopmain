@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle } from "lucide-react";
@@ -12,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { AnalyticsLoadingSkeleton } from "./components/AnalyticsLoadingSkeleton";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 interface CustomerAnalyticsDashboardProps {
   customerId: string;
@@ -67,10 +67,8 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
 
   useEffect(() => {
     // Subscribe to engagement score updates
-    const channel = supabase
-      .channel('customer-engagement-score')
-      .on(
-        'postgres_changes',
+    const channel = supabase.channel('customer-engagement-score')
+      .on('postgres_changes' as const, 
         {
           event: '*',
           schema: 'public',

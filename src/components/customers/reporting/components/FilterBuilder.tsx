@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ReportFilter, ReportField } from '../types';
 import { Plus, X } from 'lucide-react';
 
@@ -39,28 +39,35 @@ export function FilterBuilder({ filters, fields, onFiltersChange }: FilterBuilde
             <Select
               value={filter.field}
               onValueChange={(value) => updateFilter(index, { field: value })}
-              className="flex-1"
             >
-              <option value="">Select Field</option>
-              {fields.map((field) => (
-                <option key={field.name} value={field.name}>
-                  {field.label || field.name}
-                </option>
-              ))}
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Select field" />
+              </SelectTrigger>
+              <SelectContent>
+                {fields.map((field) => (
+                  <SelectItem key={field.name} value={field.name}>
+                    {field.label || field.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
             <Select
               value={filter.operator}
               onValueChange={(value) => updateFilter(index, { 
                 operator: value as 'equals' | 'contains' | 'gt' | 'lt' | 'between' | 'in'
               })}
-              className="w-[150px]"
             >
-              <option value="equals">Equals</option>
-              <option value="contains">Contains</option>
-              <option value="gt">Greater Than</option>
-              <option value="lt">Less Than</option>
-              <option value="between">Between</option>
-              <option value="in">In</option>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Select operator" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="equals">Equals</SelectItem>
+                <SelectItem value="contains">Contains</SelectItem>
+                <SelectItem value="gt">Greater Than</SelectItem>
+                <SelectItem value="lt">Less Than</SelectItem>
+                <SelectItem value="between">Between</SelectItem>
+                <SelectItem value="in">In</SelectItem>
+              </SelectContent>
             </Select>
             <Input
               placeholder="Value"

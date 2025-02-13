@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ReportField } from '../types';
 import { Plus, X } from 'lucide-react';
 
@@ -43,24 +43,31 @@ export function SortConfig({ sortOptions, fields, onSortOptionsChange }: SortCon
             <Select
               value={option.field}
               onValueChange={(value) => updateSortOption(index, { field: value })}
-              className="flex-1"
             >
-              <option value="">Select Field</option>
-              {fields.map((field) => (
-                <option key={field.name} value={field.name}>
-                  {field.label || field.name}
-                </option>
-              ))}
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Select field" />
+              </SelectTrigger>
+              <SelectContent>
+                {fields.map((field) => (
+                  <SelectItem key={field.name} value={field.name}>
+                    {field.label || field.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
             <Select
               value={option.direction}
               onValueChange={(value) => updateSortOption(index, { 
                 direction: value as 'asc' | 'desc'
               })}
-              className="w-[150px]"
             >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Select direction" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="asc">Ascending</SelectItem>
+                <SelectItem value="desc">Descending</SelectItem>
+              </SelectContent>
             </Select>
             <Button 
               variant="destructive" 

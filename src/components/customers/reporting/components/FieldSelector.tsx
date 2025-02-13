@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ReportField } from '../types';
 import { Plus, X } from 'lucide-react';
 
@@ -52,12 +52,16 @@ export function FieldSelector({ fields, onFieldsChange }: FieldSelectorProps) {
               onValueChange={(value) => updateField(index, { 
                 type: value as 'string' | 'number' | 'date' | 'boolean'
               })}
-              className="w-[150px]"
             >
-              <option value="string">Text</option>
-              <option value="number">Number</option>
-              <option value="date">Date</option>
-              <option value="boolean">Boolean</option>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="string">Text</SelectItem>
+                <SelectItem value="number">Number</SelectItem>
+                <SelectItem value="date">Date</SelectItem>
+                <SelectItem value="boolean">Boolean</SelectItem>
+              </SelectContent>
             </Select>
             <Button 
               variant="destructive" 

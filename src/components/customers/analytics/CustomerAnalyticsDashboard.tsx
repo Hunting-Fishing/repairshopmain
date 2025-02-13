@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { AlertCircle } from "lucide-react";
@@ -77,9 +76,8 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
         },
         (payload: RealtimePostgresChangesPayload<{ new: RealtimeEngagementScore }>) => {
           console.log('Engagement score updated:', payload);
-          const newScore = payload.new;
-          if (newScore && typeof newScore.total_score === 'number') {
-            setRealTimeScore(newScore.total_score);
+          if ('new' in payload && payload.new && 'total_score' in payload.new) {
+            setRealTimeScore(payload.new.total_score);
             toast.info("Engagement score updated");
           }
         }

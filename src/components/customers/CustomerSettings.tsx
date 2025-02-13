@@ -1,10 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Award, BarChart3, History, Layout, UserPlus, Settings2, Eye } from "lucide-react";
+import { Award, BarChart3, History, Layout, UserPlus, Settings2, Eye, Gauge } from "lucide-react";
 import { useState } from "react";
 import { LoyaltyTab } from "./loyalty/LoyaltyTab";
 import { LayoutSettings } from "./settings/LayoutSettings";
 import { DisplaySettings } from "./settings/DisplaySettings";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { EngagementScoringRules } from "./engagement/EngagementScoringRules";
 
 export function CustomerSettings() {
   // Layout settings state
@@ -34,6 +35,10 @@ export function CustomerSettings() {
         <TabsTrigger value="loyalty">
           <Award className="h-4 w-4 mr-2" />
           Loyalty Program
+        </TabsTrigger>
+        <TabsTrigger value="engagement">
+          <Gauge className="h-4 w-4 mr-2" />
+          Engagement Rules
         </TabsTrigger>
         <TabsTrigger value="history">
           <History className="h-4 w-4 mr-2" />
@@ -79,6 +84,10 @@ export function CustomerSettings() {
 
       <TabsContent value="loyalty">
         <LoyaltyTab />
+      </TabsContent>
+
+      <TabsContent value="engagement">
+        <EngagementScoringRules />
       </TabsContent>
 
       <TabsContent value="history">

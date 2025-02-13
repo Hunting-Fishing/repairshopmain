@@ -51,6 +51,11 @@ export interface ReportTemplate {
   filters: ReportFilter[];
   sortOptions: Array<{field: string; direction: 'asc' | 'desc'}>;
   config: Record<string, any>;
+  layout_id?: string;
+  data_source_id?: string;
+  last_generated_at?: string;
+  total_generations?: number;
+  generation_settings?: Record<string, any>;
 }
 
 export interface ReportOutput {

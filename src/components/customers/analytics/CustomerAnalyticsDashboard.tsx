@@ -17,6 +17,19 @@ interface CustomerAnalyticsDashboardProps {
   customerId: string;
 }
 
+interface EngagementScore {
+  customer_id: string;
+  total_score: number;
+  last_calculated_at: string;
+}
+
+interface RealtimeEngagementScorePayload {
+  new: {
+    total_score: number;
+    customer_id: string;
+  };
+}
+
 export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDashboardProps) {
   const [realTimeScore, setRealTimeScore] = useState<number | null>(null);
 
@@ -43,10 +56,12 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
         });
 
       if (error) throw error;
-      return data;
+      return data as number;
     },
-    onSuccess: (data) => {
-      setRealTimeScore(data);
+    meta: {
+      onSuccess: (data: number) => {
+        setRealTimeScore(data);
+      }
     }
   });
 
@@ -62,9 +77,9 @@ export function CustomerAnalyticsDashboard({ customerId }: CustomerAnalyticsDash
           table: 'customer_engagement_scores',
           filter: `customer_id=eq.${customerId}`
         },
-        (payload) => {
+        (payload: RealtimeEngagementScorePayload) => {
           console.log('Engagement score updated:', payload);
-          if (payload.new) {
+          if (payload.new && typeof payload.new.total_score === 'number') {
             setRealTimeScore(payload.new.total_score);
             toast.info("Engagement score updated");
           }

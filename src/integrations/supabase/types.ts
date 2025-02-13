@@ -488,6 +488,7 @@ export type Database = {
       }
       calendar_settings: {
         Row: {
+          business_hours: Json | null
           created_at: string
           id: string
           time_slot_duration: number
@@ -497,6 +498,7 @@ export type Database = {
           working_hours_start: number
         }
         Insert: {
+          business_hours?: Json | null
           created_at?: string
           id?: string
           time_slot_duration?: number
@@ -506,6 +508,7 @@ export type Database = {
           working_hours_start?: number
         }
         Update: {
+          business_hours?: Json | null
           created_at?: string
           id?: string
           time_slot_duration?: number
@@ -523,12 +526,10 @@ export type Database = {
           created_at: string
           file_url: string | null
           id: string
-          job_id: string | null
           metadata: Json | null
           room_id: string
           sender_id: string
           updated_at: string
-          vehicle_id: string | null
         }
         Insert: {
           content: string
@@ -536,12 +537,10 @@ export type Database = {
           created_at?: string
           file_url?: string | null
           id?: string
-          job_id?: string | null
           metadata?: Json | null
           room_id: string
           sender_id: string
           updated_at?: string
-          vehicle_id?: string | null
         }
         Update: {
           content?: string
@@ -549,21 +548,12 @@ export type Database = {
           created_at?: string
           file_url?: string | null
           id?: string
-          job_id?: string | null
           metadata?: Json | null
           room_id?: string
           sender_id?: string
           updated_at?: string
-          vehicle_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "chat_messages_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "customer_repair_jobs"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "chat_messages_room_id_fkey"
             columns: ["room_id"]
@@ -576,13 +566,6 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "chat_messages_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -1092,6 +1075,45 @@ export type Database = {
           },
         ]
       }
+      customer_data_quality_checks: {
+        Row: {
+          check_type: string
+          created_at: string | null
+          customer_id: string
+          id: string
+          issues: Json | null
+          last_checked: string | null
+          organization_id: string
+          resolution_notes: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          check_type: string
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          issues?: Json | null
+          last_checked?: string | null
+          organization_id: string
+          resolution_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          check_type?: string
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          issues?: Json | null
+          last_checked?: string | null
+          organization_id?: string
+          resolution_notes?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customer_document_versions: {
         Row: {
           changes_description: string | null
@@ -1459,9 +1481,9 @@ export type Database = {
           customer_id: string
           field_name: string
           id: string
-          new_value: string | null
+          new_value: Json | null
           notes: string | null
-          old_value: string | null
+          old_value: Json | null
         }
         Insert: {
           change_type: string
@@ -1470,9 +1492,9 @@ export type Database = {
           customer_id: string
           field_name: string
           id?: string
-          new_value?: string | null
+          new_value?: Json | null
           notes?: string | null
-          old_value?: string | null
+          old_value?: Json | null
         }
         Update: {
           change_type?: string
@@ -1481,9 +1503,9 @@ export type Database = {
           customer_id?: string
           field_name?: string
           id?: string
-          new_value?: string | null
+          new_value?: Json | null
           notes?: string | null
-          old_value?: string | null
+          old_value?: Json | null
         }
         Relationships: [
           {
@@ -2023,6 +2045,57 @@ export type Database = {
           },
         ]
       }
+      customer_portal_settings: {
+        Row: {
+          allowed_features: string[] | null
+          created_at: string | null
+          customer_id: string
+          id: string
+          last_login: string | null
+          locked_until: string | null
+          login_attempts: number | null
+          organization_id: string
+          password_last_changed: string | null
+          preferences: Json | null
+          reset_token: string | null
+          reset_token_expires: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          allowed_features?: string[] | null
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          last_login?: string | null
+          locked_until?: string | null
+          login_attempts?: number | null
+          organization_id: string
+          password_last_changed?: string | null
+          preferences?: Json | null
+          reset_token?: string | null
+          reset_token_expires?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          allowed_features?: string[] | null
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          last_login?: string | null
+          locked_until?: string | null
+          login_attempts?: number | null
+          organization_id?: string
+          password_last_changed?: string | null
+          preferences?: Json | null
+          reset_token?: string | null
+          reset_token_expires?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customer_repair_jobs: {
         Row: {
           actual_amount: number | null
@@ -2461,6 +2534,84 @@ export type Database = {
           },
         ]
       }
+      customer_welcome_sequence: {
+        Row: {
+          conditions: Json | null
+          created_at: string | null
+          delay_hours: number | null
+          id: string
+          is_active: boolean | null
+          message_type: string
+          organization_id: string
+          sequence_step: number
+          template_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string | null
+          delay_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          message_type: string
+          organization_id: string
+          sequence_step: number
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string | null
+          delay_hours?: number | null
+          id?: string
+          is_active?: boolean | null
+          message_type?: string
+          organization_id?: string
+          sequence_step?: number
+          template_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      customer_welcome_sequence_tracking: {
+        Row: {
+          created_at: string | null
+          customer_id: string
+          error_message: string | null
+          id: string
+          organization_id: string
+          scheduled_for: string
+          sent_at: string | null
+          sequence_step_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          customer_id: string
+          error_message?: string | null
+          id?: string
+          organization_id: string
+          scheduled_for: string
+          sent_at?: string | null
+          sequence_step_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          customer_id?: string
+          error_message?: string | null
+          id?: string
+          organization_id?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          sequence_step_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       customers: {
         Row: {
           address_book: Json | null
@@ -2664,6 +2815,48 @@ export type Database = {
           {
             foreignKeyName: "customers_updated_by_fkey"
             columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dashboard_configurations: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          id: string
+          organization_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          organization_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dashboard_configurations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dashboard_configurations_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -3097,7 +3290,7 @@ export type Database = {
           last_sync_at: string | null
           organization_id: string
           settings: Json | null
-          status: string
+          status: Database["public"]["Enums"]["integration_status_enum"] | null
           updated_at: string
         }
         Insert: {
@@ -3107,7 +3300,7 @@ export type Database = {
           last_sync_at?: string | null
           organization_id: string
           settings?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["integration_status_enum"] | null
           updated_at?: string
         }
         Update: {
@@ -3117,7 +3310,7 @@ export type Database = {
           last_sync_at?: string | null
           organization_id?: string
           settings?: Json | null
-          status?: string
+          status?: Database["public"]["Enums"]["integration_status_enum"] | null
           updated_at?: string
         }
         Relationships: [
@@ -4276,6 +4469,63 @@ export type Database = {
           },
         ]
       }
+      repair_job_history: {
+        Row: {
+          change_type: string
+          changed_by: string
+          created_at: string | null
+          id: string
+          new_status: string | null
+          new_value: Json | null
+          notes: string | null
+          old_status: string | null
+          old_value: Json | null
+          organization_id: string
+          repair_job_id: string
+        }
+        Insert: {
+          change_type: string
+          changed_by: string
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          new_value?: Json | null
+          notes?: string | null
+          old_status?: string | null
+          old_value?: Json | null
+          organization_id: string
+          repair_job_id: string
+        }
+        Update: {
+          change_type?: string
+          changed_by?: string
+          created_at?: string | null
+          id?: string
+          new_status?: string | null
+          new_value?: Json | null
+          notes?: string | null
+          old_status?: string | null
+          old_value?: Json | null
+          organization_id?: string
+          repair_job_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_job_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_job_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       repair_job_labor: {
         Row: {
           actual_duration_minutes: number | null
@@ -4356,6 +4606,67 @@ export type Database = {
             columns: ["technician_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_job_parts: {
+        Row: {
+          cost_per_unit: number | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          organization_id: string
+          part_id: string | null
+          quantity: number
+          repair_job_id: string
+          status: string | null
+          total_cost: number | null
+        }
+        Insert: {
+          cost_per_unit?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          organization_id: string
+          part_id?: string | null
+          quantity: number
+          repair_job_id: string
+          status?: string | null
+          total_cost?: number | null
+        }
+        Update: {
+          cost_per_unit?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          organization_id?: string
+          part_id?: string | null
+          quantity?: number
+          repair_job_id?: string
+          status?: string | null
+          total_cost?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_job_parts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_job_parts_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_job_parts_part_id_fkey"
+            columns: ["part_id"]
+            isOneToOne: false
+            referencedRelation: "inventory_items"
             referencedColumns: ["id"]
           },
         ]
@@ -4495,37 +4806,49 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          file_path: string | null
           file_size: number | null
           file_type: string
           file_url: string
           id: string
           metadata: Json
+          name: string | null
           organization_id: string
           schedule_id: string | null
+          sort_options: Json | null
+          status: string | null
           template_id: string
         }
         Insert: {
           created_at?: string
           created_by: string
+          file_path?: string | null
           file_size?: number | null
           file_type: string
           file_url: string
           id?: string
           metadata?: Json
+          name?: string | null
           organization_id: string
           schedule_id?: string | null
+          sort_options?: Json | null
+          status?: string | null
           template_id: string
         }
         Update: {
           created_at?: string
           created_by?: string
+          file_path?: string | null
           file_size?: number | null
           file_type?: string
           file_url?: string
           id?: string
           metadata?: Json
+          name?: string | null
           organization_id?: string
           schedule_id?: string | null
+          sort_options?: Json | null
+          status?: string | null
           template_id?: string
         }
         Relationships: [
@@ -4568,7 +4891,7 @@ export type Database = {
           organization_id: string
           schedule_id: string | null
           started_at: string | null
-          status: string
+          status: Database["public"]["Enums"]["report_processing_status"]
           template_id: string
           updated_at: string
         }
@@ -4580,7 +4903,7 @@ export type Database = {
           organization_id: string
           schedule_id?: string | null
           started_at?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["report_processing_status"]
           template_id: string
           updated_at?: string
         }
@@ -4592,7 +4915,7 @@ export type Database = {
           organization_id?: string
           schedule_id?: string | null
           started_at?: string | null
-          status?: string
+          status?: Database["public"]["Enums"]["report_processing_status"]
           template_id?: string
           updated_at?: string
         }
@@ -4757,6 +5080,7 @@ export type Database = {
           name: string
           organization_id: string
           sort_options: Json
+          status: string | null
           total_generations: number | null
           type: Database["public"]["Enums"]["report_type"]
           updated_at: string
@@ -4776,6 +5100,7 @@ export type Database = {
           name: string
           organization_id: string
           sort_options?: Json
+          status?: string | null
           total_generations?: number | null
           type: Database["public"]["Enums"]["report_type"]
           updated_at?: string
@@ -4795,6 +5120,7 @@ export type Database = {
           name?: string
           organization_id?: string
           sort_options?: Json
+          status?: string | null
           total_generations?: number | null
           type?: Database["public"]["Enums"]["report_type"]
           updated_at?: string
@@ -4972,6 +5298,70 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduling_notifications: {
+        Row: {
+          booking_id: string | null
+          content: string
+          created_at: string | null
+          id: string
+          notification_type: string | null
+          organization_id: string
+          recipient_type: string | null
+          repair_job_id: string | null
+          resolved_at: string | null
+          status: string | null
+          type: string
+        }
+        Insert: {
+          booking_id?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          notification_type?: string | null
+          organization_id: string
+          recipient_type?: string | null
+          repair_job_id?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          type: string
+        }
+        Update: {
+          booking_id?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          notification_type?: string | null
+          organization_id?: string
+          recipient_type?: string | null
+          repair_job_id?: string | null
+          resolved_at?: string | null
+          status?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduling_notifications_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduling_notifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduling_notifications_repair_job_id_fkey"
+            columns: ["repair_job_id"]
+            isOneToOne: false
+            referencedRelation: "customer_repair_jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -5471,8 +5861,10 @@ export type Database = {
           entity_type: string
           field_name: string | null
           id: string
+          new_status: string | null
           new_value: string | null
           notes: string | null
+          old_status: string | null
           old_value: string | null
           organization_id: string | null
           profile_id: string | null
@@ -5485,8 +5877,10 @@ export type Database = {
           entity_type: string
           field_name?: string | null
           id?: string
+          new_status?: string | null
           new_value?: string | null
           notes?: string | null
+          old_status?: string | null
           old_value?: string | null
           organization_id?: string | null
           profile_id?: string | null
@@ -5499,8 +5893,10 @@ export type Database = {
           entity_type?: string
           field_name?: string | null
           id?: string
+          new_status?: string | null
           new_value?: string | null
           notes?: string | null
+          old_status?: string | null
           old_value?: string | null
           organization_id?: string | null
           profile_id?: string | null
@@ -6690,6 +7086,101 @@ export type Database = {
           },
         ]
       }
+      template_components: {
+        Row: {
+          category: string
+          content: string | null
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          organization_id: string
+          type: Database["public"]["Enums"]["template_component_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          organization_id: string
+          type: Database["public"]["Enums"]["template_component_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          organization_id?: string
+          type?: Database["public"]["Enums"]["template_component_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_components_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_events: {
+        Row: {
+          created_at: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          organization_id: string
+          performed_at: string | null
+          performed_by: string | null
+          template_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          organization_id: string
+          performed_at?: string | null
+          performed_by?: string | null
+          template_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          organization_id?: string
+          performed_at?: string | null
+          performed_by?: string | null
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_events_performed_by_fkey"
+            columns: ["performed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       template_feedback: {
         Row: {
           comments: string | null
@@ -6724,6 +7215,73 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "job_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_tag_assignments: {
+        Row: {
+          created_at: string | null
+          id: string
+          tag_id: string
+          template_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          tag_id: string
+          template_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          tag_id?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_tag_assignments_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "template_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_tags: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_tags_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -7092,6 +7650,41 @@ export type Database = {
           },
         ]
       }
+      validation_methods: {
+        Row: {
+          config: Json | null
+          created_at: string | null
+          id: string
+          name: string
+          organization_id: string
+          validation_type: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          validation_type: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          validation_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "validation_methods_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_models_reference: {
         Row: {
           created_at: string
@@ -7419,31 +8012,63 @@ export type Database = {
           },
         ]
       }
+      staff_history_view: {
+        Row: {
+          change_type: string | null
+          changed_by: string | null
+          changed_by_first_name: string | null
+          changed_by_last_name: string | null
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string | null
+          field_name: string | null
+          id: string | null
+          new_status: string | null
+          new_value: string | null
+          notes: string | null
+          old_status: string | null
+          old_value: string | null
+          organization_id: string | null
+          profile_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_history_changed_by_fkey"
+            columns: ["changed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_history_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_history_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       work_order_messages: {
         Row: {
           content: string | null
           content_type: string | null
           created_at: string | null
-          file_url: string | null
           id: string | null
-          job_id: string | null
           metadata: Json | null
           room_id: string | null
           sender_first_name: string | null
           sender_id: string | null
           sender_last_name: string | null
           updated_at: string | null
-          vehicle_id: string | null
-          work_order_id: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "chat_messages_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "customer_repair_jobs"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "chat_messages_room_id_fkey"
             columns: ["room_id"]
@@ -7456,20 +8081,6 @@ export type Database = {
             columns: ["sender_id"]
             isOneToOne: false
             referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "chat_messages_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "chat_rooms_work_order_id_fkey"
-            columns: ["work_order_id"]
-            isOneToOne: false
-            referencedRelation: "customer_repair_jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -7502,6 +8113,12 @@ export type Database = {
           user_id: string
         }
         Returns: boolean
+      }
+      cast_validation_status: {
+        Args: {
+          status: string
+        }
+        Returns: Json
       }
       check_labor_time_conflicts: {
         Args: {
@@ -7699,6 +8316,8 @@ export type Database = {
       communication_type: "email" | "sms"
       dashboard_view_mode: "calendar" | "grid" | "list"
       demo_data_type: "work_order" | "booking" | "customer" | "vehicle"
+      integration_status: "connected" | "not_connected"
+      integration_status_enum: "connected" | "not_connected" | "disconnected"
       inventory_change_type:
         | "create"
         | "update"
@@ -7742,6 +8361,7 @@ export type Database = {
         | "failed"
         | "cancelled"
       sms_status: "pending" | "sent" | "failed" | "delivered"
+      template_component_type: "text" | "html" | "dynamic"
       template_sort_option: "name" | "created_at" | "updated_at" | "last_used"
       time_off_status: "pending" | "approved" | "rejected"
       time_off_type: "vacation" | "sick" | "personal" | "training"
@@ -7775,7 +8395,11 @@ export type Database = {
       validation_status: "pending" | "valid" | "invalid"
     }
     CompositeTypes: {
-      [_ in never]: never
+      notification_preferences_type: {
+        email: boolean | null
+        sms: boolean | null
+        push: boolean | null
+      }
     }
   }
 }

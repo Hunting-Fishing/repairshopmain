@@ -5263,6 +5263,63 @@ export type Database = {
           },
         ]
       }
+      schedule_exceptions: {
+        Row: {
+          created_at: string | null
+          end_time: string | null
+          exception_date: string
+          exception_type: Database["public"]["Enums"]["exception_type"]
+          id: string
+          organization_id: string
+          reason: string | null
+          start_time: string | null
+          status: string | null
+          technician_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_time?: string | null
+          exception_date: string
+          exception_type: Database["public"]["Enums"]["exception_type"]
+          id?: string
+          organization_id: string
+          reason?: string | null
+          start_time?: string | null
+          status?: string | null
+          technician_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string | null
+          exception_date?: string
+          exception_type?: Database["public"]["Enums"]["exception_type"]
+          id?: string
+          organization_id?: string
+          reason?: string | null
+          start_time?: string | null
+          status?: string | null
+          technician_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_exceptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedule_exceptions_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scheduled_communications: {
         Row: {
           analytics_data: Json | null
@@ -8594,6 +8651,7 @@ export type Database = {
       communication_type: "email" | "sms"
       dashboard_view_mode: "calendar" | "grid" | "list"
       demo_data_type: "work_order" | "booking" | "customer" | "vehicle"
+      exception_type: "time_off" | "holiday" | "training" | "other"
       integration_status: "connected" | "not_connected"
       integration_status_enum: "connected" | "not_connected" | "disconnected"
       inventory_change_type:

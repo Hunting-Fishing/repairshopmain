@@ -26,7 +26,7 @@ export function AddPartDialog({ repairJobId }: AddPartDialogProps) {
     }
 
     addPartMutation.mutate({
-      inventory_item_id: selectedPart,
+      part_id: selectedPart,
       quantity: parseInt(quantity),
     }, {
       onSuccess: () => {

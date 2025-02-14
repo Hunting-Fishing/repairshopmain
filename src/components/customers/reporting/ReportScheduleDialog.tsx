@@ -4,11 +4,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ReportSchedule, ReportProcessingQueueItem, RealtimePostgresChangesPayload } from './types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { ScheduleForm } from './components/ScheduleForm';
-import { ReportPreview } from './components/ReportPreview';
+import { PreviewTab } from './ReportSchedule/components/PreviewTab';
+import { DialogActions } from './ReportSchedule/components/DialogActions';
+import { useScheduleValidation } from './ReportSchedule/hooks/useScheduleValidation';
+import { useScheduleSubmit } from './ReportSchedule/hooks/useScheduleSubmit';
+import type { ReportSchedule, ReportProcessingQueueItem, RealtimePostgresChangesPayload } from './types';
 
 interface ReportScheduleDialogProps {
   templateId: string;
@@ -25,8 +28,9 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
   const [email, setEmail] = useState('');
   const [recipientType, setRecipientType] = useState<'to' | 'cc' | 'bcc'>('to');
   const [activeTab, setActiveTab] = useState('schedule');
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const { errors, setErrors, validateSchedule } = useScheduleValidation();
   const { toast } = useToast();
+  const { handleSave, handleSubmitForApproval } = useScheduleSubmit(templateId, onSchedule);
 
   const { data: template } = useQuery({
     queryKey: ['report-template', templateId],
@@ -56,8 +60,7 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
         (payload: RealtimePostgresChangesPayload<ReportProcessingQueueItem>) => {
           if (payload.new) {
             toast({
-              title: 'Report Status Update',
-              description: `Status: ${payload.new.status}`,
+              description: `Status: ${payload.new.status}`
             });
           }
         }
@@ -69,32 +72,12 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
     };
   }, [templateId, toast]);
 
-  const validateSchedule = () => {
-    const newErrors: Record<string, string> = {};
-
-    if (!schedule.name?.trim()) {
-      newErrors.name = 'Schedule name is required';
-    }
-
-    if (!schedule.frequency) {
-      newErrors.frequency = 'Frequency is required';
-    }
-
-    if (!schedule.recipients || schedule.recipients.length === 0) {
-      newErrors.recipients = 'At least one recipient is required';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const addRecipient = () => {
     if (!email) {
       setErrors(prev => ({ ...prev, email: 'Email is required' }));
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setErrors(prev => ({ ...prev, email: 'Invalid email format' }));
@@ -112,76 +95,26 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
     });
   };
 
-  const handleSave = async () => {
-    if (!validateSchedule()) {
+  const handleScheduleSave = async () => {
+    if (!validateSchedule(schedule)) {
       toast({
-        title: 'Validation Error',
         description: 'Please fill in all required fields',
         variant: 'destructive',
       });
       return;
     }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase
-      .from('report_schedules')
-      .insert({
-        template_id: templateId,
-        name: schedule.name,
-        frequency: schedule.frequency,
-        recipients: schedule.recipients,
-        created_by: user.id,
-        status: 'pending_approval'
-      });
-
-    if (!error) {
-      onSchedule(schedule);
-      toast({
-        title: 'Schedule Created',
-        description: 'Your report schedule has been submitted for approval.',
-      });
-    } else {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
+    await handleSave(schedule);
   };
 
-  const handleSubmitForApproval = async () => {
-    if (!validateSchedule()) {
+  const handleScheduleSubmit = async () => {
+    if (!validateSchedule(schedule)) {
       toast({
-        title: 'Validation Error',
         description: 'Please fill in all required fields',
         variant: 'destructive',
       });
       return;
     }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { error } = await supabase
-      .from('report_schedules')
-      .update({ status: 'pending_approval' })
-      .eq('template_id', templateId)
-      .eq('created_by', user.id);
-
-    if (!error) {
-      toast({
-        title: 'Submitted for Approval',
-        description: 'Your report has been submitted for approval.',
-      });
-    } else {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
+    await handleSubmitForApproval(schedule);
   };
 
   const previewData = [
@@ -221,19 +154,15 @@ export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleD
           </TabsContent>
 
           <TabsContent value="preview">
-            <ReportPreview template={template} previewData={previewData} />
+            <PreviewTab template={template} previewData={previewData} />
           </TabsContent>
         </Tabs>
 
-        <div className="flex justify-end space-x-2 mt-4">
-          <DialogTrigger asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogTrigger>
-          <Button onClick={handleSave}>Save as Draft</Button>
-          <Button onClick={handleSubmitForApproval} variant="default">
-            Submit for Approval
-          </Button>
-        </div>
+        <DialogActions
+          onSave={handleScheduleSave}
+          onSubmitForApproval={handleScheduleSubmit}
+          isValid={Object.keys(errors).length === 0}
+        />
       </DialogContent>
     </Dialog>
   );

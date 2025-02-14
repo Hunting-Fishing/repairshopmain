@@ -1,6 +1,6 @@
 
 import { CardHeader, CardTitle } from '@/components/ui/card';
-import { ReportExport } from '../../../components/ReportExport';
+import { ReportExport } from '../../ReportExport';
 import { ReportScheduleDialog } from '../../ReportScheduleDialog';
 
 interface ReportHeaderProps {

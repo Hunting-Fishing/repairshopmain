@@ -20,14 +20,11 @@ export function useReportSave() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['report-templates'] });
-      toast("Template Saved", {
-        description: "Report template has been saved successfully"
-      });
+      toast.success("Report template has been saved successfully");
     },
     onError: (error) => {
-      toast("Error Saving Template", {
-        description: error.message,
-        variant: "destructive"
+      toast.error("Failed to save template", {
+        description: error.message
       });
     }
   });
@@ -38,3 +35,4 @@ export function useReportSave() {
     error
   };
 }
+

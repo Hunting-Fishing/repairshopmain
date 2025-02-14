@@ -1,27 +1,25 @@
+
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { ReportType } from './types/reportTypes';
 import { ChartWidget } from '../widgets/ChartWidget';
 import { FieldSelector } from '../components/FieldSelector';
 import { FilterBuilder } from '../components/FilterBuilder';
 import { SortConfig } from '../components/SortConfig';
-import { LayoutSelector } from '../components/LayoutSelector';
-import { ReportGenerateButton } from '../components/ReportGenerateButton';
-import { ReportHeader } from './components/ReportHeader';
-import { ReportForm } from './components/ReportForm';
 import { useReportTemplate } from './hooks/useReportTemplate';
 import { useReportSave } from './hooks/useReportSave';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { ReportHeader } from './components/ReportHeader';
+import { ReportForm } from './components/ReportForm';
+import type { ReportType } from './types/reportTypes';
 
 export function ReportBuilder() {
   const [activeTab, setActiveTab] = useState<string>('fields');
   const { template, updateTemplate } = useReportTemplate();
   const { saveTemplate, isLoading } = useReportSave();
-  const { toast } = useToast();
 
   const { data: templates, refetch } = useQuery({
     queryKey: ['report-templates'],
@@ -37,9 +35,8 @@ export function ReportBuilder() {
   });
 
   const handleSchedule = async (schedule: any) => {
-    toast({
-      title: "Report Scheduled",
-      description: "The report has been scheduled successfully",
+    toast("Report Scheduled", {
+      description: "The report has been scheduled successfully"
     });
   };
 
@@ -64,7 +61,7 @@ export function ReportBuilder() {
             name={template.name || ''}
             type={template.type || 'tabular'}
             onNameChange={(name) => updateTemplate({ name })}
-            onTypeChange={(type) => updateTemplate({ type })}
+            onTypeChange={(type) => updateTemplate({ type: type as ReportType })}
           />
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>

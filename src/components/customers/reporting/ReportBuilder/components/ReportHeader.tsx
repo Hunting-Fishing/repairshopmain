@@ -1,13 +1,12 @@
 
-import { Button } from '@/components/ui/button';
-import { ReportExport } from '../../ReportExport';
-import { ReportScheduleDialog } from '../../ReportScheduleDialog';
 import { CardHeader, CardTitle } from '@/components/ui/card';
+import { ReportExport } from '../../components/ReportExport';
+import { ReportScheduleDialog } from '../../ReportScheduleDialog';
 
 interface ReportHeaderProps {
-  templateId?: string;
+  templateId: string | undefined;
   previewData: any[];
-  onSchedule: (schedule: any) => void;
+  onSchedule: (schedule: any) => Promise<void>;
 }
 
 export function ReportHeader({ templateId, previewData, onSchedule }: ReportHeaderProps) {

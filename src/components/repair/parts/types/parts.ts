@@ -1,11 +1,12 @@
 
 interface Part {
   id: string;
-  inventory_item_id: string;
+  repair_job_id: string;
+  part_id: string;
   quantity: number;
   unit_price: number;
   total_price: number;
-  notes: string;
+  notes?: string;
   inventory_item: {
     name: string;
     sku: string;
@@ -13,7 +14,7 @@ interface Part {
 }
 
 interface PartFormData {
-  inventory_item_id: string;
+  part_id: string;
   quantity: number;
 }
 

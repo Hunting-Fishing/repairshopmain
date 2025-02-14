@@ -11,7 +11,7 @@ export function usePartsQuery(repairJobId: string) {
         .from('repair_job_parts')
         .select(`
           *,
-          inventory_item:inventory_item_id (name, sku)
+          inventory_item:part_id (name, sku)
         `)
         .eq('repair_job_id', repairJobId);
 

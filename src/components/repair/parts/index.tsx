@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { AddPartDialog } from "./AddPartDialog";
 import { PartsList } from "./PartsList";
 import { usePartsQuery } from "./hooks/usePartsQuery";

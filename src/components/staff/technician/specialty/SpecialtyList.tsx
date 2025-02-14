@@ -2,6 +2,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface Specialty {
   id: string;
@@ -11,9 +13,10 @@ interface Specialty {
 
 interface SpecialtyListProps {
   specialties: Specialty[];
+  onRemove?: (id: string) => void;
 }
 
-export function SpecialtyList({ specialties }: SpecialtyListProps) {
+export function SpecialtyList({ specialties, onRemove }: SpecialtyListProps) {
   const getLevelColor = (level: string) => {
     switch (level) {
       case 'beginner':
@@ -35,10 +38,22 @@ export function SpecialtyList({ specialties }: SpecialtyListProps) {
             key={specialty.id}
             className="flex items-center justify-between p-2 rounded-lg hover:bg-accent"
           >
-            <span className="font-medium">{specialty.name}</span>
-            <Badge className={getLevelColor(specialty.level)}>
-              {specialty.level}
-            </Badge>
+            <div className="flex items-center space-x-2">
+              <span className="font-medium">{specialty.name}</span>
+              <Badge className={getLevelColor(specialty.level)}>
+                {specialty.level}
+              </Badge>
+            </div>
+            {onRemove && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onRemove(specialty.id)}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         ))}
         {specialties.length === 0 && (

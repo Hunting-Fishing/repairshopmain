@@ -298,6 +298,7 @@ export type Database = {
           buffer_after_minutes: number | null
           buffer_before_minutes: number | null
           color: string | null
+          complexity_level: string | null
           conflict_details: Json | null
           created_at: string
           created_by: string
@@ -309,6 +310,7 @@ export type Database = {
           has_conflicts: boolean | null
           id: string
           is_demo: boolean | null
+          is_emergency: boolean | null
           is_multi_day: boolean | null
           job_description: string
           last_status_change: string | null
@@ -321,6 +323,7 @@ export type Database = {
           priority: string | null
           remaining_minutes: number | null
           repair_job_id: string | null
+          required_specialty_levels: Json | null
           sequence_number: number | null
           source: string | null
           start_time: string
@@ -335,6 +338,7 @@ export type Database = {
           buffer_after_minutes?: number | null
           buffer_before_minutes?: number | null
           color?: string | null
+          complexity_level?: string | null
           conflict_details?: Json | null
           created_at?: string
           created_by: string
@@ -346,6 +350,7 @@ export type Database = {
           has_conflicts?: boolean | null
           id?: string
           is_demo?: boolean | null
+          is_emergency?: boolean | null
           is_multi_day?: boolean | null
           job_description: string
           last_status_change?: string | null
@@ -358,6 +363,7 @@ export type Database = {
           priority?: string | null
           remaining_minutes?: number | null
           repair_job_id?: string | null
+          required_specialty_levels?: Json | null
           sequence_number?: number | null
           source?: string | null
           start_time: string
@@ -372,6 +378,7 @@ export type Database = {
           buffer_after_minutes?: number | null
           buffer_before_minutes?: number | null
           color?: string | null
+          complexity_level?: string | null
           conflict_details?: Json | null
           created_at?: string
           created_by?: string
@@ -383,6 +390,7 @@ export type Database = {
           has_conflicts?: boolean | null
           id?: string
           is_demo?: boolean | null
+          is_emergency?: boolean | null
           is_multi_day?: boolean | null
           job_description?: string
           last_status_change?: string | null
@@ -395,6 +403,7 @@ export type Database = {
           priority?: string | null
           remaining_minutes?: number | null
           repair_job_id?: string | null
+          required_specialty_levels?: Json | null
           sequence_number?: number | null
           source?: string | null
           start_time?: string
@@ -4452,6 +4461,47 @@ export type Database = {
           },
         ]
       }
+      recurring_availability: {
+        Row: {
+          created_at: string | null
+          day_of_week: number
+          end_time: string
+          id: string
+          is_active: boolean | null
+          organization_id: string
+          start_time: string
+          technician_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week: number
+          end_time: string
+          id?: string
+          is_active?: boolean | null
+          organization_id: string
+          start_time: string
+          technician_id: string
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_active?: boolean | null
+          organization_id?: string
+          start_time?: string
+          technician_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_availability_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       regions: {
         Row: {
           country_id: string
@@ -5313,6 +5363,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      scheduling_metrics: {
+        Row: {
+          average_response_time: unknown | null
+          created_at: string | null
+          date: string
+          failed_assignments: number | null
+          id: string
+          organization_id: string
+          successful_assignments: number | null
+          total_bookings: number | null
+        }
+        Insert: {
+          average_response_time?: unknown | null
+          created_at?: string | null
+          date: string
+          failed_assignments?: number | null
+          id?: string
+          organization_id: string
+          successful_assignments?: number | null
+          total_bookings?: number | null
+        }
+        Update: {
+          average_response_time?: unknown | null
+          created_at?: string | null
+          date?: string
+          failed_assignments?: number | null
+          id?: string
+          organization_id?: string
+          successful_assignments?: number | null
+          total_bookings?: number | null
+        }
+        Relationships: []
       }
       scheduling_notifications: {
         Row: {
@@ -7079,6 +7162,44 @@ export type Database = {
           },
         ]
       }
+      technician_workload: {
+        Row: {
+          booking_count: number | null
+          date: string
+          id: string
+          organization_id: string
+          technician_id: string
+          total_hours: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          booking_count?: number | null
+          date: string
+          id?: string
+          organization_id: string
+          technician_id: string
+          total_hours?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          booking_count?: number | null
+          date?: string
+          id?: string
+          organization_id?: string
+          technician_id?: string
+          total_hours?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technician_workload_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       template_approval_history: {
         Row: {
           action: string
@@ -8294,6 +8415,15 @@ export type Database = {
         Args: {
           template_id: string
           new_name?: string
+        }
+        Returns: string
+      }
+      enhanced_auto_assign_technician: {
+        Args: {
+          p_booking_id: string
+          p_required_specialties?: string[]
+          p_minimum_level?: string
+          p_is_emergency?: boolean
         }
         Returns: string
       }

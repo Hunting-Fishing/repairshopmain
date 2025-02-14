@@ -1,168 +1,178 @@
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Calendar } from "lucide-react";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useToast } from '@/hooks/use-toast';
-import { ScheduleForm } from './components/ScheduleForm';
-import { PreviewTab } from './ReportSchedule/components/PreviewTab';
-import { DialogActions } from './ReportSchedule/components/DialogActions';
-import { useScheduleValidation } from './ReportSchedule/hooks/useScheduleValidation';
-import { useScheduleSubmit } from './ReportSchedule/hooks/useScheduleSubmit';
-import type { ReportSchedule, ReportProcessingQueueItem, RealtimePostgresChangesPayload } from './types';
+const scheduleSchema = z.object({
+  frequency: z.enum(["daily", "weekly", "monthly"]),
+  time: z.string(),
+  dayOfWeek: z.string().optional(),
+  dayOfMonth: z.string().optional(),
+  recipients: z.string(),
+});
+
+type ScheduleFormValues = z.infer<typeof scheduleSchema>;
 
 interface ReportScheduleDialogProps {
   templateId: string;
-  onSchedule: (schedule: Partial<ReportSchedule>) => void;
+  onSchedule: (schedule: any) => Promise<void>;
 }
 
 export function ReportScheduleDialog({ templateId, onSchedule }: ReportScheduleDialogProps) {
-  const [schedule, setSchedule] = useState<Partial<ReportSchedule>>({
-    templateId,
-    frequency: 'weekly',
-    recipients: []
+  const form = useForm<ScheduleFormValues>({
+    resolver: zodResolver(scheduleSchema),
+    defaultValues: {
+      frequency: "daily",
+      time: "09:00",
+      recipients: "",
+    },
   });
 
-  const [email, setEmail] = useState('');
-  const [recipientType, setRecipientType] = useState<'to' | 'cc' | 'bcc'>('to');
-  const [activeTab, setActiveTab] = useState('schedule');
-  const { errors, setErrors, validateSchedule } = useScheduleValidation();
-  const { toast } = useToast();
-  const { handleSave, handleSubmitForApproval } = useScheduleSubmit(templateId, onSchedule);
-
-  const { data: template } = useQuery({
-    queryKey: ['report-template', templateId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('report_templates')
-        .select('*')
-        .eq('id', templateId)
-        .single();
-
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('report-status')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'report_processing_queue',
-          filter: `template_id=eq.${templateId}`
-        },
-        (payload: RealtimePostgresChangesPayload<ReportProcessingQueueItem>) => {
-          if (payload.new) {
-            toast({
-              description: `Status: ${payload.new.status}`
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [templateId, toast]);
-
-  const addRecipient = () => {
-    if (!email) {
-      setErrors(prev => ({ ...prev, email: 'Email is required' }));
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setErrors(prev => ({ ...prev, email: 'Invalid email format' }));
-      return;
-    }
-
-    setSchedule({
-      ...schedule,
-      recipients: [...(schedule.recipients || []), { email, type: recipientType }]
-    });
-    setEmail('');
-    setErrors(prev => {
-      const { recipients, ...rest } = prev;
-      return rest;
+  const handleSubmit = async (values: ScheduleFormValues) => {
+    await onSchedule({
+      templateId,
+      ...values,
     });
   };
-
-  const handleScheduleSave = async () => {
-    if (!validateSchedule(schedule)) {
-      toast({
-        description: 'Please fill in all required fields',
-        variant: 'destructive',
-      });
-      return;
-    }
-    await handleSave(schedule);
-  };
-
-  const handleScheduleSubmit = async () => {
-    if (!validateSchedule(schedule)) {
-      toast({
-        description: 'Please fill in all required fields',
-        variant: 'destructive',
-      });
-      return;
-    }
-    await handleSubmitForApproval(schedule);
-  };
-
-  const previewData = [
-    { name: 'Jan', value: 100 },
-    { name: 'Feb', value: 200 },
-    { name: 'Mar', value: 150 },
-    { name: 'Apr', value: 300 },
-  ];
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Schedule Report</Button>
+        <Button variant="outline">
+          <Calendar className="mr-2 h-4 w-4" />
+          Schedule
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Schedule Report</DialogTitle>
         </DialogHeader>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="schedule">Schedule</TabsTrigger>
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="schedule">
-            <ScheduleForm
-              schedule={schedule}
-              email={email}
-              recipientType={recipientType}
-              onEmailChange={setEmail}
-              onRecipientTypeChange={setRecipientType}
-              onScheduleChange={setSchedule}
-              onAddRecipient={addRecipient}
-              errors={errors}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="frequency"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Frequency</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <RadioGroupItem value="daily" />
+                        <FormLabel className="font-normal">Daily</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <RadioGroupItem value="weekly" />
+                        <FormLabel className="font-normal">Weekly</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <RadioGroupItem value="monthly" />
+                        <FormLabel className="font-normal">Monthly</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                </FormItem>
+              )}
             />
-          </TabsContent>
 
-          <TabsContent value="preview">
-            <PreviewTab template={template} previewData={previewData} />
-          </TabsContent>
-        </Tabs>
+            {form.watch("frequency") === "weekly" && (
+              <FormField
+                control={form.control}
+                name="dayOfWeek"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Day of Week</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select day" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="1">Monday</SelectItem>
+                        <SelectItem value="2">Tuesday</SelectItem>
+                        <SelectItem value="3">Wednesday</SelectItem>
+                        <SelectItem value="4">Thursday</SelectItem>
+                        <SelectItem value="5">Friday</SelectItem>
+                        <SelectItem value="6">Saturday</SelectItem>
+                        <SelectItem value="0">Sunday</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+            )}
 
-        <DialogActions
-          onSave={handleScheduleSave}
-          onSubmitForApproval={handleScheduleSubmit}
-          isValid={Object.keys(errors).length === 0}
-        />
+            {form.watch("frequency") === "monthly" && (
+              <FormField
+                control={form.control}
+                name="dayOfMonth"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Day of Month</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select day" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Array.from({ length: 31 }, (_, i) => (
+                          <SelectItem key={i + 1} value={(i + 1).toString()}>
+                            {i + 1}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+            )}
+
+            <FormField
+              control={form.control}
+              name="time"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time</FormLabel>
+                  <FormControl>
+                    <Input type="time" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="recipients"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Recipients (comma-separated emails)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="email@example.com" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <DialogTrigger asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogTrigger>
+              <Button type="submit">Schedule Report</Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

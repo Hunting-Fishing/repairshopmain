@@ -1,14 +1,15 @@
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { ReportTemplate } from '../types/reportTypes';
 
 export function useReportSave() {
-  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate: saveTemplate, isPending: isLoading, error } = useMutation({
-    mutationFn: async (template: Partial<ReportTemplate>) => {
+  const saveTemplate = async (template: Partial<ReportTemplate>) => {
+    try {
+      setIsLoading(true);
       const { error } = await supabase
         .from('report_templates')
         .insert({
@@ -17,23 +18,19 @@ export function useReportSave() {
         });
 
       if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['report-templates'] });
-      toast("Template Saved", {
-        description: "Report template has been saved successfully"
-      });
-    },
-    onError: (error) => {
-      toast("Error Saving Template", {
+      
+      toast.success("Report template saved successfully");
+    } catch (error: any) {
+      toast.error("Failed to save template", {
         description: error.message
       });
+    } finally {
+      setIsLoading(false);
     }
-  });
+  };
 
   return {
     saveTemplate,
-    isLoading,
-    error
+    isLoading
   };
 }

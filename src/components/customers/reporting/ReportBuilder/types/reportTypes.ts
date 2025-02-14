@@ -1,16 +1,16 @@
 
-export type ReportTabType = 'fields' | 'filters' | 'sort' | 'preview';
+export type ReportType = 'tabular' | 'summary' | 'chart';
 
-export interface ReportConfig {
-  chartType: 'bar' | 'line' | 'pie';
-  xAxis: string;
-  yAxis: string;
+export interface ReportTemplate {
+  id?: string;
+  name: string;
+  type: ReportType;
+  fields: string[];
+  filters: any[];
+  sortOptions: any[];
+  config?: {
+    chartType: string;
+    xAxis: string;
+    yAxis: string;
+  };
 }
-
-export interface ReportSchedule {
-  frequency: 'daily' | 'weekly' | 'monthly';
-  startDate: Date;
-  recipients: string[];
-}
-
-export type { ReportTemplate, ReportType, ReportField, ReportFilter } from '@/components/customers/reporting/types';

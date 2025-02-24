@@ -1,32 +1,25 @@
-import { useState } from 'react';
+
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { ReportTemplate, ReportType } from './types';
 import { ChartWidget } from './widgets/ChartWidget';
-import { ReportScheduleDialog } from './ReportScheduleDialog';
-import { ReportExport } from './ReportExport';
-import { useToast } from '@/hooks/use-toast';
 import { FieldSelector } from './components/FieldSelector';
 import { FilterBuilder } from './components/FilterBuilder';
 import { SortConfig } from './components/SortConfig';
-import { LayoutSelector } from './components/LayoutSelector';
-import { ReportGenerateButton } from './components/ReportGenerateButton';
+import { useReportTemplate } from './hooks/useReportTemplate';
+import { useReportSave } from './hooks/useReportSave';
+import { toast } from 'sonner';
+import { ReportHeader } from './components/ReportHeader';
+import { ReportForm } from './components/ReportForm';
+import type { ReportType } from './types';
 
 export function ReportBuilder() {
   const [activeTab, setActiveTab] = useState<string>('fields');
-  const [template, setTemplate] = useState<Partial<ReportTemplate>>({
-    type: 'tabular',
-    fields: [],
-    filters: [],
-    sortOptions: []
-  });
-
-  const { toast } = useToast();
+  const { template, updateTemplate } = useReportTemplate();
+  const { saveTemplate, isLoading } = useReportSave();
 
   const { data: templates, refetch } = useQuery({
     queryKey: ['report-templates'],
@@ -41,33 +34,9 @@ export function ReportBuilder() {
     }
   });
 
-  const handleSave = async () => {
-    const { error } = await supabase
-      .from('report_templates')
-      .insert({
-        ...template,
-        created_by: (await supabase.auth.getUser()).data.user?.id
-      });
-
-    if (error) {
-      toast({
-        title: "Error Saving Template",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Template Saved",
-        description: "Report template has been saved successfully",
-      });
-      refetch();
-    }
-  };
-
   const handleSchedule = async (schedule: any) => {
-    toast({
-      title: "Report Scheduled",
-      description: "The report has been scheduled successfully",
+    toast("Report Scheduled", {
+      description: "The report has been scheduled successfully"
     });
   };
 
@@ -79,32 +48,28 @@ export function ReportBuilder() {
     { name: 'Apr', value: 300 },
   ];
 
+  const handleLayoutChange = (layoutId: string) => {
+    updateTemplate({
+      ...template,
+      config: { ...template.config, layout_id: layoutId }
+    });
+  };
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Report Builder</CardTitle>
-        <div className="flex items-center gap-2">
-          <ReportExport templateId={template.id || ''} data={previewData} />
-          <ReportScheduleDialog templateId={template.id || ''} onSchedule={handleSchedule} />
-        </div>
-      </CardHeader>
+      <ReportHeader 
+        templateId={template.id} 
+        previewData={previewData}
+        onSchedule={handleSchedule}
+      />
       <CardContent>
         <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              placeholder="Report Name"
-              value={template.name || ''}
-              onChange={(e) => setTemplate({ ...template, name: e.target.value })}
-            />
-            <Select
-              value={template.type}
-              onValueChange={(value) => setTemplate({ ...template, type: value as ReportType })}
-            >
-              <option value="tabular">Tabular Report</option>
-              <option value="summary">Summary Report</option>
-              <option value="chart">Chart Report</option>
-            </Select>
-          </div>
+          <ReportForm
+            name={template.name || ''}
+            type={template.type || 'tabular'}
+            onNameChange={(name) => updateTemplate({ name })}
+            onTypeChange={(type) => updateTemplate({ type: type as ReportType })}
+          />
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList>
@@ -117,7 +82,7 @@ export function ReportBuilder() {
             <TabsContent value="fields">
               <FieldSelector
                 fields={template.fields || []}
-                onFieldsChange={(fields) => setTemplate({ ...template, fields })}
+                onFieldsChange={(fields) => updateTemplate({ fields })}
               />
             </TabsContent>
 
@@ -125,7 +90,7 @@ export function ReportBuilder() {
               <FilterBuilder
                 filters={template.filters || []}
                 fields={template.fields || []}
-                onFiltersChange={(filters) => setTemplate({ ...template, filters })}
+                onFiltersChange={(filters) => updateTemplate({ filters })}
               />
             </TabsContent>
 
@@ -133,36 +98,12 @@ export function ReportBuilder() {
               <SortConfig
                 sortOptions={template.sortOptions || []}
                 fields={template.fields || []}
-                onSortOptionsChange={(sortOptions) => setTemplate({ ...template, sortOptions })}
+                onSortOptionsChange={(sortOptions) => updateTemplate({ sortOptions })}
               />
             </TabsContent>
 
             <TabsContent value="preview">
               <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Preview & Generate</CardTitle>
-                  <div className="flex gap-2">
-                    <LayoutSelector
-                      templateId={template.id || ''}
-                      value={template.layout_id}
-                      onChange={(layoutId) => setTemplate({ ...template, layout_id: layoutId })}
-                    />
-                    {template.id && (
-                      <ReportGenerateButton
-                        templateId={template.id}
-                        parameters={{
-                          fields: template.fields,
-                          filters: template.filters,
-                          sortOptions: template.sortOptions
-                        }}
-                        onComplete={(outputUrl) => {
-                          // Handle the generated report
-                          window.open(outputUrl, '_blank');
-                        }}
-                      />
-                    )}
-                  </div>
-                </CardHeader>
                 <CardContent>
                   {template.type === 'chart' && (
                     <ChartWidget
@@ -187,7 +128,9 @@ export function ReportBuilder() {
 
           <div className="flex justify-end space-x-2">
             <Button variant="outline">Cancel</Button>
-            <Button onClick={handleSave}>Save Report</Button>
+            <Button onClick={() => saveTemplate(template)} disabled={isLoading}>
+              Save Report
+            </Button>
           </div>
         </div>
       </CardContent>

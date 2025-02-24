@@ -1,6 +1,27 @@
 
 export type ReportType = 'tabular' | 'summary' | 'chart';
 
+export interface DashboardConfig {
+  layout: DashboardWidget[];
+  settings: {
+    refreshInterval: number;
+    defaultView: string;
+  };
+}
+
+export interface DashboardWidget {
+  id: string;
+  type: 'chart' | 'metric' | 'list';
+  title: string;
+  config: Record<string, any>;
+  position: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  };
+}
+
 export interface ReportField {
   name: string;
   label: string;
@@ -28,6 +49,7 @@ export interface ReportTemplate {
     xAxis?: string;
     yAxis?: string;
     layout?: string;
+    layout_id?: string;
   };
   organization_id?: string;
   created_by?: string;

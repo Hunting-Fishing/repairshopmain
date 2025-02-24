@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import type { ReportTemplate } from '../types/reportTypes';
+import type { ReportTemplate } from '../../types';
 
 export function useReportSave() {
   const [isLoading, setIsLoading] = useState(false);

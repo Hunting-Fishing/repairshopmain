@@ -1,7 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { ReportSchedule } from '../../ReportBuilder/types/reportTypes';
+import type { ReportSchedule } from '../../types';
 
 export function useScheduleSubmit(templateId: string, onSchedule: (schedule: Partial<ReportSchedule>) => void) {
   const { toast } = useToast();

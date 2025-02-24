@@ -13,13 +13,15 @@ import {
 } from "@/components/ui/select";
 import { useLocationData } from "@/hooks/useLocationData";
 import { useBusinessTypes } from "@/hooks/useBusinessTypes";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const { signUp } = useAuth();
   const { countries, regions } = useLocationData(selectedCountry);
-  const businessTypes = useBusinessTypes();
+  const { businessTypes, isLoading: isLoadingTypes } = useBusinessTypes();
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -65,18 +67,22 @@ export function RegisterForm() {
           placeholder="Business Phone"
           required
         />
-        <Select name="businessType" required>
-          <SelectTrigger>
-            <SelectValue placeholder="Select Business Type" />
-          </SelectTrigger>
-          <SelectContent>
-            {businessTypes?.map((type) => (
-              <SelectItem key={type.id} value={type.name}>
-                {type.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {isLoadingTypes ? (
+          <Skeleton className="h-10 w-full" />
+        ) : (
+          <Select name="businessType" required>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Business Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {businessTypes?.map((type) => (
+                <SelectItem key={type.id} value={type.name}>
+                  {type.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
       <div className="space-y-2">
         <Label>Personal Information</Label>
@@ -155,7 +161,14 @@ export function RegisterForm() {
         />
       </div>
       <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Creating account..." : "Create Account"}
+        {isLoading ? (
+          <>
+            <LoadingSpinner className="mr-2" />
+            Creating account...
+          </>
+        ) : (
+          "Create Account"
+        )}
       </Button>
     </form>
   );

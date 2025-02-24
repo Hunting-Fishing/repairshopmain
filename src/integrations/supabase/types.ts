@@ -4120,6 +4120,51 @@ export type Database = {
           },
         ]
       }
+      labor_entries: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          hours_worked: number | null
+          id: string
+          rate_per_hour: number | null
+          technician_id: string | null
+          work_order_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          hours_worked?: number | null
+          id?: string
+          rate_per_hour?: number | null
+          technician_id?: string | null
+          work_order_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          hours_worked?: number | null
+          id?: string
+          rate_per_hour?: number | null
+          technician_id?: string | null
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "labor_entries_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "labor_entries_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loyalty_program_settings: {
         Row: {
           created_at: string
@@ -5263,6 +5308,41 @@ export type Database = {
           },
         ]
       }
+      roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       schedule_exceptions: {
         Row: {
           created_at: string | null
@@ -5417,6 +5497,67 @@ export type Database = {
             columns: ["template_id"]
             isOneToOne: false
             referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedules: {
+        Row: {
+          created_at: string | null
+          end_time: string
+          id: string
+          notes: string | null
+          organization_id: string | null
+          start_time: string
+          status: string | null
+          technician_id: string | null
+          updated_at: string | null
+          work_order_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_time: string
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          start_time: string
+          status?: string | null
+          technician_id?: string | null
+          updated_at?: string | null
+          work_order_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          start_time?: string
+          status?: string | null
+          technician_id?: string | null
+          updated_at?: string | null
+          work_order_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedules_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedules_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "schedules_work_order_id_fkey"
+            columns: ["work_order_id"]
+            isOneToOne: false
+            referencedRelation: "work_orders"
             referencedColumns: ["id"]
           },
         ]
@@ -8228,6 +8369,97 @@ export type Database = {
           },
         ]
       }
+      work_orders: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          customer_id: string | null
+          description: string | null
+          estimated_completion: string | null
+          id: string
+          notes: string | null
+          organization_id: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["work_order_status"] | null
+          technician_id: string | null
+          updated_at: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          description?: string | null
+          estimated_completion?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["work_order_status"] | null
+          technician_id?: string | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          customer_id?: string | null
+          description?: string | null
+          estimated_completion?: string | null
+          id?: string
+          notes?: string | null
+          organization_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["work_order_status"] | null
+          technician_id?: string | null
+          updated_at?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "work_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics_dashboard"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "work_orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_technician_id_fkey"
+            columns: ["technician_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_orders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       customer_analytics: {
@@ -8484,6 +8716,342 @@ export type Database = {
         }
         Returns: string
       }
+      gbt_bit_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_bool_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_bool_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_bpchar_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_bytea_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_cash_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_cash_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_date_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_date_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_decompress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_enum_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_enum_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_float4_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_float4_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_float8_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_float8_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_inet_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_int2_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_int2_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_int4_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_int4_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_int8_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_int8_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_intv_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_intv_decompress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_intv_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_macad_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_macad_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_macad8_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_macad8_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_numeric_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_oid_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_oid_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_text_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_time_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_time_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_timetz_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_ts_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_ts_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_tstz_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_uuid_compress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_uuid_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_var_decompress: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbt_var_fetch: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey_var_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey_var_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey16_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey16_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey2_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey2_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey32_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey32_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey4_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey4_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey8_in: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      gbtreekey8_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
       generate_demo_work_orders: {
         Args: {
           org_id: string
@@ -8736,6 +9304,7 @@ export type Database = {
         | "hr"
         | "custom"
       validation_status: "pending" | "valid" | "invalid"
+      work_order_status: "pending" | "in_progress" | "completed" | "cancelled"
     }
     CompositeTypes: {
       notification_preferences_type: {

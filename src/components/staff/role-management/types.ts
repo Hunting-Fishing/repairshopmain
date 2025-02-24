@@ -1,8 +1,9 @@
+
 export type StaffMember = {
   id: string;
   first_name: string | null;
   last_name: string | null;
-  role: "owner" | "management" | "technician" | "service_advisor" | "parts" | "hr" | "custom";
+  role: string;
   custom_role_id?: string | null;
 };
 
@@ -12,33 +13,19 @@ export type CustomRole = {
   organization_id: string;
 };
 
-export const roles: StaffMember["role"][] = [
-  "owner",
-  "management",
-  "technician",
-  "service_advisor",
-  "parts",
-  "hr",
-  "custom"
-];
+export const roles = ['owner', 'management', 'service_advisor', 'technician', 'custom'] as const;
 
-export const getRoleBadgeColor = (role: string) => {
+export function getRoleBadgeColor(role: string): string {
   switch (role) {
-    case "owner":
-      return "bg-purple-500";
-    case "management":
-      return "bg-blue-500";
-    case "technician":
-      return "bg-green-500";
-    case "service_advisor":
-      return "bg-yellow-500";
-    case "parts":
-      return "bg-orange-500";
-    case "hr":
-      return "bg-pink-500";
-    case "custom":
-      return "bg-gray-500";
+    case 'owner':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100';
+    case 'management':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100';
+    case 'service_advisor':
+      return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100';
+    case 'technician':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-100';
     default:
-      return "bg-gray-500";
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100';
   }
-};
+}

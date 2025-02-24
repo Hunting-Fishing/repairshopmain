@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SkillAssessment } from "../types";
@@ -46,6 +47,19 @@ export function useSkillAssessments(profileId?: string) {
 
       return transformedData;
     },
-    enabled: !!profileId
+    enabled: !!profileId,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    onError: (error: Error) => {
+      // Log error to audit_logs
+      supabase.from('audit_logs').insert({
+        action_type: 'error',
+        table_name: 'staff_skill_assessments',
+        error_message: error.message,
+        level: 'error',
+      });
+      
+      toast.error('Failed to load skill assessments');
+    }
   });
 }

@@ -13,8 +13,21 @@ export function useInventoryMetrics() {
         .limit(1)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        // Log error to audit_logs
+        await supabase.from('audit_logs').insert({
+          action_type: 'error',
+          table_name: 'inventory_metrics',
+          error_message: error.message,
+          level: 'error',
+        });
+        throw error;
+      }
+
       return data;
     },
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 1000 * 60 * 2, // Cache for 2 minutes
   });
 }

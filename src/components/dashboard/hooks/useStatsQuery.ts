@@ -31,5 +31,16 @@ export function useStatsQuery() {
       return data as StatData[];
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    retry: 3, // Retry failed requests 3 times
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
+    onError: (error) => {
+      // Log error to audit_logs table
+      supabase.from('audit_logs').insert({
+        action_type: 'error',
+        table_name: 'stats',
+        error_message: error.message,
+        level: 'error',
+      });
+    },
   });
 }

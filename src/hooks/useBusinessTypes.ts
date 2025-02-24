@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-interface BusinessType {
+export interface BusinessType {
   id: string;
   name: string;
 }
@@ -13,7 +13,7 @@ export function useBusinessTypes() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("business_types")
-        .select("*")
+        .select("id,name")
         .order("name");
       
       if (error) throw error;

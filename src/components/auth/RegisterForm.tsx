@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,13 +11,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useLocationData } from "@/hooks/useLocationData";
-import { useBusinessTypes } from "@/hooks/useBusinessTypes";
+import { useBusinessTypes, BusinessType } from "@/hooks/useBusinessTypes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [selectedBusinessType, setSelectedBusinessType] = useState<BusinessType | null>(null);
   const { signUp } = useAuth();
   const { countries, regions } = useLocationData(selectedCountry);
   const { businessTypes, isLoading: isLoadingTypes } = useBusinessTypes();
@@ -33,7 +33,7 @@ export function RegisterForm() {
       password: formData.get("password") as string,
       organizationName: formData.get("organizationName") as string,
       businessPhone: formData.get("businessPhone") as string,
-      businessType: formData.get("businessType") as string,
+      businessType: selectedBusinessType?.id,
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
       phoneNumber: formData.get("phoneNumber") as string,
@@ -70,13 +70,22 @@ export function RegisterForm() {
         {isLoadingTypes ? (
           <Skeleton className="h-10 w-full" />
         ) : (
-          <Select name="businessType" required>
+          <Select 
+            value={selectedBusinessType?.id}
+            onValueChange={(value) => {
+              const selected = businessTypes?.find(type => type.id === value);
+              setSelectedBusinessType(selected || null);
+            }}
+            required
+          >
             <SelectTrigger>
-              <SelectValue placeholder="Select Business Type" />
+              <SelectValue placeholder="Select Business Type">
+                {selectedBusinessType?.name}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {businessTypes?.map((type) => (
-                <SelectItem key={type.id} value={type.name}>
+                <SelectItem key={type.id} value={type.id}>
                   {type.name}
                 </SelectItem>
               ))}

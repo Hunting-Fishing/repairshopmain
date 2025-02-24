@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { SkillAssessment } from "../types";
-import { toast } from "sonner";
+import { logError, handleQueryError } from "@/utils/error-handling";
 
 export function useSkillAssessments(profileId?: string) {
   return useQuery({
@@ -48,16 +48,14 @@ export function useSkillAssessments(profileId?: string) {
         }));
 
         return transformedData;
-      } catch (error: any) {
-        // Log error to audit_logs
-        await supabase.from('audit_logs').insert({
-          action_type: 'error',
-          table_name: 'staff_skill_assessments',
-          error_message: error.message,
-          level: 'error',
-        });
-        
-        toast.error('Failed to load skill assessments');
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          await logError(error, {
+            table_name: 'staff_skill_assessments',
+            action_type: 'query',
+          });
+          handleQueryError(error, 'load skill assessments');
+        }
         throw error;
       }
     },

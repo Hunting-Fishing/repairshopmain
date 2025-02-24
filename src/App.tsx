@@ -8,6 +8,7 @@ import { AuthProvider, AuthContext } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { RootLayout } from "./components/layout/RootLayout";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { GlobalErrorBoundary } from "@/components/shared/errors/GlobalErrorBoundary";
 import AppRoutes from "./routes";
 
 const queryClient = new QueryClient({
@@ -20,27 +21,29 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <AuthProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <BrowserRouter>
-          <AuthContext.Consumer>
-            {({ user }) => (
-              <ThemeProvider userId={user?.id}>
-                <SidebarProvider>
-                  <div className="min-h-screen flex w-full">
-                    <RootLayout>
-                      <AppRoutes />
-                    </RootLayout>
-                  </div>
-                </SidebarProvider>
-              </ThemeProvider>
-            )}
-          </AuthContext.Consumer>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </AuthProvider>
+  <GlobalErrorBoundary>
+    <AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <BrowserRouter>
+            <AuthContext.Consumer>
+              {({ user }) => (
+                <ThemeProvider userId={user?.id}>
+                  <SidebarProvider>
+                    <div className="min-h-screen flex w-full">
+                      <RootLayout>
+                        <AppRoutes />
+                      </RootLayout>
+                    </div>
+                  </SidebarProvider>
+                </ThemeProvider>
+              )}
+            </AuthContext.Consumer>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </AuthProvider>
+  </GlobalErrorBoundary>
 );
 
 export default App;

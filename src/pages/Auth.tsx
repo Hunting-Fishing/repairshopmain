@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import { RequestPasswordResetForm } from "@/components/auth/RequestPasswordResetForm";
 import { Navbar } from "@/components/ui/navbar/Navbar";
 
 const authLinks = [
@@ -35,15 +36,19 @@ export default function Auth() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="login">Login</TabsTrigger>
                   <TabsTrigger value="register">Register</TabsTrigger>
+                  <TabsTrigger value="reset">Reset</TabsTrigger>
                 </TabsList>
                 <TabsContent value="login">
                   <LoginForm />
                 </TabsContent>
                 <TabsContent value="register">
                   <RegisterForm />
+                </TabsContent>
+                <TabsContent value="reset">
+                  <RequestPasswordResetForm />
                 </TabsContent>
               </Tabs>
             </CardContent>

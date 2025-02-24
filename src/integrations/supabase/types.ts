@@ -632,6 +632,7 @@ export type Database = {
           file_url: string | null
           id: string
           metadata: Json | null
+          organization_id: string | null
           room_id: string
           sender_id: string
           updated_at: string
@@ -643,6 +644,7 @@ export type Database = {
           file_url?: string | null
           id?: string
           metadata?: Json | null
+          organization_id?: string | null
           room_id: string
           sender_id: string
           updated_at?: string
@@ -654,11 +656,19 @@ export type Database = {
           file_url?: string | null
           id?: string
           metadata?: Json | null
+          organization_id?: string | null
           room_id?: string
           sender_id?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "chat_messages_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "chat_messages_room_id_fkey"
             columns: ["room_id"]

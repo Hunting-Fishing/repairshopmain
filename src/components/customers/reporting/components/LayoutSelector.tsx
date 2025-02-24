@@ -1,5 +1,5 @@
 
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
 import { getReportLayouts } from '../services/reportService';
 
@@ -16,15 +16,17 @@ export function LayoutSelector({ templateId, value, onChange }: LayoutSelectorPr
   });
 
   return (
-    <Select
-      value={value}
-      onValueChange={onChange}
-    >
-      {layouts.map((layout) => (
-        <Select.Option key={layout.id} value={layout.id}>
-          {layout.name}
-        </Select.Option>
-      ))}
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select layout" />
+      </SelectTrigger>
+      <SelectContent>
+        {layouts.map((layout) => (
+          <SelectItem key={layout.id} value={layout.id}>
+            {layout.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
     </Select>
   );
 }

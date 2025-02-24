@@ -17,30 +17,32 @@ export function useStatsQuery() {
   return useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('stats')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        toast.error('Failed to fetch statistics');
+      try {
+        const { data, error } = await supabase
+          .from('stats')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          toast.error('Failed to fetch statistics');
+          throw error;
+        }
+
+        console.log('Fetched stats:', data);
+        return data as StatData[];
+      } catch (error: any) {
+        // Log error to audit_logs table
+        await supabase.from('audit_logs').insert({
+          action_type: 'error',
+          table_name: 'stats',
+          error_message: error.message,
+          level: 'error',
+        });
         throw error;
       }
-
-      console.log('Fetched stats:', data);
-      return data as StatData[];
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     retry: 3, // Retry failed requests 3 times
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
-    onError: (error) => {
-      // Log error to audit_logs table
-      supabase.from('audit_logs').insert({
-        action_type: 'error',
-        table_name: 'stats',
-        error_message: error.message,
-        level: 'error',
-      });
-    },
   });
 }

@@ -33,27 +33,25 @@ export class GlobalErrorBoundary extends React.Component<Props, ErrorState> {
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorState> {
-    // Categorize the error
-    const errorInfo = {
-      type: "unknown" as ErrorType,
-      details: error.message,
-    };
+    let errorType: ErrorType = "unknown";
 
     if (error.message.includes("network") || error.message.includes("fetch")) {
-      errorInfo.type = "network";
+      errorType = "network";
     } else if (error.message.includes("500") || error.message.includes("server")) {
-      errorInfo.type = "server";
+      errorType = "server";
     }
 
     return {
       hasError: true,
       error,
-      errorInfo,
+      errorInfo: {
+        type: errorType,
+        details: error.message,
+      },
     };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log to audit_logs table via Supabase
     console.error("Error caught by boundary:", error, errorInfo);
     this.logError(error, errorInfo);
   }

@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import type { ReportSchedule } from '../../ReportBuilder/types/reportTypes';
+import type { ReportSchedule } from '../../types';
 
 export function useScheduleValidation() {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -27,11 +27,11 @@ export function useScheduleValidation() {
       }
     }
 
-    if (schedule.frequency === 'weekly' && !schedule.dayOfWeek) {
+    if (schedule.frequency === 'weekly' && !schedule.frequency_config?.dayOfWeek) {
       newErrors.dayOfWeek = 'Day of week is required for weekly schedules';
     }
 
-    if (schedule.frequency === 'monthly' && !schedule.dayOfMonth) {
+    if (schedule.frequency === 'monthly' && !schedule.frequency_config?.dayOfMonth) {
       newErrors.dayOfMonth = 'Day of month is required for monthly schedules';
     }
 

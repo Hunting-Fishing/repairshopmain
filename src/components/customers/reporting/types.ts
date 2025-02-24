@@ -1,31 +1,4 @@
 
-export interface ReportSchedule {
-  id?: string;
-  templateId: string;
-  name?: string;
-  frequency: 'daily' | 'weekly' | 'monthly';
-  recipients: Array<{ email: string; type: 'to' | 'cc' | 'bcc' }>;
-}
-
-export interface ReportProcessingQueueItem {
-  id: string;
-  template_id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  created_at: string;
-  updated_at: string;
-  organization_id: string;
-}
-
-export interface RealtimePostgresChangesPayload<T = any> {
-  schema: string;
-  table: string;
-  commit_timestamp: string;
-  eventType: 'INSERT' | 'UPDATE' | 'DELETE';
-  new: T;
-  old: T | null;
-  errors: null | any[];
-}
-
 export type ReportType = 'tabular' | 'summary' | 'chart';
 
 export interface ReportField {
@@ -43,44 +16,77 @@ export interface ReportFilter {
 }
 
 export interface ReportTemplate {
-  id: string;
+  id?: string;
   name: string;
   description?: string;
   type: ReportType;
   fields: ReportField[];
   filters: ReportFilter[];
   sortOptions: Array<{field: string; direction: 'asc' | 'desc'}>;
-  config: Record<string, any>;
-  layout_id?: string;
-  data_source_id?: string;
-  last_generated_at?: string;
-  total_generations?: number;
-  generation_settings?: Record<string, any>;
+  config?: {
+    chartType?: string;
+    xAxis?: string;
+    yAxis?: string;
+    layout?: string;
+  };
+  organization_id?: string;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ReportSchedule {
+  id?: string;
+  template_id: string;
+  name: string;
+  frequency: 'daily' | 'weekly' | 'monthly';
+  frequency_config?: {
+    dayOfWeek?: number; // 0-6 for weekly
+    dayOfMonth?: number; // 1-31 for monthly
+  };
+  recipients: Array<{
+    email: string;
+    type: 'to' | 'cc' | 'bcc';
+  }>;
+  status: 'active' | 'paused' | 'pending_approval';
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+  organization_id?: string;
+  last_run?: string;
+  next_run?: string;
+}
+
+export interface ReportGenerationJob {
+  id: string;
+  template_id: string;
+  schedule_id?: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  created_by: string;
+  created_at: string;
+  started_at?: string;
+  completed_at?: string;
+  output_url?: string;
+  output_size?: number;
+  error_message?: string;
+  processing_stats: Record<string, any>;
+  parameters: Record<string, any>;
+  organization_id: string;
 }
 
 export interface ReportOutput {
   id: string;
-  templateId: string;
-  scheduleId?: string;
-  fileUrl: string;
-  fileType: string;
-  fileSize?: number;
-  metadata: Record<string, any>;
-  createdAt: string;
-}
-
-export interface DashboardWidget {
-  id: string;
-  type: 'chart' | 'metric' | 'list' | 'table';
-  title: string;
-  config: Record<string, any>;
-  position: {x: number; y: number; w: number; h: number};
-}
-
-export interface DashboardConfig {
-  id: string;
+  template_id: string;
+  schedule_id?: string;
   name: string;
-  description?: string;
-  layout: DashboardWidget[];
-  isDefault: boolean;
+  file_type: string;
+  file_url: string;
+  file_path?: string;
+  file_size?: number;
+  status: string;
+  created_by: string;
+  created_at: string;
+  metadata: Record<string, any>;
+  organization_id: string;
+  sort_options?: Array<{field: string; direction: 'asc' | 'desc'}>;
 }

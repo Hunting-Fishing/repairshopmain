@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import type { ReportTemplate } from '../types/reportTypes';
+import type { ReportTemplate } from '../../types';
 
 export function useReportTemplate() {
   const [template, setTemplate] = useState<Partial<ReportTemplate>>({

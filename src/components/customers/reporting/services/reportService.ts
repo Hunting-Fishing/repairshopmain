@@ -1,6 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import type { ReportTemplate, ReportSchedule, ReportGenerationJob, ReportOutput } from '../ReportBuilder/types/reportTypes';
+import type { ReportTemplate, ReportSchedule, ReportGenerationJob, ReportOutput } from '../types';
 
 export interface GenerateReportParams {
   templateId: string;
@@ -33,6 +32,15 @@ export async function generateReport({ templateId, parameters = {} }: GenerateRe
 
   if (error) throw error;
   return data;
+}
+
+export async function getReportLayouts(): Promise<any[]> {
+  const { data, error } = await supabase
+    .from('report_template_layouts')
+    .select('*');
+
+  if (error) throw error;
+  return data || [];
 }
 
 export async function scheduleReport(templateId: string, schedule: Partial<ReportSchedule>): Promise<ReportSchedule> {

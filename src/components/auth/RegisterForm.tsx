@@ -2,19 +2,17 @@
 import { useState, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useLocationData } from "@/hooks/useLocationData";
 import { useBusinessTypes, BusinessType } from "@/hooks/useBusinessTypes";
-import { Skeleton } from "@/components/ui/skeleton";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { toast } from "sonner";
 import { validatePassword, isPasswordValid } from "@/utils/auth/passwordValidation";
-import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
 import { useAuthRateLimit } from "@/hooks/useAuthRateLimit";
+import { BusinessInformationSection } from "./form-sections/BusinessInformationSection";
+import { PersonalInformationSection } from "./form-sections/PersonalInformationSection";
+import { AddressSection } from "./form-sections/AddressSection";
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +33,11 @@ export function RegisterForm() {
     const value = e.target.value;
     setPassword(value);
     setPasswordErrors(validatePassword(value));
+  };
+
+  const handleBusinessTypeChange = (value: string) => {
+    const selected = businessTypes?.find(type => type.id === value);
+    setSelectedBusinessType(selected || null);
   };
 
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,160 +111,26 @@ export function RegisterForm() {
 
   return (
     <form onSubmit={handleSignUp} ref={formRef} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="organizationName">Business Information</Label>
-        <Input
-          id="organizationName"
-          name="organizationName"
-          placeholder="Business Name"
-          required
-          aria-label="Business name"
-        />
-        <Input
-          id="businessPhone"
-          name="businessPhone"
-          placeholder="Business Phone"
-          required
-          aria-label="Business phone number"
-        />
-        {isLoadingTypes ? (
-          <Skeleton className="h-10 w-full" />
-        ) : (
-          <Select 
-            value={selectedBusinessType?.id}
-            onValueChange={(value) => {
-              const selected = businessTypes?.find(type => type.id === value);
-              setSelectedBusinessType(selected || null);
-            }}
-            required
-          >
-            <SelectTrigger aria-label="Select business type">
-              <SelectValue placeholder="Select Business Type">
-                {selectedBusinessType?.name}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {businessTypes?.map((type) => (
-                <SelectItem key={type.id} value={type.id}>
-                  {type.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
+      <BusinessInformationSection
+        isLoadingTypes={isLoadingTypes}
+        businessTypes={businessTypes}
+        selectedBusinessType={selectedBusinessType}
+        onBusinessTypeChange={handleBusinessTypeChange}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="firstName">Personal Information</Label>
-        <Input
-          id="firstName"
-          name="firstName"
-          placeholder="First Name"
-          required
-          aria-label="First name"
-        />
-        <Input
-          id="lastName"
-          name="lastName"
-          placeholder="Last Name"
-          required
-          aria-label="Last name"
-        />
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          aria-label="Email address"
-        />
-        <div className="space-y-2">
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="Password"
-            required
-            value={password}
-            onChange={handlePasswordChange}
-            aria-label="Password"
-            aria-describedby="password-requirements"
-          />
-          <Input
-            id="confirmPassword"
-            name="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            aria-label="Confirm password"
-          />
-          <div id="password-requirements">
-            <PasswordStrengthIndicator errors={passwordErrors} />
-          </div>
-        </div>
-        <Input
-          id="phoneNumber"
-          name="phoneNumber"
-          placeholder="Phone Number"
-          required
-          aria-label="Phone number"
-        />
-      </div>
+      <PersonalInformationSection
+        password={password}
+        confirmPassword={confirmPassword}
+        passwordErrors={passwordErrors}
+        onPasswordChange={handlePasswordChange}
+        onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="streetAddress">Address</Label>
-        <Input
-          id="streetAddress"
-          name="streetAddress"
-          placeholder="Street Address"
-          required
-          aria-label="Street address"
-        />
-        <Input
-          id="city"
-          name="city"
-          placeholder="City"
-          required
-          aria-label="City"
-        />
-        <Select 
-          name="country" 
-          required
-          onValueChange={(value) => setSelectedCountry(value)}
-        >
-          <SelectTrigger aria-label="Select country">
-            <SelectValue placeholder="Select Country" />
-          </SelectTrigger>
-          <SelectContent>
-            {countries?.map((country) => (
-              <SelectItem key={country.id} value={country.id}>
-                {country.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select name="stateProvince" required>
-          <SelectTrigger aria-label="Select state or province">
-            <SelectValue placeholder="Select State/Province" />
-          </SelectTrigger>
-          <SelectContent>
-            {regions?.map((region) => (
-              <SelectItem key={region.id} value={region.id}>
-                {region.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Input
-          id="postalCode"
-          name="postalCode"
-          placeholder="Postal Code"
-          required
-          aria-label="Postal code"
-        />
-      </div>
+      <AddressSection
+        countries={countries}
+        regions={regions}
+        onCountryChange={setSelectedCountry}
+      />
 
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (

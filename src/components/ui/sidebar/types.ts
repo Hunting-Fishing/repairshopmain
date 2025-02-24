@@ -31,3 +31,8 @@ export interface SidebarMenuButtonProps
   isActive?: boolean;
   tooltip?: string | React.ComponentProps<"div">;
 }
+
+export interface SidebarGroupProps extends React.ComponentProps<"div"> {
+  label?: string;
+  icon?: React.ElementType;
+}

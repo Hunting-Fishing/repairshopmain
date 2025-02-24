@@ -2,10 +2,16 @@
 export { useSidebar, SidebarProvider } from "./context";
 export { 
   Sidebar, 
-  SidebarMenu, 
-  SidebarMenuButton,
   SidebarHeader,
   SidebarContent,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
   SidebarFooter 
 } from "./components";
-export type { SidebarProps, SidebarMenuButtonProps } from "./types";
+export type { 
+  SidebarProps, 
+  SidebarMenuButtonProps,
+  SidebarGroupProps
+} from "./types";

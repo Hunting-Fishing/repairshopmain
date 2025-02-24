@@ -178,6 +178,30 @@ export type Database = {
           },
         ]
       }
+      auth_rate_limits: {
+        Row: {
+          attempt_count: number | null
+          created_at: string | null
+          id: string
+          ip_address: string
+          last_attempt_at: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          created_at?: string | null
+          id?: string
+          ip_address: string
+          last_attempt_at?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          created_at?: string | null
+          id?: string
+          ip_address?: string
+          last_attempt_at?: string | null
+        }
+        Relationships: []
+      }
       auth_tokens: {
         Row: {
           created_at: string | null
@@ -8715,6 +8739,12 @@ export type Database = {
           status: string
         }
         Returns: Json
+      }
+      check_auth_rate_limit: {
+        Args: {
+          client_ip: string
+        }
+        Returns: boolean
       }
       check_labor_time_conflicts: {
         Args: {

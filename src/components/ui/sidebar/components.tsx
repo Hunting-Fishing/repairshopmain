@@ -19,7 +19,6 @@ export function Sidebar({
 
   return (
     <div
-      ref={ref}
       className={cn(
         "group peer hidden md:block text-sidebar-foreground",
         className
@@ -64,4 +63,38 @@ export function SidebarMenuButton({
   );
 }
 
-// ... Export other sidebar components following similar pattern
+export function SidebarHeader({ 
+  className, 
+  ...props 
+}: React.ComponentProps<"div">) {
+  return (
+    <div 
+      className={cn("flex h-14 items-center px-4", className)} 
+      {...props} 
+    />
+  );
+}
+
+export function SidebarContent({ 
+  className, 
+  ...props 
+}: React.ComponentProps<"div">) {
+  return (
+    <div 
+      className={cn("flex flex-1 flex-col gap-4 px-2", className)} 
+      {...props} 
+    />
+  );
+}
+
+export function SidebarFooter({ 
+  className, 
+  ...props 
+}: React.ComponentProps<"div">) {
+  return (
+    <div 
+      className={cn("mt-auto px-4 py-4", className)} 
+      {...props} 
+    />
+  );
+}

@@ -1,6 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
+import { generateReport } from "./services/reportService";
+import { toast } from "sonner";
 
 interface ReportExportProps {
   templateId: string;
@@ -9,8 +11,22 @@ interface ReportExportProps {
 
 export function ReportExport({ templateId, data }: ReportExportProps) {
   const handleExport = async () => {
-    // Export logic will be implemented here
-    console.log('Exporting report', { templateId, data });
+    try {
+      const job = await generateReport({ 
+        templateId,
+        parameters: { data }
+      });
+      
+      toast.success("Report generation started", {
+        description: "You'll be notified when it's ready"
+      });
+      
+      console.log('Export job created:', job);
+    } catch (error: any) {
+      toast.error("Failed to start export", {
+        description: error.message
+      });
+    }
   };
 
   return (

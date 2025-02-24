@@ -1,79 +1,84 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { ReportTemplate } from '../types';
+import type { ReportTemplate, ReportSchedule, ReportGenerationJob, ReportOutput } from '../ReportBuilder/types/reportTypes';
 
 export interface GenerateReportParams {
   templateId: string;
   parameters?: Record<string, any>;
 }
 
-export interface ReportGenerationJob {
-  id: string;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  output_url?: string;
-  error_message?: string;
-}
-
-export async function generateReport({ templateId, parameters = {} }: GenerateReportParams) {
+export async function generateReport({ templateId, parameters = {} }: GenerateReportParams): Promise<ReportGenerationJob> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  // Create a generation job
-  const { data: job, error: jobError } = await supabase
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.organization_id) throw new Error('Organization not found');
+
+  const { data, error } = await supabase
     .from('report_generation_jobs')
     .insert({
       template_id: templateId,
       parameters,
       status: 'pending',
-      created_by: user.id
+      created_by: user.id,
+      organization_id: profile.organization_id
     })
     .select()
     .single();
 
-  if (jobError) throw jobError;
-  return job;
+  if (error) throw error;
+  return data;
 }
 
-export async function getReportStatus(jobId: string) {
-  const { data: job, error } = await supabase
+export async function scheduleReport(templateId: string, schedule: Partial<ReportSchedule>): Promise<ReportSchedule> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('organization_id')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile?.organization_id) throw new Error('Organization not found');
+
+  const { data, error } = await supabase
+    .from('report_schedules')
+    .insert({
+      ...schedule,
+      template_id: templateId,
+      created_by: user.id,
+      organization_id: profile.organization_id,
+      status: 'pending_approval'
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getReportStatus(jobId: string): Promise<ReportGenerationJob> {
+  const { data, error } = await supabase
     .from('report_generation_jobs')
     .select('*')
     .eq('id', jobId)
     .single();
 
   if (error) throw error;
-  return job as ReportGenerationJob;
-}
-
-export async function getReportDataSources() {
-  const { data, error } = await supabase
-    .from('report_data_sources')
-    .select('*')
-    .order('name');
-
-  if (error) throw error;
   return data;
 }
 
-export async function getReportLayouts(templateId: string) {
+export async function getReportOutput(outputId: string): Promise<ReportOutput> {
   const { data, error } = await supabase
-    .from('report_template_layouts')
+    .from('report_outputs')
     .select('*')
-    .eq('template_id', templateId)
-    .order('name');
-
-  if (error) throw error;
-  return data;
-}
-
-export async function scheduleReport(templateId: string, schedule: any) {
-  const { data, error } = await supabase
-    .from('report_schedules')
-    .insert({
-      template_id: templateId,
-      ...schedule
-    })
-    .select()
+    .eq('id', outputId)
     .single();
 
   if (error) throw error;

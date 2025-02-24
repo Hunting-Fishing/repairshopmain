@@ -10,11 +10,23 @@ export function useReportSave() {
   const saveTemplate = async (template: Partial<ReportTemplate>) => {
     try {
       setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('organization_id')
+        .eq('id', user.id)
+        .single();
+
+      if (!profile?.organization_id) throw new Error("Organization not found");
+
       const { error } = await supabase
         .from('report_templates')
         .insert({
           ...template,
-          created_by: (await supabase.auth.getUser()).data.user?.id
+          created_by: user.id,
+          organization_id: profile.organization_id
         });
 
       if (error) throw error;

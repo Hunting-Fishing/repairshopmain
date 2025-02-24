@@ -8,11 +8,13 @@ interface Props {
   children: React.ReactNode;
 }
 
+type ErrorType = "unknown" | "network" | "server";
+
 interface ErrorState {
   hasError: boolean;
   error: Error | null;
   errorInfo: {
-    type: "unknown" | "network" | "server" | null;
+    type: ErrorType | null;
     code?: string;
     details?: string;
   };
@@ -33,7 +35,7 @@ export class GlobalErrorBoundary extends React.Component<Props, ErrorState> {
   static getDerivedStateFromError(error: Error): Partial<ErrorState> {
     // Categorize the error
     const errorInfo = {
-      type: "unknown" as const,
+      type: "unknown" as ErrorType,
       details: error.message,
     };
 

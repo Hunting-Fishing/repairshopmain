@@ -13,11 +13,16 @@ export function ListView() {
     isLoading: isViewStateLoading
   } = useViewState("list");
 
+  // Provide default values when destructuring from viewState
   const {
-    search_filters: { searchQuery = "" },
-    pagination_settings: { itemsPerPage = 10, currentPage = 1 },
-    sort_preferences: { field = "created_at", direction = "desc" }
-  } = viewState;
+    search_filters = { searchQuery: "" },
+    pagination_settings = { itemsPerPage: 10, currentPage: 1 },
+    sort_preferences = { field: "created_at", direction: "desc" }
+  } = viewState || {};
+
+  const { searchQuery = "" } = search_filters;
+  const { itemsPerPage = 10, currentPage = 1 } = pagination_settings;
+  const { field = "created_at", direction = "desc" } = sort_preferences;
 
   const { data: appointments, isLoading, error } = useAppointments({
     searchQuery,
@@ -28,6 +33,8 @@ export function ListView() {
   });
 
   const handleSearchChange = (value: string) => {
+    if (!viewState) return;
+    
     updateViewState({
       search_filters: { ...viewState.search_filters, searchQuery: value }
     });

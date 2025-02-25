@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Loader2, Save, X } from "lucide-react";
+import { Save, X } from "lucide-react";
 
 interface FormActionsProps {
   isSubmitting: boolean;
@@ -30,20 +30,12 @@ export function FormActions({ isSubmitting, changes, onCancel }: FormActionsProp
         </Button>
         <Button 
           type="submit" 
-          disabled={isSubmitting}
+          loading={isSubmitting}
+          loadingText="Saving..."
           className="min-w-[100px] bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300"
         >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save className="w-4 h-4 mr-2" />
-              Save Item
-            </>
-          )}
+          <Save className="w-4 h-4 mr-2" />
+          Save Item
         </Button>
       </div>
     </div>

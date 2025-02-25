@@ -30,7 +30,11 @@ export function ChatRoomFormContent({ onCancel, staffOptions, onSubmit }: ChatRo
         <Button variant="outline" type="button" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button 
+          type="submit" 
+          loading={isLoading}
+          loadingText={roomType === 'direct' ? 'Starting...' : 'Creating...'}
+        >
           {roomType === 'direct' ? 'Start Conversation' : 'Create Room'}
         </Button>
       </DialogFooter>

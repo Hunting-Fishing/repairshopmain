@@ -62,7 +62,11 @@ export function SkillAssessmentForm({
             <Button type="button" variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button type="submit">
+            <Button 
+              type="submit"
+              loading={isSubmitting}
+              loadingText="Reviewing..."
+            >
               Review Changes
             </Button>
           </DialogFooter>

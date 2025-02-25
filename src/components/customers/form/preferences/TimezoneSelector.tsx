@@ -91,8 +91,9 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
                       <CommandItem
                         key={timezone.value}
                         value={timezone.value}
-                        onSelect={(currentValue) => {
-                          form.setValue("timezone", currentValue);
+                        onSelect={() => {
+                          form.setValue("timezone", timezone.value || "");
+                          field.onChange(timezone.value || "");
                           setOpen(false);
                           setSearchValue("");
                         }}

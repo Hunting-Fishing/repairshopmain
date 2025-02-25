@@ -13,8 +13,9 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
   const { formState: { isValid, errors } } = useFormContext();
   const { toast } = useToast();
 
-  const handleDisabledClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!isValid) {
+      e.preventDefault();
       const errorFields = Object.keys(errors);
       toast({
         variant: "destructive",
@@ -29,9 +30,12 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
   return (
     <Button
       type="submit"
-      disabled={!isValid || isSubmitting}
-      className="w-full md:w-auto"
-      onClick={!isValid ? handleDisabledClick : undefined}
+      disabled={isSubmitting}
+      className={cn(
+        "w-full md:w-auto",
+        !isValid && "opacity-50 cursor-not-allowed hover:bg-primary"
+      )}
+      onClick={handleClick}
     >
       {isSubmitting ? (
         <>

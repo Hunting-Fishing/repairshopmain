@@ -1,42 +1,29 @@
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider } from "react-router-dom";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ThemeProvider } from "./contexts/ThemeContext";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { GlobalErrorBoundary } from "@/components/shared/errors/GlobalErrorBoundary";
-import { router } from "./routes/routes";
+import { AuthProvider } from "@/contexts/AuthContext";
+import Auth from "@/pages/Auth";
+import CustomerPortal from "@/pages/CustomerPortal";
+import Customers from "@/pages/Customers";
+import CustomerDetail from "@/pages/CustomerDetail";
+import CustomerManagement from "@/pages/CustomerManagement";
+import WorkOrders from "@/pages/WorkOrders";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-const App = () => {
+function App() {
   return (
-    <GlobalErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider>
-            <TooltipProvider>
-              <SidebarProvider>
-                <RouterProvider router={router} />
-                <Toaster />
-                <Sonner />
-              </SidebarProvider>
-            </TooltipProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </GlobalErrorBoundary>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/customer-portal" element={<CustomerPortal />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/:id" element={<CustomerDetail />} />
+          <Route path="/customer-management" element={<CustomerManagement />} />
+          <Route path="/work-orders" element={<WorkOrders />} />
+        </Routes>
+        <Toaster />
+      </Router>
+    </AuthProvider>
   );
-};
+}
 
 export default App;

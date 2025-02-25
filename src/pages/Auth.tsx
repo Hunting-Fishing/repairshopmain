@@ -18,7 +18,7 @@ export default function Auth() {
 
   // Redirect if already authenticated
   if (session) {
-    navigate("/");
+    navigate("/customer-portal");
     return null;
   }
 

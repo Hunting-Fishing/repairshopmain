@@ -118,9 +118,40 @@ export type Database = {
           },
         ]
       }
+      archival_logs: {
+        Row: {
+          completed_at: string | null
+          error_message: string | null
+          id: string
+          records_archived: number | null
+          started_at: string
+          status: string
+          table_name: string
+        }
+        Insert: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_archived?: number | null
+          started_at?: string
+          status?: string
+          table_name: string
+        }
+        Update: {
+          completed_at?: string | null
+          error_message?: string | null
+          id?: string
+          records_archived?: number | null
+          started_at?: string
+          status?: string
+          table_name?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action_type: string
+          browser_info: Json | null
           created_at: string | null
           id: string
           ip_address: string | null
@@ -129,12 +160,16 @@ export type Database = {
           old_data: Json | null
           organization_id: string
           record_id: string | null
+          session_id: string | null
+          severity: string | null
+          source_ip: string | null
           table_name: string
           user_agent: string | null
           user_id: string
         }
         Insert: {
           action_type: string
+          browser_info?: Json | null
           created_at?: string | null
           id?: string
           ip_address?: string | null
@@ -143,12 +178,16 @@ export type Database = {
           old_data?: Json | null
           organization_id: string
           record_id?: string | null
+          session_id?: string | null
+          severity?: string | null
+          source_ip?: string | null
           table_name: string
           user_agent?: string | null
           user_id: string
         }
         Update: {
           action_type?: string
+          browser_info?: Json | null
           created_at?: string | null
           id?: string
           ip_address?: string | null
@@ -157,6 +196,9 @@ export type Database = {
           old_data?: Json | null
           organization_id?: string
           record_id?: string | null
+          session_id?: string | null
+          severity?: string | null
+          source_ip?: string | null
           table_name?: string
           user_agent?: string | null
           user_id?: string
@@ -229,6 +271,39 @@ export type Database = {
           type?: string
           used_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      backup_logs: {
+        Row: {
+          backup_type: string
+          completed_at: string | null
+          error_message: string | null
+          file_path: string | null
+          id: string
+          size_bytes: number | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          backup_type: string
+          completed_at?: string | null
+          error_message?: string | null
+          file_path?: string | null
+          id?: string
+          size_bytes?: number | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          backup_type?: string
+          completed_at?: string | null
+          error_message?: string | null
+          file_path?: string | null
+          id?: string
+          size_bytes?: number | null
+          started_at?: string
+          status?: string
         }
         Relationships: []
       }
@@ -9320,6 +9395,10 @@ export type Database = {
       }
     }
     Functions: {
+      archive_old_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       auto_assign_technician: {
         Args: {
           booking_id: string
@@ -9866,6 +9945,10 @@ export type Database = {
         Args: {
           staff_id: string
         }
+        Returns: undefined
+      }
+      schedule_database_backup: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       set_limit: {

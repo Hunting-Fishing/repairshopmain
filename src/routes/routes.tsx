@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "@/pages/Auth";
@@ -27,120 +28,166 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export const router = createBrowserRouter([
+// Define route types for better organization
+const ROUTE_TYPES = {
+  PUBLIC: 'public',
+  PROTECTED: 'protected',
+  ADMIN: 'admin'
+} as const;
+
+// Define route configurations with proper typing
+type RouteConfig = {
+  path: string;
+  element: JSX.Element;
+  allowedRoles?: string[];
+  children?: RouteConfig[];
+};
+
+// Helper function to wrap routes with proper protection
+const wrapRoute = (config: RouteConfig) => {
+  if (config.allowedRoles) {
+    return (
+      <ProtectedRoute allowedRoles={config.allowedRoles}>
+        <ErrorBoundary>
+          <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <LoadingSpinner size="lg" />
+            </div>
+          }>
+            {config.element}
+          </Suspense>
+        </ErrorBoundary>
+      </ProtectedRoute>
+    );
+  }
+  return config.element;
+};
+
+// Main route configurations
+const routes: RouteConfig[] = [
   {
     path: "/",
     element: <AppLayout><Outlet /></AppLayout>,
-    errorElement: <NotFoundPage />,
     children: [
       {
-        index: true,
-        element: <ProtectedRoute><Index /></ProtectedRoute>,
+        path: "",
+        element: <Index />,
+        allowedRoles: ['owner', 'management', 'service_advisor', 'technician']
       },
       {
         path: "alerts",
-        element: (
-          <ProtectedRoute allowedRoles={['owner', 'management']}>
-            <ErrorBoundary>
-              <Suspense fallback={
-                <div className="flex items-center justify-center min-h-screen">
-                  <LoadingSpinner size="lg" />
-                </div>
-              }>
-                <AlertsDashboard />
-              </Suspense>
-            </ErrorBoundary>
-          </ProtectedRoute>
-        ),
+        element: <AlertsDashboard />,
+        allowedRoles: ['owner', 'management']
       },
       {
         path: "calendar",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor', 'technician']}><Calendar /></ProtectedRoute>,
+        element: <Calendar />,
+        allowedRoles: ['owner', 'management', 'service_advisor', 'technician']
       },
       {
         path: "calendar/settings",
-        element: <ProtectedRoute allowedRoles={['owner', 'management']}><CalendarSettings /></ProtectedRoute>,
+        element: <CalendarSettings />,
+        allowedRoles: ['owner', 'management']
       },
       {
         path: "customers",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><Customers /></ProtectedRoute>,
+        element: <Customers />,
+        allowedRoles: ['owner', 'management', 'service_advisor']
       },
       {
         path: "customers/:id",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><CustomerDetail /></ProtectedRoute>,
+        element: <CustomerDetail />,
+        allowedRoles: ['owner', 'management', 'service_advisor']
       },
       {
         path: "customer-management",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><CustomerManagement /></ProtectedRoute>,
+        element: <CustomerManagement />,
+        allowedRoles: ['owner', 'management', 'service_advisor']
       },
       {
         path: "staff",
-        element: <ProtectedRoute allowedRoles={['owner', 'management']}><Staff /></ProtectedRoute>,
+        element: <Staff />,
+        allowedRoles: ['owner', 'management']
       },
       {
         path: "vehicles",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><Vehicles /></ProtectedRoute>,
+        element: <Vehicles />,
+        allowedRoles: ['owner', 'management', 'service_advisor']
       },
       {
         path: "work-orders",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor', 'technician']}><WorkOrders /></ProtectedRoute>,
+        element: <WorkOrders />,
+        allowedRoles: ['owner', 'management', 'service_advisor', 'technician']
       },
       {
         path: "shop-items",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><ShopItems /></ProtectedRoute>,
+        element: <ShopItems />,
+        allowedRoles: ['owner', 'management', 'service_advisor']
       },
       {
         path: "repair-jobs/:id",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor', 'technician']}><RepairJobDetails /></ProtectedRoute>,
+        element: <RepairJobDetails />,
+        allowedRoles: ['owner', 'management', 'service_advisor', 'technician']
       },
       {
         path: "inventory",
-        element: <ProtectedRoute allowedRoles={['owner', 'management', 'service_advisor']}><Inventory /></ProtectedRoute>,
+        element: <Inventory />,
+        allowedRoles: ['owner', 'management', 'service_advisor']
       },
       {
         path: "application-control",
-        element: <ProtectedRoute allowedRoles={['owner', 'management']}>
-          <Outlet />
-        </ProtectedRoute>,
+        element: <Outlet />,
+        allowedRoles: ['owner', 'management'],
         children: [
           {
-            index: true,
-            element: <ApplicationControl />,
+            path: "",
+            element: <ApplicationControl />
           },
           {
             path: "communications",
-            element: <Communications />,
+            element: <Communications />
           },
           {
             path: "shops",
-            element: <Shops />,
+            element: <Shops />
           },
           {
             path: "job-templates",
-            element: <JobTemplates />,
+            element: <JobTemplates />
           },
           {
             path: "inventory/suppliers",
-            element: <InventorySuppliers />,
+            element: <InventorySuppliers />
           }
-        ],
-      },
-    ],
+        ]
+      }
+    ]
   },
   {
     path: "/auth",
-    element: <Auth />,
+    element: <Auth />
   },
   {
     path: "/auth/set-password",
-    element: <SetPassword />,
+    element: <SetPassword />
   },
   {
     path: "/auth/verify-email",
-    element: <EmailVerification />,
+    element: <EmailVerification />
   },
   {
     path: "*",
-    element: <NotFoundPage />,
+    element: <NotFoundPage />
   }
-]);
+];
+
+// Create router with processed routes
+const processRoutes = (routeConfigs: RouteConfig[]): RouteConfig[] => {
+  return routeConfigs.map(config => ({
+    ...config,
+    element: wrapRoute(config),
+    children: config.children ? processRoutes(config.children) : undefined
+  }));
+};
+
+export const router = createBrowserRouter(processRoutes(routes));

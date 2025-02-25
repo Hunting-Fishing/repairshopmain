@@ -3,14 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { RootLayout } from "./components/layout/RootLayout";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GlobalErrorBoundary } from "@/components/shared/errors/GlobalErrorBoundary";
-import { NavigationLoading } from "@/components/ui/navigation-loading";
-import AppRoutes from "./routes";
+import { router } from "./routes/routes";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,24 +23,17 @@ const App = () => {
   return (
     <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <ThemeProvider>
-              <TooltipProvider>
-                <SidebarProvider>
-                  <NavigationLoading />
-                  <div className="min-h-screen flex w-full">
-                    <RootLayout>
-                      <AppRoutes />
-                    </RootLayout>
-                  </div>
-                  <Toaster />
-                  <Sonner />
-                </SidebarProvider>
-              </TooltipProvider>
-            </ThemeProvider>
-          </AuthProvider>
-        </BrowserRouter>
+        <AuthProvider>
+          <ThemeProvider>
+            <TooltipProvider>
+              <SidebarProvider>
+                <RouterProvider router={router} />
+                <Toaster />
+                <Sonner />
+              </SidebarProvider>
+            </TooltipProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </GlobalErrorBoundary>
   );

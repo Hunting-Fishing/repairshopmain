@@ -8780,6 +8780,101 @@ export type Database = {
           },
         ]
       }
+      unified_customer_analytics: {
+        Row: {
+          average_rating: number | null
+          churn_risk: number | null
+          created_at: string | null
+          customer_id: string | null
+          customer_since: string | null
+          email: string | null
+          engagement_score: number | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          loyalty_points: number | null
+          organization_id: string | null
+          recent_activities: Json | null
+          satisfaction_score: number | null
+          total_feedback: number | null
+          total_repair_jobs: number | null
+          total_spend: number | null
+          updated_at: string | null
+          validation_success_rate: number | null
+        }
+        Insert: {
+          average_rating?: number | null
+          churn_risk?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          customer_since?: string | null
+          email?: string | null
+          engagement_score?: number | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          loyalty_points?: number | null
+          organization_id?: string | null
+          recent_activities?: Json | null
+          satisfaction_score?: number | null
+          total_feedback?: number | null
+          total_repair_jobs?: number | null
+          total_spend?: number | null
+          updated_at?: string | null
+          validation_success_rate?: number | null
+        }
+        Update: {
+          average_rating?: number | null
+          churn_risk?: number | null
+          created_at?: string | null
+          customer_id?: string | null
+          customer_since?: string | null
+          email?: string | null
+          engagement_score?: number | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          loyalty_points?: number | null
+          organization_id?: string | null
+          recent_activities?: Json | null
+          satisfaction_score?: number | null
+          total_feedback?: number | null
+          total_repair_jobs?: number | null
+          total_spend?: number | null
+          updated_at?: string | null
+          validation_success_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unified_customer_analytics_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "unified_customer_analytics_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics_dashboard"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "unified_customer_analytics_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unified_customer_analytics_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string | null

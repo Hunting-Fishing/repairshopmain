@@ -9,7 +9,7 @@ import { CustomerHeader } from "@/components/customers/customer-management/Custo
 import { CustomerToolbar } from "@/components/customers/customer-management/CustomerToolbar";
 import { CustomerTable, Customer } from "@/components/customers/customer-management/CustomerTable";
 
-export function CustomerManagement() {
+export default function CustomerManagement() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -102,9 +102,7 @@ export function CustomerManagement() {
   };
 
   return (
-    <div className="space
-
--y-6">
+    <div className="space-y-6">
       <CustomerHeader onNavigateToControl={() => navigate("/customer-management")} />
       <CustomerToolbar
         searchQuery={searchQuery}

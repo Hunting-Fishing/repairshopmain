@@ -29,14 +29,16 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
       if (mode === "edit" && initialData?.id) {
         console.log("Updating customer with ID:", initialData.id);
         
-        // Prepare update data
-        const updateData = {
+        // Create a type-safe update object that includes all the cleaned values
+        const updateData: Partial<CustomerFormValues> & { updated_at: string } = {
           ...cleanedValues,
           updated_at: new Date().toISOString()
         };
         
-        // Remove id from update data as it's used in the where clause
-        delete updateData.id;
+        // Now TypeScript knows updateData can have an id property
+        if ('id' in updateData) {
+          delete updateData.id;
+        }
         
         console.log("Sending update with data:", updateData);
         

@@ -7,6 +7,8 @@ import { VehicleList } from "./vehicles/VehicleList";
 import { CustomerHistoryList } from "./history/CustomerHistoryList";
 import { CustomerAnalyticsDashboard } from "./analytics/CustomerAnalyticsDashboard";
 import { CustomerCommunications } from "./communications/CustomerCommunications";
+import { useForm } from "react-hook-form";
+import { CustomerFormValues } from "./types/customerTypes";
 
 interface CustomerTabsProps {
   customerId: string;
@@ -14,6 +16,8 @@ interface CustomerTabsProps {
 }
 
 export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTabsProps) {
+  const form = useForm<CustomerFormValues>();
+
   return (
     <Tabs defaultValue={defaultTab} className="w-full">
       <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-7">
@@ -28,7 +32,10 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
       <div className="mt-6">
         <TabsContent value="details">
           <CustomerTabContent label="Customer Details">
-            <CustomerFormFields customerId={customerId} />
+            <CustomerFormFields 
+              form={form} 
+              customerId={customerId}
+            />
           </CustomerTabContent>
         </TabsContent>
 

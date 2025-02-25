@@ -18,9 +18,15 @@ interface CustomerFormContainerProps {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   mode?: "create" | "edit";
   isSubmitting?: boolean;
+  customerId: string;
 }
 
-export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting = false }: CustomerFormContainerProps) {
+export function CustomerFormContainer({ 
+  onSubmit, 
+  mode = "create", 
+  isSubmitting = false,
+  customerId 
+}: CustomerFormContainerProps) {
   const { isModernTheme, toggleTheme } = useTheme();
   const form = useFormContext<CustomerFormValues>();
 
@@ -54,7 +60,11 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
               title="Personal Information"
               isModernTheme={isModernTheme}
             >
-              <CustomerFormFields form={form} isModernTheme={isModernTheme} />
+              <CustomerFormFields 
+                form={form} 
+                isModernTheme={isModernTheme} 
+                customerId={customerId}
+              />
             </FormSection>
           </div>
 

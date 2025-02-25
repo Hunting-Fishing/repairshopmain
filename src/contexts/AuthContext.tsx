@@ -7,6 +7,7 @@ import { toast } from "sonner";
 interface AuthContextType {
   session: Session | null;
   user: User | null;
+  isLoading: boolean; // Added this property
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (data: SignUpData) => Promise<void>;
   signOut: () => Promise<void>;
@@ -33,6 +34,7 @@ export const AuthContext = React.createContext<AuthContextType | undefined>(unde
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null);
   const [user, setUser] = React.useState<User | null>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
   const [isInitialized, setIsInitialized] = React.useState(false);
 
   React.useEffect(() => {
@@ -41,11 +43,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
+        setIsLoading(false);
         setIsInitialized(true);
       } catch (error) {
         console.error("Error initializing auth:", error);
         toast.error("Failed to initialize authentication");
-        setIsInitialized(true); // Still set initialized to true even on error
+        setIsLoading(false);
+        setIsInitialized(true);
       }
     };
 
@@ -155,10 +159,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const contextValue = React.useMemo(() => ({
     session,
     user,
+    isLoading,
     signIn,
     signUp,
     signOut,
-  }), [session, user, signIn, signUp, signOut]);
+  }), [session, user, isLoading, signIn, signUp, signOut]);
 
   if (!isInitialized) {
     return null;

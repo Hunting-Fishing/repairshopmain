@@ -1,6 +1,7 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 
@@ -8,6 +9,15 @@ interface CustomerAddressFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
   isModernTheme?: boolean;
 }
+
+const countries = [
+  { id: "US", name: "United States" },
+  { id: "GB", name: "United Kingdom" },
+  { id: "FR", name: "France" },
+  { id: "JP", name: "Japan" },
+  { id: "CN", name: "China" },
+  { id: "AU", name: "Australia" }
+];
 
 export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerAddressFieldsProps) => {
   const inputClasses = isModernTheme
@@ -83,9 +93,26 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
           render={({ field }) => (
             <FormItem>
               <FormLabel className={labelClasses}>Country</FormLabel>
-              <FormControl>
-                <Input {...field} className={inputClasses} />
-              </FormControl>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+              >
+                <FormControl>
+                  <SelectTrigger className={inputClasses}>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {countries.map((country) => (
+                    <SelectItem 
+                      key={country.id} 
+                      value={country.id}
+                    >
+                      {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

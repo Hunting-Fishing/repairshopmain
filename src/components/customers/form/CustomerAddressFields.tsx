@@ -59,9 +59,41 @@ interface PlaceResult {
   formatted_address: string;
 }
 
+declare global {
+  interface Window {
+    google: typeof google;
+    initGoogleMaps: () => void;
+  }
+}
+
 export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerAddressFieldsProps) => {
   const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
+
+  // Initialize Google Maps
+  useEffect(() => {
+    if (window.google) {
+      setIsGoogleMapsLoaded(true);
+      return;
+    }
+
+    // Initialize Google Maps script
+    window.initGoogleMaps = () => {
+      setIsGoogleMapsLoaded(true);
+    };
+
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initGoogleMaps`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(script);
+      delete window.initGoogleMaps;
+    };
+  }, []);
 
   const inputClasses = isModernTheme
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg"
@@ -79,7 +111,7 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
 
   // Function to get address suggestions
   const getAddressSuggestions = async (input: string) => {
-    if (!input) return;
+    if (!input || !isGoogleMapsLoaded) return;
     setIsSearching(true);
     
     try {
@@ -102,6 +134,8 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
 
   // Handle address selection
   const handleAddressSelect = async (address: string) => {
+    if (!isGoogleMapsLoaded) return;
+    
     try {
       const geocoder = new google.maps.Geocoder();
       const response = await geocoder.geocode({ address });
@@ -138,7 +172,7 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
   };
 
   useEffect(() => {
-    if (streetAddress) {
+    if (streetAddress && isGoogleMapsLoaded) {
       debouncedGetSuggestions(streetAddress);
     } else {
       setAddressSuggestions([]);
@@ -147,7 +181,7 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     return () => {
       debouncedGetSuggestions.cancel();
     };
-  }, [streetAddress]);
+  }, [streetAddress, isGoogleMapsLoaded]);
 
   return (
     <div className="space-y-4">

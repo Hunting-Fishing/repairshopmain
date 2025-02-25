@@ -22,7 +22,16 @@ const formSchema = z.object({
   country: z.string().optional(),
   customer_type: z.enum(["Personal", "Fleet", "Business"]),
   language_preference: z.string().optional(),
-  timezone: z.string().optional(),
+  timezone: z.string().optional()
+    .refine((val) => {
+      if (!val) return true; // Optional field
+      try {
+        new Date().toLocaleString('en-US', { timeZone: val });
+        return true;
+      } catch {
+        return false;
+      }
+    }, "Invalid timezone"),
   company_size: z.string().optional(),
   business_classification_id: z.string().optional(),
   preferred_contact_time: z.object({
@@ -32,7 +41,7 @@ const formSchema = z.object({
   secondary_contact: z.object({
     name: z.string().optional(),
     phone: z.string().optional(),
-    email: z.string().optional(),
+    email: z.string().email("Invalid email address").optional(),
     relationship: z.string().optional()
   }).optional(),
   marketing_preferences: z.object({
@@ -73,7 +82,7 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
     },
   });
 
-  if (mode === "edit" && !initialData) {
+  if (mode === "edit" && !initialData?.id) {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
@@ -111,6 +120,20 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
         }
       }
 
+      // Validate timezone if provided
+      if (values.timezone) {
+        try {
+          new Date().toLocaleString('en-US', { timeZone: values.timezone });
+        } catch (error) {
+          toast({
+            title: "Validation Error",
+            description: "Invalid timezone selected",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
       // Validate address if all fields are provided
       if (values.street_address && values.city && values.state_province && values.postal_code && values.country) {
         const addressValidation = await validateAddress(
@@ -124,6 +147,19 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
           toast({
             title: "Validation Error",
             description: addressValidation.message,
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      // Validate secondary contact email if provided
+      if (values.secondary_contact?.email) {
+        const secondaryEmailValidation = await validateEmail(values.secondary_contact.email);
+        if (!secondaryEmailValidation.isValid) {
+          toast({
+            title: "Validation Error",
+            description: "Invalid secondary contact email address",
             variant: "destructive",
           });
           return;

@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useState, useMemo } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface TimezoneSelectorProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -45,32 +46,40 @@ const TIMEZONE_LIST = [
 export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [timezoneError, setTimezoneError] = useState<string | null>(null);
 
   const timezones = useMemo(() => {
-    return TIMEZONE_LIST.map(zone => {
-      try {
-        const formatter = new Intl.DateTimeFormat('en-US', {
-          timeZone: zone,
-          timeZoneName: 'long',
-          hour: 'numeric',
-        });
-        const now = new Date();
-        const parts = formatter.formatToParts(now);
-        const timeZonePart = parts.find(part => part.type === 'timeZoneName');
-        const offset = timeZonePart ? timeZonePart.value : '';
-        
-        return {
-          value: zone,
-          label: `${zone.replace(/_/g, ' ')} (${offset})`
-        };
-      } catch (e) {
-        console.error(`Error formatting timezone ${zone}:`, e);
-        return {
-          value: zone,
-          label: zone.replace(/_/g, ' ')
-        };
-      }
-    }).sort((a, b) => a.label.localeCompare(b.label));
+    try {
+      return TIMEZONE_LIST.map(zone => {
+        try {
+          const formatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: zone,
+            timeZoneName: 'long',
+            hour: 'numeric',
+          });
+          const now = new Date();
+          const parts = formatter.formatToParts(now);
+          const timeZonePart = parts.find(part => part.type === 'timeZoneName');
+          const offset = timeZonePart ? timeZonePart.value : '';
+          
+          return {
+            value: zone,
+            label: `${zone.replace(/_/g, ' ')} (${offset})`
+          };
+        } catch (e) {
+          console.error(`Error formatting timezone ${zone}:`, e);
+          setTimezoneError(`Invalid timezone format: ${zone}`);
+          return {
+            value: zone,
+            label: zone.replace(/_/g, ' ')
+          };
+        }
+      }).sort((a, b) => a.label.localeCompare(b.label));
+    } catch (error) {
+      console.error("Error processing timezones:", error);
+      setTimezoneError("Failed to load timezone data");
+      return [];
+    }
   }, []);
 
   const filteredTimezones = searchValue === "" 
@@ -83,6 +92,18 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
   const currentTimezone = form.watch("timezone");
   const selectedTimezone = timezones.find(tz => tz.value === currentTimezone);
 
+  const validateTimezone = (value: string) => {
+    try {
+      // Attempt to create a date with the timezone to validate it
+      new Date().toLocaleString('en-US', { timeZone: value });
+      setTimezoneError(null);
+      return true;
+    } catch (error) {
+      setTimezoneError(`Invalid timezone: ${value}`);
+      return false;
+    }
+  };
+
   return (
     <FormField
       control={form.control}
@@ -90,6 +111,11 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
       render={({ field }) => (
         <FormItem className="flex flex-col">
           <FormLabel className={labelClasses}>Timezone (Optional)</FormLabel>
+          {timezoneError && (
+            <Alert variant="destructive" className="mb-2">
+              <AlertDescription>{timezoneError}</AlertDescription>
+            </Alert>
+          )}
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
@@ -100,7 +126,8 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
                   aria-expanded={open}
                   className={cn(
                     "w-full justify-between",
-                    !field.value && "text-muted-foreground"
+                    !field.value && "text-muted-foreground",
+                    timezoneError && "border-red-500"
                   )}
                 >
                   {selectedTimezone?.label || "Select timezone..."}
@@ -124,10 +151,12 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
                         key={timezone.value}
                         value={timezone.value}
                         onSelect={(value) => {
-                          form.setValue("timezone", timezone.value);
-                          field.onChange(timezone.value);
-                          setOpen(false);
-                          setSearchValue("");
+                          if (validateTimezone(timezone.value)) {
+                            form.setValue("timezone", timezone.value);
+                            field.onChange(timezone.value);
+                            setOpen(false);
+                            setSearchValue("");
+                          }
                         }}
                       >
                         <Check

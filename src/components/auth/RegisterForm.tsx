@@ -10,9 +10,19 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { toast } from "sonner";
 import { validatePassword, isPasswordValid } from "@/utils/auth/passwordValidation";
 import { useAuthRateLimit } from "@/hooks/useAuthRateLimit";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { BusinessInformationSection } from "./form-sections/BusinessInformationSection";
 import { PersonalInformationSection } from "./form-sections/PersonalInformationSection";
 import { AddressSection } from "./form-sections/AddressSection";
+
+const ROLES = ['admin', 'moderator', 'user'] as const;
+type UserRole = typeof ROLES[number];
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +30,7 @@ export function RegisterForm() {
   const [selectedBusinessType, setSelectedBusinessType] = useState<BusinessType | null>(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState<UserRole>("user");
   const formRef = useRef<HTMLFormElement>(null);
 
   const { signUp } = useAuth();
@@ -67,9 +78,17 @@ export function RegisterForm() {
     setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      setIsLoading(false);
+      return;
+    }
+
     const signUpData = {
-      email: formData.get("email") as string,
-      password: password,
+      email,
+      password,
       organizationName: formData.get("organizationName") as string,
       businessPhone: formData.get("businessPhone") as string,
       businessType: selectedBusinessType?.id,
@@ -81,6 +100,7 @@ export function RegisterForm() {
       stateProvince: formData.get("stateProvince") as string,
       postalCode: formData.get("postalCode") as string,
       country: formData.get("country") as string,
+      role,
     };
 
     try {
@@ -90,6 +110,7 @@ export function RegisterForm() {
       setConfirmPassword("");
       setSelectedBusinessType(null);
       setSelectedCountry("");
+      setRole("user");
     } catch (error) {
       // Error is handled by the AuthContext
     } finally {
@@ -131,6 +152,24 @@ export function RegisterForm() {
         regions={regions}
         onCountryChange={setSelectedCountry}
       />
+
+      <div className="space-y-2">
+        <label htmlFor="role" className="text-sm font-medium">
+          Role
+        </label>
+        <Select value={role} onValueChange={(value: UserRole) => setRole(value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select Role" />
+          </SelectTrigger>
+          <SelectContent>
+            {ROLES.map((role) => (
+              <SelectItem key={role} value={role}>
+                {role.charAt(0).toUpperCase() + role.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? (

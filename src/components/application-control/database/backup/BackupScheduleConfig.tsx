@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,10 +42,14 @@ export function BackupScheduleConfig() {
       
       if (error) throw error;
       return data as Schedule[];
-    },
-    onSuccess: (data) => {
-      const dailySchedule = data.find(s => s.schedule_type === "daily");
-      const weeklySchedule = data.find(s => s.schedule_type === "weekly");
+    }
+  });
+
+  // Use useEffect to handle the success case instead of onSuccess
+  useEffect(() => {
+    if (schedules) {
+      const dailySchedule = schedules.find(s => s.schedule_type === "daily");
+      const weeklySchedule = schedules.find(s => s.schedule_type === "weekly");
       
       if (dailySchedule) {
         setDailyTime(dailySchedule.time.substring(0, 5));
@@ -54,8 +58,8 @@ export function BackupScheduleConfig() {
         setWeeklyDay(weeklySchedule.day_of_week || "");
         setWeeklyTime(weeklySchedule.time.substring(0, 5));
       }
-    },
-  });
+    }
+  }, [schedules]);
 
   const updateSchedule = async (type: "daily" | "weekly", time: string, day?: string) => {
     try {

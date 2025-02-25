@@ -4,20 +4,46 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CustomerAddressFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
   isModernTheme?: boolean;
 }
 
+// Comprehensive list of countries with their ISO codes
 const countries = [
   { id: "US", name: "United States" },
+  { id: "CA", name: "Canada" },
   { id: "GB", name: "United Kingdom" },
+  { id: "AU", name: "Australia" },
+  { id: "NZ", name: "New Zealand" },
   { id: "FR", name: "France" },
+  { id: "DE", name: "Germany" },
   { id: "JP", name: "Japan" },
   { id: "CN", name: "China" },
-  { id: "AU", name: "Australia" }
-];
+  { id: "IN", name: "India" },
+  { id: "BR", name: "Brazil" },
+  { id: "MX", name: "Mexico" },
+  { id: "ES", name: "Spain" },
+  { id: "IT", name: "Italy" },
+  { id: "NL", name: "Netherlands" },
+  { id: "SE", name: "Sweden" },
+  { id: "NO", name: "Norway" },
+  { id: "DK", name: "Denmark" },
+  { id: "FI", name: "Finland" },
+  { id: "IE", name: "Ireland" },
+  { id: "SG", name: "Singapore" },
+  { id: "KR", name: "South Korea" },
+  { id: "ZA", name: "South Africa" },
+  { id: "AE", name: "United Arab Emirates" },
+  { id: "SA", name: "Saudi Arabia" },
+  { id: "RU", name: "Russia" },
+  { id: "CH", name: "Switzerland" },
+  { id: "AT", name: "Austria" },
+  { id: "BE", name: "Belgium" },
+  { id: "PT", name: "Portugal" }
+].sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by country name
 
 export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerAddressFieldsProps) => {
   const inputClasses = isModernTheme
@@ -103,14 +129,16 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {countries.map((country) => (
-                    <SelectItem 
-                      key={country.id} 
-                      value={country.id}
-                    >
-                      {country.name}
-                    </SelectItem>
-                  ))}
+                  <ScrollArea className="h-80">
+                    {countries.map((country) => (
+                      <SelectItem 
+                        key={country.id} 
+                        value={country.id}
+                      >
+                        {country.name}
+                      </SelectItem>
+                    ))}
+                  </ScrollArea>
                 </SelectContent>
               </Select>
               <FormMessage />

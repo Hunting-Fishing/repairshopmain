@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ export function EmailVerification() {
   const [isVerifying, setIsVerifying] = useState(true);
   const [isError, setIsError] = useState(false);
 
-  useState(() => {
+  useEffect(() => {
     const verifyEmail = async () => {
       if (!token) {
         setIsError(true);

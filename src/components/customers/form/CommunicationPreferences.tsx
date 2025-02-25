@@ -9,7 +9,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface CommunicationPreferencesProps {
@@ -54,21 +54,19 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
     { value: "Pacific/Auckland", label: "Auckland (GMT+12)" }
   ];
 
-  const filteredTimezones = timezones.filter(timezone => 
-    timezone.label.toLowerCase().includes(inputValue.toLowerCase()) ||
-    timezone.value.toLowerCase().includes(inputValue.toLowerCase())
-  );
+  const filteredTimezones = inputValue === "" 
+    ? timezones 
+    : timezones.filter(timezone => 
+        timezone.label.toLowerCase().includes(inputValue.toLowerCase()) ||
+        timezone.value.toLowerCase().includes(inputValue.toLowerCase())
+      );
 
-  const handleSelect = useCallback((value: string) => {
-    if (!value) return;
-    
-    const timezone = timezones.find(tz => tz.value === value);
-    if (!timezone) return;
-
-    form.setValue("timezone", timezone.value);
+  const handleSelect = (value: string) => {
+    form.setValue("timezone", value);
     setOpen(false);
-    setInputValue("");
-  }, [form]);
+  };
+
+  const currentValue = form.watch("timezone");
 
   return (
     <div className="space-y-6">
@@ -126,31 +124,31 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
                     )}
                   >
                     {field.value ? 
-                      timezones.find(tz => tz.value === field.value)?.label 
+                      timezones.find(tz => tz.value === field.value)?.label || field.value
                       : "Select timezone..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0" align="start">
-                <Command shouldFilter={false}>
+                <Command>
                   <CommandInput 
                     placeholder="Search timezone..." 
-                    value={inputValue}
+                    value={inputValue} 
                     onValueChange={setInputValue}
                   />
                   <CommandEmpty>No timezone found.</CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-y-auto">
+                  <CommandGroup>
                     {filteredTimezones.map((timezone) => (
                       <CommandItem
-                        key={timezone.value}
                         value={timezone.value}
+                        key={timezone.value}
                         onSelect={handleSelect}
                       >
                         <Check
                           className={cn(
                             "mr-2 h-4 w-4",
-                            field.value === timezone.value ? "opacity-100" : "opacity-0"
+                            currentValue === timezone.value ? "opacity-100" : "opacity-0"
                           )}
                         />
                         {timezone.label}

@@ -14,16 +14,22 @@ import { AlertCircle, CheckCircle2, Activity, Server, Database, HardDrive } from
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 
+interface SystemMetrics {
+  cpu_usage: number;
+  memory_usage: number;
+  error_rate: number;
+  response_time: number;
+}
+
 interface SystemStatusData {
   database: 'connected' | 'disconnected';
   api: 'operational' | 'degraded' | 'down';
   storage: 'available' | 'limited' | 'unavailable';
-  metrics: {
-    cpu_usage: number;
-    memory_usage: number;
-    error_rate: number;
-    response_time: number;
-  };
+}
+
+interface SystemConfiguration {
+  status: string;
+  metrics: SystemStatusData & SystemMetrics;
 }
 
 interface MetricCardProps {
@@ -74,7 +80,7 @@ export function SystemStatus() {
       }
 
       await supabase.rpc('update_system_metrics');
-      return data as { status: string; metrics: SystemStatusData };
+      return data as SystemConfiguration;
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });

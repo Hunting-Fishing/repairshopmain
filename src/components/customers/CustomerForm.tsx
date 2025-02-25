@@ -12,9 +12,10 @@ export interface CustomerFormProps {
   onSuccess: () => void;
   initialData?: CustomerFormValues;
   mode?: "create" | "edit";
+  customerId: string;
 }
 
-export function CustomerForm({ onSuccess, initialData, mode = "create" }: CustomerFormProps) {
+export function CustomerForm({ onSuccess, initialData, mode = "create", customerId }: CustomerFormProps) {
   const { handleSubmit, isSubmitting } = useCustomerSubmit({
     mode,
     initialData,
@@ -63,6 +64,7 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
         onSubmit={methods.handleSubmit(handleSubmit)}
         mode={mode}
         isSubmitting={isSubmitting}
+        customerId={customerId}
       />
     </FormProvider>
   );

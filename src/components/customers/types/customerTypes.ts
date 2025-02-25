@@ -29,6 +29,7 @@ export interface CustomerFormValues {
     sms: boolean;
     phone: boolean;
   };
+  id?: string; // Added this line to support edit mode
 }
 
 export interface Customer extends CustomerFormValues {

@@ -60,31 +60,27 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
         }
       }
 
-      let operation;
+      let result;
       if (mode === "edit" && initialData?.id) {
         console.log("Updating customer with ID:", initialData.id);
-        operation = supabase
+        const updateData = {
+          ...values,
+          email_validation_status: emailValidation.isValid ? 'valid' : 'invalid',
+          phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
+          address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending',
+          updated_at: new Date().toISOString()
+        };
+        
+        console.log("Sending update with data:", updateData);
+        
+        result = await supabase
           .from("customers")
-          .update({
-            ...values,
-            email_validation_status: emailValidation.isValid ? 'valid' : 'invalid',
-            phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
-            address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending',
-            updated_at: new Date().toISOString()
-          })
+          .update(updateData)
           .eq('id', initialData.id)
-          .select();
-
-        const { data: customer, error } = await operation;
-
-        if (error) {
-          console.error("Database update failed:", error);
-          throw error;
-        }
-
-        console.log("Update successful:", customer);
+          .select()
+          .single();
       } else {
-        operation = supabase
+        result = await supabase
           .from("customers")
           .insert([{
             ...values,
@@ -92,25 +88,26 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
             phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
             address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending'
           }])
-          .select();
+          .select()
+          .single();
       }
 
-      const { data: customer, error } = await operation;
-
-      if (error) {
-        console.error("Database operation failed:", error);
-        throw error;
+      if (result.error) {
+        console.error("Database operation failed:", result.error);
+        throw result.error;
       }
 
-      if (!customer) {
+      if (!result.data) {
         throw new Error("No data returned from the database");
       }
 
+      const customer = result.data;
+
       // Log validation attempts
-      await logValidationAttempt(Array.isArray(customer) ? customer[0].id : customer.id, 'email', emailValidation.isValid ? 'valid' : 'invalid', emailValidation.message);
+      await logValidationAttempt(customer.id, 'email', emailValidation.isValid ? 'valid' : 'invalid', emailValidation.message);
       if (values.phone_number) {
         const phoneValidation = await validatePhone(values.phone_number);
-        await logValidationAttempt(Array.isArray(customer) ? customer[0].id : customer.id, 'phone', phoneValidation.isValid ? 'valid' : 'invalid', phoneValidation.message);
+        await logValidationAttempt(customer.id, 'phone', phoneValidation.isValid ? 'valid' : 'invalid', phoneValidation.message);
       }
       if (values.street_address) {
         const addressValidation = await validateAddress(
@@ -120,7 +117,7 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
           values.postal_code,
           values.country
         );
-        await logValidationAttempt(Array.isArray(customer) ? customer[0].id : customer.id, 'address', addressValidation.isValid ? 'valid' : 'invalid', addressValidation.message);
+        await logValidationAttempt(customer.id, 'address', addressValidation.isValid ? 'valid' : 'invalid', addressValidation.message);
       }
 
       onSuccess();

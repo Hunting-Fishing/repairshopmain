@@ -22,7 +22,7 @@ export function useInvitation(): UseInvitationReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validateData = (data: InvitationData) => {
+  const validateData = (data: InvitationData): z.ZodIssue[] => {
     try {
       invitationSchema.parse(data);
       return [];
@@ -30,7 +30,12 @@ export function useInvitation(): UseInvitationReturn {
       if (error instanceof z.ZodError) {
         return error.errors;
       }
-      return [{ path: ["form"], message: "Validation failed" }];
+      return [{
+        code: "custom",
+        path: ["form"],
+        message: "Validation failed",
+        fatal: true
+      }];
     }
   };
 
@@ -41,11 +46,12 @@ export function useInvitation(): UseInvitationReturn {
     try {
       // Validate the input data
       const validationErrors = validateData(data);
+      
       if (validationErrors.length > 0) {
         const newErrors: Record<string, string> = {};
-        validationErrors.forEach((error: z.ZodIssue) => {
-          // Convert the path array to a string key for the first path segment
-          const fieldName = error.path[0].toString();
+        // Explicitly type the array and use proper forEach typing
+        (validationErrors as z.ZodIssue[]).forEach(error => {
+          const fieldName = String(error.path[0] || 'form');
           newErrors[fieldName] = error.message;
         });
         setErrors(newErrors);

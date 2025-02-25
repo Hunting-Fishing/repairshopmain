@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -143,5 +142,25 @@ export function trackSystemPerformance() {
     response_time: Math.random() * 1000
   };
 
+  // Push metrics to external monitoring
+  pushToExternalMonitoring({
+    timestamp: new Date().toISOString(),
+    metrics
+  });
+
   return logSystemMetrics(metrics);
+}
+
+// Add API validation helper
+export async function validateAndExecute<T>(
+  operation: () => Promise<T>,
+  context: string
+): Promise<T> {
+  try {
+    const result = await defaultValidator.withRetry(operation);
+    return result;
+  } catch (error) {
+    handleQueryError(error as Error, context);
+    throw error;
+  }
 }

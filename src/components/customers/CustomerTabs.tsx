@@ -15,7 +15,9 @@ import { CustomerAnalyticsDashboard } from "./analytics/CustomerAnalyticsDashboa
 import { useState } from "react";
 import { Vehicle } from "./vehicles/types";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface CustomerTabsProps {
   customerId: string;
@@ -26,6 +28,7 @@ interface CustomerTabsProps {
 export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsProps) {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [activeTab, setActiveTab] = useState("details");
+  const navigate = useNavigate();
 
   const handleVehicleSelect = (vehicle: Vehicle | null) => {
     setSelectedVehicle(vehicle);
@@ -36,6 +39,19 @@ export function CustomerTabs({ customerId, customer, onSuccess }: CustomerTabsPr
 
   return (
     <div className="space-y-4">
+      {/* Navigation Header */}
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate("/customers")}
+          className="hover:bg-accent"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-2xl font-bold">Customer Details</h1>
+      </div>
+
       {/* Quick Contact Actions */}
       <div className="flex items-center gap-4 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 rounded-lg border shadow-sm">
         <div className="space-y-1">

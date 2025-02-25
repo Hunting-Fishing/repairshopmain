@@ -7884,6 +7884,42 @@ export type Database = {
           },
         ]
       }
+      system_alerts: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       system_configuration: {
         Row: {
           created_at: string
@@ -9521,6 +9557,10 @@ export type Database = {
         Args: {
           org_id: string
         }
+        Returns: undefined
+      }
+      cleanup_old_alerts: {
+        Args: Record<PropertyKey, never>
         Returns: undefined
       }
       create_auth_token: {

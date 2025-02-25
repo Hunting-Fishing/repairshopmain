@@ -51,6 +51,19 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
   const currentTimezone = form.watch("timezone");
   const selectedTimezone = timezones.find(tz => tz.value === currentTimezone);
 
+  const handleSelect = (value: string) => {
+    // Handle empty selection
+    if (!value) {
+      form.setValue("timezone", undefined);
+      field.onChange(undefined);
+    } else {
+      form.setValue("timezone", value);
+      field.onChange(value);
+    }
+    setOpen(false);
+    setSearchValue("");
+  };
+
   return (
     <FormField
       control={form.control}
@@ -83,32 +96,24 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
                   value={searchValue}
                   onValueChange={setSearchValue}
                 />
-                {filteredTimezones.length === 0 ? (
-                  <CommandEmpty>No timezone found.</CommandEmpty>
-                ) : (
-                  <CommandGroup className="max-h-[300px] overflow-y-auto">
-                    {filteredTimezones.map((timezone) => (
-                      <CommandItem
-                        key={timezone.value}
-                        value={timezone.value}
-                        onSelect={() => {
-                          form.setValue("timezone", timezone.value || "");
-                          field.onChange(timezone.value || "");
-                          setOpen(false);
-                          setSearchValue("");
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            currentTimezone === timezone.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {timezone.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                )}
+                <CommandEmpty>No timezone found.</CommandEmpty>
+                <CommandGroup className="max-h-[300px] overflow-y-auto">
+                  {filteredTimezones.map((timezone) => (
+                    <CommandItem
+                      key={timezone.value}
+                      value={timezone.value}
+                      onSelect={() => handleSelect(timezone.value)}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          currentTimezone === timezone.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {timezone.label}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
               </Command>
             </PopoverContent>
           </Popover>

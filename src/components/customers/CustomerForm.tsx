@@ -20,7 +20,7 @@ const formSchema = z.object({
   country: z.string().optional(),
   customer_type: z.enum(["Personal", "Fleet", "Business"]),
   language_preference: z.string().optional(),
-  timezone: z.string().optional(),
+  timezone: z.string().optional(), // Made explicitly optional
   company_size: z.string().optional(),
   business_classification_id: z.string().optional(),
   preferred_contact_time: z.object({

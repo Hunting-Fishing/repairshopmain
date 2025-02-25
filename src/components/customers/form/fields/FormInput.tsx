@@ -30,6 +30,8 @@ export function FormInput({
 }: FormInputProps) {
   const error = form.formState.errors[name];
   const isTouched = form.formState.touchedFields[name];
+  const value = form.getValues(name);
+  const isEmpty = required && (!value || value.trim() === "");
   
   const inputClasses = cn(
     "transition-all duration-200",
@@ -37,14 +39,15 @@ export function FormInput({
       ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white rounded-lg"
       : "bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white",
     error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
-    required && !form.getValues(name) && isTouched && "border-red-500 bg-red-50/50"
+    isEmpty && isTouched && "border-red-500 bg-red-50/50"
   );
 
   const labelClasses = cn(
     isModernTheme
       ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
       : "text-gray-700 font-medium",
-    error && "text-red-500"
+    error && "text-red-500",
+    isEmpty && isTouched && "text-red-500"
   );
 
   return (
@@ -68,10 +71,15 @@ export function FormInput({
               placeholder={required ? `${placeholder} *` : placeholder}
               className={inputClasses}
               aria-required={required}
-              aria-invalid={!!error}
+              aria-invalid={!!error || isEmpty}
             />
           </FormControl>
-          <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />
+          {error && <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />}
+          {isEmpty && isTouched && !error && (
+            <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
+              {label} is required
+            </FormMessage>
+          )}
         </FormItem>
       )}
     />

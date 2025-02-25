@@ -11,7 +11,7 @@ interface SubmitButtonProps {
 }
 
 export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps) {
-  const { formState: { isValid, errors } } = useFormContext();
+  const { formState: { isValid, errors }, getValues } = useFormContext();
   const { toast } = useToast();
 
   const getFieldLabel = (fieldName: string): string => {
@@ -25,17 +25,35 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
   };
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!isValid) {
+    const values = getValues();
+    const missingFields = [];
+    
+    // Check required fields
+    if (!values.first_name) missingFields.push("First Name");
+    if (!values.last_name) missingFields.push("Last Name");
+    if (!values.email) missingFields.push("Email");
+    if (!values.customer_type) missingFields.push("Customer Type");
+
+    if (missingFields.length > 0) {
       e.preventDefault();
-      const errorFields = Object.keys(errors);
-      const missingFields = errorFields.map(field => getFieldLabel(field));
       
       toast({
         variant: "destructive",
         title: "Required Fields Missing",
-        description: missingFields.length > 0
-          ? `Please fill in the following required fields: ${missingFields.join(', ')}`
-          : "Please fill out all required fields marked with an asterisk (*) before saving."
+        description: `Please fill in the following fields: ${missingFields.join(', ')}`
+      });
+      return;
+    }
+
+    // If there are other validation errors (e.g., invalid email format)
+    if (!isValid) {
+      e.preventDefault();
+      const errorFields = Object.keys(errors).map(field => getFieldLabel(field));
+      
+      toast({
+        variant: "destructive",
+        title: "Validation Errors",
+        description: `Please check the following fields: ${errorFields.join(', ')}`
       });
     }
   };

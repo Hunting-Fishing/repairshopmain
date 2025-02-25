@@ -12,9 +12,23 @@ import { StaffHeader } from "@/components/staff/components/StaffHeader";
 import { StaffTabsList } from "@/components/staff/components/StaffTabsList";
 import { useStaffTabs } from "@/components/staff/hooks/useStaffTabs";
 import { StaffHistoryList } from "@/components/staff/history/StaffHistoryList";
+import { StaffScheduler } from "@/components/staff/scheduling";
+import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
 
 export default function Staff() {
   const form = useStaffTabs();
+  const { data: staffMembers } = useStaffMembers();
+
+  const shiftTypes = [
+    { name: "Morning", duration: 240 }, // 4 hours
+    { name: "Afternoon", duration: 360 }, // 6 hours
+    { name: "Full Day", duration: 480 }, // 8 hours
+  ];
+
+  const formattedStaff = staffMembers?.map(staff => ({
+    id: parseInt(staff.id.replace(/-/g, ''), 16) % 100000, // Convert UUID to smaller number for demo
+    name: `${staff.first_name} ${staff.last_name}`
+  })) || [];
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -34,6 +48,9 @@ export default function Staff() {
               <TechnicianSettings form={form} />
             </form>
           </Form>
+        </TabsContent>
+        <TabsContent value="scheduling">
+          <StaffScheduler staff={formattedStaff} shiftTypes={shiftTypes} />
         </TabsContent>
         <TabsContent value="assignment-rules">
           <AssignmentRules />

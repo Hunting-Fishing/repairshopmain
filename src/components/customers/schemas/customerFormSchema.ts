@@ -1,23 +1,24 @@
 
 import * as z from "zod";
+import { validationMessages } from "./validationMessages";
 
 export const customerFormSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
+  first_name: z.string().min(1, validationMessages.required.first_name),
+  last_name: z.string().min(1, validationMessages.required.last_name),
+  email: z.string().email(validationMessages.format.email),
   phone_number: z.string().optional(),
   street_address: z.string().optional(),
   city: z.string().optional(),
   state_province: z.string().optional(),
   postal_code: z.string().optional(),
   country: z.string({
-    required_error: "Country is required",
-  }).min(1, "Country is required"),
+    required_error: validationMessages.required.country,
+  }).min(1, validationMessages.required.country),
   customer_type: z.enum(["Personal", "Fleet", "Business"]),
   language_preference: z.string().optional(),
   timezone: z.string({
-    required_error: "Timezone is required",
-  }).min(1, "Please select a timezone"),
+    required_error: validationMessages.required.timezone,
+  }).min(1, validationMessages.required.timezone),
   marketing_preferences: z.object({
     email: z.boolean().optional(),
     sms: z.boolean().optional(),
@@ -28,7 +29,7 @@ export const customerFormSchema = z.object({
   secondary_contact: z.object({
     name: z.string().optional(),
     phone: z.string().optional(),
-    email: z.string().email("Invalid email address").optional(),
+    email: z.string().email(validationMessages.format.email).optional(),
     relationship: z.string().optional()
   }).optional(),
   id: z.string().optional()

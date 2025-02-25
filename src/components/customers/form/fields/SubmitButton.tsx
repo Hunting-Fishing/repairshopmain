@@ -4,6 +4,8 @@ import { useFormContext } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
+import { validationMessages } from "../schemas/validationMessages";
 
 interface SubmitButtonProps {
   label: string;
@@ -34,6 +36,16 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     'customer_type'
   ]);
 
+  // Form state persistence
+  useEffect(() => {
+    const formData = getValues();
+    const customerId = formData.id;
+    
+    if (customerId) {
+      localStorage.setItem(`customer_form_${customerId}`, JSON.stringify(formData));
+    }
+  }, [watchedFields, getValues]);
+
   // Check if any watched field has a value
   const hasChanges = watchedFields.some(field => field);
 
@@ -51,24 +63,12 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const values = getValues();
-    const missingFields = [];
-    
-    // Base required fields for all customer types
-    if (!values.first_name?.trim()) missingFields.push("First Name");
-    if (!values.last_name?.trim()) missingFields.push("Last Name");
-    if (!values.email?.trim()) missingFields.push("Email");
-    if (!values.country?.trim()) missingFields.push("Country");
-    if (!values.timezone?.trim()) missingFields.push("Timezone");
-
-    // Business-specific fields validation
-    if (values.customer_type === "Business") {
-      if (!values.company_size) missingFields.push("Company Size");
-      if (!values.business_classification_id) missingFields.push("Business Classification");
-    }
+    const missingFields = Object.entries(validationMessages.required)
+      .filter(([field, _]) => !values[field as keyof typeof values])
+      .map(([field, _]) => getFieldLabel(field));
 
     if (missingFields.length > 0) {
       e.preventDefault();
-      
       toast({
         variant: "destructive",
         title: "Required Fields Missing",
@@ -77,47 +77,23 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
       return;
     }
 
-    // If there are other validation errors (e.g., invalid email format)
     if (Object.keys(errors).length > 0) {
       e.preventDefault();
       const errorFields = Object.keys(errors)
-        .filter(field => {
-          // Filter out optional fields and fields that shouldn't block submission
-          const fieldsToIgnore = [
-            'company_size',
-            'business_classification_id',
-            'preferred_contact_time',
-            'language_preference'
-          ];
-          
-          // Don't block submission for these fields
-          if (fieldsToIgnore.includes(field)) return false;
-          
-          // For business type, only include business-specific fields
-          if (values.customer_type !== "Business") {
-            return !["company_size", "business_classification_id"].includes(field);
-          }
-          
-          return true;
-        })
         .map(field => getFieldLabel(field));
       
-      if (errorFields.length > 0) {
-        toast({
-          variant: "destructive",
-          title: "Validation Errors",
-          description: `Please check the following fields: ${errorFields.join(', ')}`
-        });
-        return;
-      }
+      toast({
+        variant: "destructive",
+        title: "Validation Errors",
+        description: `Please check the following fields: ${errorFields.join(', ')}`
+      });
+      return;
     }
 
     // If we get here, allow the form to submit
     console.log('Submitting form with values:', values);
   };
 
-  // For edit mode, we want to enable the button if there are any values
-  // For create mode, we need all required fields
   const isEditMode = label.toLowerCase().includes('update');
   const shouldDisable = isSubmitting;
 

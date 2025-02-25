@@ -77,10 +77,23 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
       e.preventDefault();
       const errorFields = Object.keys(errors)
         .filter(field => {
-          // Filter out optional fields based on customer type
+          // Filter out optional fields and fields that shouldn't block submission
+          const fieldsToIgnore = [
+            'company_size',
+            'business_classification_id',
+            'preferred_contact_time',
+            'timezone',
+            'language_preference'
+          ];
+          
+          // Don't block submission for these fields
+          if (fieldsToIgnore.includes(field)) return false;
+          
+          // For business type, only include business-specific fields
           if (values.customer_type !== "Business") {
-            return !["company_size", "business_classification_id", "preferred_contact_time"].includes(field);
+            return !["company_size", "business_classification_id"].includes(field);
           }
+          
           return true;
         })
         .map(field => getFieldLabel(field));
@@ -91,18 +104,18 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
           title: "Validation Errors",
           description: `Please check the following fields: ${errorFields.join(', ')}`
         });
+        return;
       }
     }
 
-    // Log form state for debugging
-    console.log('Form Values:', values);
-    console.log('Form Errors:', errors);
+    // If we get here, allow the form to submit
+    console.log('Submitting form with values:', values);
   };
 
   // For edit mode, we want to enable the button if there are any values
   // For create mode, we need all required fields
   const isEditMode = label.toLowerCase().includes('update');
-  const shouldDisable = isSubmitting || (!isEditMode && !hasChanges);
+  const shouldDisable = isSubmitting;
 
   return (
     <Button

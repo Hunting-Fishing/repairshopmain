@@ -29,9 +29,9 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     const missingFields = [];
     
     // Check required fields
-    if (!values.first_name) missingFields.push("First Name");
-    if (!values.last_name) missingFields.push("Last Name");
-    if (!values.email) missingFields.push("Email");
+    if (!values.first_name?.trim()) missingFields.push("First Name");
+    if (!values.last_name?.trim()) missingFields.push("Last Name");
+    if (!values.email?.trim()) missingFields.push("Email");
     if (!values.customer_type) missingFields.push("Customer Type");
 
     if (missingFields.length > 0) {
@@ -46,7 +46,7 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     }
 
     // If there are other validation errors (e.g., invalid email format)
-    if (!isValid) {
+    if (Object.keys(errors).length > 0) {
       e.preventDefault();
       const errorFields = Object.keys(errors).map(field => getFieldLabel(field));
       

@@ -39,7 +39,7 @@ export function FormInput({
       ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white rounded-lg"
       : "bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white",
     error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
-    isEmpty && isTouched && "border-red-500 bg-red-50/50"
+    isEmpty && "border-red-500 bg-red-50/50"
   );
 
   const labelClasses = cn(
@@ -47,7 +47,7 @@ export function FormInput({
       ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
       : "text-gray-700 font-medium",
     error && "text-red-500",
-    isEmpty && isTouched && "text-red-500"
+    isEmpty && "text-red-500"
   );
 
   return (
@@ -75,7 +75,7 @@ export function FormInput({
             />
           </FormControl>
           {error && <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />}
-          {isEmpty && isTouched && !error && (
+          {isEmpty && !error && (
             <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
               {label} is required
             </FormMessage>

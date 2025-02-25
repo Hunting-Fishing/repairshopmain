@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import type { WorkOrderFiltersType, SortConfig } from "@/pages/WorkOrders";
 
 interface DatabaseWorkOrder {
   id: string;
@@ -30,14 +31,14 @@ interface WorkOrder {
   date: string;
 }
 
-export function useWorkOrders() {
+export function useWorkOrders(filters?: WorkOrderFiltersType, sortConfig?: SortConfig) {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchWorkOrders = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('customer_repair_jobs')
         .select(`
           id,
@@ -55,9 +56,32 @@ export function useWorkOrders() {
             model,
             year
           )
-        `)
-        .order('created_at', { ascending: false })
-        .returns<DatabaseWorkOrder[]>();
+        `);
+
+      // Apply filters
+      if (filters?.customerId) {
+        query = query.eq('customer_id', filters.customerId);
+      }
+      if (filters?.status) {
+        query = query.eq('status', filters.status);
+      }
+      if (filters?.startDate) {
+        query = query.gte('created_at', filters.startDate.toISOString());
+      }
+      if (filters?.endDate) {
+        query = query.lte('created_at', filters.endDate.toISOString());
+      }
+
+      // Apply sorting
+      if (sortConfig) {
+        query = query.order(sortConfig.field, { 
+          ascending: sortConfig.direction === 'asc'
+        });
+      } else {
+        query = query.order('created_at', { ascending: false });
+      }
+
+      const { data, error } = await query.returns<DatabaseWorkOrder[]>();
 
       if (error) throw error;
 
@@ -83,9 +107,29 @@ export function useWorkOrders() {
     }
   };
 
+  const updateWorkOrders = async (ids: string[], updates: Partial<WorkOrder>) => {
+    const { error } = await supabase
+      .from('customer_repair_jobs')
+      .update(updates)
+      .in('id', ids);
+
+    if (error) throw error;
+    await fetchWorkOrders();
+  };
+
+  const deleteWorkOrders = async (ids: string[]) => {
+    const { error } = await supabase
+      .from('customer_repair_jobs')
+      .delete()
+      .in('id', ids);
+
+    if (error) throw error;
+    await fetchWorkOrders();
+  };
+
   useEffect(() => {
     fetchWorkOrders();
-  }, [toast]);
+  }, [filters, sortConfig, toast]);
 
   useEffect(() => {
     const channel = supabase
@@ -116,5 +160,5 @@ export function useWorkOrders() {
     };
   }, [toast]);
 
-  return { workOrders, isLoading, fetchWorkOrders };
+  return { workOrders, isLoading, fetchWorkOrders, updateWorkOrders, deleteWorkOrders };
 }

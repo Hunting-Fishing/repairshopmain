@@ -12,11 +12,6 @@ const invitationSchema = z.object({
 
 export type InvitationData = z.infer<typeof invitationSchema>;
 
-interface ValidationError {
-  path: string[];
-  message: string;
-}
-
 interface UseInvitationReturn {
   sendInvitation: (data: InvitationData) => Promise<void>;
   isLoading: boolean;
@@ -48,8 +43,10 @@ export function useInvitation(): UseInvitationReturn {
       const validationErrors = validateData(data);
       if (validationErrors.length > 0) {
         const newErrors: Record<string, string> = {};
-        validationErrors.forEach((error: ValidationError) => {
-          newErrors[error.path[0]] = error.message;
+        validationErrors.forEach((error: z.ZodIssue) => {
+          // Convert the path array to a string key for the first path segment
+          const fieldName = error.path[0].toString();
+          newErrors[fieldName] = error.message;
         });
         setErrors(newErrors);
         return;

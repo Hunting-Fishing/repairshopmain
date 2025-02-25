@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
-import { validationMessages } from "../schemas/validationMessages";
+import { validationMessages } from "../../schemas/validationMessages";
 
 interface SubmitButtonProps {
   label: string;

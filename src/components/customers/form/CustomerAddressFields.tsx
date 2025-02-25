@@ -1,12 +1,10 @@
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import debounce from "lodash/debounce";
-import { AddressLookup } from "./components/AddressLookup";
 import { AddressFields } from "./components/AddressFields";
+import { StreetAddressField } from "./components/StreetAddressField";
 import { ADDRESS_TYPES, CustomerAddressFieldsProps, NominatimResult } from "./types/addressTypes";
 import { getPostalCodePattern } from "./utils/addressUtils";
 
@@ -58,34 +56,30 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700";
 
-  const selectedCountry = useWatch({
-    control: form.control,
-    name: "country"
-  });
+  const selectedCountry = useWatch({ control: form.control, name: "country" });
+  const streetAddress = useWatch({ control: form.control, name: "street_address" });
 
-  const streetAddress = useWatch({
-    control: form.control,
-    name: "street_address"
-  });
+  const handleAddressSelect = (result: NominatimResult) => {
+    const { address } = result;
+    form.setValue('street_address', addressType === 'po_box' ? '' : 
+      `${address.house_number || ''} ${address.road || ''}`.trim());
+    form.setValue('city', address.city || '');
+    form.setValue('state_province', address.state || '');
+    form.setValue('postal_code', address.postcode || '');
+    form.setValue('country', address.country_code?.toUpperCase() || '');
+    setAddressSuggestions([]);
+  };
 
-  const getAddressSuggestions = async (input: string) => {
+  const handleAddressLookup = async (input: string) => {
     if (!input || isManualEntry) return;
     setIsSearching(true);
-    
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&addressdetails=1`,
-        {
-          headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'CustomerManagementSystem'
-          }
-        }
+        { headers: { 'Accept': 'application/json', 'User-Agent': 'CustomerManagementSystem' } }
       );
-      
       if (response.ok) {
-        const results: NominatimResult[] = await response.json();
-        setAddressSuggestions(results);
+        setAddressSuggestions(await response.json());
       }
     } catch (error) {
       console.error('Address search error:', error);
@@ -94,26 +88,7 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     }
   };
 
-  const debouncedGetSuggestions = debounce(getAddressSuggestions, 500);
-
-  const handleAddressSelect = (result: NominatimResult) => {
-    const { address } = result;
-    
-    form.setValue('street_address', addressType === 'po_box' ? '' : 
-      `${address.house_number || ''} ${address.road || ''}`.trim());
-    form.setValue('city', address.city || '');
-    form.setValue('state_province', address.state || '');
-    form.setValue('postal_code', address.postcode || '');
-    form.setValue('country', address.country_code?.toUpperCase() || '');
-
-    setAddressSuggestions([]);
-  };
-
-  const handleAddressTypeChange = (type: typeof ADDRESS_TYPES[number]['id']) => {
-    setAddressType(type);
-    setIsManualEntry(type === 'po_box');
-    setAddressSuggestions([]);
-  };
+  const debouncedGetSuggestions = debounce(handleAddressLookup, 500);
 
   useEffect(() => {
     if (streetAddress && !isManualEntry) {
@@ -121,27 +96,23 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     } else {
       setAddressSuggestions([]);
     }
-
-    return () => {
-      debouncedGetSuggestions.cancel();
-    };
+    return () => debouncedGetSuggestions.cancel();
   }, [streetAddress, isManualEntry]);
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-2">
-        <Select
-          value={addressType}
-          onValueChange={handleAddressTypeChange}
-        >
+        <Select value={addressType} onValueChange={(type) => {
+          setAddressType(type as typeof ADDRESS_TYPES[number]['id']);
+          setIsManualEntry(type === 'po_box');
+          setAddressSuggestions([]);
+        }}>
           <SelectTrigger className="w-[200px]">
             <SelectValue placeholder="Select address type" />
           </SelectTrigger>
           <SelectContent>
             {ADDRESS_TYPES.map((type) => (
-              <SelectItem key={type.id} value={type.id}>
-                {type.label}
-              </SelectItem>
+              <SelectItem key={type.id} value={type.id}>{type.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -162,43 +133,16 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
         )}
       </div>
 
-      <div className="relative">
-        <FormField
-          control={form.control}
-          name="street_address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClasses}>
-                {addressType === 'po_box' ? 'PO Box Number' : 'Street Address'}
-                {isManualEntry && addressType !== 'po_box' && " (Suite, Unit, etc. accepted)"}
-              </FormLabel>
-              <div className="relative">
-                <FormControl>
-                  <Input 
-                    {...field} 
-                    className={inputClasses}
-                    placeholder={
-                      addressType === 'po_box' 
-                        ? "Enter PO Box number" 
-                        : isManualEntry 
-                          ? "Enter complete address" 
-                          : "Start typing to search address"
-                    }
-                  />
-                </FormControl>
-                {!isManualEntry && addressType !== 'po_box' && (
-                  <AddressLookup 
-                    isSearching={isSearching}
-                    suggestions={addressSuggestions}
-                    onSelect={handleAddressSelect}
-                  />
-                )}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <StreetAddressField
+        form={form}
+        inputClasses={inputClasses}
+        labelClasses={labelClasses}
+        addressType={addressType}
+        isManualEntry={isManualEntry}
+        isSearching={isSearching}
+        suggestions={addressSuggestions}
+        onAddressSelect={handleAddressSelect}
+      />
       
       <AddressFields 
         form={form}

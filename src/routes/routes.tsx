@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "@/pages/Auth";
@@ -23,6 +22,10 @@ import { SetPassword } from "@/pages/SetPassword";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { EmailVerification } from "@/components/auth/EmailVerification";
+import { AlertsDashboard } from "@/components/application-control/AlertsDashboard";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { Suspense } from "react";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +36,22 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <ProtectedRoute><Index /></ProtectedRoute>,
+      },
+      {
+        path: "alerts",
+        element: (
+          <ProtectedRoute allowedRoles={['owner', 'management']}>
+            <ErrorBoundary>
+              <Suspense fallback={
+                <div className="flex items-center justify-center min-h-screen">
+                  <LoadingSpinner size="lg" />
+                </div>
+              }>
+                <AlertsDashboard />
+              </Suspense>
+            </ErrorBoundary>
+          </ProtectedRoute>
+        ),
       },
       {
         path: "calendar",

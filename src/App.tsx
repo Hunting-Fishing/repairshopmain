@@ -8,13 +8,14 @@ import Customers from "@/pages/Customers";
 import CustomerDetail from "@/pages/CustomerDetail";
 import CustomerManagement from "@/pages/CustomerManagement";
 import WorkOrders from "@/pages/WorkOrders";
+import Index from "@/pages/Index";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/customer-portal" replace />} />
+          <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/customer-portal" element={<CustomerPortal />} />
           <Route path="/customers" element={<Customers />} />

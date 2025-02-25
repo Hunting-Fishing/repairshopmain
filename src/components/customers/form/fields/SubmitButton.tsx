@@ -11,8 +11,30 @@ interface SubmitButtonProps {
 }
 
 export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps) {
-  const { formState: { isValid, errors, isDirty }, getValues } = useFormContext();
+  const { 
+    formState: { errors }, 
+    getValues,
+    watch 
+  } = useFormContext();
+  
   const { toast } = useToast();
+
+  // Watch critical fields for changes
+  const watchedFields = watch([
+    'first_name',
+    'last_name',
+    'email',
+    'phone_number',
+    'street_address',
+    'city',
+    'state_province',
+    'postal_code',
+    'country',
+    'customer_type'
+  ]);
+
+  // Check if any watched field has a value
+  const hasChanges = watchedFields.some(field => field);
 
   const getFieldLabel = (fieldName: string): string => {
     const labels: Record<string, string> = {
@@ -59,8 +81,7 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
           if (values.customer_type !== "Business") {
             return !["company_size", "business_classification_id", "preferred_contact_time"].includes(field);
           }
-          // Filter out timezone validation
-          return field !== "timezone";
+          return true;
         })
         .map(field => getFieldLabel(field));
       
@@ -72,15 +93,24 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
         });
       }
     }
+
+    // Log form state for debugging
+    console.log('Form Values:', values);
+    console.log('Form Errors:', errors);
   };
+
+  // For edit mode, we want to enable the button if there are any values
+  // For create mode, we need all required fields
+  const isEditMode = label.toLowerCase().includes('update');
+  const shouldDisable = isSubmitting || (!isEditMode && !hasChanges);
 
   return (
     <Button
       type="submit"
-      disabled={isSubmitting || (!isDirty && !isValid)} // Allow submission if form is valid and has changes
+      disabled={shouldDisable}
       className={cn(
         "w-full md:w-auto",
-        (!isDirty || !isValid) && "opacity-50 cursor-not-allowed hover:bg-primary"
+        shouldDisable && "opacity-50 cursor-not-allowed hover:bg-primary"
       )}
       onClick={handleClick}
     >

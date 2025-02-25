@@ -12,9 +12,16 @@ import { AlertTriangle } from "lucide-react";
 import { validatePhone, validateEmail, validateAddress, logValidationAttempt } from "@/utils/validation";
 
 const formSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
+  first_name: z.string()
+    .min(3, "First name must be at least 3 characters")
+    .max(50, "First name must be less than 50 characters"),
+  last_name: z.string()
+    .min(3, "Last name must be at least 3 characters")
+    .max(50, "Last name must be less than 50 characters"),
+  email: z.string()
+    .min(5, "Email must be at least 5 characters")
+    .max(80, "Email must be less than 80 characters")
+    .email("Invalid email format"),
   phone_number: z.string().optional(),
   street_address: z.string().optional(),
   city: z.string().optional(),
@@ -82,7 +89,8 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
         phone: false
       }
     },
-    mode: "onChange"
+    mode: "onChange",
+    criteriaMode: "all"
   });
 
   if (mode === "edit" && !initialData?.id) {
@@ -125,20 +133,6 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
         }
       }
 
-      // Validate timezone if provided
-      if (values.timezone) {
-        try {
-          new Date().toLocaleString('en-US', { timeZone: values.timezone });
-        } catch (error) {
-          toast({
-            title: "Validation Error",
-            description: "Invalid timezone selected",
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-
       // Validate address if all fields are provided
       if (values.street_address && values.city && values.state_province && values.postal_code && values.country) {
         const addressValidation = await validateAddress(
@@ -152,19 +146,6 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
           toast({
             title: "Validation Error",
             description: addressValidation.message,
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-
-      // Validate secondary contact email if provided
-      if (values.secondary_contact?.email) {
-        const secondaryEmailValidation = await validateEmail(values.secondary_contact.email);
-        if (!secondaryEmailValidation.isValid) {
-          toast({
-            title: "Validation Error",
-            description: "Invalid secondary contact email address",
             variant: "destructive",
           });
           return;

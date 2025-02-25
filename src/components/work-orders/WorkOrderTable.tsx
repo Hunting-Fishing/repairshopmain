@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 interface WorkOrder {
   id: string;
@@ -31,13 +32,13 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
       case "in-progress":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
     }
   };
 
@@ -45,8 +46,16 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
     navigate(`/repair-jobs/${id}`);
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border dark:border-gray-800">
       <Table>
         <TableHeader>
           <TableRow>
@@ -60,13 +69,7 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
-                Loading work orders...
-              </TableCell>
-            </TableRow>
-          ) : workOrders.length === 0 ? (
+          {workOrders.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center py-4">
                 No work orders found
@@ -91,7 +94,7 @@ export function WorkOrderTable({ workOrders, isLoading }: WorkOrderTableProps) {
                 <TableCell>{order.date}</TableCell>
                 <TableCell>
                   {order.is_demo && (
-                    <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                    <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                       Demo
                     </Badge>
                   )}

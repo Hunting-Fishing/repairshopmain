@@ -1,6 +1,6 @@
 
-import { AxiosError } from 'axios';
-import { toast } from 'sonner';
+import { toast } from "sonner";
+import axios, { AxiosError } from "axios";
 
 interface ValidationOptions {
   maxRetries?: number;
@@ -29,10 +29,11 @@ export class APIValidator {
   }
 
   handleError(error: unknown) {
-    if (error instanceof AxiosError) {
-      if (error.response) {
-        toast.error(`API Error: ${error.response.status} - ${error.response.statusText}`);
-      } else if (error.request) {
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        toast.error(`API Error: ${axiosError.response.status} - ${axiosError.response.statusText}`);
+      } else if (axiosError.request) {
         toast.error('No response received from server');
       } else {
         toast.error('Error setting up request');

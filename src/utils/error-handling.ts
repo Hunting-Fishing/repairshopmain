@@ -1,5 +1,8 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { pushToExternalMonitoring } from "./monitoring/externalIntegrations";
+import { defaultValidator } from "./monitoring/apiValidation";
 
 export interface ErrorLogEntry {
   action_type: string;

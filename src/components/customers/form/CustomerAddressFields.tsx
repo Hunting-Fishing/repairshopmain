@@ -1,28 +1,16 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UseFormReturn, useWatch } from "react-hook-form";
-import { CustomerFormValues } from "../types/customerTypes";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import debounce from "lodash/debounce";
+import { AddressLookup } from "./components/AddressLookup";
+import { AddressFields } from "./components/AddressFields";
+import { ADDRESS_TYPES, CustomerAddressFieldsProps, NominatimResult } from "./types/addressTypes";
+import { getPostalCodePattern } from "./utils/addressUtils";
 
-interface CustomerAddressFieldsProps {
-  form: UseFormReturn<CustomerFormValues>;
-  isModernTheme?: boolean;
-}
-
-const ADDRESS_TYPES = [
-  { id: 'residential', label: 'Residential' },
-  { id: 'business', label: 'Business' },
-  { id: 'po_box', label: 'PO Box' },
-  { id: 'other', label: 'Other' }
-] as const;
-
-// Comprehensive list of countries with their ISO codes
+// Comprehensive list of countries
 const countries = [
   { id: "US", name: "United States" },
   { id: "CA", name: "Canada" },
@@ -54,20 +42,7 @@ const countries = [
   { id: "AT", name: "Austria" },
   { id: "BE", name: "Belgium" },
   { id: "PT", name: "Portugal" }
-].sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by country name
-
-interface NominatimResult {
-  display_name: string;
-  address: {
-    house_number?: string;
-    road?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    country_code?: string;
-    postcode?: string;
-  };
-}
+].sort((a, b) => a.name.localeCompare(b.name));
 
 export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerAddressFieldsProps) => {
   const [addressSuggestions, setAddressSuggestions] = useState<NominatimResult[]>([]);
@@ -83,30 +58,16 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700";
 
-  // Watch for country changes to handle postal code format
   const selectedCountry = useWatch({
     control: form.control,
     name: "country"
   });
 
-  // Watch the street_address field for changes
   const streetAddress = useWatch({
     control: form.control,
     name: "street_address"
   });
 
-  // Handle postal code format based on country
-  const getPostalCodePattern = (countryCode: string) => {
-    const patterns: { [key: string]: string } = {
-      'US': '^\\d{5}(-\\d{4})?$', // USA: 12345 or 12345-6789
-      'CA': '^[A-Za-z]\\d[A-Za-z] ?\\d[A-Za-z]\\d$', // Canada: A1A 1A1
-      'GB': '^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$', // UK: AA9A 9AA
-      // Add more country patterns as needed
-    };
-    return patterns[countryCode] || '^.+$'; // Default to any non-empty string
-  };
-
-  // Function to get address suggestions
   const getAddressSuggestions = async (input: string) => {
     if (!input || isManualEntry) return;
     setIsSearching(true);
@@ -133,14 +94,11 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     }
   };
 
-  // Debounce the address lookup
   const debouncedGetSuggestions = debounce(getAddressSuggestions, 500);
 
-  // Handle address selection
   const handleAddressSelect = (result: NominatimResult) => {
     const { address } = result;
     
-    // Update form values
     form.setValue('street_address', addressType === 'po_box' ? '' : 
       `${address.house_number || ''} ${address.road || ''}`.trim());
     form.setValue('city', address.city || '');
@@ -148,15 +106,13 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     form.setValue('postal_code', address.postcode || '');
     form.setValue('country', address.country_code?.toUpperCase() || '');
 
-    // Clear suggestions
     setAddressSuggestions([]);
   };
 
-  // Handle address type change
   const handleAddressTypeChange = (type: typeof ADDRESS_TYPES[number]['id']) => {
     setAddressType(type);
-    setIsManualEntry(type === 'po_box'); // Automatically switch to manual entry for PO Box
-    setAddressSuggestions([]); // Clear suggestions when type changes
+    setIsManualEntry(type === 'po_box');
+    setAddressSuggestions([]);
   };
 
   useEffect(() => {
@@ -230,112 +186,28 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
                     }
                   />
                 </FormControl>
-                {!isManualEntry && addressType !== 'po_box' && isSearching && (
-                  <Search className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground animate-spin" />
+                {!isManualEntry && addressType !== 'po_box' && (
+                  <AddressLookup 
+                    isSearching={isSearching}
+                    suggestions={addressSuggestions}
+                    onSelect={handleAddressSelect}
+                  />
                 )}
               </div>
-              {!isManualEntry && addressType !== 'po_box' && addressSuggestions.length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
-                  <ScrollArea className="max-h-[200px]">
-                    {addressSuggestions.map((result, index) => (
-                      <Button
-                        key={index}
-                        variant="ghost"
-                        className="w-full justify-start px-3 py-2 text-sm hover:bg-gray-100"
-                        onClick={() => handleAddressSelect(result)}
-                      >
-                        {result.display_name}
-                      </Button>
-                    ))}
-                  </ScrollArea>
-                </div>
-              )}
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
       
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="city"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClasses}>City</FormLabel>
-              <FormControl>
-                <Input {...field} className={inputClasses} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="state_province"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClasses}>State/Province</FormLabel>
-              <FormControl>
-                <Input {...field} className={inputClasses} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <FormField
-          control={form.control}
-          name="postal_code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClasses}>Postal Code</FormLabel>
-              <FormControl>
-                <Input 
-                  {...field} 
-                  className={inputClasses}
-                  pattern={selectedCountry ? getPostalCodePattern(selectedCountry) : undefined}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className={labelClasses}>Country</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger className={inputClasses}>
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <ScrollArea className="h-80">
-                    {countries.map((country) => (
-                      <SelectItem 
-                        key={country.id} 
-                        value={country.id}
-                      >
-                        {country.name}
-                      </SelectItem>
-                    ))}
-                  </ScrollArea>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <AddressFields 
+        form={form}
+        inputClasses={inputClasses}
+        labelClasses={labelClasses}
+        selectedCountry={selectedCountry}
+        postalCodePattern={selectedCountry ? getPostalCodePattern(selectedCountry) : undefined}
+        countries={countries}
+      />
     </div>
   );
 };

@@ -3,7 +3,6 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useLocationData } from "@/hooks/useLocationData";
 import { FormInput } from "./fields/FormInput";
 
 interface CustomerFormFieldsProps {
@@ -19,8 +18,6 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
   const labelClasses = isModernTheme
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700 font-medium";
-
-  const { countries } = useLocationData(form.watch("country") || "");
 
   const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
     <span className="flex items-center gap-1">
@@ -91,31 +88,6 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
         label="Phone Number"
         placeholder="Enter phone number"
         isModernTheme={isModernTheme}
-      />
-
-      <FormField
-        control={form.control}
-        name="country"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className={labelClasses}>Country</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger className={selectTriggerClasses}>
-                  <SelectValue placeholder="Select country" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {countries?.map((country) => (
-                  <SelectItem key={country.id} value={country.id}>
-                    {country.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage className="text-red-500 text-sm font-medium" />
-          </FormItem>
-        )}
       />
     </div>
   );

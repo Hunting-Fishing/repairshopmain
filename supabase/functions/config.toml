@@ -1,19 +1,7 @@
 
 project_id = "agtjuxiysmzhmpnbuzmc"
-[functions.import-vehicle-data]
+[functions.send-invitation]
 verify_jwt = true
 
-[functions.amazon-product-search]
-verify_jwt = true
-
-[functions.send-sms]
-verify_jwt = true
-
-[functions.send-email]
-verify_jwt = true
-
-[functions.send-auth-email]
-verify_jwt = true
-
-[functions.handle-database-backup]
+[functions.verify-invitation]
 verify_jwt = true

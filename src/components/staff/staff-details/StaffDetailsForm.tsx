@@ -23,11 +23,11 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
   const form = useForm<StaffDetailsFormValues>({
     resolver: zodResolver(staffDetailsSchema),
     defaultValues: {
-      first_name: staffMember.first_name || "",
-      last_name: staffMember.last_name || "",
-      email: staffMember.email || "",
-      phone_number: staffMember.phone_number || "",
-      notes: staffMember.notes || "",
+      first_name: staffMember.first_name,
+      last_name: staffMember.last_name,
+      email: staffMember.email,
+      phone_number: staffMember.phone_number,
+      notes: staffMember.notes,
       emergency_contact: staffMember.emergency_contact || {
         name: "",
         phone: "",

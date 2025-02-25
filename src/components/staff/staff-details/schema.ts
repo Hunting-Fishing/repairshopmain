@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 export const staffDetailsSchema = z.object({
@@ -10,6 +11,6 @@ export const staffDetailsSchema = z.object({
     name: z.string().optional(),
     phone: z.string().optional(),
     relationship: z.string().optional(),
-  }).optional(),
-  skills: z.array(z.string()).optional(),
+  }),
+  skills: z.array(z.string()).default([]),
 });

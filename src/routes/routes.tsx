@@ -1,3 +1,4 @@
+
 import { createBrowserRouter, Outlet, Navigate } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "@/pages/Auth";
@@ -21,6 +22,7 @@ import InventorySuppliers from "@/pages/InventorySuppliers";
 import { SetPassword } from "@/pages/SetPassword";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { NotFoundPage } from "@/pages/NotFoundPage";
+import { EmailVerification } from "@/components/auth/EmailVerification";
 
 export const router = createBrowserRouter([
   {
@@ -113,6 +115,10 @@ export const router = createBrowserRouter([
   {
     path: "/auth/set-password",
     element: <SetPassword />,
+  },
+  {
+    path: "/auth/verify-email",
+    element: <EmailVerification />,
   },
   {
     path: "*",

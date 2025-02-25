@@ -19,7 +19,7 @@ interface CommunicationPreferencesProps {
 
 export const CommunicationPreferences = ({ form, isModernTheme = false }: CommunicationPreferencesProps) => {
   const [open, setOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
   
   const labelClasses = isModernTheme
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
@@ -54,17 +54,18 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
     { value: "Pacific/Auckland", label: "Auckland (GMT+12)" }
   ];
 
-  const filteredTimezones = inputValue === "" 
+  const filteredTimezones = searchValue === "" 
     ? timezones 
     : timezones.filter(timezone => 
-        timezone.label.toLowerCase().includes(inputValue.toLowerCase()) ||
-        timezone.value.toLowerCase().includes(inputValue.toLowerCase())
+        timezone.label.toLowerCase().includes(searchValue.toLowerCase()) ||
+        timezone.value.toLowerCase().includes(searchValue.toLowerCase())
       );
 
-  const handleSelect = (value: string) => {
+  const handleTimezoneSelect = (value: string) => {
+    if (!value) return;
     form.setValue("timezone", value);
-    setInputValue("");
     setOpen(false);
+    setSearchValue("");
   };
 
   const currentTimezone = form.watch("timezone");
@@ -126,17 +127,17 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {selectedTimezone ? selectedTimezone.label : "Select timezone..."}
+                    {selectedTimezone?.label || "Select timezone..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0" align="start">
-                <Command>
+                <Command shouldFilter={false}>
                   <CommandInput 
                     placeholder="Search timezone..." 
-                    value={inputValue}
-                    onValueChange={setInputValue}
+                    value={searchValue}
+                    onValueChange={setSearchValue}
                   />
                   <CommandEmpty>No timezone found.</CommandEmpty>
                   <CommandGroup className="max-h-[300px] overflow-y-auto">
@@ -144,7 +145,7 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
                       <CommandItem
                         key={timezone.value}
                         value={timezone.value}
-                        onSelect={handleSelect}
+                        onSelect={() => handleTimezoneSelect(timezone.value)}
                         className="flex items-center"
                       >
                         <Check

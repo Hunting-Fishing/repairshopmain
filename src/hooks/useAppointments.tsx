@@ -22,7 +22,14 @@ export function useAppointments({
     queryFn: async () => {
       const query = supabase
         .from("bookings")
-        .select("*, profiles(first_name, last_name)")
+        .select(`
+          *,
+          technician:profiles!bookings_assigned_technician_id_fkey(
+            id,
+            first_name,
+            last_name
+          )
+        `)
         .order(sortField, { ascending: sortDirection === "asc" })
         .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
 

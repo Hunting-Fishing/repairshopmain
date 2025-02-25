@@ -1,3 +1,4 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
@@ -104,31 +105,33 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0">
-                <Command>
-                  <CommandInput placeholder="Search timezone..." />
-                  <CommandEmpty>No timezone found.</CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-y-auto">
-                    {timezones.map((timezone) => (
-                      <CommandItem
-                        value={timezone}
-                        key={timezone}
-                        onSelect={() => {
-                          field.onChange(timezone);
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            field.value === timezone ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {timezone}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </Command>
+              <PopoverContent className="w-[400px] p-0" align="start">
+                {timezones.length > 0 && (
+                  <Command>
+                    <CommandInput placeholder="Search timezone..." />
+                    <CommandEmpty>No timezone found.</CommandEmpty>
+                    <CommandGroup className="max-h-[300px] overflow-y-auto">
+                      {timezones.map((timezone) => (
+                        <CommandItem
+                          value={timezone}
+                          key={timezone}
+                          onSelect={() => {
+                            field.onChange(timezone);
+                            setOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              field.value === timezone ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {timezone}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                )}
               </PopoverContent>
             </Popover>
             <FormMessage />

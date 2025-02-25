@@ -6,6 +6,7 @@ import { StorageBucketsTab } from "./StorageBucketsTab";
 import { VehicleDataTab } from "./VehicleDataTab";
 import { JobTemplatesTab } from "./job-templates/JobTemplatesTab";
 import { DatabaseIcon } from "lucide-react";
+import { BackupScheduleConfig } from "./backup/BackupScheduleConfig";
 
 export function DatabaseTab() {
   return (
@@ -36,6 +37,7 @@ export function DatabaseTab() {
               <TabsTrigger value="buckets">Storage Buckets</TabsTrigger>
               <TabsTrigger value="vehicle-data">Vehicle Data</TabsTrigger>
               <TabsTrigger value="job-templates">Job Templates</TabsTrigger>
+              <TabsTrigger value="backup">Backup Settings</TabsTrigger>
             </TabsList>
 
             <TabsContent value="tables">
@@ -52,6 +54,10 @@ export function DatabaseTab() {
 
             <TabsContent value="job-templates">
               <JobTemplatesTab />
+            </TabsContent>
+
+            <TabsContent value="backup">
+              <BackupScheduleConfig />
             </TabsContent>
           </Tabs>
         </CardContent>

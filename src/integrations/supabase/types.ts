@@ -307,6 +307,47 @@ export type Database = {
         }
         Relationships: []
       }
+      backup_schedule_config: {
+        Row: {
+          created_at: string
+          day_of_week: string | null
+          id: string
+          organization_id: string | null
+          schedule_type: string
+          time: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          day_of_week?: string | null
+          id?: string
+          organization_id?: string | null
+          schedule_type: string
+          time: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: string | null
+          id?: string
+          organization_id?: string | null
+          schedule_type?: string
+          time?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "backup_schedule_config_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_history: {
         Row: {
           booking_id: string
@@ -9966,6 +10007,10 @@ export type Database = {
           "": string
         }
         Returns: string[]
+      }
+      update_backup_schedule: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       validate_auth_token: {
         Args: {

@@ -26,9 +26,14 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
 
   const themeClass = isModernTheme ? "modern-theme" : "basic-theme";
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSubmit(e);
+  };
+
   return (
     <div className={`space-y-8 animate-fade-in ${themeClass}`}>
-      <Form onSubmit={onSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8">
         {mode === "edit" && <EditModeAlert />}
 
         <div className="flex items-center justify-end gap-2 mb-6">
@@ -78,7 +83,7 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
             isSubmitting={isSubmitting}
           />
         </div>
-      </Form>
+      </form>
     </div>
   );
 }

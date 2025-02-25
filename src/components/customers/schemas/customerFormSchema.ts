@@ -22,7 +22,7 @@ export const customerFormSchema = z.object({
   language_preference: z.string().optional(),
   timezone: z.string().optional()
     .refine((val) => {
-      if (!val) return true;
+      if (!val) return true; // Make timezone optional
       try {
         new Date().toLocaleString('en-US', { timeZone: val });
         return true;

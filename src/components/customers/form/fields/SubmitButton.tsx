@@ -28,14 +28,15 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     const values = getValues();
     const missingFields = [];
     
-    // Check required fields based on customer type
+    // Base required fields for all customer types
     if (!values.first_name?.trim()) missingFields.push("First Name");
     if (!values.last_name?.trim()) missingFields.push("Last Name");
     if (!values.email?.trim()) missingFields.push("Email");
-    
-    // Only require customer_type if it's not already set to "Personal"
-    if (!values.customer_type && values.customer_type !== "Personal") {
-      missingFields.push("Customer Type");
+
+    // Business-specific fields validation
+    if (values.customer_type === "Business") {
+      if (!values.company_size) missingFields.push("Company Size");
+      if (!values.business_classification_id) missingFields.push("Business Classification");
     }
 
     if (missingFields.length > 0) {
@@ -53,7 +54,14 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     if (Object.keys(errors).length > 0) {
       e.preventDefault();
       const errorFields = Object.keys(errors)
-        .filter(field => field !== 'timezone') // Exclude timezone from validation errors
+        .filter(field => {
+          // Filter out optional fields based on customer type
+          if (values.customer_type !== "Business") {
+            return !["company_size", "business_classification_id", "preferred_contact_time"].includes(field);
+          }
+          // Filter out timezone validation
+          return field !== "timezone";
+        })
         .map(field => getFieldLabel(field));
       
       if (errorFields.length > 0) {

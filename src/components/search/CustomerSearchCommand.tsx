@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Command, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { useQuery } from "@tanstack/react-query";
@@ -46,7 +47,7 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
 
-  const { data: customers, isLoading, isFetching } = useQuery({
+  const { data: customers = [], isLoading, isFetching } = useQuery({
     queryKey: ["customers", filters],
     queryFn: async () => {
       let query = supabase
@@ -74,7 +75,7 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
       
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data || [];
     },
     enabled: Object.values(filters).some(value => value.length > 0),
   });
@@ -112,11 +113,11 @@ export function CustomerSearchCommand({ onSelect, className }: CustomerSearchCom
               <SearchX className="mx-auto h-8 w-8 mb-4" />
               <p>Enter search criteria to find customers</p>
             </div>
-          ) : customers?.length === 0 ? (
+          ) : customers.length === 0 ? (
             <CommandEmpty>No customers found.</CommandEmpty>
           ) : (
             <CommandGroup heading="Results">
-              {customers?.map((customer) => (
+              {customers.map((customer) => (
                 <CommandItem 
                   key={customer.id} 
                   value={`${customer.first_name} ${customer.last_name}`}

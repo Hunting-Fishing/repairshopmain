@@ -48,52 +48,22 @@ const countries = [
   { id: "PT", name: "Portugal" }
 ].sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by country name
 
-interface AddressComponent {
-  long_name: string;
-  short_name: string;
-  types: string[];
-}
-
-interface PlaceResult {
-  address_components: AddressComponent[];
-  formatted_address: string;
-}
-
-declare global {
-  interface Window {
-    google: typeof google;
-    initGoogleMaps: () => void;
-  }
+interface NominatimResult {
+  display_name: string;
+  address: {
+    house_number?: string;
+    road?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    country_code?: string;
+    postcode?: string;
+  };
 }
 
 export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerAddressFieldsProps) => {
-  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
+  const [addressSuggestions, setAddressSuggestions] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
-
-  // Initialize Google Maps
-  useEffect(() => {
-    if (window.google) {
-      setIsGoogleMapsLoaded(true);
-      return;
-    }
-
-    // Initialize Google Maps script
-    window.initGoogleMaps = () => {
-      setIsGoogleMapsLoaded(true);
-    };
-
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initGoogleMaps`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-      delete window.initGoogleMaps;
-    };
-  }, []);
 
   const inputClasses = isModernTheme
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg"
@@ -111,19 +81,26 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
 
   // Function to get address suggestions
   const getAddressSuggestions = async (input: string) => {
-    if (!input || !isGoogleMapsLoaded) return;
+    if (!input) return;
     setIsSearching(true);
     
     try {
-      const geocoder = new google.maps.Geocoder();
-      const response = await geocoder.geocode({ address: input });
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input)}&addressdetails=1`,
+        {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'CustomerManagementSystem' // Required by Nominatim's usage policy
+          }
+        }
+      );
       
-      if (response.results) {
-        const suggestions = response.results.map(result => result.formatted_address);
-        setAddressSuggestions(suggestions);
+      if (response.ok) {
+        const results: NominatimResult[] = await response.json();
+        setAddressSuggestions(results);
       }
     } catch (error) {
-      console.error('Geocoding error:', error);
+      console.error('Address search error:', error);
     } finally {
       setIsSearching(false);
     }
@@ -133,46 +110,27 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
   const debouncedGetSuggestions = debounce(getAddressSuggestions, 500);
 
   // Handle address selection
-  const handleAddressSelect = async (address: string) => {
-    if (!isGoogleMapsLoaded) return;
+  const handleAddressSelect = (result: NominatimResult) => {
+    const { address } = result;
     
-    try {
-      const geocoder = new google.maps.Geocoder();
-      const response = await geocoder.geocode({ address });
-      
-      if (response.results?.[0]) {
-        const result = response.results[0] as PlaceResult;
-        const addressComponents = result.address_components;
-        
-        // Helper function to find address component by type
-        const findComponent = (type: string) => 
-          addressComponents.find(component => component.types.includes(type));
+    // Construct street address
+    const streetNumber = address.house_number || '';
+    const street = address.road || '';
+    const streetAddress = `${streetNumber} ${street}`.trim();
 
-        // Extract address components
-        const streetNumber = findComponent('street_number')?.long_name || '';
-        const route = findComponent('route')?.long_name || '';
-        const city = findComponent('locality')?.long_name || findComponent('administrative_area_level_2')?.long_name || '';
-        const state = findComponent('administrative_area_level_1')?.short_name || '';
-        const country = findComponent('country')?.short_name || '';
-        const postalCode = findComponent('postal_code')?.long_name || '';
+    // Update form values
+    form.setValue('street_address', streetAddress);
+    form.setValue('city', address.city || '');
+    form.setValue('state_province', address.state || '');
+    form.setValue('postal_code', address.postcode || '');
+    form.setValue('country', address.country_code?.toUpperCase() || '');
 
-        // Update form values
-        form.setValue('street_address', `${streetNumber} ${route}`.trim());
-        form.setValue('city', city);
-        form.setValue('state_province', state);
-        form.setValue('postal_code', postalCode);
-        form.setValue('country', country);
-
-        // Clear suggestions
-        setAddressSuggestions([]);
-      }
-    } catch (error) {
-      console.error('Error selecting address:', error);
-    }
+    // Clear suggestions
+    setAddressSuggestions([]);
   };
 
   useEffect(() => {
-    if (streetAddress && isGoogleMapsLoaded) {
+    if (streetAddress) {
       debouncedGetSuggestions(streetAddress);
     } else {
       setAddressSuggestions([]);
@@ -181,7 +139,7 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     return () => {
       debouncedGetSuggestions.cancel();
     };
-  }, [streetAddress, isGoogleMapsLoaded]);
+  }, [streetAddress]);
 
   return (
     <div className="space-y-4">
@@ -203,14 +161,14 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
               {addressSuggestions.length > 0 && (
                 <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
                   <ScrollArea className="max-h-[200px]">
-                    {addressSuggestions.map((suggestion, index) => (
+                    {addressSuggestions.map((result, index) => (
                       <Button
                         key={index}
                         variant="ghost"
                         className="w-full justify-start px-3 py-2 text-sm hover:bg-gray-100"
-                        onClick={() => handleAddressSelect(suggestion)}
+                        onClick={() => handleAddressSelect(result)}
                       >
-                        {suggestion}
+                        {result.display_name}
                       </Button>
                     ))}
                   </ScrollArea>

@@ -1,3 +1,4 @@
+
 import { Search, Filter, Download, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,7 +82,11 @@ export function CustomerToolbar({
           <DialogHeader>
             <DialogTitle>Add New Customer</DialogTitle>
           </DialogHeader>
-          <CustomerForm onSuccess={() => onOpenChange(false)} />
+          <CustomerForm 
+            onSuccess={() => onOpenChange(false)} 
+            mode="create"
+            customerId="new" // For new customers, we use a placeholder ID
+          />
         </DialogContent>
       </Dialog>
     </div>

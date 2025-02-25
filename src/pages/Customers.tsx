@@ -153,7 +153,11 @@ export default function Customers() {
                     </DialogTitle>
                   </DialogHeader>
                   <div className="p-8">
-                    <CustomerForm onSuccess={handleCustomerAdded} />
+                    <CustomerForm 
+                      onSuccess={handleCustomerAdded} 
+                      mode="create"
+                      customerId="new" // For new customers, we use a placeholder ID
+                    />
                   </div>
                 </ScrollArea>
               </DialogContent>

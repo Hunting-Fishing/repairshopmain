@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
@@ -22,27 +23,28 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
   const form = useForm<StaffDetailsFormValues>({
     resolver: zodResolver(staffDetailsSchema),
     defaultValues: {
-      first_name: staffMember.first_name,
-      last_name: staffMember.last_name,
-      email: staffMember.email,
-      phone_number: staffMember.phone_number,
-      notes: staffMember.notes,
-      emergency_contact: staffMember.emergency_contact,
-      skills: staffMember.skills,
+      first_name: staffMember.first_name ?? null,
+      last_name: staffMember.last_name ?? null,
+      email: staffMember.email ?? null,
+      phone_number: staffMember.phone_number ?? null,
+      notes: staffMember.notes ?? null,
+      emergency_contact: staffMember.emergency_contact ?? null,
+      skills: staffMember.skills
     },
   });
 
   const onSubmit = async (values: StaffDetailsFormValues) => {
     try {
+      // Ensure all required fields are present with their proper types
       const updateData: StaffMemberData = {
         id: staffMember.id,
-        first_name: values.first_name,
-        last_name: values.last_name,
-        email: values.email,
-        phone_number: values.phone_number,
-        notes: values.notes,
-        emergency_contact: values.emergency_contact,
-        skills: values.skills || [],
+        first_name: values.first_name ?? null,
+        last_name: values.last_name ?? null,
+        email: values.email ?? null,
+        phone_number: values.phone_number ?? null,
+        notes: values.notes ?? null,
+        emergency_contact: values.emergency_contact ?? null,
+        skills: values.skills ?? []
       };
 
       await updateStaffMember(updateData);

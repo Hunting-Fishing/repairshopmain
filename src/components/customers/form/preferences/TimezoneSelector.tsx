@@ -48,13 +48,6 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
         timezone.value.toLowerCase().includes(searchValue.toLowerCase())
       );
 
-  const handleTimezoneSelect = (value: string) => {
-    if (!value) return;
-    form.setValue("timezone", value);
-    setOpen(false);
-    setSearchValue("");
-  };
-
   const currentTimezone = form.watch("timezone");
   const selectedTimezone = timezones.find(tz => tz.value === currentTimezone);
 
@@ -104,7 +97,11 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
                     <CommandItem
                       key={timezone.value}
                       value={timezone.value}
-                      onSelect={() => handleTimezoneSelect(timezone.value)}
+                      onSelect={(value) => {
+                        form.setValue("timezone", value);
+                        setOpen(false);
+                        setSearchValue("");
+                      }}
                       className="flex items-center"
                     >
                       <Check

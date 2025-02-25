@@ -7,11 +7,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CustomerFormFieldsProps {
+  form: UseFormReturn<CustomerFormValues>;
   customerId: string;
   isModernTheme?: boolean;
 }
 
-export const CustomerFormFields = ({ customerId, isModernTheme = false }: CustomerFormFieldsProps) => {
+export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: CustomerFormFieldsProps) => {
   const { data: customer } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {

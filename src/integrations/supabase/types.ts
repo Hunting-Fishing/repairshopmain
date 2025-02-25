@@ -9403,6 +9403,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      create_auth_token: {
+        Args: {
+          user_id: string
+          token_type: string
+        }
+        Returns: string
+      }
       duplicate_template: {
         Args: {
           template_id: string
@@ -9876,6 +9883,13 @@ export type Database = {
           "": string
         }
         Returns: string[]
+      }
+      validate_auth_token: {
+        Args: {
+          token_text: string
+          token_type: string
+        }
+        Returns: string
       }
     }
     Enums: {

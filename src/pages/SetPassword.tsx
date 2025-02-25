@@ -47,12 +47,21 @@ export function SetPassword() {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.rpc('set_staff_password', {
-        token,
-        new_password: data.password
+      // First validate the token
+      const { data: userId, error: validationError } = await supabase
+        .rpc('validate_auth_token', {
+          token_text: token,
+          token_type: 'password_reset'
+        });
+
+      if (validationError) throw validationError;
+
+      // Update the password
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: data.password
       });
 
-      if (error) throw error;
+      if (updateError) throw updateError;
 
       toast.success("Password set successfully");
       navigate("/auth");

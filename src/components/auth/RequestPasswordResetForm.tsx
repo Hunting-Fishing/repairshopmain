@@ -37,14 +37,43 @@ export function RequestPasswordResetForm() {
   const onSubmit = async (data: ResetFormValues) => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-        redirectTo: `${window.location.origin}/set-password`,
+      // First check if user exists
+      const { data: userData, error: userError } = await supabase
+        .from("auth.users")
+        .select("id")
+        .eq("email", data.email)
+        .single();
+
+      if (userError || !userData) {
+        // We don't want to reveal if the email exists or not
+        setSubmitted(true);
+        return;
+      }
+
+      // Generate token using our database function
+      const { data: tokenData, error: tokenError } = await supabase
+        .rpc("create_auth_token", {
+          user_id: userData.id,
+          token_type: "password_reset",
+        });
+
+      if (tokenError) throw tokenError;
+
+      // Send email with token
+      const response = await supabase.functions.invoke("send-auth-email", {
+        body: {
+          email: data.email,
+          token: tokenData,
+          type: "password_reset",
+        },
       });
 
-      if (error) throw error;
-
-      setSubmitted(true);
-      toast.success("Password reset email sent");
+      if (!response.error) {
+        setSubmitted(true);
+        toast.success("Password reset email sent");
+      } else {
+        throw response.error;
+      }
     } catch (error: any) {
       console.error("Error requesting password reset:", error);
       toast.error(error.message || "Failed to send reset email");

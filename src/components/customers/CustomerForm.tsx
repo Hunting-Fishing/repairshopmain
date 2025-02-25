@@ -1,7 +1,8 @@
 
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormContainer } from "./form/CustomerFormContainer";
 import { CustomerFormValues } from "./types/customerTypes";
@@ -59,8 +60,9 @@ export interface CustomerFormProps {
 
 export function CustomerForm({ onSuccess, initialData, mode = "create" }: CustomerFormProps) {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const form = useForm<CustomerFormValues>({
+  const methods = useForm<CustomerFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
       first_name: "",
@@ -80,6 +82,7 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
         phone: false
       }
     },
+    mode: "onChange"
   });
 
   if (mode === "edit" && !initialData?.id) {
@@ -96,6 +99,8 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
 
   const onSubmit = async (values: CustomerFormValues) => {
     try {
+      setIsSubmitting(true);
+
       // Validate email
       const emailValidation = await validateEmail(values.email);
       if (!emailValidation.isValid) {
@@ -233,14 +238,18 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
         title: "Error",
         description: error.message || "An unexpected error occurred. Please try again.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <CustomerFormContainer 
-      form={form} 
-      onSubmit={onSubmit} 
-      mode={mode} 
-    />
+    <FormProvider {...methods}>
+      <CustomerFormContainer 
+        onSubmit={methods.handleSubmit(onSubmit)}
+        mode={mode}
+        isSubmitting={isSubmitting}
+      />
+    </FormProvider>
   );
 }

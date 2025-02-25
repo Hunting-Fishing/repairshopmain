@@ -3,32 +3,29 @@ import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { CustomerFormFields } from "./CustomerFormFields";
 import { CustomerAddressFields } from "./CustomerAddressFields";
 import { BusinessFormFields } from "./BusinessFormFields";
 import { CommunicationPreferences } from "./CommunicationPreferences";
-import { FormSection } from "./FormSection"; // Add this import
-import { UseFormReturn } from "react-hook-form";
-import { CustomerFormValues } from "../types/customerTypes";
+import { FormSection } from "./FormSection";
 import { EditModeAlert } from "./EditModeAlert";
+import { SubmitButton } from "./fields/SubmitButton";
 
 interface CustomerFormContainerProps {
-  form: UseFormReturn<CustomerFormValues>;
-  onSubmit: (values: CustomerFormValues) => Promise<void>;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   mode?: "create" | "edit";
+  isSubmitting?: boolean;
 }
 
-export function CustomerFormContainer({ form, onSubmit, mode = "create" }: CustomerFormContainerProps) {
+export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting = false }: CustomerFormContainerProps) {
   const [isModernTheme, setIsModernTheme] = useState(false);
-  const customerType = form.watch("customer_type");
 
   const themeClass = isModernTheme ? "modern-theme" : "basic-theme";
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={`space-y-8 animate-fade-in ${themeClass}`}>
+    <Form>
+      <form onSubmit={onSubmit} className={`space-y-8 animate-fade-in ${themeClass}`}>
         {mode === "edit" && <EditModeAlert />}
 
         <div className="flex items-center justify-end gap-2 mb-6">
@@ -49,17 +46,8 @@ export function CustomerFormContainer({ form, onSubmit, mode = "create" }: Custo
               title="Personal Information"
               isModernTheme={isModernTheme}
             >
-              <CustomerFormFields form={form} isModernTheme={isModernTheme} />
+              <CustomerFormFields isModernTheme={isModernTheme} />
             </FormSection>
-
-            {customerType === "Business" && (
-              <FormSection
-                title="Business Information"
-                isModernTheme={isModernTheme}
-              >
-                <BusinessFormFields form={form} isModernTheme={isModernTheme} />
-              </FormSection>
-            )}
           </div>
 
           <div className="space-y-6">
@@ -67,14 +55,14 @@ export function CustomerFormContainer({ form, onSubmit, mode = "create" }: Custo
               title="Address Information"
               isModernTheme={isModernTheme}
             >
-              <CustomerAddressFields form={form} isModernTheme={isModernTheme} />
+              <CustomerAddressFields isModernTheme={isModernTheme} />
             </FormSection>
 
             <FormSection
               title="Communication Preferences"
               isModernTheme={isModernTheme}
             >
-              <CommunicationPreferences form={form} isModernTheme={isModernTheme} />
+              <CommunicationPreferences isModernTheme={isModernTheme} />
             </FormSection>
           </div>
         </div>
@@ -82,16 +70,10 @@ export function CustomerFormContainer({ form, onSubmit, mode = "create" }: Custo
         <Separator className={isModernTheme ? 'bg-orange-200/50' : 'bg-[#FEC6A1]/20'} />
         
         <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            className={`w-full md:w-auto px-8 shadow-lg hover:shadow-xl transition-all duration-200 ${
-              isModernTheme
-                ? 'bg-gradient-to-r from-[#F97316] via-[#EA580C] to-[#C2410C] hover:from-[#EA580C] hover:via-[#C2410C] hover:to-[#9A3412] text-white border border-orange-400/50'
-                : 'bg-gradient-to-r from-[#F97316] to-[#EA580C] hover:from-[#EA580C] hover:to-[#EA580C] text-white'
-            }`}
-          >
-            {mode === "create" ? "Add Customer" : "Update Customer"}
-          </Button>
+          <SubmitButton 
+            label={mode === "create" ? "Add Customer" : "Update Customer"}
+            isSubmitting={isSubmitting}
+          />
         </div>
       </form>
     </Form>

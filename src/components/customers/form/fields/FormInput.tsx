@@ -5,9 +5,14 @@ import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 
+// Only allow field names that correspond to string values
+type AllowedFields = {
+  [K in keyof CustomerFormValues]: CustomerFormValues[K] extends string | undefined ? K : never;
+}[keyof CustomerFormValues];
+
 interface FormInputProps {
   form: UseFormReturn<CustomerFormValues>;
-  name: keyof CustomerFormValues;
+  name: AllowedFields;
   label: string;
   type?: string;
   placeholder?: string;

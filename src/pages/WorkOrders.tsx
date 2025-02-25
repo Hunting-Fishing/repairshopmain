@@ -57,7 +57,7 @@ export default function WorkOrders() {
       
       if (error) throw error;
 
-      return (data as RepairJob[]).map(order => ({
+      return (data as unknown as RepairJob[]).map(order => ({
         id: order.id,
         customer: order.customers ? `${order.customers.first_name} ${order.customers.last_name}` : 'N/A',
         vehicle: order.vehicles ? `${order.vehicles.year} ${order.vehicles.make} ${order.vehicles.model}` : 'N/A',

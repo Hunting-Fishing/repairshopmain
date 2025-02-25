@@ -27,8 +27,8 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
   const themeClass = isModernTheme ? "modern-theme" : "basic-theme";
 
   return (
-    <Form>
-      <form onSubmit={onSubmit} className={`space-y-8 animate-fade-in ${themeClass}`}>
+    <div className={`space-y-8 animate-fade-in ${themeClass}`}>
+      <form onSubmit={onSubmit}>
         {mode === "edit" && <EditModeAlert />}
 
         <div className="flex items-center justify-end gap-2 mb-6">
@@ -79,6 +79,6 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
           />
         </div>
       </form>
-    </Form>
+    </div>
   );
 }

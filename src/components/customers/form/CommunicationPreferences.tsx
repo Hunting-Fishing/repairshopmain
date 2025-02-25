@@ -19,6 +19,8 @@ interface CommunicationPreferencesProps {
 
 export const CommunicationPreferences = ({ form, isModernTheme = false }: CommunicationPreferencesProps) => {
   const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  
   const labelClasses = isModernTheme
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700 font-medium";
@@ -51,6 +53,10 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
     "Pacific/Auckland"
   ];
 
+  const filteredTimezones = timezones.filter(timezone => 
+    timezone.toLowerCase().includes(searchValue.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">Communication Preferences</h3>
@@ -61,7 +67,7 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
         render={({ field }) => (
           <FormItem>
             <FormLabel className={labelClasses}>Preferred Language</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
+            <Select onValueChange={field.onChange} value={field.value || ""}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select language" />
@@ -98,40 +104,37 @@ export const CommunicationPreferences = ({ form, isModernTheme = false }: Commun
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value
-                      ? timezones.find((timezone) => timezone === field.value)
-                      : "Select timezone..."}
+                    {field.value || "Select timezone..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="w-[400px] p-0" align="start">
-                {timezones.length > 0 && (
-                  <Command>
-                    <CommandInput placeholder="Search timezone..." />
-                    <CommandEmpty>No timezone found.</CommandEmpty>
-                    <CommandGroup className="max-h-[300px] overflow-y-auto">
-                      {timezones.map((timezone) => (
-                        <CommandItem
-                          value={timezone}
-                          key={timezone}
-                          onSelect={() => {
-                            field.onChange(timezone);
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              field.value === timezone ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {timezone}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                )}
+                <Command value={searchValue} onValueChange={setSearchValue}>
+                  <CommandInput value={searchValue} onValueChange={setSearchValue} placeholder="Search timezone..." />
+                  <CommandEmpty>No timezone found.</CommandEmpty>
+                  <CommandGroup className="max-h-[300px] overflow-y-auto">
+                    {filteredTimezones.map((timezone) => (
+                      <CommandItem
+                        key={timezone}
+                        value={timezone}
+                        onSelect={() => {
+                          field.onChange(timezone);
+                          setSearchValue("");
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            field.value === timezone ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {timezone}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
               </PopoverContent>
             </Popover>
             <FormMessage />

@@ -12,7 +12,14 @@ import {
   ShoppingBag
 } from "lucide-react";
 
-export const marketingItems = [
+interface MarketingItem {
+  title: string;
+  description: string;
+  color: string;
+  path: string;
+}
+
+export const marketingItems: MarketingItem[] = [
   {
     title: "Parts Revenue",
     description: "Earn commissions on Amazon parts sales",

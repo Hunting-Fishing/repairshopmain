@@ -1,10 +1,13 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useWatch } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import debounce from "lodash/debounce";
 
 interface CustomerAddressFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -45,7 +48,21 @@ const countries = [
   { id: "PT", name: "Portugal" }
 ].sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically by country name
 
+interface AddressComponent {
+  long_name: string;
+  short_name: string;
+  types: string[];
+}
+
+interface PlaceResult {
+  address_components: AddressComponent[];
+  formatted_address: string;
+}
+
 export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerAddressFieldsProps) => {
+  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   const inputClasses = isModernTheme
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg"
     : "bg-white";
@@ -54,21 +71,122 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700";
 
+  // Watch the street_address field for changes
+  const streetAddress = useWatch({
+    control: form.control,
+    name: "street_address"
+  });
+
+  // Function to get address suggestions
+  const getAddressSuggestions = async (input: string) => {
+    if (!input) return;
+    setIsSearching(true);
+    
+    try {
+      const geocoder = new google.maps.Geocoder();
+      const response = await geocoder.geocode({ address: input });
+      
+      if (response.results) {
+        const suggestions = response.results.map(result => result.formatted_address);
+        setAddressSuggestions(suggestions);
+      }
+    } catch (error) {
+      console.error('Geocoding error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Debounce the address lookup
+  const debouncedGetSuggestions = debounce(getAddressSuggestions, 500);
+
+  // Handle address selection
+  const handleAddressSelect = async (address: string) => {
+    try {
+      const geocoder = new google.maps.Geocoder();
+      const response = await geocoder.geocode({ address });
+      
+      if (response.results?.[0]) {
+        const result = response.results[0] as PlaceResult;
+        const addressComponents = result.address_components;
+        
+        // Helper function to find address component by type
+        const findComponent = (type: string) => 
+          addressComponents.find(component => component.types.includes(type));
+
+        // Extract address components
+        const streetNumber = findComponent('street_number')?.long_name || '';
+        const route = findComponent('route')?.long_name || '';
+        const city = findComponent('locality')?.long_name || findComponent('administrative_area_level_2')?.long_name || '';
+        const state = findComponent('administrative_area_level_1')?.short_name || '';
+        const country = findComponent('country')?.short_name || '';
+        const postalCode = findComponent('postal_code')?.long_name || '';
+
+        // Update form values
+        form.setValue('street_address', `${streetNumber} ${route}`.trim());
+        form.setValue('city', city);
+        form.setValue('state_province', state);
+        form.setValue('postal_code', postalCode);
+        form.setValue('country', country);
+
+        // Clear suggestions
+        setAddressSuggestions([]);
+      }
+    } catch (error) {
+      console.error('Error selecting address:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (streetAddress) {
+      debouncedGetSuggestions(streetAddress);
+    } else {
+      setAddressSuggestions([]);
+    }
+
+    return () => {
+      debouncedGetSuggestions.cancel();
+    };
+  }, [streetAddress]);
+
   return (
     <div className="space-y-4">
-      <FormField
-        control={form.control}
-        name="street_address"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className={labelClasses}>Street Address</FormLabel>
-            <FormControl>
-              <Input {...field} className={inputClasses} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="relative">
+        <FormField
+          control={form.control}
+          name="street_address"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className={labelClasses}>Street Address</FormLabel>
+              <div className="relative">
+                <FormControl>
+                  <Input {...field} className={inputClasses} />
+                </FormControl>
+                {isSearching && (
+                  <Search className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground animate-spin" />
+                )}
+              </div>
+              {addressSuggestions.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
+                  <ScrollArea className="max-h-[200px]">
+                    {addressSuggestions.map((suggestion, index) => (
+                      <Button
+                        key={index}
+                        variant="ghost"
+                        className="w-full justify-start px-3 py-2 text-sm hover:bg-gray-100"
+                        onClick={() => handleAddressSelect(suggestion)}
+                      >
+                        {suggestion}
+                      </Button>
+                    ))}
+                  </ScrollArea>
+                </div>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
       
       <div className="grid grid-cols-2 gap-4">
         <FormField

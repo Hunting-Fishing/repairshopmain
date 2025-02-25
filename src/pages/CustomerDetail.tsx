@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomerTabs } from "@/components/customers/CustomerTabs";
 import { AppSidebar } from "@/components/layout/AppSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -16,58 +15,76 @@ export default function CustomerDetail() {
   const { data: customer, isLoading } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
-      if (!id) return null;
+      if (!id) {
+        navigate("/customers");
+        return null;
+      }
+
       const { data, error } = await supabase
         .from("customers")
         .select("*")
         .eq("id", id)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error fetching customer",
+          description: error.message,
+        });
+        throw error;
+      }
+
+      if (!data) {
+        toast({
+          variant: "destructive",
+          title: "Customer not found",
+          description: "The requested customer could not be found.",
+        });
+        navigate("/customers");
+        return null;
+      }
+
       return data;
     },
-    enabled: !!id
+    retry: false
   });
-
-  const handleSuccess = () => {
-    toast({
-      title: "Success",
-      description: "Customer details have been saved.",
-    });
-    navigate("/customers");
-  };
 
   if (isLoading) {
     return (
-      <SidebarProvider>
-        <div className="flex min-h-screen w-full">
-          <AppSidebar />
-          <main className="flex-1 p-6">
-            <div className="space-y-4">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          </main>
-        </div>
-      </SidebarProvider>
-    );
-  }
-
-  return (
-    <SidebarProvider>
       <div className="flex min-h-screen w-full">
         <AppSidebar />
         <main className="flex-1 p-6">
-          {customer && (
-            <CustomerTabs 
-              customerId={id!} 
-              customer={customer} 
-              onSuccess={handleSuccess}
-            />
-          )}
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
         </main>
       </div>
-    </SidebarProvider>
+    );
+  }
+
+  if (!customer) {
+    return null;
+  }
+
+  return (
+    <div className="flex min-h-screen w-full">
+      <AppSidebar />
+      <main className="flex-1 p-6">
+        <CustomerTabs 
+          customerId={id!} 
+          customer={customer} 
+          onSuccess={() => {
+            toast({
+              title: "Success",
+              description: "Customer details have been saved.",
+            });
+            navigate("/customers");
+          }}
+        />
+      </main>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
@@ -28,12 +27,8 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
       email: staffMember.email,
       phone_number: staffMember.phone_number,
       notes: staffMember.notes,
-      emergency_contact: staffMember.emergency_contact || {
-        name: "",
-        phone: "",
-        relationship: "",
-      },
-      skills: staffMember.skills || [],
+      emergency_contact: staffMember.emergency_contact,
+      skills: staffMember.skills,
     },
   });
 
@@ -47,7 +42,7 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
         phone_number: values.phone_number,
         notes: values.notes,
         emergency_contact: values.emergency_contact,
-        skills: values.skills,
+        skills: values.skills || [],
       };
 
       await updateStaffMember(updateData);

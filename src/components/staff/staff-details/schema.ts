@@ -12,5 +12,5 @@ export const staffDetailsSchema = z.object({
     phone: z.string().optional(),
     relationship: z.string().optional(),
   }).nullable(),
-  skills: z.array(z.string()).default([]),
+  skills: z.array(z.string())
 });

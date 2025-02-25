@@ -11,12 +11,12 @@ export interface StaffMemberData {
   email: string | null;
   phone_number: string | null;
   notes: string | null;
-  emergency_contact?: {
+  emergency_contact: {
     name?: string;
     phone?: string;
     relationship?: string;
   } | null;
-  skills?: string[];
+  skills: string[];
 }
 
 export interface StaffDetailsFormProps {

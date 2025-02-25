@@ -11,6 +11,8 @@ import { CommunicationPreferences } from "./CommunicationPreferences";
 import { FormSection } from "./FormSection";
 import { EditModeAlert } from "./EditModeAlert";
 import { SubmitButton } from "./fields/SubmitButton";
+import { useFormContext } from "react-hook-form";
+import { CustomerFormValues } from "../types/customerTypes";
 
 interface CustomerFormContainerProps {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -20,6 +22,7 @@ interface CustomerFormContainerProps {
 
 export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting = false }: CustomerFormContainerProps) {
   const [isModernTheme, setIsModernTheme] = useState(false);
+  const form = useFormContext<CustomerFormValues>();
 
   const themeClass = isModernTheme ? "modern-theme" : "basic-theme";
 
@@ -46,7 +49,7 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
               title="Personal Information"
               isModernTheme={isModernTheme}
             >
-              <CustomerFormFields isModernTheme={isModernTheme} />
+              <CustomerFormFields form={form} isModernTheme={isModernTheme} />
             </FormSection>
           </div>
 
@@ -55,14 +58,14 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
               title="Address Information"
               isModernTheme={isModernTheme}
             >
-              <CustomerAddressFields isModernTheme={isModernTheme} />
+              <CustomerAddressFields form={form} isModernTheme={isModernTheme} />
             </FormSection>
 
             <FormSection
               title="Communication Preferences"
               isModernTheme={isModernTheme}
             >
-              <CommunicationPreferences isModernTheme={isModernTheme} />
+              <CommunicationPreferences form={form} isModernTheme={isModernTheme} />
             </FormSection>
           </div>
         </div>

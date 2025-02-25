@@ -27,23 +27,38 @@ export function FormInput({
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className={className}>
-          <FormLabel>
-            {label}
-            {required && <span className="text-destructive">*</span>}
-          </FormLabel>
-          <FormControl>
-            <Input 
-              type={type}
-              placeholder={placeholder}
-              {...field}
-              value={field.value || ""}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
+      render={({ field }) => {
+        // Handle complex object types by stringifying them for display
+        const value = typeof field.value === 'object' 
+          ? JSON.stringify(field.value)
+          : field.value?.toString() || "";
+
+        return (
+          <FormItem className={className}>
+            <FormLabel>
+              {label}
+              {required && <span className="text-destructive">*</span>}
+            </FormLabel>
+            <FormControl>
+              <Input 
+                type={type}
+                placeholder={placeholder}
+                {...field}
+                value={value}
+                onChange={(e) => {
+                  // Handle change based on the field type
+                  if (type === 'number') {
+                    field.onChange(Number(e.target.value));
+                  } else {
+                    field.onChange(e.target.value);
+                  }
+                }}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }

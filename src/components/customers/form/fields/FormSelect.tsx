@@ -32,29 +32,39 @@ export function FormSelect({
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className={className}>
-          <FormLabel>
-            {label}
-            {required && <span className="text-destructive">*</span>}
-          </FormLabel>
-          <Select onValueChange={field.onChange} value={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder={placeholder} />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )}
+      render={({ field }) => {
+        // Convert complex objects to string representation for comparison
+        const value = typeof field.value === 'object' 
+          ? JSON.stringify(field.value)
+          : field.value?.toString() || "";
+
+        return (
+          <FormItem className={className}>
+            <FormLabel>
+              {label}
+              {required && <span className="text-destructive">*</span>}
+            </FormLabel>
+            <Select 
+              onValueChange={(val) => field.onChange(val)}
+              value={value}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder={placeholder} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {options.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }

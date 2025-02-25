@@ -3,21 +3,9 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import type { StaffMemberData } from "@/components/staff/staff-details/types";
 
-export interface UpdateStaffMemberData {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  email: string | null;
-  phone_number?: string | null;
-  notes?: string | null;
-  emergency_contact?: {
-    name?: string;
-    phone?: string;
-    relationship?: string;
-  } | null;
-  skills?: string[];
-}
+export type UpdateStaffMemberData = StaffMemberData;
 
 export function useUpdateStaffMember() {
   const [isLoading, setIsLoading] = useState(false);

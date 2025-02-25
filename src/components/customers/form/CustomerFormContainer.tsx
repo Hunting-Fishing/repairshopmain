@@ -28,7 +28,7 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
 
   return (
     <div className={`space-y-8 animate-fade-in ${themeClass}`}>
-      <form onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit} className="space-y-8">
         {mode === "edit" && <EditModeAlert />}
 
         <div className="flex items-center justify-end gap-2 mb-6">
@@ -78,7 +78,7 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
             isSubmitting={isSubmitting}
           />
         </div>
-      </form>
+      </Form>
     </div>
   );
 }

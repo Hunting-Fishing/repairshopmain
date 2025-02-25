@@ -24,12 +24,13 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     'first_name',
     'last_name',
     'email',
+    'country',
+    'timezone',
     'phone_number',
     'street_address',
     'city',
     'state_province',
     'postal_code',
-    'country',
     'customer_type'
   ]);
 
@@ -41,6 +42,8 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
       first_name: "First Name",
       last_name: "Last Name",
       email: "Email",
+      country: "Country",
+      timezone: "Timezone",
       customer_type: "Customer Type"
     };
     return labels[fieldName] || fieldName;
@@ -54,6 +57,8 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     if (!values.first_name?.trim()) missingFields.push("First Name");
     if (!values.last_name?.trim()) missingFields.push("Last Name");
     if (!values.email?.trim()) missingFields.push("Email");
+    if (!values.country?.trim()) missingFields.push("Country");
+    if (!values.timezone?.trim()) missingFields.push("Timezone");
 
     // Business-specific fields validation
     if (values.customer_type === "Business") {
@@ -82,7 +87,6 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
             'company_size',
             'business_classification_id',
             'preferred_contact_time',
-            'timezone',
             'language_preference'
           ];
           

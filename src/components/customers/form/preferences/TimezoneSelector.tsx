@@ -15,23 +15,18 @@ interface TimezoneSelectorProps {
 }
 
 const timezones = [
-  "UTC",
-  "America/New_York",
-  "America/Los_Angeles",
-  "America/Chicago",
-  "America/Phoenix",
-  "America/Denver",
-  "Europe/London",
-  "Europe/Paris",
-  "Europe/Berlin",
-  "Asia/Tokyo",
-  "Asia/Shanghai",
-  "Asia/Dubai",
-  "Australia/Sydney",
-].map(zone => ({
-  value: zone,
-  label: zone.replace(/_/g, ' ')
-}));
+  { value: "UTC", label: "UTC" },
+  { value: "America/New_York", label: "Eastern Time (ET)" },
+  { value: "America/Chicago", label: "Central Time (CT)" },
+  { value: "America/Denver", label: "Mountain Time (MT)" },
+  { value: "America/Los_Angeles", label: "Pacific Time (PT)" },
+  { value: "America/Phoenix", label: "Arizona Time" },
+  { value: "Europe/London", label: "London" },
+  { value: "Europe/Paris", label: "Paris" },
+  { value: "Asia/Tokyo", label: "Tokyo" },
+  { value: "Asia/Shanghai", label: "Shanghai" },
+  { value: "Australia/Sydney", label: "Sydney" }
+];
 
 export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) {
   const [open, setOpen] = useState(false);
@@ -73,7 +68,7 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
                       key={timezone.value}
                       value={timezone.value}
                       onSelect={() => {
-                        field.onChange(timezone.value);
+                        form.setValue("timezone", timezone.value);
                         setOpen(false);
                       }}
                     >

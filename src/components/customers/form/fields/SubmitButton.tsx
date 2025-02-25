@@ -28,11 +28,15 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     const values = getValues();
     const missingFields = [];
     
-    // Check required fields
+    // Check required fields based on customer type
     if (!values.first_name?.trim()) missingFields.push("First Name");
     if (!values.last_name?.trim()) missingFields.push("Last Name");
     if (!values.email?.trim()) missingFields.push("Email");
-    if (!values.customer_type) missingFields.push("Customer Type");
+    
+    // Only require customer_type if it's not already set to "Personal"
+    if (!values.customer_type && values.customer_type !== "Personal") {
+      missingFields.push("Customer Type");
+    }
 
     if (missingFields.length > 0) {
       e.preventDefault();
@@ -48,13 +52,17 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
     // If there are other validation errors (e.g., invalid email format)
     if (Object.keys(errors).length > 0) {
       e.preventDefault();
-      const errorFields = Object.keys(errors).map(field => getFieldLabel(field));
+      const errorFields = Object.keys(errors)
+        .filter(field => field !== 'timezone') // Exclude timezone from validation errors
+        .map(field => getFieldLabel(field));
       
-      toast({
-        variant: "destructive",
-        title: "Validation Errors",
-        description: `Please check the following fields: ${errorFields.join(', ')}`
-      });
+      if (errorFields.length > 0) {
+        toast({
+          variant: "destructive",
+          title: "Validation Errors",
+          description: `Please check the following fields: ${errorFields.join(', ')}`
+        });
+      }
     }
   };
 

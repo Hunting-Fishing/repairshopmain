@@ -1,5 +1,5 @@
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Auth from "@/pages/Auth";
@@ -14,6 +14,7 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
+          <Route path="/" element={<Navigate to="/customer-portal" replace />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/customer-portal" element={<CustomerPortal />} />
           <Route path="/customers" element={<Customers />} />

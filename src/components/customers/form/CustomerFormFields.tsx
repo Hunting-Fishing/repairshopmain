@@ -3,13 +3,29 @@ import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 import { FormInput } from "./fields/FormInput";
 import { CustomerTypeSelect } from "./fields/CustomerTypeSelect";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CustomerFormFieldsProps {
-  form: UseFormReturn<CustomerFormValues>;
+  customerId: string;
   isModernTheme?: boolean;
 }
 
-export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerFormFieldsProps) => {
+export const CustomerFormFields = ({ customerId, isModernTheme = false }: CustomerFormFieldsProps) => {
+  const { data: customer } = useQuery({
+    queryKey: ["customer", customerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("id", customerId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+  });
+
   return (
     <div className="space-y-4">
       <CustomerTypeSelect 

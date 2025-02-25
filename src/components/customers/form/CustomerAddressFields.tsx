@@ -1,3 +1,4 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -229,7 +230,7 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
                     }
                   />
                 </FormControl>
-                {!isManualEntry && !addressType === 'po_box' && isSearching && (
+                {!isManualEntry && addressType !== 'po_box' && isSearching && (
                   <Search className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground animate-spin" />
                 )}
               </div>

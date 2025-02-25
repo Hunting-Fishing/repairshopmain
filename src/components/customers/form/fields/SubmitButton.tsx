@@ -14,16 +14,28 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
   const { formState: { isValid, errors } } = useFormContext();
   const { toast } = useToast();
 
+  const getFieldLabel = (fieldName: string): string => {
+    const labels: Record<string, string> = {
+      first_name: "First Name",
+      last_name: "Last Name",
+      email: "Email",
+      customer_type: "Customer Type"
+    };
+    return labels[fieldName] || fieldName;
+  };
+
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!isValid) {
       e.preventDefault();
       const errorFields = Object.keys(errors);
+      const missingFields = errorFields.map(field => getFieldLabel(field));
+      
       toast({
         variant: "destructive",
-        title: "Unable to save changes",
-        description: errorFields.length > 0
-          ? `Please check the following fields: ${errorFields.join(', ')}`
-          : "Please fill out all required fields correctly before saving."
+        title: "Required Fields Missing",
+        description: missingFields.length > 0
+          ? `Please fill in the following required fields: ${missingFields.join(', ')}`
+          : "Please fill out all required fields marked with an asterisk (*) before saving."
       });
     }
   };

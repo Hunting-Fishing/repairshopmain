@@ -29,13 +29,15 @@ export function FormInput({
   required = false
 }: FormInputProps) {
   const error = form.formState.errors[name];
+  const isTouched = form.formState.touchedFields[name];
   
   const inputClasses = cn(
     "transition-all duration-200",
     isModernTheme
       ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white rounded-lg"
       : "bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white",
-    error && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+    error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
+    required && !form.getValues(name) && isTouched && "border-red-500 bg-red-50/50"
   );
 
   const labelClasses = cn(
@@ -54,15 +56,18 @@ export function FormInput({
           <FormLabel className={labelClasses}>
             <span className="flex items-center gap-1">
               {label}
-              {required && <span className="text-red-500">*</span>}
+              {required && (
+                <span className="text-red-500 text-sm font-bold ml-0.5" aria-label="required field">*</span>
+              )}
             </span>
           </FormLabel>
           <FormControl>
             <Input
               {...field}
               type={type}
-              placeholder={placeholder}
+              placeholder={required ? `${placeholder} *` : placeholder}
               className={inputClasses}
+              aria-required={required}
               aria-invalid={!!error}
             />
           </FormControl>

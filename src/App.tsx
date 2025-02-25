@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider, AuthContext } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { RootLayout } from "./components/layout/RootLayout";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -21,31 +21,31 @@ const queryClient = new QueryClient({
   },
 });
 
-const App = () => (
-  <GlobalErrorBoundary>
-    <AuthProvider>
+const App = () => {
+  return (
+    <GlobalErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <BrowserRouter>
-            <AuthContext.Consumer>
-              {({ user }) => (
-                <ThemeProvider userId={user?.id}>
-                  <SidebarProvider>
-                    <NavigationLoading />
-                    <div className="min-h-screen flex w-full">
-                      <RootLayout>
-                        <AppRoutes />
-                      </RootLayout>
-                    </div>
-                  </SidebarProvider>
-                </ThemeProvider>
-              )}
-            </AuthContext.Consumer>
-          </BrowserRouter>
-        </TooltipProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <ThemeProvider>
+              <TooltipProvider>
+                <SidebarProvider>
+                  <NavigationLoading />
+                  <div className="min-h-screen flex w-full">
+                    <RootLayout>
+                      <AppRoutes />
+                    </RootLayout>
+                  </div>
+                  <Toaster />
+                  <Sonner />
+                </SidebarProvider>
+              </TooltipProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </QueryClientProvider>
-    </AuthProvider>
-  </GlobalErrorBoundary>
-);
+    </GlobalErrorBoundary>
+  );
+};
 
 export default App;

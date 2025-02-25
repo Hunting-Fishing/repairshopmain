@@ -17,6 +17,10 @@ export function StaffTabsList() {
         <Settings2 className="h-4 w-4" />
         Settings
       </TabsTrigger>
+      <TabsTrigger value="scheduling" className="flex items-center gap-2 data-[state=active]:bg-background">
+        <Calendar className="h-4 w-4" />
+        Scheduling
+      </TabsTrigger>
       <TabsTrigger value="assignment-rules" className="flex items-center gap-2 data-[state=active]:bg-background">
         <GitBranch className="h-4 w-4" />
         Assignment Rules

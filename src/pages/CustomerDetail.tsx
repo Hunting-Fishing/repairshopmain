@@ -73,17 +73,7 @@ export default function CustomerDetail() {
     <div className="flex min-h-screen w-full">
       <AppSidebar />
       <main className="flex-1 p-6">
-        <CustomerTabs 
-          customerId={id!} 
-          customer={customer} 
-          onSuccess={() => {
-            toast({
-              title: "Success",
-              description: "Customer details have been saved.",
-            });
-            navigate("/customers");
-          }}
-        />
+        <CustomerTabs customerId={id!} defaultTab="details" />
       </main>
     </div>
   );

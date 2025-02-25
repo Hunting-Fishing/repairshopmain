@@ -3,9 +3,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomerTabContent } from "./CustomerTabContent";
 import { CustomerFormFields } from "./form/CustomerFormFields";
 import { CustomerDocuments } from "./documents/CustomerDocuments";
-import { CustomerVehicles } from "./vehicles/VehicleList";
-import { CustomerHistory } from "./history/CustomerHistoryList";
-import { CustomerAnalytics } from "./analytics/CustomerAnalyticsDashboard";
+import { VehicleList } from "./vehicles/VehicleList";
+import { CustomerHistoryList } from "./history/CustomerHistoryList";
+import { CustomerAnalyticsDashboard } from "./analytics/CustomerAnalyticsDashboard";
 import { CustomerCommunications } from "./communications/CustomerCommunications";
 
 interface CustomerTabsProps {
@@ -34,7 +34,7 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
 
         <TabsContent value="vehicles">
           <CustomerTabContent label="Vehicles">
-            <CustomerVehicles customerId={customerId} />
+            <VehicleList customerId={customerId} />
           </CustomerTabContent>
         </TabsContent>
 
@@ -46,7 +46,7 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
 
         <TabsContent value="history">
           <CustomerTabContent label="History">
-            <CustomerHistory customerId={customerId} />
+            <CustomerHistoryList customerId={customerId} />
           </CustomerTabContent>
         </TabsContent>
 
@@ -58,7 +58,7 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
 
         <TabsContent value="analytics">
           <CustomerTabContent label="Analytics">
-            <CustomerAnalytics customerId={customerId} />
+            <CustomerAnalyticsDashboard customerId={customerId} />
           </CustomerTabContent>
         </TabsContent>
       </div>

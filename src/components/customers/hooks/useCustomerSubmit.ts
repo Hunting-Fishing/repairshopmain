@@ -20,56 +20,23 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
       setIsSubmitting(true);
       console.log("Handling submit in mode:", mode, "with values:", values);
 
-      const emailValidation = await validateEmail(values.email);
-      if (!emailValidation.isValid) {
-        toast({
-          title: "Validation Error",
-          description: emailValidation.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (values.phone_number) {
-        const phoneValidation = await validatePhone(values.phone_number);
-        if (!phoneValidation.isValid) {
-          toast({
-            title: "Validation Error",
-            description: phoneValidation.message,
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-
-      if (values.street_address && values.city && values.state_province && values.postal_code && values.country) {
-        const addressValidation = await validateAddress(
-          values.street_address,
-          values.city,
-          values.state_province,
-          values.postal_code,
-          values.country
-        );
-        if (!addressValidation.isValid) {
-          toast({
-            title: "Validation Error",
-            description: addressValidation.message,
-            variant: "destructive",
-          });
-          return;
-        }
-      }
+      // Remove undefined and null values
+      const cleanedValues = Object.fromEntries(
+        Object.entries(values).filter(([_, v]) => v != null)
+      );
 
       let result;
       if (mode === "edit" && initialData?.id) {
         console.log("Updating customer with ID:", initialData.id);
+        
+        // Prepare update data
         const updateData = {
-          ...values,
-          email_validation_status: emailValidation.isValid ? 'valid' : 'invalid',
-          phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
-          address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending',
+          ...cleanedValues,
           updated_at: new Date().toISOString()
         };
+        
+        // Remove id from update data as it's used in the where clause
+        delete updateData.id;
         
         console.log("Sending update with data:", updateData);
         
@@ -79,15 +46,12 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
           .eq('id', initialData.id)
           .select()
           .single();
+
+        console.log("Update result:", result);
       } else {
         result = await supabase
           .from("customers")
-          .insert([{
-            ...values,
-            email_validation_status: emailValidation.isValid ? 'valid' : 'invalid',
-            phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
-            address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending'
-          }])
+          .insert([cleanedValues])
           .select()
           .single();
       }
@@ -101,24 +65,7 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
         throw new Error("No data returned from the database");
       }
 
-      const customer = result.data;
-
-      // Log validation attempts
-      await logValidationAttempt(customer.id, 'email', emailValidation.isValid ? 'valid' : 'invalid', emailValidation.message);
-      if (values.phone_number) {
-        const phoneValidation = await validatePhone(values.phone_number);
-        await logValidationAttempt(customer.id, 'phone', phoneValidation.isValid ? 'valid' : 'invalid', phoneValidation.message);
-      }
-      if (values.street_address) {
-        const addressValidation = await validateAddress(
-          values.street_address,
-          values.city,
-          values.state_province,
-          values.postal_code,
-          values.country
-        );
-        await logValidationAttempt(customer.id, 'address', addressValidation.isValid ? 'valid' : 'invalid', addressValidation.message);
-      }
+      console.log("Operation successful:", result.data);
 
       onSuccess();
       toast({

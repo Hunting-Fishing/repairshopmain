@@ -55,17 +55,9 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
     <FormField
       control={form.control}
       name="timezone"
-      rules={{
-        validate: {
-          validTimezone: (value) => {
-            if (!value) return true;
-            return timezones.some(tz => tz.value === value) || "Please select a valid timezone";
-          }
-        }
-      }}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel className={labelClasses}>Timezone</FormLabel>
+          <FormLabel className={labelClasses}>Timezone (Optional)</FormLabel>
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
@@ -85,35 +77,37 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0" align="start">
-              <Command shouldFilter={false}>
+              <Command>
                 <CommandInput 
                   placeholder="Search timezone..." 
                   value={searchValue}
                   onValueChange={setSearchValue}
                 />
-                <CommandEmpty>No timezone found.</CommandEmpty>
-                <CommandGroup className="max-h-[300px] overflow-y-auto">
-                  {filteredTimezones.map((timezone) => (
-                    <CommandItem
-                      key={timezone.value}
-                      value={timezone.value}
-                      onSelect={(value) => {
-                        form.setValue("timezone", value);
-                        setOpen(false);
-                        setSearchValue("");
-                      }}
-                      className="flex items-center"
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          currentTimezone === timezone.value ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {timezone.label}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                {filteredTimezones.length === 0 ? (
+                  <CommandEmpty>No timezone found.</CommandEmpty>
+                ) : (
+                  <CommandGroup className="max-h-[300px] overflow-y-auto">
+                    {filteredTimezones.map((timezone) => (
+                      <CommandItem
+                        key={timezone.value}
+                        value={timezone.value}
+                        onSelect={(currentValue) => {
+                          form.setValue("timezone", currentValue);
+                          setOpen(false);
+                          setSearchValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            currentTimezone === timezone.value ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {timezone.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
               </Command>
             </PopoverContent>
           </Popover>

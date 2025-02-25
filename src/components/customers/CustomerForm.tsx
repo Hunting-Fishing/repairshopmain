@@ -1,63 +1,12 @@
 
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormContainer } from "./form/CustomerFormContainer";
 import { CustomerFormValues } from "./types/customerTypes";
-import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { validatePhone, validateEmail, validateAddress, logValidationAttempt } from "@/utils/validation";
-
-const formSchema = z.object({
-  first_name: z.string()
-    .min(3, "First name must be at least 3 characters")
-    .max(50, "First name must be less than 50 characters"),
-  last_name: z.string()
-    .min(3, "Last name must be at least 3 characters")
-    .max(50, "Last name must be less than 50 characters"),
-  email: z.string()
-    .min(5, "Email must be at least 5 characters")
-    .max(80, "Email must be less than 80 characters")
-    .email("Invalid email format"),
-  phone_number: z.string().optional(),
-  street_address: z.string().optional(),
-  city: z.string().optional(),
-  state_province: z.string().optional(),
-  postal_code: z.string().optional(),
-  country: z.string().optional(),
-  customer_type: z.enum(["Personal", "Fleet", "Business"]),
-  language_preference: z.string().optional(),
-  timezone: z.string().optional()
-    .refine((val) => {
-      if (!val) return true; // Optional field
-      try {
-        new Date().toLocaleString('en-US', { timeZone: val });
-        return true;
-      } catch {
-        return false;
-      }
-    }, "Invalid timezone"),
-  company_size: z.string().optional(),
-  business_classification_id: z.string().optional(),
-  preferred_contact_time: z.object({
-    start: z.string(),
-    end: z.string()
-  }).optional(),
-  secondary_contact: z.object({
-    name: z.string().optional(),
-    phone: z.string().optional(),
-    email: z.string().email("Invalid email address").optional(),
-    relationship: z.string().optional()
-  }).optional(),
-  marketing_preferences: z.object({
-    email: z.boolean(),
-    sms: z.boolean(),
-    phone: z.boolean()
-  }).optional()
-});
+import { customerFormSchema } from "./schemas/customerFormSchema";
+import { useCustomerSubmit } from "./hooks/useCustomerSubmit";
 
 export interface CustomerFormProps {
   onSuccess: () => void;
@@ -66,11 +15,14 @@ export interface CustomerFormProps {
 }
 
 export function CustomerForm({ onSuccess, initialData, mode = "create" }: CustomerFormProps) {
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { handleSubmit, isSubmitting } = useCustomerSubmit({
+    mode,
+    initialData,
+    onSuccess
+  });
   
   const methods = useForm<CustomerFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(customerFormSchema),
     defaultValues: initialData || {
       first_name: "",
       last_name: "",
@@ -105,129 +57,10 @@ export function CustomerForm({ onSuccess, initialData, mode = "create" }: Custom
     );
   }
 
-  const onSubmit = async (values: CustomerFormValues) => {
-    try {
-      setIsSubmitting(true);
-
-      // Validate email
-      const emailValidation = await validateEmail(values.email);
-      if (!emailValidation.isValid) {
-        toast({
-          title: "Validation Error",
-          description: emailValidation.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Validate phone if provided
-      if (values.phone_number) {
-        const phoneValidation = await validatePhone(values.phone_number);
-        if (!phoneValidation.isValid) {
-          toast({
-            title: "Validation Error",
-            description: phoneValidation.message,
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-
-      // Validate address if all fields are provided
-      if (values.street_address && values.city && values.state_province && values.postal_code && values.country) {
-        const addressValidation = await validateAddress(
-          values.street_address,
-          values.city,
-          values.state_province,
-          values.postal_code,
-          values.country
-        );
-        if (!addressValidation.isValid) {
-          toast({
-            title: "Validation Error",
-            description: addressValidation.message,
-            variant: "destructive",
-          });
-          return;
-        }
-      }
-
-      let operation;
-      if (mode === "edit" && initialData?.id) {
-        operation = supabase
-          .from("customers")
-          .update({
-            ...values,
-            email_validation_status: emailValidation.isValid ? 'valid' : 'invalid',
-            phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
-            address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', initialData.id)
-          .select()
-          .single();
-      } else {
-        operation = supabase
-          .from("customers")
-          .insert([{
-            ...values,
-            email_validation_status: emailValidation.isValid ? 'valid' : 'invalid',
-            phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
-            address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending'
-          }])
-          .select()
-          .single();
-      }
-
-      const { data: customer, error } = await operation;
-
-      if (error) {
-        console.error("Database operation failed:", error);
-        throw error;
-      }
-
-      if (!customer) {
-        throw new Error("No data returned from the database");
-      }
-
-      // Log validation attempts
-      await logValidationAttempt(customer.id, 'email', emailValidation.isValid ? 'valid' : 'invalid', emailValidation.message);
-      if (values.phone_number) {
-        const phoneValidation = await validatePhone(values.phone_number);
-        await logValidationAttempt(customer.id, 'phone', phoneValidation.isValid ? 'valid' : 'invalid', phoneValidation.message);
-      }
-      if (values.street_address) {
-        const addressValidation = await validateAddress(
-          values.street_address,
-          values.city,
-          values.state_province,
-          values.postal_code,
-          values.country
-        );
-        await logValidationAttempt(customer.id, 'address', addressValidation.isValid ? 'valid' : 'invalid', addressValidation.message);
-      }
-
-      onSuccess();
-      toast({
-        title: "Success",
-        description: `Customer has been ${mode === "edit" ? "updated" : "created"} successfully.`,
-      });
-    } catch (error: any) {
-      console.error("Form submission error:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || "An unexpected error occurred. Please try again.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <FormProvider {...methods}>
       <CustomerFormContainer 
-        onSubmit={methods.handleSubmit(onSubmit)}
+        onSubmit={methods.handleSubmit(handleSubmit)}
         mode={mode}
         isSubmitting={isSubmitting}
       />

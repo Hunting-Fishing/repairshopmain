@@ -1,64 +1,63 @@
 
-import { useFormContext } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 
 interface FormInputProps {
+  form: UseFormReturn<CustomerFormValues>;
   name: keyof CustomerFormValues;
   label: string;
-  required?: boolean;
   type?: string;
   placeholder?: string;
-  className?: string;
+  isModernTheme?: boolean;
 }
 
 export function FormInput({
+  form,
   name,
   label,
-  required = false,
   type = "text",
   placeholder,
-  className,
+  isModernTheme = false
 }: FormInputProps) {
-  const { control } = useFormContext<CustomerFormValues>();
+  const error = form.formState.errors[name];
+  
+  const inputClasses = cn(
+    "transition-all duration-200",
+    isModernTheme
+      ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white rounded-lg"
+      : "bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white",
+    error && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+  );
+
+  const labelClasses = cn(
+    isModernTheme
+      ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
+      : "text-gray-700 font-medium",
+    error && "text-red-500"
+  );
 
   return (
     <FormField
-      control={control}
+      control={form.control}
       name={name}
-      render={({ field }) => {
-        // Handle complex object types by stringifying them for display
-        const value = typeof field.value === 'object' 
-          ? JSON.stringify(field.value)
-          : field.value?.toString() || "";
-
-        return (
-          <FormItem className={className}>
-            <FormLabel>
-              {label}
-              {required && <span className="text-destructive">*</span>}
-            </FormLabel>
-            <FormControl>
-              <Input 
-                type={type}
-                placeholder={placeholder}
-                {...field}
-                value={value}
-                onChange={(e) => {
-                  // Handle change based on the field type
-                  if (type === 'number') {
-                    field.onChange(Number(e.target.value));
-                  } else {
-                    field.onChange(e.target.value);
-                  }
-                }}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        );
-      }}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className={labelClasses}>{label}</FormLabel>
+          <FormControl>
+            <Input
+              {...field}
+              type={type}
+              placeholder={placeholder}
+              className={inputClasses}
+              aria-invalid={!!error}
+            />
+          </FormControl>
+          <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />
+        </FormItem>
+      )}
     />
   );
 }

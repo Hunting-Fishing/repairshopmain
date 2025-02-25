@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useFormContext } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 interface SubmitButtonProps {
   label: string;

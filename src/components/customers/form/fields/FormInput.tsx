@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 
-// Only allow field names that correspond to string values
 type AllowedFields = {
   [K in keyof CustomerFormValues]: CustomerFormValues[K] extends string | undefined ? K : never;
 }[keyof CustomerFormValues];
@@ -17,6 +16,7 @@ interface FormInputProps {
   type?: string;
   placeholder?: string;
   isModernTheme?: boolean;
+  required?: boolean;
 }
 
 export function FormInput({
@@ -25,7 +25,8 @@ export function FormInput({
   label,
   type = "text",
   placeholder,
-  isModernTheme = false
+  isModernTheme = false,
+  required = false
 }: FormInputProps) {
   const error = form.formState.errors[name];
   
@@ -50,7 +51,12 @@ export function FormInput({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className={labelClasses}>{label}</FormLabel>
+          <FormLabel className={labelClasses}>
+            <span className="flex items-center gap-1">
+              {label}
+              {required && <span className="text-red-500">*</span>}
+            </span>
+          </FormLabel>
           <FormControl>
             <Input
               {...field}

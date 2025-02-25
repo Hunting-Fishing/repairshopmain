@@ -22,6 +22,13 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
 
   const { countries } = useLocationData(form.watch("country") || "");
 
+  const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
+    <span className="flex items-center gap-1">
+      {children}
+      <span className="text-red-500">*</span>
+    </span>
+  );
+
   return (
     <div className="space-y-4">
       <FormField
@@ -29,7 +36,9 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
         name="customer_type"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className={labelClasses}>Customer Type</FormLabel>
+            <FormLabel className={labelClasses}>
+              <RequiredLabel>Customer Type</RequiredLabel>
+            </FormLabel>
             <Select onValueChange={field.onChange} defaultValue={field.value}>
               <FormControl>
                 <SelectTrigger className={selectTriggerClasses}>
@@ -54,6 +63,7 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
           label="First Name"
           placeholder="Enter first name"
           isModernTheme={isModernTheme}
+          required={true}
         />
         <FormInput
           form={form}
@@ -61,6 +71,7 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
           label="Last Name"
           placeholder="Enter last name"
           isModernTheme={isModernTheme}
+          required={true}
         />
       </div>
       
@@ -71,6 +82,7 @@ export const CustomerFormFields = ({ form, isModernTheme = false }: CustomerForm
         type="email"
         placeholder="Enter email address"
         isModernTheme={isModernTheme}
+        required={true}
       />
       
       <FormInput

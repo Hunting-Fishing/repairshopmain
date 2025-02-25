@@ -11,7 +11,7 @@ interface SubmitButtonProps {
 }
 
 export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps) {
-  const { formState: { isValid, errors }, getValues } = useFormContext();
+  const { formState: { isValid, errors, isDirty }, getValues } = useFormContext();
   const { toast } = useToast();
 
   const getFieldLabel = (fieldName: string): string => {
@@ -77,17 +77,17 @@ export function SubmitButton({ label, isSubmitting = false }: SubmitButtonProps)
   return (
     <Button
       type="submit"
-      disabled={isSubmitting}
+      disabled={isSubmitting || (!isDirty && !isValid)} // Allow submission if form is valid and has changes
       className={cn(
         "w-full md:w-auto",
-        !isValid && "opacity-50 cursor-not-allowed hover:bg-primary"
+        (!isDirty || !isValid) && "opacity-50 cursor-not-allowed hover:bg-primary"
       )}
       onClick={handleClick}
     >
       {isSubmitting ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Submitting...
+          {label === "Add Customer" ? "Creating..." : "Updating..."}
         </>
       ) : (
         label

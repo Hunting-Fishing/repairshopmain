@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomerTabs } from "@/components/customers/CustomerTabs";
+import { AppSidebar } from "@/components/layout/AppSidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -48,14 +50,19 @@ export default function CustomerDetail() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      {customer && (
-        <CustomerTabs 
-          customerId={id!} 
-          customer={customer} 
-          onSuccess={handleSuccess}
-        />
-      )}
-    </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full">
+        <AppSidebar />
+        <main className="flex-1 p-6">
+          {customer && (
+            <CustomerTabs 
+              customerId={id!} 
+              customer={customer} 
+              onSuccess={handleSuccess}
+            />
+          )}
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }

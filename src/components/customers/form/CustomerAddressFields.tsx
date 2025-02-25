@@ -1,4 +1,3 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,6 +13,13 @@ interface CustomerAddressFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
   isModernTheme?: boolean;
 }
+
+const ADDRESS_TYPES = [
+  { id: 'residential', label: 'Residential' },
+  { id: 'business', label: 'Business' },
+  { id: 'po_box', label: 'PO Box' },
+  { id: 'other', label: 'Other' }
+] as const;
 
 // Comprehensive list of countries with their ISO codes
 const countries = [
@@ -66,6 +72,7 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
   const [addressSuggestions, setAddressSuggestions] = useState<NominatimResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isManualEntry, setIsManualEntry] = useState(false);
+  const [addressType, setAddressType] = useState<typeof ADDRESS_TYPES[number]['id']>('residential');
 
   const inputClasses = isModernTheme
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg"
@@ -75,11 +82,28 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
     ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
     : "text-gray-700";
 
+  // Watch for country changes to handle postal code format
+  const selectedCountry = useWatch({
+    control: form.control,
+    name: "country"
+  });
+
   // Watch the street_address field for changes
   const streetAddress = useWatch({
     control: form.control,
     name: "street_address"
   });
+
+  // Handle postal code format based on country
+  const getPostalCodePattern = (countryCode: string) => {
+    const patterns: { [key: string]: string } = {
+      'US': '^\\d{5}(-\\d{4})?$', // USA: 12345 or 12345-6789
+      'CA': '^[A-Za-z]\\d[A-Za-z] ?\\d[A-Za-z]\\d$', // Canada: A1A 1A1
+      'GB': '^[A-Z]{1,2}\\d[A-Z\\d]? ?\\d[A-Z]{2}$', // UK: AA9A 9AA
+      // Add more country patterns as needed
+    };
+    return patterns[countryCode] || '^.+$'; // Default to any non-empty string
+  };
 
   // Function to get address suggestions
   const getAddressSuggestions = async (input: string) => {
@@ -115,13 +139,9 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
   const handleAddressSelect = (result: NominatimResult) => {
     const { address } = result;
     
-    // Construct street address
-    const streetNumber = address.house_number || '';
-    const street = address.road || '';
-    const streetAddress = `${streetNumber} ${street}`.trim();
-
     // Update form values
-    form.setValue('street_address', streetAddress);
+    form.setValue('street_address', addressType === 'po_box' ? '' : 
+      `${address.house_number || ''} ${address.road || ''}`.trim());
     form.setValue('city', address.city || '');
     form.setValue('state_province', address.state || '');
     form.setValue('postal_code', address.postcode || '');
@@ -129,6 +149,13 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
 
     // Clear suggestions
     setAddressSuggestions([]);
+  };
+
+  // Handle address type change
+  const handleAddressTypeChange = (type: typeof ADDRESS_TYPES[number]['id']) => {
+    setAddressType(type);
+    setIsManualEntry(type === 'po_box'); // Automatically switch to manual entry for PO Box
+    setAddressSuggestions([]); // Clear suggestions when type changes
   };
 
   useEffect(() => {
@@ -145,19 +172,37 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end mb-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            setIsManualEntry(!isManualEntry);
-            setAddressSuggestions([]);
-          }}
-          className="text-sm"
+      <div className="flex justify-between items-center mb-2">
+        <Select
+          value={addressType}
+          onValueChange={handleAddressTypeChange}
         >
-          {isManualEntry ? "Use Address Lookup" : "Enter Address Manually"}
-        </Button>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Select address type" />
+          </SelectTrigger>
+          <SelectContent>
+            {ADDRESS_TYPES.map((type) => (
+              <SelectItem key={type.id} value={type.id}>
+                {type.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {addressType !== 'po_box' && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setIsManualEntry(!isManualEntry);
+              setAddressSuggestions([]);
+            }}
+            className="text-sm"
+          >
+            {isManualEntry ? "Use Address Lookup" : "Enter Address Manually"}
+          </Button>
+        )}
       </div>
 
       <div className="relative">
@@ -167,21 +212,28 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
           render={({ field }) => (
             <FormItem>
               <FormLabel className={labelClasses}>
-                Street Address {isManualEntry && "(PO Box, Suite, etc. accepted)"}
+                {addressType === 'po_box' ? 'PO Box Number' : 'Street Address'}
+                {isManualEntry && addressType !== 'po_box' && " (Suite, Unit, etc. accepted)"}
               </FormLabel>
               <div className="relative">
                 <FormControl>
                   <Input 
                     {...field} 
                     className={inputClasses}
-                    placeholder={isManualEntry ? "Enter complete address (PO Box, Suite, etc.)" : "Start typing to search address"}
+                    placeholder={
+                      addressType === 'po_box' 
+                        ? "Enter PO Box number" 
+                        : isManualEntry 
+                          ? "Enter complete address" 
+                          : "Start typing to search address"
+                    }
                   />
                 </FormControl>
-                {!isManualEntry && isSearching && (
+                {!isManualEntry && !addressType === 'po_box' && isSearching && (
                   <Search className="absolute right-3 top-2.5 h-5 w-5 text-muted-foreground animate-spin" />
                 )}
               </div>
-              {!isManualEntry && addressSuggestions.length > 0 && (
+              {!isManualEntry && addressType !== 'po_box' && addressSuggestions.length > 0 && (
                 <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
                   <ScrollArea className="max-h-[200px]">
                     {addressSuggestions.map((result, index) => (
@@ -240,7 +292,11 @@ export const CustomerAddressFields = ({ form, isModernTheme = false }: CustomerA
             <FormItem>
               <FormLabel className={labelClasses}>Postal Code</FormLabel>
               <FormControl>
-                <Input {...field} className={inputClasses} />
+                <Input 
+                  {...field} 
+                  className={inputClasses}
+                  pattern={selectedCountry ? getPostalCodePattern(selectedCountry) : undefined}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

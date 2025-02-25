@@ -2,17 +2,13 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { SchedulingProps, Shift } from "@/types/scheduling";
 import { toast } from "sonner";
+import { ShiftCard } from "./components/ShiftCard";
+import { ShiftSelector } from "./components/ShiftSelector";
+import { parseTime, isSameDay, addMinutes } from "./utils/timeUtils";
 
 export function StaffScheduler({ staff, shiftTypes }: SchedulingProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -124,33 +120,12 @@ export function StaffScheduler({ staff, shiftTypes }: SchedulingProps) {
             className="rounded-md border"
           />
 
-          <div className="space-y-2">
-            <Select onValueChange={(value) => setSelectedStaff(Number(value))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select staff member" />
-              </SelectTrigger>
-              <SelectContent>
-                {staff.map((member) => (
-                  <SelectItem key={member.id} value={member.id.toString()}>
-                    {member.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select onValueChange={setSelectedShiftType}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select shift type" />
-              </SelectTrigger>
-              <SelectContent>
-                {shiftTypes.map((type) => (
-                  <SelectItem key={type.name} value={type.name}>
-                    {type.name} ({type.duration} minutes)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <ShiftSelector
+            staff={staff}
+            shiftTypes={shiftTypes}
+            onStaffSelect={(value) => setSelectedStaff(Number(value))}
+            onShiftTypeSelect={setSelectedShiftType}
+          />
         </div>
 
         <div className="min-h-[500px] rounded-lg border p-4">
@@ -164,26 +139,14 @@ export function StaffScheduler({ staff, shiftTypes }: SchedulingProps) {
                 );
 
                 return (
-                  <div
+                  <ShiftCard
                     key={shift.id}
-                    className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                  >
-                    <div>
-                      <h3 className="font-medium">{staffMember?.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {shiftType?.name} - {shift.startTime} to {shift.endTime}
-                      </p>
-                    </div>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() =>
-                        setShifts(shifts.filter((s) => s.id !== shift.id))
-                      }
-                    >
-                      Remove
-                    </Button>
-                  </div>
+                    staffMember={staffMember}
+                    shiftType={shiftType}
+                    startTime={shift.startTime}
+                    endTime={shift.endTime}
+                    onDelete={() => setShifts(shifts.filter((s) => s.id !== shift.id))}
+                  />
                 );
               })}
           </div>
@@ -191,23 +154,4 @@ export function StaffScheduler({ staff, shiftTypes }: SchedulingProps) {
       </div>
     </div>
   );
-}
-
-function parseTime(timeString: string): number {
-  const [hours, minutes] = timeString.split(":").map(Number);
-  const date = new Date();
-  date.setHours(hours, minutes, 0, 0);
-  return date.getTime();
-}
-
-function isSameDay(date1: Date, date2: Date): boolean {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
-}
-
-function addMinutes(timestamp: number, minutes: number): Date {
-  return new Date(timestamp + minutes * 60000);
 }

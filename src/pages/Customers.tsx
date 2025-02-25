@@ -20,6 +20,7 @@ import { CustomerSearchBar } from "@/components/customers/page/CustomerSearchBar
 import { CustomerViewToggle } from "@/components/customers/page/CustomerViewToggle";
 import { CustomerGrid } from "@/components/customers/page/CustomerGrid";
 import { useTheme } from "@/contexts/ThemeContext";
+import { AppSidebar } from "@/components/layout/AppSidebar";
 
 export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -105,76 +106,79 @@ export default function Customers() {
   );
 
   return (
-    <div className="space-y-8 animate-fade-in p-6">
-      <div className={`rounded-xl p-8 shadow-lg ${
-        isModernTheme 
-          ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50'
-          : 'bg-white'
-      }`}>
-        <CustomerHeader isModernTheme={isModernTheme} />
-        
-        <div className="flex items-center gap-4 mt-6">
-          <CustomerSearchBar 
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            isModernTheme={isModernTheme}
-          />
-          <CustomerViewToggle 
-            viewMode={viewMode}
-            onViewChange={setViewMode}
-            isModernTheme={isModernTheme}
-          />
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button 
-                className={`${
-                  isModernTheme
-                    ? 'bg-blue-500 hover:bg-blue-600'
-                    : 'bg-[#F97316] hover:bg-[#EA580C]'
-                } transition-colors shadow-md hover:shadow-lg`}
-                size="lg"
-              >
-                <Plus className="mr-2 h-5 w-5" />
-                Add Customer
-              </Button>
-            </DialogTrigger>
-            <DialogContent className={`sm:max-w-[800px] max-h-[90vh] ${
-              isModernTheme
-                ? 'bg-gradient-to-b from-white to-blue-50/10 border-blue-100/20'
-                : 'bg-white'
-            }`}>
-              <ScrollArea className="max-h-[85vh]">
-                <DialogHeader className="p-8 rounded-t-lg">
-                  <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                    Add New Customer
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="p-8">
-                  <CustomerForm onSuccess={handleCustomerAdded} />
-                </div>
-              </ScrollArea>
-            </DialogContent>
-          </Dialog>
+    <div className="flex min-h-screen w-full">
+      <AppSidebar />
+      <div className="space-y-8 animate-fade-in p-6 flex-1">
+        <div className={`rounded-xl p-8 shadow-lg ${
+          isModernTheme 
+            ? 'bg-gradient-to-br from-[#F8FAFC]/80 via-[#EFF6FF] to-[#DBEAFE]/50'
+            : 'bg-white'
+        }`}>
+          <CustomerHeader isModernTheme={isModernTheme} />
+          
+          <div className="flex items-center gap-4 mt-6">
+            <CustomerSearchBar 
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              isModernTheme={isModernTheme}
+            />
+            <CustomerViewToggle 
+              viewMode={viewMode}
+              onViewChange={setViewMode}
+              isModernTheme={isModernTheme}
+            />
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  className={`${
+                    isModernTheme
+                      ? 'bg-blue-500 hover:bg-blue-600'
+                      : 'bg-[#F97316] hover:bg-[#EA580C]'
+                  } transition-colors shadow-md hover:shadow-lg`}
+                  size="lg"
+                >
+                  <Plus className="mr-2 h-5 w-5" />
+                  Add Customer
+                </Button>
+              </DialogTrigger>
+              <DialogContent className={`sm:max-w-[800px] max-h-[90vh] ${
+                isModernTheme
+                  ? 'bg-gradient-to-b from-white to-blue-50/10 border-blue-100/20'
+                  : 'bg-white'
+              }`}>
+                <ScrollArea className="max-h-[85vh]">
+                  <DialogHeader className="p-8 rounded-t-lg">
+                    <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                      Add New Customer
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="p-8">
+                    <CustomerForm onSuccess={handleCustomerAdded} />
+                  </div>
+                </ScrollArea>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      </div>
 
-      <div className={`${
-        isModernTheme
-          ? 'bg-white/80 backdrop-blur-sm'
-          : 'bg-white'
-      } rounded-xl shadow-lg p-6 animate-fade-in`}>
-        {viewMode === "list" ? (
-          <CustomerTable 
-            customers={filteredCustomers} 
-            isLoading={isLoading}
-            onDelete={handleDelete}
-          />
-        ) : (
-          <CustomerGrid 
-            customers={filteredCustomers}
-            isModernTheme={isModernTheme}
-          />
-        )}
+        <div className={`${
+          isModernTheme
+            ? 'bg-white/80 backdrop-blur-sm'
+            : 'bg-white'
+        } rounded-xl shadow-lg p-6 animate-fade-in`}>
+          {viewMode === "list" ? (
+            <CustomerTable 
+              customers={filteredCustomers} 
+              isLoading={isLoading}
+              onDelete={handleDelete}
+            />
+          ) : (
+            <CustomerGrid 
+              customers={filteredCustomers}
+              isModernTheme={isModernTheme}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

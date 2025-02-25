@@ -4957,6 +4957,7 @@ export type Database = {
           invitation_sent_at: string | null
           invitation_token: string | null
           last_name: string | null
+          locale: string | null
           notes: string | null
           notification_preferences: Json | null
           organization_id: string | null
@@ -4971,6 +4972,7 @@ export type Database = {
           street_address: string | null
           technician_settings: Json | null
           theme_preference: string | null
+          timezone: string | null
           updated_at: string
         }
         Insert: {
@@ -4989,6 +4991,7 @@ export type Database = {
           invitation_sent_at?: string | null
           invitation_token?: string | null
           last_name?: string | null
+          locale?: string | null
           notes?: string | null
           notification_preferences?: Json | null
           organization_id?: string | null
@@ -5003,6 +5006,7 @@ export type Database = {
           street_address?: string | null
           technician_settings?: Json | null
           theme_preference?: string | null
+          timezone?: string | null
           updated_at?: string
         }
         Update: {
@@ -5021,6 +5025,7 @@ export type Database = {
           invitation_sent_at?: string | null
           invitation_token?: string | null
           last_name?: string | null
+          locale?: string | null
           notes?: string | null
           notification_preferences?: Json | null
           organization_id?: string | null
@@ -5035,6 +5040,7 @@ export type Database = {
           street_address?: string | null
           technician_settings?: Json | null
           theme_preference?: string | null
+          timezone?: string | null
           updated_at?: string
         }
         Relationships: [

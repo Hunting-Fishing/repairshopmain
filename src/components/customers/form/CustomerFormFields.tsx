@@ -16,6 +16,8 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
   const { data: customer } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
+      if (customerId === "new") return null;
+      
       const { data, error } = await supabase
         .from("customers")
         .select("*")
@@ -24,7 +26,8 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
 
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: customerId !== "new"
   });
 
   return (

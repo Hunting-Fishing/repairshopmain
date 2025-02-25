@@ -65,7 +65,7 @@ export default function CustomerDetail() {
     );
   }
 
-  if (!customer) {
+  if (!customer || !id) {
     return null;
   }
 
@@ -73,7 +73,7 @@ export default function CustomerDetail() {
     <div className="flex min-h-screen w-full">
       <AppSidebar />
       <main className="flex-1 p-6">
-        <CustomerTabs customerId={id!} defaultTab="details" />
+        <CustomerTabs customerId={id} defaultTab="details" />
       </main>
     </div>
   );

@@ -10012,6 +10012,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      update_system_metrics: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       validate_auth_token: {
         Args: {
           token_text: string

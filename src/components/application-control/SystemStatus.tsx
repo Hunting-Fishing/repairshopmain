@@ -9,6 +9,7 @@ import {
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 interface SystemStatusData {
   database: 'connected' | 'disconnected';

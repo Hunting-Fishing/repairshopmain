@@ -3,7 +3,6 @@ import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
 import { CustomerFormFields } from "./CustomerFormFields";
 import { CustomerAddressFields } from "./CustomerAddressFields";
 import { BusinessFormFields } from "./BusinessFormFields";
@@ -13,6 +12,7 @@ import { EditModeAlert } from "./EditModeAlert";
 import { SubmitButton } from "./fields/SubmitButton";
 import { useFormContext } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface CustomerFormContainerProps {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -21,7 +21,7 @@ interface CustomerFormContainerProps {
 }
 
 export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting = false }: CustomerFormContainerProps) {
-  const [isModernTheme, setIsModernTheme] = useState(false);
+  const { isModernTheme, toggleTheme } = useTheme();
   const form = useFormContext<CustomerFormValues>();
 
   const themeClass = isModernTheme ? "modern-theme" : "basic-theme";
@@ -43,7 +43,7 @@ export function CustomerFormContainer({ onSubmit, mode = "create", isSubmitting 
           <Switch
             id="theme-toggle"
             checked={isModernTheme}
-            onCheckedChange={setIsModernTheme}
+            onCheckedChange={toggleTheme}
             className="data-[state=checked]:bg-gradient-to-r from-[#F97316] to-[#EA580C]"
           />
         </div>

@@ -35,7 +35,6 @@ const timezones = [
 
 export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
 
   return (
     <FormField
@@ -66,15 +65,15 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0">
               <Command>
-                <CommandInput placeholder="Search timezone..." />
+                <CommandInput placeholder="Search timezone..." className="h-9" />
                 <CommandEmpty>No timezone found.</CommandEmpty>
                 <CommandGroup className="max-h-[300px] overflow-y-auto">
                   {timezones.map((timezone) => (
                     <CommandItem
                       key={timezone.value}
                       value={timezone.value}
-                      onSelect={(currentValue) => {
-                        form.setValue("timezone", currentValue);
+                      onSelect={() => {
+                        field.onChange(timezone.value);
                         setOpen(false);
                       }}
                     >

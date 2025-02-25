@@ -55,54 +55,48 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
     <FormField
       control={form.control}
       name="timezone"
-      render={({ field }) => {
-        const handleSelect = (value: string) => {
-          if (!value) {
-            form.setValue("timezone", undefined);
-            field.onChange(undefined);
-          } else {
-            form.setValue("timezone", value);
-            field.onChange(value);
-          }
-          setOpen(false);
-          setSearchValue("");
-        };
-
-        return (
-          <FormItem className="flex flex-col">
-            <FormLabel className={labelClasses}>Timezone (Optional)</FormLabel>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    type="button"
-                    aria-expanded={open}
-                    className={cn(
-                      "w-full justify-between",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {selectedTimezone?.label || "Select timezone..."}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0" align="start">
-                <Command>
-                  <CommandInput 
-                    placeholder="Search timezone..." 
-                    value={searchValue}
-                    onValueChange={setSearchValue}
-                  />
+      render={({ field }) => (
+        <FormItem className="flex flex-col">
+          <FormLabel className={labelClasses}>Timezone (Optional)</FormLabel>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  type="button"
+                  aria-expanded={open}
+                  className={cn(
+                    "w-full justify-between",
+                    !field.value && "text-muted-foreground"
+                  )}
+                >
+                  {selectedTimezone?.label || "Select timezone..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+            <PopoverContent className="w-[400px] p-0" align="start">
+              <Command shouldFilter={false}>
+                <CommandInput 
+                  placeholder="Search timezone..." 
+                  value={searchValue}
+                  onValueChange={setSearchValue}
+                />
+                {filteredTimezones.length === 0 ? (
                   <CommandEmpty>No timezone found.</CommandEmpty>
+                ) : (
                   <CommandGroup className="max-h-[300px] overflow-y-auto">
                     {filteredTimezones.map((timezone) => (
                       <CommandItem
                         key={timezone.value}
                         value={timezone.value}
-                        onSelect={() => handleSelect(timezone.value)}
+                        onSelect={(value) => {
+                          form.setValue("timezone", timezone.value);
+                          field.onChange(timezone.value);
+                          setOpen(false);
+                          setSearchValue("");
+                        }}
                       >
                         <Check
                           className={cn(
@@ -114,13 +108,13 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
                       </CommandItem>
                     ))}
                   </CommandGroup>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            <FormMessage />
-          </FormItem>
-        );
-      }}
+                )}
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <FormMessage />
+        </FormItem>
+      )}
     />
   );
 }

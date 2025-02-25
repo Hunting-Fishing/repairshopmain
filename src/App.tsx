@@ -9,6 +9,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { RootLayout } from "./components/layout/RootLayout";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { GlobalErrorBoundary } from "@/components/shared/errors/GlobalErrorBoundary";
+import { NavigationLoading } from "@/components/ui/navigation-loading";
 import AppRoutes from "./routes";
 
 const queryClient = new QueryClient({
@@ -30,6 +31,7 @@ const App = () => (
               {({ user }) => (
                 <ThemeProvider userId={user?.id}>
                   <SidebarProvider>
+                    <NavigationLoading />
                     <div className="min-h-screen flex w-full">
                       <RootLayout>
                         <AppRoutes />

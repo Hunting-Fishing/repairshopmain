@@ -14,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUpdateStaffMember } from "@/hooks/staff/useUpdateStaffMember";
 import { CertificationList } from "../certifications/CertificationList";
 import { staffDetailsSchema } from "./schema";
-import type { StaffDetailsFormProps, StaffDetailsFormValues } from "./types";
+import type { StaffDetailsFormProps, StaffDetailsFormValues, StaffMemberData } from "./types";
 import { toast } from "sonner";
 
 export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps) {
@@ -39,10 +39,18 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
 
   const onSubmit = async (values: StaffDetailsFormValues) => {
     try {
-      await updateStaffMember({
+      const updateData: StaffMemberData = {
         id: staffMember.id,
-        ...values,
-      });
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone_number: values.phone_number,
+        notes: values.notes,
+        emergency_contact: values.emergency_contact,
+        skills: values.skills,
+      };
+
+      await updateStaffMember(updateData);
       toast.success("Staff member updated successfully");
       onClose();
     } catch (error) {

@@ -9,6 +9,22 @@ import { WorkOrderTable } from "@/components/work-orders/WorkOrderTable";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
+interface RepairJob {
+  id: string;
+  description: string;
+  status: string;
+  created_at: string;
+  customers: {
+    first_name: string;
+    last_name: string;
+  } | null;
+  vehicles: {
+    make: string;
+    model: string;
+    year: string;
+  } | null;
+}
+
 export default function WorkOrders() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
 
@@ -41,7 +57,7 @@ export default function WorkOrders() {
       
       if (error) throw error;
 
-      return data.map(order => ({
+      return (data as RepairJob[]).map(order => ({
         id: order.id,
         customer: order.customers ? `${order.customers.first_name} ${order.customers.last_name}` : 'N/A',
         vehicle: order.vehicles ? `${order.vehicles.year} ${order.vehicles.make} ${order.vehicles.model}` : 'N/A',

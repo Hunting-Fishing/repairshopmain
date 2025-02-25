@@ -10224,6 +10224,14 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      redeem_loyalty_reward: {
+        Args: {
+          p_customer_id: string
+          p_reward_id: string
+          p_points_cost: number
+        }
+        Returns: undefined
+      }
       reset_staff_password: {
         Args: {
           staff_id: string

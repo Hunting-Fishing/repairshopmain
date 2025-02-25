@@ -1,93 +1,110 @@
 
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { PointsDisplay } from "./PointsDisplay";
+import { RewardsList } from "./RewardsList";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { TierSettings } from "./TierSettings";
-import { PointSettings } from "./PointSettings";
-import { useLoyaltySettings } from "./hooks/useLoyaltySettings";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { format } from "date-fns";
 
 export function LoyaltyTab() {
-  const { settings, isLoading, updateSettings } = useLoyaltySettings();
+  const { user } = useAuth();
 
-  const [tierSettings, setTierSettings] = useState(
-    settings?.tier_settings || {
-      bronze: { min: 0, max: 1000 },
-      silver: { min: 1001, max: 5000 },
-      gold: { min: 5001, max: null }
-    }
-  );
+  const { data: customer, refetch } = useQuery({
+    queryKey: ["customer-loyalty"],
+    queryFn: async () => {
+      if (!user?.id) return null;
 
-  const [pointsSettings, setPointsSettings] = useState(
-    settings?.point_settings || {
-      earning: { dollars: 1, points: 1 },
-      redeeming: { points: 100, dollars: 5 }
-    }
-  );
+      const { data, error } = await supabase
+        .from("customers")
+        .select("loyalty_points, loyalty_tier, loyalty_join_date")
+        .eq("auth_id", user.id)
+        .single();
 
-  const handleSaveSettings = () => {
-    updateSettings.mutate({
-      tier_settings: tierSettings,
-      point_settings: pointsSettings,
-    });
-  };
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-8 w-[200px]" />
-          <Skeleton className="h-4 w-[300px] mt-2" />
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <Skeleton className="h-6 w-[150px] mb-2" />
-            <div className="grid gap-4 md:grid-cols-3">
-              <Skeleton className="h-[200px]" />
-              <Skeleton className="h-[200px]" />
-              <Skeleton className="h-[200px]" />
-            </div>
-          </div>
-          <div>
-            <Skeleton className="h-6 w-[150px] mb-2" />
-            <div className="grid gap-4 md:grid-cols-2">
-              <Skeleton className="h-[150px]" />
-              <Skeleton className="h-[150px]" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const { data: redemptions } = useQuery({
+    queryKey: ["reward-redemptions"],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
+      const { data, error } = await supabase
+        .from("loyalty_reward_redemptions")
+        .select(`
+          *,
+          reward:loyalty_rewards(name, points_cost)
+        `)
+        .eq("customer_id", user.id)
+        .order("redeemed_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Loyalty Program Settings</CardTitle>
-        <CardDescription>
-          Configure your customer loyalty program settings and rewards
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Tier System</h3>
-          <TierSettings tierSettings={tierSettings} setTierSettings={setTierSettings} />
-        </div>
+    <div className="space-y-6">
+      {customer && (
+        <PointsDisplay 
+          points={customer.loyalty_points} 
+          tier={customer.loyalty_tier} 
+        />
+      )}
 
-        <div>
-          <h3 className="text-lg font-semibold mb-2">Point System</h3>
-          <PointSettings pointsSettings={pointsSettings} setPointsSettings={setPointsSettings} />
-        </div>
+      <Tabs defaultValue="rewards">
+        <TabsList>
+          <TabsTrigger value="rewards">Available Rewards</TabsTrigger>
+          <TabsTrigger value="history">Redemption History</TabsTrigger>
+        </TabsList>
 
-        <div className="flex justify-end">
-          <Button 
-            onClick={handleSaveSettings} 
-            disabled={updateSettings.isPending}
-          >
-            {updateSettings.isPending ? "Saving..." : "Save Settings"}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+        <TabsContent value="rewards" className="mt-6">
+          <RewardsList 
+            customerPoints={customer?.loyalty_points ?? 0}
+            onRewardRedeemed={refetch}
+          />
+        </TabsContent>
+
+        <TabsContent value="history">
+          <Card>
+            <CardHeader>
+              <CardTitle>Redemption History</CardTitle>
+              <CardDescription>View your past reward redemptions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!redemptions?.length ? (
+                <p className="text-center py-4 text-muted-foreground">
+                  No redemptions yet
+                </p>
+              ) : (
+                <div className="space-y-4">
+                  {redemptions.map((redemption) => (
+                    <div 
+                      key={redemption.id}
+                      className="flex justify-between items-center border-b pb-4 last:border-0"
+                    >
+                      <div>
+                        <p className="font-medium">{redemption.reward?.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {format(new Date(redemption.redeemed_at!), "PPp")}
+                        </p>
+                      </div>
+                      <span className="text-orange-500 font-medium">
+                        -{redemption.points_cost} points
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 
@@ -18,28 +18,31 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  const timezones = [
-    { value: "UTC", label: "UTC (Coordinated Universal Time)" },
-    { value: "America/New_York", label: "New York (GMT-4)" },
-    { value: "America/Chicago", label: "Chicago (GMT-5)" },
-    { value: "America/Denver", label: "Denver (GMT-6)" },
-    { value: "America/Los_Angeles", label: "Los Angeles (GMT-7)" },
-    { value: "America/Phoenix", label: "Phoenix (GMT-7)" },
-    { value: "America/Anchorage", label: "Anchorage (GMT-8)" },
-    { value: "America/Honolulu", label: "Honolulu (GMT-10)" },
-    { value: "America/Toronto", label: "Toronto (GMT-4)" },
-    { value: "America/Vancouver", label: "Vancouver (GMT-7)" },
-    { value: "Europe/London", label: "London (GMT+1)" },
-    { value: "Europe/Paris", label: "Paris (GMT+2)" },
-    { value: "Europe/Berlin", label: "Berlin (GMT+2)" },
-    { value: "Europe/Rome", label: "Rome (GMT+2)" },
-    { value: "Europe/Madrid", label: "Madrid (GMT+2)" },
-    { value: "Asia/Tokyo", label: "Tokyo (GMT+9)" },
-    { value: "Asia/Shanghai", label: "Shanghai (GMT+8)" },
-    { value: "Asia/Singapore", label: "Singapore (GMT+8)" },
-    { value: "Australia/Sydney", label: "Sydney (GMT+10)" },
-    { value: "Pacific/Auckland", label: "Auckland (GMT+12)" }
-  ];
+  // Get all available timezones using Intl API
+  const timezones = useMemo(() => {
+    const timeZones = Intl.supportedValuesOf('timeZone').map(zone => {
+      try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: zone,
+          timeZoneName: 'long',
+          hour: 'numeric',
+        });
+        const now = new Date();
+        const offset = formatter.formatToParts(now)
+          .find(part => part.type === 'timeZoneName')?.value || '';
+        return {
+          value: zone,
+          label: `${zone.replace('_', ' ')} (${offset})`
+        };
+      } catch (e) {
+        return {
+          value: zone,
+          label: zone.replace('_', ' ')
+        };
+      }
+    });
+    return timeZones.sort((a, b) => a.label.localeCompare(b.label));
+  }, []);
 
   const filteredTimezones = searchValue === "" 
     ? timezones 

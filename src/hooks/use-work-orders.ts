@@ -1,8 +1,18 @@
-
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import type { WorkOrderFiltersType, SortConfig } from "@/pages/WorkOrders";
+import { supabase } from "@/integrations/supabase/client";
+
+interface WorkOrderFilters {
+  customerId?: string | null;
+  status?: string;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+interface SortConfig {
+  field: string;
+  direction: 'asc' | 'desc';
+}
 
 interface DatabaseWorkOrder {
   id: string;
@@ -31,7 +41,7 @@ interface WorkOrder {
   date: string;
 }
 
-export function useWorkOrders(filters?: WorkOrderFiltersType, sortConfig?: SortConfig) {
+export function useWorkOrders(filters?: WorkOrderFilters, sortConfig?: SortConfig) {
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();

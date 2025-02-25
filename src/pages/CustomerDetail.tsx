@@ -39,13 +39,18 @@ export default function CustomerDetail() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6">
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full">
+          <AppSidebar />
+          <main className="flex-1 p-6">
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </main>
         </div>
-      </div>
+      </SidebarProvider>
     );
   }
 

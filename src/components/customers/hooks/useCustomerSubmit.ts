@@ -18,6 +18,7 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
   const handleSubmit = async (values: CustomerFormValues) => {
     try {
       setIsSubmitting(true);
+      console.log("Handling submit in mode:", mode, "with values:", values);
 
       const emailValidation = await validateEmail(values.email);
       if (!emailValidation.isValid) {
@@ -61,6 +62,7 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
 
       let operation;
       if (mode === "edit" && initialData?.id) {
+        console.log("Updating customer with ID:", initialData.id);
         operation = supabase
           .from("customers")
           .update({
@@ -71,8 +73,16 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
             updated_at: new Date().toISOString()
           })
           .eq('id', initialData.id)
-          .select()
-          .single();
+          .select();
+
+        const { data: customer, error } = await operation;
+
+        if (error) {
+          console.error("Database update failed:", error);
+          throw error;
+        }
+
+        console.log("Update successful:", customer);
       } else {
         operation = supabase
           .from("customers")
@@ -82,8 +92,7 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
             phone_validation_status: values.phone_number ? (await validatePhone(values.phone_number)).isValid ? 'valid' : 'invalid' : 'pending',
             address_validation_status: (values.street_address && values.city && values.state_province && values.postal_code && values.country) ? 'valid' : 'pending'
           }])
-          .select()
-          .single();
+          .select();
       }
 
       const { data: customer, error } = await operation;
@@ -97,10 +106,11 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
         throw new Error("No data returned from the database");
       }
 
-      await logValidationAttempt(customer.id, 'email', emailValidation.isValid ? 'valid' : 'invalid', emailValidation.message);
+      // Log validation attempts
+      await logValidationAttempt(Array.isArray(customer) ? customer[0].id : customer.id, 'email', emailValidation.isValid ? 'valid' : 'invalid', emailValidation.message);
       if (values.phone_number) {
         const phoneValidation = await validatePhone(values.phone_number);
-        await logValidationAttempt(customer.id, 'phone', phoneValidation.isValid ? 'valid' : 'invalid', phoneValidation.message);
+        await logValidationAttempt(Array.isArray(customer) ? customer[0].id : customer.id, 'phone', phoneValidation.isValid ? 'valid' : 'invalid', phoneValidation.message);
       }
       if (values.street_address) {
         const addressValidation = await validateAddress(
@@ -110,7 +120,7 @@ export const useCustomerSubmit = ({ mode, initialData, onSuccess }: UseCustomerS
           values.postal_code,
           values.country
         );
-        await logValidationAttempt(customer.id, 'address', addressValidation.isValid ? 'valid' : 'invalid', addressValidation.message);
+        await logValidationAttempt(Array.isArray(customer) ? customer[0].id : customer.id, 'address', addressValidation.isValid ? 'valid' : 'invalid', addressValidation.message);
       }
 
       onSuccess();

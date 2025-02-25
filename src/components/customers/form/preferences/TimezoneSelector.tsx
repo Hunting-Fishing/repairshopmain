@@ -14,13 +14,40 @@ interface TimezoneSelectorProps {
   labelClasses: string;
 }
 
+// Define standard IANA timezone list
+const TIMEZONE_LIST = [
+  "UTC",
+  "America/New_York",
+  "America/Los_Angeles",
+  "America/Chicago",
+  "America/Phoenix",
+  "America/Denver",
+  "America/Toronto",
+  "America/Vancouver",
+  "America/Mexico_City",
+  "America/Sao_Paulo",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Europe/Rome",
+  "Europe/Madrid",
+  "Europe/Amsterdam",
+  "Asia/Tokyo",
+  "Asia/Shanghai",
+  "Asia/Singapore",
+  "Asia/Dubai",
+  "Asia/Hong_Kong",
+  "Australia/Sydney",
+  "Australia/Melbourne",
+  "Pacific/Auckland"
+];
+
 export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  // Get all available timezones using Intl API
   const timezones = useMemo(() => {
-    const timeZones = Intl.supportedValuesOf('timeZone').map(zone => {
+    return TIMEZONE_LIST.map(zone => {
       try {
         const formatter = new Intl.DateTimeFormat('en-US', {
           timeZone: zone,
@@ -28,20 +55,22 @@ export function TimezoneSelector({ form, labelClasses }: TimezoneSelectorProps) 
           hour: 'numeric',
         });
         const now = new Date();
-        const offset = formatter.formatToParts(now)
-          .find(part => part.type === 'timeZoneName')?.value || '';
+        const parts = formatter.formatToParts(now);
+        const timeZonePart = parts.find(part => part.type === 'timeZoneName');
+        const offset = timeZonePart ? timeZonePart.value : '';
+        
         return {
           value: zone,
-          label: `${zone.replace('_', ' ')} (${offset})`
+          label: `${zone.replace(/_/g, ' ')} (${offset})`
         };
       } catch (e) {
+        console.error(`Error formatting timezone ${zone}:`, e);
         return {
           value: zone,
-          label: zone.replace('_', ' ')
+          label: zone.replace(/_/g, ' ')
         };
       }
-    });
-    return timeZones.sort((a, b) => a.label.localeCompare(b.label));
+    }).sort((a, b) => a.label.localeCompare(b.label));
   }, []);
 
   const filteredTimezones = searchValue === "" 

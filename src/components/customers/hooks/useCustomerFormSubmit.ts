@@ -3,11 +3,10 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormValues } from "../types/customerTypes";
-import { useCustomerFormData } from "./useCustomerFormData";
-import { useCustomerDataSave } from "./useCustomerDataSave";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { customerValidationSchema } from "../schemas/customerValidationSchema";
+import { logError } from "@/utils/error-handling";
 
 interface ChangeRecord {
   old: any;
@@ -26,130 +25,139 @@ export function useCustomerFormSubmit({
   mode 
 }: {
   onSuccess: () => void;
-  initialData?: CustomerFormValues;
+  initialData?: Partial<CustomerFormValues>;
   mode: "create" | "edit";
 }) {
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showNotesDialog, setShowNotesDialog] = useState(false);
   const [changeNotes, setChangeNotes] = useState("");
   const [pendingChanges, setPendingChanges] = useState<PendingChanges | null>(null);
+  const [formErrors, setFormErrors] = useState<any>(null);
 
   // Initialize form with react-hook-form
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerValidationSchema),
-    defaultValues: initialData || {
-      first_name: "",
-      last_name: "",
-      email: "",
-      phone_number: "",
-      customer_type: "Personal",
-      language_preference: "en",
-      marketing_preferences: {
+    defaultValues: {
+      first_name: initialData?.first_name || "",
+      last_name: initialData?.last_name || "",
+      email: initialData?.email || "",
+      phone_number: initialData?.phone_number || "",
+      customer_type: initialData?.customer_type || "Personal",
+      language_preference: initialData?.language_preference || "en",
+      marketing_preferences: initialData?.marketing_preferences || {
         email: false,
         sms: false,
         phone: false
-      }
+      },
+      ...initialData // Spread remaining initial values
     }
   });
 
-  // Initialize form monitoring
-  const formMonitoring = useCustomerFormData(form);
-  const { updateField } = useCustomerDataSave(initialData?.id || "new");
-
   const handleSubmit = async (values: CustomerFormValues) => {
+    console.log("Starting form submission with values:", values);
+    setIsSubmitting(true);
+    setFormErrors(null);
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user.id) {
         throw new Error("User session not found");
       }
 
+      // For edit mode
       if (mode === "edit" && initialData?.id) {
+        console.log("Processing edit mode submission");
+        
+        // Compare changes
         const changes: Record<string, ChangeRecord> = {};
         Object.keys(values).forEach((key) => {
-          if (values[key as keyof CustomerFormValues] !== initialData[key as keyof CustomerFormValues]) {
+          const typedKey = key as keyof CustomerFormValues;
+          if (values[typedKey] !== initialData[typedKey]) {
             changes[key] = {
-              old: initialData[key as keyof CustomerFormValues],
-              new: values[key as keyof CustomerFormValues],
+              old: initialData[typedKey],
+              new: values[typedKey],
             };
           }
         });
 
         if (Object.keys(changes).length > 0) {
-          setPendingChanges({
-            values,
-            changes,
-            userId: session.user.id,
-          });
-          setShowNotesDialog(true);
-          return;
-        }
-      }
+          console.log("Found changes:", changes);
+          
+          // Update the customer record
+          const { error: updateError } = await supabase
+            .from('customers')
+            .update(values)
+            .eq('id', initialData.id);
 
-      // For edit mode, update each changed field individually
-      if (mode === "edit" && initialData?.id) {
-        for (const [key, value] of Object.entries(values)) {
-          if (value !== initialData[key as keyof CustomerFormValues]) {
-            await updateField({ 
-              field: key as keyof CustomerFormValues, 
-              value 
-            });
+          if (updateError) {
+            throw updateError;
           }
+
+          // Log the changes
+          await supabase.from('customer_history').insert({
+            customer_id: initialData.id,
+            change_type: 'UPDATE',
+            changed_by: session.user.id,
+            changes: changes,
+            notes: changeNotes
+          });
         }
       } else {
-        // For create mode, insert new customer
-        const { error } = await supabase
+        // Create mode
+        console.log("Processing create mode submission");
+        const { error: insertError } = await supabase
           .from('customers')
           .insert([values]);
         
-        if (error) throw error;
+        if (insertError) throw insertError;
       }
+
+      toast({
+        title: `Customer ${mode === "create" ? "created" : "updated"} successfully`,
+        description: "The changes have been saved.",
+      });
 
       onSuccess();
     } catch (error: any) {
+      console.error("Form submission error:", error);
+      
+      logError(error, {
+        action_type: mode === "create" ? "customer_creation" : "customer_update",
+        table_name: "customers",
+        level: "error",
+        metadata: {
+          formValues: values,
+          customerId: initialData?.id
+        }
+      });
+
+      setFormErrors({
+        type: "server",
+        message: error.message
+      });
+
       toast({
         variant: "destructive",
-        title: `Error ${mode === "create" ? "adding" : "updating"} customer`,
+        title: `Error ${mode === "create" ? "creating" : "updating"} customer`,
         description: error.message,
       });
-    }
-  };
-
-  const handleNotesSubmit = async () => {
-    if (!pendingChanges) return;
-
-    try {
-      // Update each changed field with the notes
-      for (const [key, change] of Object.entries(pendingChanges.changes)) {
-        await updateField({ 
-          field: key as keyof CustomerFormValues, 
-          value: change.new 
-        });
-      }
-
-      setShowNotesDialog(false);
-      setPendingChanges(null);
-      setChangeNotes("");
-      onSuccess();
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error updating customer",
-        description: error.message,
-      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return {
     form,
-    handleSubmit,
+    handleSubmit: form.handleSubmit(handleSubmit),
+    isSubmitting,
+    formErrors,
     showNotesDialog: {
       open: showNotesDialog,
       onOpenChange: setShowNotesDialog,
       notes: changeNotes,
       onNotesChange: setChangeNotes,
     },
-    handleNotesSubmit,
-    pendingChanges,
-    formState: formMonitoring
+    pendingChanges
   };
 }

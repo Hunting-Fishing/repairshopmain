@@ -12,7 +12,7 @@ export default function CustomerDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { data: customer, isLoading } = useQuery({
+  const { data: customer, isLoading, error } = useQuery({
     queryKey: ["customer", id],
     queryFn: async () => {
       if (!id) {

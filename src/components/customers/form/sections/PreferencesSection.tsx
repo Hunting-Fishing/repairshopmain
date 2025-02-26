@@ -1,4 +1,3 @@
-
 import { UseFormReturn, useWatch } from "react-hook-form";
 import { CustomerFormValues, CustomerType } from "../../types/customerTypes";
 import { FormSection } from "../FormSection";
@@ -99,23 +98,6 @@ export function PreferencesSection({
       return;
     }
 
-    // Business-specific validation
-    if (data.customer_type === 'Business') {
-      const missingFields = [];
-      if (!data.company_name) missingFields.push('Company Name');
-      if (!data.company_size) missingFields.push('Company Size');
-      if (!data.business_classification_id) missingFields.push('Business Classification');
-
-      if (missingFields.length > 0) {
-        toast({
-          title: "Required Fields Missing",
-          description: `Please fill in the following business fields: ${missingFields.join(', ')}`,
-          variant: "destructive",
-        });
-        return;
-      }
-    }
-
     try {
       await form.handleSubmit(() => {})();
     } catch (error) {
@@ -142,18 +124,6 @@ export function PreferencesSection({
                   <div className="ml-3">
                     <p className="text-sm text-yellow-700">
                       Please select a valid customer type before updating preferences
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {customerType === 'Business' && (
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700">
-                      Business customers must provide company name, size, and business classification
                     </p>
                   </div>
                 </div>

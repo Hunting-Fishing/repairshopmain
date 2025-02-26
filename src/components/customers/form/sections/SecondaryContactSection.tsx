@@ -135,7 +135,7 @@ export function SecondaryContactSection({ form, isModernTheme = false }: Seconda
           <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-4">
             <FormControl>
               <Checkbox
-                checked={field.value}
+                checked={field.value || false}
                 onCheckedChange={field.onChange}
               />
             </FormControl>

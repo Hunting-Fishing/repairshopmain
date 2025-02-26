@@ -1,3 +1,4 @@
+
 export interface CustomerFormValues {
   first_name: string;
   last_name: string;
@@ -24,6 +25,7 @@ export interface CustomerFormValues {
     phone?: string;
     email?: string;
     relationship?: string;
+    is_emergency?: boolean;
   };
   marketing_preferences?: {
     email: boolean;

@@ -13,12 +13,13 @@ interface AddressDetailsProps {
 }
 
 export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDetailsProps) {
-  const { watch } = useFormContext();
-  const country = watch(getFieldName("country"));
-
+  // Move function declaration before usage
   const getFieldName = (field: keyof CustomerFormValues['address_book'][0]): `address_book.${number}.${keyof CustomerFormValues['address_book'][0]}` => {
     return `address_book.${addressIndex}.${field}` as const;
   };
+
+  const { watch } = useFormContext();
+  const country = watch(getFieldName("country"));
 
   // Validate postal code when country changes
   useEffect(() => {
@@ -34,7 +35,7 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
         form.clearErrors(getFieldName("postal_code"));
       }
     }
-  }, [country, form]);
+  }, [country, form, getFieldName]);
 
   const inputClasses = isModernTheme
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg"
@@ -89,7 +90,11 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
         name={getFieldName("postal_code")}
         rules={{
           required: "Postal code is required",
-          validate: (value) => validatePostalCode(value, country) || getValidationMessage("postal_code", country)
+          validate: (value) => {
+            if (!country || !value) return "Country and postal code are required";
+            return validatePostalCode(value.toString(), country.toString()) || 
+              getValidationMessage("postal_code", country.toString());
+          }
         }}
         render={({ field }) => (
           <FormItem>

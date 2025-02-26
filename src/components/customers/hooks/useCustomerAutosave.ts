@@ -60,9 +60,9 @@ export const useCustomerAutosave = (
 
   // Watch for form changes
   useEffect(() => {
-    const subscription = form.watch(async (value, { name, type }) => {
-      // Don't autosave if it's just being mounted
-      if (type === 'all') return;
+    const subscription = form.watch((value, { name, type }) => {
+      // Skip initial form setup
+      if (!name) return;
       
       console.log('Field changed:', { name, value });
       setIsDirty(true);
@@ -72,7 +72,7 @@ export const useCustomerAutosave = (
 
       // Only validate and save if we have a customer type
       if (formData.customer_type) {
-        await debouncedSave(formData);
+        debouncedSave(formData);
       }
     });
 

@@ -7,6 +7,13 @@ import { CustomerFormValues } from "../../types/customerTypes";
 import { ValidationStatus } from "../../ValidationStatus";
 import { validateEmail, validatePhoneNumber } from "@/utils/validation/fieldValidation";
 import { useState } from "react";
+import { HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type AllowedFields = {
   [K in keyof CustomerFormValues]: CustomerFormValues[K] extends string | undefined ? K : never;
@@ -21,6 +28,7 @@ interface FormInputProps {
   isModernTheme?: boolean;
   required?: boolean;
   readOnly?: boolean;
+  helpText?: string;
 }
 
 export function FormInput({
@@ -31,7 +39,8 @@ export function FormInput({
   placeholder,
   isModernTheme = false,
   required = false,
-  readOnly = false
+  readOnly = false,
+  helpText
 }: FormInputProps) {
   const [shake, setShake] = useState(false);
   const error = form.formState.errors[name];
@@ -82,18 +91,32 @@ export function FormInput({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
-          <FormLabel className={labelClasses}>
-            <span className="flex items-center gap-1">
-              {label}
-              {required && (
-                <span 
-                  className="text-red-500 text-sm font-bold ml-0.5" 
-                  aria-label="required field"
-                >*</span>
-              )}
-            </span>
-          </FormLabel>
+        <FormItem className="relative">
+          <div className="flex items-center gap-2">
+            <FormLabel className={labelClasses}>
+              <span className="flex items-center gap-1">
+                {label}
+                {required && (
+                  <span 
+                    className="text-red-500 text-sm font-bold ml-0.5" 
+                    aria-label="required field"
+                  >*</span>
+                )}
+              </span>
+            </FormLabel>
+            {helpText && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="w-[200px] text-sm">{helpText}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
           <FormControl>
             <Input
               {...field}

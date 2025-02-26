@@ -1,22 +1,13 @@
 
-export interface Segment {
-  id: string;
-  name: string;
-  description: string | null;
-  criteria: any;
-}
-
-export interface Tag {
+export interface CustomerTag {
   id: string;
   name: string;
   color: string | null;
+}
+
+export interface CustomerSegment {
+  id: string;
+  name: string;
   description: string | null;
-}
-
-export interface SegmentAssignment {
-  segment: Segment;
-}
-
-export interface TagAssignment {
-  tag: Tag;
+  criteria: Record<string, string>;
 }

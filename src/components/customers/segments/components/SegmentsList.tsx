@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
+import { CustomerSegment } from "../types";
 
 interface SegmentsListProps {
   customerId: string;
@@ -26,7 +27,7 @@ export function SegmentsList({ customerId }: SegmentsListProps) {
         .eq("customer_id", customerId);
 
       if (error) throw error;
-      return assignments.map(a => a.segment);
+      return assignments.map(a => a.segment as CustomerSegment);
     }
   });
 
@@ -59,7 +60,7 @@ export function SegmentsList({ customerId }: SegmentsListProps) {
             <div className="flex flex-wrap gap-2">
               {Object.entries(segment.criteria || {}).map(([key, value]) => (
                 <Badge key={key} variant="outline">
-                  {key}: {value}
+                  {key}: {String(value)}
                 </Badge>
               ))}
             </div>

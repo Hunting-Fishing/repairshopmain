@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { CustomerTag } from "../types";
 
 interface TagsListProps {
   customerId: string;
@@ -40,7 +40,7 @@ export function TagsList({ customerId, className }: TagsListProps) {
         .eq("customer_id", customerId);
 
       if (error) throw error;
-      return assignments.map(a => a.tag);
+      return assignments.map(a => a.tag as CustomerTag);
     }
   });
 
@@ -60,7 +60,7 @@ export function TagsList({ customerId, className }: TagsListProps) {
         .eq("organization_id", userData?.organization_id);
 
       if (error) throw error;
-      return data;
+      return data as CustomerTag[];
     }
   });
 
@@ -144,6 +144,7 @@ export function TagsList({ customerId, className }: TagsListProps) {
             key={tag.id}
             variant="secondary"
             className="flex items-center gap-1 pr-1"
+            style={tag.color ? { backgroundColor: tag.color } : undefined}
           >
             {tag.name}
             <Button

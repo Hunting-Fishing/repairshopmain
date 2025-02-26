@@ -23,13 +23,15 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
 
   // Validate postal code when country changes
   useEffect(() => {
-    const postalCode = form.getValues(getFieldName("postal_code"));
-    if (country && postalCode) {
-      const isValid = validatePostalCode(postalCode, country);
+    const postalCode = form.getValues(getFieldName("postal_code"))?.toString();
+    const countryValue = country?.toString();
+    
+    if (countryValue && postalCode) {
+      const isValid = validatePostalCode(postalCode, countryValue);
       if (!isValid) {
         form.setError(getFieldName("postal_code"), {
           type: "manual",
-          message: getValidationMessage("postal_code", country)
+          message: getValidationMessage("postal_code", countryValue)
         });
       } else {
         form.clearErrors(getFieldName("postal_code"));
@@ -92,8 +94,10 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
           required: "Postal code is required",
           validate: (value) => {
             if (!country || !value) return "Country and postal code are required";
-            return validatePostalCode(value.toString(), country.toString()) || 
-              getValidationMessage("postal_code", country.toString());
+            const postalCodeStr = value.toString();
+            const countryStr = country.toString();
+            return validatePostalCode(postalCodeStr, countryStr) || 
+              getValidationMessage("postal_code", countryStr);
           }
         }}
         render={({ field }) => (

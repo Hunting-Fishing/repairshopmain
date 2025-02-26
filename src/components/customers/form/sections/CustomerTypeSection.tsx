@@ -26,7 +26,10 @@ export function CustomerTypeSection({
   useEffect(() => {
     if (customerType === "Business") {
       const companyName = form.getValues("company_name");
-      if (!companyName) {
+      const businessClassification = form.getValues("business_classification_id");
+      const companySize = form.getValues("company_size");
+
+      if (!companyName || !businessClassification || !companySize) {
         toast({
           title: "Business Information Required",
           description: "When selecting Business type, please provide the company name and other business details.",
@@ -37,18 +40,25 @@ export function CustomerTypeSection({
     }
   }, [customerType, form, toast]);
 
-  const handleCompanyFieldBlur = (field: keyof CustomerFormValues) => {
+  // Watch for changes in business-related fields
+  useEffect(() => {
     if (customerType === "Business") {
-      const value = form.getValues(field);
-      if (!value) {
-        toast({
-          title: "Required Field",
-          description: `${field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} is required for business customers.`,
-          variant: "destructive"
-        });
-      }
+      const subscription = form.watch((value, { name }) => {
+        if (["company_name", "business_classification_id", "company_size"].includes(name || "")) {
+          const fieldName = name?.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+          if (!value[name as keyof CustomerFormValues]) {
+            toast({
+              title: "Required Field",
+              description: `${fieldName} is required for business customers.`,
+              variant: "destructive"
+            });
+          }
+        }
+      });
+
+      return () => subscription.unsubscribe();
     }
-  };
+  }, [customerType, form, toast]);
 
   return (
     <>
@@ -119,7 +129,6 @@ export function CustomerTypeSection({
                 required={true}
                 placeholder="Enter company name"
                 isModernTheme={isModernTheme}
-                onBlur={() => handleCompanyFieldBlur("company_name")}
               />
               
               <FormInput
@@ -129,7 +138,6 @@ export function CustomerTypeSection({
                 required={true}
                 placeholder="Select business classification"
                 isModernTheme={isModernTheme}
-                onBlur={() => handleCompanyFieldBlur("business_classification_id")}
               />
 
               <FormInput
@@ -139,7 +147,6 @@ export function CustomerTypeSection({
                 required={true}
                 placeholder="Enter company size"
                 isModernTheme={isModernTheme}
-                onBlur={() => handleCompanyFieldBlur("company_size")}
               />
             </div>
           )}

@@ -1,8 +1,10 @@
 
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, useFormContext } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { validatePostalCode, getValidationMessage } from "../../schemas/addressValidationSchema";
+import { useEffect } from "react";
 
 interface AddressDetailsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -11,9 +13,28 @@ interface AddressDetailsProps {
 }
 
 export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDetailsProps) {
+  const { watch } = useFormContext();
+  const country = watch(getFieldName("country"));
+
   const getFieldName = (field: keyof CustomerFormValues['address_book'][0]): `address_book.${number}.${keyof CustomerFormValues['address_book'][0]}` => {
     return `address_book.${addressIndex}.${field}` as const;
   };
+
+  // Validate postal code when country changes
+  useEffect(() => {
+    const postalCode = form.getValues(getFieldName("postal_code"));
+    if (country && postalCode) {
+      const isValid = validatePostalCode(postalCode, country);
+      if (!isValid) {
+        form.setError(getFieldName("postal_code"), {
+          type: "manual",
+          message: getValidationMessage("postal_code", country)
+        });
+      } else {
+        form.clearErrors(getFieldName("postal_code"));
+      }
+    }
+  }, [country, form]);
 
   const inputClasses = isModernTheme
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg"
@@ -24,9 +45,12 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
       <FormField
         control={form.control}
         name={getFieldName("city")}
+        rules={{
+          required: "City is required",
+        }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>City</FormLabel>
+            <FormLabel>City*</FormLabel>
             <FormControl>
               <Input 
                 {...field} 
@@ -42,9 +66,12 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
       <FormField
         control={form.control}
         name={getFieldName("state_province")}
+        rules={{
+          required: "State/Province is required",
+        }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>State/Province</FormLabel>
+            <FormLabel>State/Province*</FormLabel>
             <FormControl>
               <Input 
                 {...field} 
@@ -60,9 +87,13 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
       <FormField
         control={form.control}
         name={getFieldName("postal_code")}
+        rules={{
+          required: "Postal code is required",
+          validate: (value) => validatePostalCode(value, country) || getValidationMessage("postal_code", country)
+        }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Postal Code</FormLabel>
+            <FormLabel>Postal Code*</FormLabel>
             <FormControl>
               <Input 
                 {...field} 
@@ -78,9 +109,12 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
       <FormField
         control={form.control}
         name={getFieldName("country")}
+        rules={{
+          required: "Country is required",
+        }}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Country</FormLabel>
+            <FormLabel>Country*</FormLabel>
             <FormControl>
               <Input 
                 {...field} 

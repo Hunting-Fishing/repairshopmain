@@ -34,14 +34,20 @@ export function AddressSearchField({ form, isModernTheme, addressIndex }: Addres
       country: address.address.country || '',
     };
 
-    if (addressIndex !== undefined) {
-      Object.entries(formattedAddress).forEach(([key, value]) => {
-        form.setValue(`address_book.${addressIndex}.${key}`, value);
-      });
+    if (typeof addressIndex === 'number') {
+      // Type-safe way to set nested address book fields
+      form.setValue(`address_book.${addressIndex}.street_address` as const, formattedAddress.street_address);
+      form.setValue(`address_book.${addressIndex}.city` as const, formattedAddress.city);
+      form.setValue(`address_book.${addressIndex}.state_province` as const, formattedAddress.state_province);
+      form.setValue(`address_book.${addressIndex}.postal_code` as const, formattedAddress.postal_code);
+      form.setValue(`address_book.${addressIndex}.country` as const, formattedAddress.country);
     } else {
-      Object.entries(formattedAddress).forEach(([key, value]) => {
-        form.setValue(key as keyof typeof formattedAddress, value);
-      });
+      // Setting top-level address fields
+      form.setValue('street_address', formattedAddress.street_address);
+      form.setValue('city', formattedAddress.city);
+      form.setValue('state_province', formattedAddress.state_province);
+      form.setValue('postal_code', formattedAddress.postal_code);
+      form.setValue('country', formattedAddress.country);
     }
 
     setSearch("");

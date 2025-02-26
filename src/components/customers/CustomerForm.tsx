@@ -1,4 +1,3 @@
-
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { CustomerFormFields } from "./form/CustomerFormFields";
@@ -93,7 +92,32 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     try {
       setIsSubmitting(true);
 
+      // Validate business rules
+      const { isValid, errors } = validateCustomerBusinessRules(values, values.customer_type);
+      
+      if (!isValid) {
+        errors.forEach(error => {
+          toast({
+            title: "Validation Error",
+            description: error,
+            variant: "destructive",
+          });
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       if (mode === "edit") {
+        // Get existing data for change detection
+        const { data: existingData } = await supabase
+          .from("customers")
+          .select("*")
+          .eq("id", customerId)
+          .single();
+
+        // Handle lifecycle and workflow triggers
+        await handleCustomerDataChanges(existingData, values);
+
         const { error } = await supabase
           .from("customers")
           .update(values)
@@ -101,6 +125,9 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
 
         if (error) throw error;
       } else {
+        // Handle lifecycle and workflow triggers for new customer
+        await handleCustomerDataChanges(null, values);
+
         const { error } = await supabase
           .from("customers")
           .insert([values]);

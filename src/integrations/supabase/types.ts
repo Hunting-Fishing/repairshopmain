@@ -1448,10 +1448,13 @@ export type Database = {
       }
       customer_documents: {
         Row: {
+          category_id: string | null
           created_at: string | null
           created_by: string
           customer_id: string
           description: string | null
+          expiry_date: string | null
+          expiry_reminder_sent: boolean | null
           file_size: number | null
           file_type: string
           file_url: string
@@ -1466,10 +1469,13 @@ export type Database = {
           version: number | null
         }
         Insert: {
+          category_id?: string | null
           created_at?: string | null
           created_by: string
           customer_id: string
           description?: string | null
+          expiry_date?: string | null
+          expiry_reminder_sent?: boolean | null
           file_size?: number | null
           file_type: string
           file_url: string
@@ -1484,10 +1490,13 @@ export type Database = {
           version?: number | null
         }
         Update: {
+          category_id?: string | null
           created_at?: string | null
           created_by?: string
           customer_id?: string
           description?: string | null
+          expiry_date?: string | null
+          expiry_reminder_sent?: boolean | null
           file_size?: number | null
           file_type?: string
           file_url?: string
@@ -1502,6 +1511,13 @@ export type Database = {
           version?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "customer_documents_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "document_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "customer_documents_customer_id_fkey"
             columns: ["customer_id"]
@@ -3292,6 +3308,51 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_categories: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          organization_id: string
+          parent_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          organization_id: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          organization_id?: string
+          parent_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_categories_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "document_categories"
             referencedColumns: ["id"]
           },
         ]

@@ -15,13 +15,20 @@ interface CustomerDocumentsProps {
 export function CustomerDocuments({ customerId }: CustomerDocumentsProps) {
   const [uploading, setUploading] = useState(false);
   const [notes, setNotes] = useState("");
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [expiryDate, setExpiryDate] = useState<string | null>(null);
 
   const { data: documents, refetch } = useQuery({
     queryKey: ["customer-documents", customerId],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("customer_documents")
-        .select("*")
+        .select(`
+          *,
+          document_categories (
+            name
+          )
+        `)
         .eq("customer_id", customerId)
         .order("created_at", { ascending: false });
 
@@ -71,6 +78,8 @@ export function CustomerDocuments({ customerId }: CustomerDocumentsProps) {
           file_type: fileExt,
           file_size: file.size,
           notes: notes.trim() || null,
+          category_id: categoryId,
+          expiry_date: expiryDate,
           created_by: profile.user?.id,
         });
 
@@ -78,6 +87,8 @@ export function CustomerDocuments({ customerId }: CustomerDocumentsProps) {
 
       toast.success("Document uploaded successfully");
       setNotes("");
+      setCategoryId(null);
+      setExpiryDate(null);
       refetch();
     } catch (error: any) {
       console.error("Error uploading document:", error);

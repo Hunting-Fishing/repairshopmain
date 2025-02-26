@@ -7,6 +7,10 @@ import { Upload } from "lucide-react";
 import { validateFile, FILE_RESTRICTIONS } from "@/utils/validation/fieldValidation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DocumentCategory } from "../types";
 
 interface DocumentUploadFormProps {
   notes: string;
@@ -17,6 +21,21 @@ interface DocumentUploadFormProps {
 
 export function DocumentUploadForm({ notes, uploading, onNotesChange, onFileSelect }: DocumentUploadFormProps) {
   const [dragActive, setDragActive] = useState(false);
+  const [categoryId, setCategoryId] = useState<string>("");
+  const [expiryDate, setExpiryDate] = useState<string>("");
+
+  const { data: categories } = useQuery({
+    queryKey: ["document-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("document_categories")
+        .select("*")
+        .order("name");
+      
+      if (error) throw error;
+      return data as DocumentCategory[];
+    }
+  });
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -69,14 +88,44 @@ export function DocumentUploadForm({ notes, uploading, onNotesChange, onFileSele
 
   return (
     <div className="space-y-4">
-      <div>
-        <Label>Document Notes</Label>
-        <Textarea
-          value={notes}
-          onChange={(e) => onNotesChange(e.target.value)}
-          placeholder="Add notes about this document..."
-          className="mt-1"
-        />
+      <div className="grid gap-4">
+        <div>
+          <Label>Category</Label>
+          <Select 
+            value={categoryId} 
+            onValueChange={setCategoryId}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {categories?.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Document Notes</Label>
+          <Textarea
+            value={notes}
+            onChange={(e) => onNotesChange(e.target.value)}
+            placeholder="Add notes about this document..."
+          />
+        </div>
+
+        <div>
+          <Label>Expiry Date (optional)</Label>
+          <Input
+            type="date"
+            value={expiryDate}
+            onChange={(e) => setExpiryDate(e.target.value)}
+            min={new Date().toISOString().split('T')[0]}
+          />
+        </div>
       </div>
 
       <div 

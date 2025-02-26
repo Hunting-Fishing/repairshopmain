@@ -9,7 +9,8 @@ import { FormSelect } from "../fields/FormSelect";
 import { cn } from "@/lib/utils";
 import { Building2, User, Truck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CustomerTypeSectionProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -21,22 +22,59 @@ export function CustomerTypeSection({
   isModernTheme = false,
 }: CustomerTypeSectionProps) {
   const customerType = form.watch("customer_type");
+  const businessClassification = form.watch("business_classification_id");
   const { toast } = useToast();
   const isInitialMount = useRef(true);
   const previousType = useRef(customerType);
+  const [showOtherField, setShowOtherField] = useState(false);
+  const [otherClassification, setOtherClassification] = useState("");
 
   // Reset business fields when changing away from business type
   useEffect(() => {
     if (!isInitialMount.current && previousType.current === "Business" && customerType !== "Business") {
-      // Clear business-related fields and their errors
       form.setValue("company_name", "");
       form.setValue("business_classification_id", "");
-      form.setValue("tax_number", ""); // Updated from company_size to tax_number
+      form.setValue("tax_number", "");
       form.clearErrors(["company_name", "business_classification_id", "tax_number"]);
+      setOtherClassification("");
+      setShowOtherField(false);
     }
     
     previousType.current = customerType;
   }, [customerType, form]);
+
+  // Handle business classification changes
+  useEffect(() => {
+    setShowOtherField(businessClassification === "other");
+    if (businessClassification !== "other") {
+      setOtherClassification("");
+    }
+  }, [businessClassification]);
+
+  // Save other classification to database
+  const saveOtherClassification = async () => {
+    if (businessClassification === "other" && otherClassification) {
+      try {
+        const { error } = await supabase
+          .from('business_classification_others')
+          .insert({
+            customer_id: form.getValues("id"),
+            classification_type: "business",
+            other_description: otherClassification,
+            organization_id: form.getValues("organization_id")
+          });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error("Error saving other classification:", error);
+        toast({
+          title: "Error saving classification",
+          description: "There was an error saving the other classification",
+          variant: "destructive"
+        });
+      }
+    }
+  };
 
   // Handle customer type changes and validate fields
   useEffect(() => {
@@ -50,12 +88,15 @@ export function CustomerTypeSection({
         if (form.getValues("customer_type") === "Business") {
           const companyName = form.getValues("company_name");
           const businessClassification = form.getValues("business_classification_id");
-          const taxNumber = form.getValues("tax_number"); // Updated from company_size
+          const taxNumber = form.getValues("tax_number");
           
           const missingFields = [];
           if (!companyName) missingFields.push("Company Name");
           if (!businessClassification) missingFields.push("Business Classification");
-          if (!taxNumber) missingFields.push("Tax #"); // Updated label
+          if (!taxNumber) missingFields.push("Tax #");
+          if (businessClassification === "other" && !otherClassification) {
+            missingFields.push("Other Classification Description");
+          }
 
           if (missingFields.length > 0) {
             toast({
@@ -71,7 +112,7 @@ export function CustomerTypeSection({
       const timeoutId = setTimeout(validateBusinessFields, 100);
       return () => clearTimeout(timeoutId);
     }
-  }, [customerType, form, toast]);
+  }, [customerType, form, toast, otherClassification]);
 
   // Business classification options
   const businessClassificationOptions = [
@@ -103,10 +144,13 @@ export function CustomerTypeSection({
               if (value === "Business") {
                 const companyName = form.getValues("company_name");
                 const businessClassification = form.getValues("business_classification_id");
-                const taxNumber = form.getValues("tax_number"); // Updated from company_size
+                const taxNumber = form.getValues("tax_number");
                 
                 if (!companyName || !businessClassification || !taxNumber) {
                   return "Please complete all required business information";
+                }
+                if (businessClassification === "other" && !otherClassification) {
+                  return "Please provide a description for Other classification";
                 }
               }
               return true;
@@ -192,7 +236,32 @@ export function CustomerTypeSection({
               placeholder="Select business classification"
               options={businessClassificationOptions}
               isModernTheme={isModernTheme}
+              onChange={(value) => {
+                if (value === "other") {
+                  setShowOtherField(true);
+                } else {
+                  setShowOtherField(false);
+                  setOtherClassification("");
+                }
+              }}
             />
+
+            {showOtherField && (
+              <FormInput
+                form={form}
+                name="other_classification"
+                label="Other Classification"
+                required={true}
+                placeholder="Please specify the business classification"
+                value={otherClassification}
+                onChange={(e) => {
+                  setOtherClassification(e.target.value);
+                  saveOtherClassification();
+                }}
+                isModernTheme={isModernTheme}
+                helpText="Please provide details about your business classification"
+              />
+            )}
 
             <FormInput
               form={form}

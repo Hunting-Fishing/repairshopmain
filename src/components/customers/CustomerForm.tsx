@@ -1,3 +1,4 @@
+
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { CustomerFormFields } from "./form/CustomerFormFields";
@@ -13,6 +14,7 @@ import { useCustomerAutosave } from "./hooks/useCustomerAutosave";
 import { CustomerErrorBoundary } from "./error-boundary/CustomerErrorBoundary";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { validateCustomerBusinessRules, handleCustomerDataChanges } from "./rules/customerBusinessRules";
 import {
   AlertDialog,
   AlertDialogAction,

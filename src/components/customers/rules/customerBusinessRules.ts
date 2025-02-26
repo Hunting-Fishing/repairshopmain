@@ -100,15 +100,16 @@ export function determineCustomerLifecycleStage(data: CustomerFormValues): strin
     return 'new';
   }
 
+  const customerSinceDate = new Date(data.customer_since);
   const daysSinceJoining = Math.floor(
-    (new Date().getTime() - new Date(data.customer_since).getTime()) / (1000 * 60 * 60 * 24)
+    (new Date().getTime() - customerSinceDate.getTime()) / (1000 * 60 * 60 * 24)
   );
 
   if (daysSinceJoining < 30) {
     return 'onboarding';
   } else if (daysSinceJoining < 90) {
     return 'active';
-  } else if (data.loyalty_points && data.loyalty_points > 1000) {
+  } else if (data.loyalty_points && parseInt(data.loyalty_points) > 1000) {
     return 'loyal';
   } else {
     return 'established';
@@ -136,7 +137,7 @@ export async function handleCustomerDataChanges(
   }
 }
 
-// Helper functions for workflow automation
+// Helper functions
 async function enrollInLoyaltyProgram(customer: CustomerFormValues): Promise<void> {
   // Implementation would go here
 }

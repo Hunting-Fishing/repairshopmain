@@ -36,6 +36,8 @@ export interface CustomerFormValues {
   address_book?: CustomerAddress[];
   id?: string;
   region_code?: string;
+  customer_since?: string;
+  loyalty_join_date?: string;
 }
 
 export interface Customer extends CustomerFormValues {
@@ -65,7 +67,6 @@ export interface ValidationRule {
   errorMessage: string;
 }
 
-// Business Rules Types
 export type CustomerType = 'Personal' | 'Fleet' | 'Business';
 
 export interface BusinessRuleValidation {

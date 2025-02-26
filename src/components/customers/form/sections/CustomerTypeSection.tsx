@@ -6,7 +6,9 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FormInput } from "../fields/FormInput";
 import { cn } from "@/lib/utils";
-import { Building2, User } from "lucide-react";
+import { Building2, User, Truck } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 interface CustomerTypeSectionProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -18,6 +20,35 @@ export function CustomerTypeSection({
   isModernTheme = false,
 }: CustomerTypeSectionProps) {
   const customerType = form.watch("customer_type");
+  const { toast } = useToast();
+
+  // Watch for customer type changes and validate required fields
+  useEffect(() => {
+    if (customerType === "Business") {
+      const companyName = form.getValues("company_name");
+      if (!companyName) {
+        toast({
+          title: "Business Information Required",
+          description: "When selecting Business type, please provide the company name and other business details.",
+          duration: 5000,
+          variant: "default"
+        });
+      }
+    }
+  }, [customerType, form, toast]);
+
+  const handleCompanyFieldBlur = (field: keyof CustomerFormValues) => {
+    if (customerType === "Business") {
+      const value = form.getValues(field);
+      if (!value) {
+        toast({
+          title: "Required Field",
+          description: `${field.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} is required for business customers.`,
+          variant: "destructive"
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -63,6 +94,15 @@ export function CustomerTypeSection({
                         Business
                       </FormLabel>
                     </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="Fleet" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                        <Truck className="h-4 w-4" />
+                        Fleet
+                      </FormLabel>
+                    </FormItem>
                   </RadioGroup>
                 </FormControl>
                 <FormMessage />
@@ -79,6 +119,7 @@ export function CustomerTypeSection({
                 required={true}
                 placeholder="Enter company name"
                 isModernTheme={isModernTheme}
+                onBlur={() => handleCompanyFieldBlur("company_name")}
               />
               
               <FormInput
@@ -88,6 +129,7 @@ export function CustomerTypeSection({
                 required={true}
                 placeholder="Select business classification"
                 isModernTheme={isModernTheme}
+                onBlur={() => handleCompanyFieldBlur("business_classification_id")}
               />
 
               <FormInput
@@ -97,6 +139,7 @@ export function CustomerTypeSection({
                 required={true}
                 placeholder="Enter company size"
                 isModernTheme={isModernTheme}
+                onBlur={() => handleCompanyFieldBlur("company_size")}
               />
             </div>
           )}

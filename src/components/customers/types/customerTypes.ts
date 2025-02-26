@@ -1,4 +1,3 @@
-
 export interface CustomerFormValues {
   first_name: string;
   last_name: string;
@@ -31,14 +30,7 @@ export interface CustomerFormValues {
     sms: boolean;
     phone: boolean;
   };
-  address_book?: Array<{
-    type: string;
-    street_address: string;
-    city: string;
-    state_province: string;
-    postal_code: string;
-    country: string;
-  }>;
+  address_book?: CustomerAddress[];
   id?: string;
 }
 
@@ -51,4 +43,14 @@ export interface BusinessClassification {
   id: string;
   name: string;
   description?: string;
+}
+
+export interface CustomerAddress {
+  type: 'home' | 'work' | 'other';
+  is_primary: boolean;
+  street_address: string;
+  city: string;
+  state_province: string;
+  postal_code: string;
+  country: string;
 }

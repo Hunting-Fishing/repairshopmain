@@ -18,7 +18,13 @@ const baseSchema = {
 };
 
 // Personal customer schema (base schema only)
-const personalSchema = z.object(baseSchema);
+const personalSchema = z.object({
+  ...baseSchema,
+  company_name: z.string().optional(),
+  business_classification_id: z.string().optional(),
+  company_size: z.string().optional(),
+  fleet_details: z.any().optional()
+});
 
 // Business customer schema (includes business-specific fields)
 const businessSchema = z.object({
@@ -26,12 +32,15 @@ const businessSchema = z.object({
   company_name: z.string().min(2, "Company name is required and must be at least 2 characters"),
   business_classification_id: z.string().min(1, "Business classification is required"),
   company_size: z.string().min(1, "Company size is required"),
+  fleet_details: z.any().optional()
 });
 
 // Fleet customer schema
 const fleetSchema = z.object({
   ...baseSchema,
   company_name: z.string().min(2, "Fleet name is required"),
+  business_classification_id: z.string().optional(),
+  company_size: z.string().optional(),
   fleet_details: z.object({
     account_number: z.string().optional(),
     vehicle_count: z.number().min(1, "Number of vehicles is required"),

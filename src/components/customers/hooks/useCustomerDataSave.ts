@@ -1,142 +1,138 @@
 
+import { useState } from "react";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CustomerFormValues } from "../types/customerTypes";
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import type { CustomerFormValues } from "../types/customerTypes";
+import { useToast } from "@/hooks/use-toast";
 
-export function useCustomerDataSave() {
-  const { data: userProfile, error: profileError } = useQuery({
-    queryKey: ["user-profile"],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id) {
-        throw new Error("No authenticated user found");
-      }
-      
+interface ProfileCompleteness {
+  score: number;
+  missingFields: string[];
+  suggestions: string[];
+}
+
+export function useCustomerDataSave(customerId: string) {
+  const [isSaving, setIsSaving] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Field-level update mutation
+  const updateFieldMutation = useMutation({
+    mutationFn: async ({ field, value }: { field: keyof CustomerFormValues; value: any }) => {
+      setIsSaving(true);
       const { data, error } = await supabase
-        .from("profiles")
-        .select("organization_id")
-        .eq("id", session.user.id)
+        .from('customers')
+        .update({ [field]: value })
+        .eq('id', customerId)
+        .select()
         .single();
-        
-      if (error) {
-        console.error("Error fetching user profile:", error);
-        throw error;
-      }
-      
+
+      if (error) throw error;
       return data;
     },
-    retry: 1,
-  });
-
-  const createHistoryRecords = async (
-    customerId: string,
-    userId: string,
-    changes: Record<string, { old: any; new: any }>,
-    notes: string
-  ) => {
-    try {
-      const historyRecords = Object.entries(changes).map(([field, values]) => ({
-        customer_id: customerId,
-        changed_by: userId,
-        change_type: "update",
-        field_name: field,
-        old_value: values.old?.toString() || null,
-        new_value: values.new?.toString() || null,
-        notes,
+    onSuccess: (data, variables) => {
+      // Optimistically update the cache
+      queryClient.setQueryData(['customer', customerId], (oldData: any) => ({
+        ...oldData,
+        [variables.field]: variables.value
       }));
 
-      const { error } = await supabase
-        .from("customer_history")
-        .insert(historyRecords);
-
-      if (error) {
-        console.error("Error creating history records:", error);
-        throw error;
-      }
-    } catch (error) {
-      console.error("Error in createHistoryRecords:", error);
-      toast.error("Failed to create history records");
-      throw error;
+      toast({
+        title: "Field updated",
+        description: `Successfully updated ${variables.field}`,
+      });
+    },
+    onError: (error) => {
+      console.error('Field update error:', error);
+      toast({
+        title: "Update failed",
+        description: "Failed to update field. Please try again.",
+        variant: "destructive"
+      });
+    },
+    onSettled: () => {
+      setIsSaving(false);
     }
+  });
+
+  // Calculate profile completeness
+  const calculateProfileCompleteness = (data: CustomerFormValues): ProfileCompleteness => {
+    const requiredFields = [
+      'first_name',
+      'last_name',
+      'email',
+      'phone_number',
+      'customer_type'
+    ];
+
+    const optionalFields = [
+      'street_address',
+      'city',
+      'state_province',
+      'postal_code',
+      'country',
+      'company_name',
+      'language_preference',
+      'timezone'
+    ];
+
+    const missingRequired = requiredFields.filter(field => !data[field as keyof CustomerFormValues]);
+    const missingOptional = optionalFields.filter(field => !data[field as keyof CustomerFormValues]);
+
+    const requiredScore = ((requiredFields.length - missingRequired.length) / requiredFields.length) * 70;
+    const optionalScore = ((optionalFields.length - missingOptional.length) / optionalFields.length) * 30;
+
+    const totalScore = Math.round(requiredScore + optionalScore);
+
+    return {
+      score: totalScore,
+      missingFields: [...missingRequired, ...missingOptional],
+      suggestions: generateSuggestions(missingRequired, missingOptional)
+    };
   };
 
-  const saveCustomer = async (
-    values: CustomerFormValues,
-    userId: string,
-    notes: string,
-    mode: "create" | "edit",
-    initialData?: any
-  ) => {
+  // Generate improvement suggestions
+  const generateSuggestions = (missingRequired: string[], missingOptional: string[]): string[] => {
+    const suggestions: string[] = [];
+
+    if (missingRequired.length > 0) {
+      suggestions.push(`Complete required fields: ${missingRequired.join(', ')}`);
+    }
+
+    if (missingOptional.length > 0) {
+      suggestions.push(`Consider adding: ${missingOptional.join(', ')}`);
+    }
+
+    return suggestions;
+  };
+
+  // Enrich customer data with external sources
+  const enrichCustomerData = async (customerData: CustomerFormValues) => {
     try {
-      if (!userProfile?.organization_id) {
-        throw new Error("No organization ID found");
-      }
+      // Example: Enrich with social media profiles
+      if (customerData.email) {
+        const { data: enrichedData, error } = await supabase
+          .functions.invoke('enrich-customer-data', {
+            body: { email: customerData.email }
+          });
 
-      const { data, error } = mode === "create"
-        ? await supabase
-            .from("customers")
-            .insert({
-              ...values,
-              organization_id: userProfile.organization_id,
-              created_by: userId,
-              updated_by: userId,
-            })
-            .select()
-            .single()
-        : await supabase
-            .from("customers")
-            .update({
-              ...values,
-              updated_by: userId,
-            })
-            .eq("id", initialData.id)
-            .select()
-            .single();
-
-      if (error) {
-        console.error("Error saving customer:", error);
-        toast.error(error.message);
-        throw error;
-      }
-
-      if (mode === "edit" && data) {
-        const changes = Object.keys(values).reduce((acc, key) => {
-          if (values[key as keyof CustomerFormValues] !== initialData[key]) {
-            acc[key] = {
-              old: initialData[key],
-              new: values[key as keyof CustomerFormValues],
-            };
-          }
-          return acc;
-        }, {} as Record<string, { old: any; new: any }>);
-
-        if (Object.keys(changes).length > 0) {
-          await createHistoryRecords(initialData.id, userId, changes, notes);
+        if (!error && enrichedData) {
+          // Update customer with enriched data
+          await updateFieldMutation.mutateAsync({
+            field: 'social_profiles',
+            value: enrichedData.socialProfiles
+          });
         }
-      } else if (mode === "create" && data) {
-        await createHistoryRecords(
-          data.id,
-          userId,
-          Object.keys(values).reduce((acc, key) => ({
-            ...acc,
-            [key]: { old: null, new: values[key as keyof CustomerFormValues] },
-          }), {}),
-          "Initial customer creation"
-        );
       }
-
-      toast.success(`Customer ${mode === "create" ? "created" : "updated"} successfully`);
-      return data;
     } catch (error) {
-      console.error("Error in saveCustomer:", error);
-      throw error;
+      console.error('Data enrichment error:', error);
     }
   };
 
   return {
-    userProfile,
-    profileError,
-    saveCustomer,
+    isSaving,
+    updateField: updateFieldMutation.mutateAsync,
+    calculateProfileCompleteness,
+    enrichCustomerData
   };
 }

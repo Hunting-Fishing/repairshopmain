@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
+import { ValidationStatus } from "../../ValidationStatus";
+import { validateEmail, validatePhoneNumber } from "@/utils/validation/fieldValidation";
 
 type AllowedFields = {
   [K in keyof CustomerFormValues]: CustomerFormValues[K] extends string | undefined ? K : never;
@@ -53,6 +55,30 @@ export function FormInput({
     isEmpty && "text-red-500"
   );
 
+  let validationStatus = null;
+
+  if (isTouched && value) {
+    if (type === "email") {
+      const emailValidation = validateEmail(value);
+      if (!emailValidation.isValid) {
+        validationStatus = {
+          status: "error" as const,
+          type: "Email",
+          message: emailValidation.message || "Invalid email"
+        };
+      }
+    } else if (name === "phone_number") {
+      const phoneValidation = validatePhoneNumber(value);
+      if (!phoneValidation.isValid) {
+        validationStatus = {
+          status: "error" as const,
+          type: "Phone",
+          message: phoneValidation.message || "Invalid phone number"
+        };
+      }
+    }
+  }
+
   return (
     <FormField
       control={form.control}
@@ -83,6 +109,9 @@ export function FormInput({
             <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
               {label} is required
             </FormMessage>
+          )}
+          {validationStatus && (
+            <ValidationStatus {...validationStatus} />
           )}
         </FormItem>
       )}

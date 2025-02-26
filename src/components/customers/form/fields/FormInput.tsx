@@ -15,16 +15,30 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// Updated type to allow nested paths
-type NestedKeys<T> = {
-  [K in keyof T]: T[K] extends object
-    ? `${K & string}.${NestedKeys<T[K]> & string}`
+// Define paths type for nested object access
+type PathImpl<T, K extends keyof T> = K extends string
+  ? T[K] extends Record<string, any>
+    ? T[K] extends ArrayLike<any>
+      ? K | `${K}.${PathImpl<T[K], Exclude<keyof T[K], keyof any[]>>}`
+      : K | `${K}.${PathImpl<T[K], keyof T[K]>}`
     : K
-}[keyof T];
+  : never;
+
+type Path<T> = PathImpl<T, keyof T> | keyof T;
+
+type PathValue<T, P extends Path<T>> = P extends `${infer K}.${infer Rest}`
+  ? K extends keyof T
+    ? Rest extends Path<T[K]>
+      ? PathValue<T[K], Rest>
+      : never
+    : never
+  : P extends keyof T
+  ? T[P]
+  : never;
 
 interface FormInputProps {
   form: UseFormReturn<CustomerFormValues>;
-  name: NestedKeys<CustomerFormValues>;
+  name: Path<CustomerFormValues>;
   label: string;
   type?: string;
   placeholder?: string;
@@ -46,10 +60,10 @@ export function FormInput({
   helpText
 }: FormInputProps) {
   const [shake, setShake] = useState(false);
-  const error = form.formState.errors[name];
-  const isTouched = form.formState.touchedFields[name];
+  const error = form.formState.errors[name as keyof CustomerFormValues];
+  const isTouched = form.formState.touchedFields[name as keyof CustomerFormValues];
   const value = form.getValues(name);
-  const isEmpty = required && (!value || value.trim() === "");
+  const isEmpty = required && (!value || (typeof value === 'string' && value.trim() === ""));
   
   const inputClasses = cn(
     "transition-all duration-200",
@@ -82,12 +96,14 @@ export function FormInput({
     if (!isTouched || !value) return null;
 
     if (type === "email") {
-      return validateEmail(value);
+      return validateEmail(String(value));
     } else if (name === "phone_number") {
-      return validatePhoneNumber(value);
+      return validatePhoneNumber(String(value));
     }
     return null;
   })();
+
+  const stringValue = typeof value === 'string' ? value : '';
 
   return (
     <FormField
@@ -123,6 +139,7 @@ export function FormInput({
           <FormControl>
             <Input
               {...field}
+              value={stringValue}
               type={type}
               placeholder={required ? `${placeholder} *` : placeholder}
               className={inputClasses}

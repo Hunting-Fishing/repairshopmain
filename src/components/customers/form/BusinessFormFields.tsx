@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
@@ -34,14 +35,6 @@ export const BusinessFormFields = ({ form, isModernTheme = false }: BusinessForm
       return data;
     },
   });
-
-  const companySizes = [
-    "1-10 employees",
-    "11-50 employees",
-    "51-200 employees",
-    "201-500 employees",
-    "501+ employees"
-  ];
 
   if (isLoading) {
     return (
@@ -81,24 +74,17 @@ export const BusinessFormFields = ({ form, isModernTheme = false }: BusinessForm
 
       <FormField
         control={form.control}
-        name="company_size"
+        name="tax_number"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className={labelClasses}>Company Size</FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger className={inputClasses}>
-                  <SelectValue placeholder="Select company size" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {companySizes.map((size) => (
-                  <SelectItem key={size} value={size}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FormLabel className={labelClasses}>Tax Number</FormLabel>
+            <FormControl>
+              <Input 
+                {...field}
+                className={inputClasses}
+                placeholder="Enter tax number"
+              />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}

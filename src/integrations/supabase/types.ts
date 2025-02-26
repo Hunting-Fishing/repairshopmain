@@ -2940,6 +2940,47 @@ export type Database = {
           },
         ]
       }
+      customer_type_schemas: {
+        Row: {
+          created_at: string
+          customer_type: string
+          id: string
+          optional_fields: Json
+          organization_id: string
+          required_fields: Json
+          updated_at: string
+          validation_rules: Json
+        }
+        Insert: {
+          created_at?: string
+          customer_type: string
+          id?: string
+          optional_fields?: Json
+          organization_id: string
+          required_fields?: Json
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Update: {
+          created_at?: string
+          customer_type?: string
+          id?: string
+          optional_fields?: Json
+          organization_id?: string
+          required_fields?: Json
+          updated_at?: string
+          validation_rules?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_type_schemas_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_validation_logs: {
         Row: {
           created_at: string | null

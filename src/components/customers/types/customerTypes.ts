@@ -1,3 +1,4 @@
+
 export interface CustomerFormValues {
   first_name: string;
   last_name: string;
@@ -12,8 +13,8 @@ export interface CustomerFormValues {
   language_preference?: string;
   timezone?: string;
   company_name?: string;
-  company_size?: string;
   business_classification_id?: string;
+  tax_number?: string;
   loyalty_tier?: string;
   loyalty_points?: string;
   notes?: string;
@@ -50,30 +51,6 @@ export interface CustomerFormValues {
     manager_contact?: string;
     service_schedule?: string;
     vehicles?: FleetVehicle[];
-  };
-  payment_billing?: {
-    fleet_card_provider?: string;
-    fleet_card_number?: string;
-    billing_contact?: string;
-    billing_email?: string;
-    payment_terms?: string;
-    po_required?: boolean;
-    tax_exempt_number?: string;
-    credit_limit?: number;
-    billing_method?: 'email' | 'mail' | 'portal';
-  };
-  service_preferences?: {
-    authorized_service_limit?: number;
-    preferred_parts?: string;
-    preferred_fluids?: string;
-    emergency_contacts?: string[];
-    roadside_provider?: string;
-  };
-  insurance_compliance?: {
-    insurance_provider?: string;
-    policy_number?: string;
-    dot_number?: string;
-    safety_inspection_due?: string;
   };
 }
 

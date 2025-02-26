@@ -17,6 +17,7 @@ export const customerValidationSchema = z.object({
   customer_type: z.enum(["Personal", "Fleet", "Business"]),
   language_preference: z.string().optional(),
   timezone: z.string().min(1, "Timezone is required"),
+  business_classification_id: z.string().optional(),
   address_book: z.array(z.object({
     type: z.string(),
     street_address: z.string().min(1, "Street address is required"),

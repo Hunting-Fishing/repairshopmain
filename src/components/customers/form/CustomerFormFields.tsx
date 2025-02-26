@@ -38,6 +38,9 @@ export function CustomerFormFields({
     return () => subscription.unsubscribe();
   }, [form, calculateProfileCompleteness]);
 
+  // Get the current customer type
+  const customerType = form.watch("customer_type");
+
   return (
     <div className="space-y-8">
       <ProfileCompletenessSection 
@@ -45,19 +48,41 @@ export function CustomerFormFields({
         recommendations={completeness.recommendations}
       />
 
+      <CustomerTypeSection form={form} isModernTheme={isModernTheme} />
+      
       <BasicInformationSection form={form} isModernTheme={isModernTheme} />
       
       <PrimaryAddressSection form={form} isModernTheme={isModernTheme} />
-      
-      <CustomerTypeSection form={form} isModernTheme={isModernTheme} />
+
+      {customerType === "Business" && (
+        <AdditionalDetailsSection 
+          form={form} 
+          isModernTheme={isModernTheme} 
+          requiredFields={["company_name", "business_classification_id", "company_size"]}
+        />
+      )}
+
+      {customerType === "Fleet" && (
+        <AdditionalDetailsSection 
+          form={form} 
+          isModernTheme={isModernTheme} 
+          requiredFields={["company_name"]}
+        />
+      )}
+
+      {customerType === "Personal" && (
+        <AdditionalDetailsSection 
+          form={form} 
+          isModernTheme={isModernTheme} 
+          requiredFields={[]}
+        />
+      )}
 
       <PreferencesSection form={form} isModernTheme={isModernTheme} />
 
       <SocialProfilesSection form={form} isModernTheme={isModernTheme} />
 
       <AddressBookSection form={form} isModernTheme={isModernTheme} />
-
-      <AdditionalDetailsSection form={form} isModernTheme={isModernTheme} />
     </div>
   );
 }

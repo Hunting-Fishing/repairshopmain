@@ -46,6 +46,7 @@ interface FormInputProps {
   required?: boolean;
   readOnly?: boolean;
   helpText?: string;
+  icon?: React.ReactNode; // Add this line to accept an icon prop
 }
 
 export function FormInput({
@@ -57,7 +58,8 @@ export function FormInput({
   isModernTheme = false,
   required = false,
   readOnly = false,
-  helpText
+  helpText,
+  icon // Add this to the destructured props
 }: FormInputProps) {
   const [shake, setShake] = useState(false);
   const error = form.formState.errors[name as keyof CustomerFormValues];
@@ -137,17 +139,24 @@ export function FormInput({
             )}
           </div>
           <FormControl>
-            <Input
-              {...field}
-              value={stringValue}
-              type={type}
-              placeholder={required ? `${placeholder} *` : placeholder}
-              className={inputClasses}
-              aria-required={required}
-              aria-invalid={!!error || isEmpty}
-              readOnly={readOnly}
-              onBlur={handleBlur}
-            />
+            <div className="relative">
+              {icon && (
+                <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                  {icon}
+                </div>
+              )}
+              <Input
+                {...field}
+                value={stringValue}
+                type={type}
+                placeholder={required ? `${placeholder} *` : placeholder}
+                className={cn(inputClasses, icon && "pl-10")}
+                aria-required={required}
+                aria-invalid={!!error || isEmpty}
+                readOnly={readOnly}
+                onBlur={handleBlur}
+              />
+            </div>
           </FormControl>
           {error && (
             <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />

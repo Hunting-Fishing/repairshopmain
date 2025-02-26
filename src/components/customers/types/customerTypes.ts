@@ -12,6 +12,7 @@ export interface CustomerFormValues {
   customer_type: 'Personal' | 'Fleet' | 'Business';
   language_preference?: string;
   timezone?: string;
+  company_name?: string;
   company_size?: string;
   business_classification_id?: string;
   loyalty_tier?: string;
@@ -34,6 +35,7 @@ export interface CustomerFormValues {
   };
   address_book?: CustomerAddress[];
   id?: string;
+  region_code?: string;
 }
 
 export interface Customer extends CustomerFormValues {
@@ -55,4 +57,18 @@ export interface CustomerAddress {
   state_province: string;
   postal_code: string;
   country: string;
+}
+
+export interface ValidationRule {
+  field: keyof CustomerFormValues;
+  validate: (value: any, formData: CustomerFormValues) => boolean | string;
+  errorMessage: string;
+}
+
+// Business Rules Types
+export type CustomerType = 'Personal' | 'Fleet' | 'Business';
+
+export interface BusinessRuleValidation {
+  type: CustomerType;
+  rules: ValidationRule[];
 }

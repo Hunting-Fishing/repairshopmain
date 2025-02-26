@@ -1,25 +1,27 @@
 
 import { AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 interface TabErrorStateProps {
-  error: Error;
-  resetError?: () => void;
+  message?: string;
+  onRetry?: () => void;
 }
 
-export const TabErrorState = ({ error, resetError }: TabErrorStateProps) => {
+export function TabErrorState({ 
+  message = "There was a problem loading this section.",
+  onRetry 
+}: TabErrorStateProps) {
   return (
-    <Alert variant="destructive">
+    <Alert variant="destructive" className="mx-auto max-w-2xl my-8">
       <AlertCircle className="h-4 w-4" />
       <AlertTitle>Error</AlertTitle>
-      <AlertDescription className="mt-2 flex flex-col gap-3">
-        <p>{error.message}</p>
-        {resetError && (
+      <AlertDescription className="mt-2 flex flex-col gap-4">
+        <p>{message}</p>
+        {onRetry && (
           <Button 
             variant="outline" 
-            size="sm" 
-            onClick={resetError}
+            onClick={onRetry}
             className="w-fit"
           >
             Try again
@@ -28,4 +30,4 @@ export const TabErrorState = ({ error, resetError }: TabErrorStateProps) => {
       </AlertDescription>
     </Alert>
   );
-};
+}

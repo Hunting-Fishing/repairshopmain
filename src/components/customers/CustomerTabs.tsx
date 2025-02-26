@@ -13,10 +13,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { customerFormSchema } from "./schemas/customerFormSchema";
-import { Skeleton } from "../ui/skeleton";
+import { TabLoadingSkeleton } from "./loading/TabLoadingSkeleton";
+import { TabErrorState } from "./loading/TabErrorState";
 import { toast } from "sonner";
-import { Alert, AlertDescription } from "../ui/alert";
-import { AlertCircle } from "lucide-react";
 
 interface CustomerTabsProps {
   customerId: string;
@@ -24,7 +23,7 @@ interface CustomerTabsProps {
 }
 
 export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTabsProps) {
-  const { data: customerData, isLoading, error } = useQuery({
+  const { data: customerData, isLoading, error, refetch } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -51,36 +50,22 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
     mode: "onChange" // Enable real-time validation
   });
 
-  const { formState: { isDirty, errors } } = form;
-
-  // Handle form auto-save
-  const handleAutoSave = async (values: CustomerFormValues) => {
-    try {
-      const { error } = await supabase
-        .from("customers")
-        .update(values)
-        .eq("id", customerId);
-
-      if (error) throw error;
-      toast.success("Changes saved successfully");
-    } catch (err) {
-      toast.error("Failed to save changes");
-      console.error("Auto-save error:", err);
-    }
-  };
-
   if (isLoading) {
-    return <Skeleton className="w-full h-[200px]" />;
+    return <TabLoadingSkeleton />;
   }
 
   if (error) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Failed to load customer data. Please try again later.
-        </AlertDescription>
-      </Alert>
+      <TabErrorState 
+        message="Failed to load customer data. Please try again later."
+        onRetry={() => {
+          toast.promise(refetch(), {
+            loading: "Retrying...",
+            success: "Successfully loaded customer data",
+            error: "Failed to load customer data"
+          });
+        }}
+      />
     );
   }
 
@@ -97,15 +82,6 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
         </TabsList>
 
         <div className="mt-6">
-          {Object.keys(errors).length > 0 && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                Please fix the validation errors before proceeding.
-              </AlertDescription>
-            </Alert>
-          )}
-
           <TabsContent value="details">
             <CustomerTabContent label="Customer Details">
               <CustomerFormFields 

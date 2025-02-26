@@ -14,6 +14,8 @@ export interface CustomerFormValues {
   timezone?: string;
   company_size?: string;
   business_classification_id?: string;
+  loyalty_tier?: string;
+  loyalty_points?: string;
   preferred_contact_time?: {
     start: string;
     end: string;
@@ -29,7 +31,7 @@ export interface CustomerFormValues {
     sms: boolean;
     phone: boolean;
   };
-  id?: string; // Added this line to support edit mode
+  id?: string;
 }
 
 export interface Customer extends CustomerFormValues {

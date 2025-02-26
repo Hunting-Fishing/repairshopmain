@@ -102,7 +102,6 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
             />
             
             <FormSelect
-              form={form}
               name="business_classification_id"
               label="Business Classification"
               placeholder="Select business classification"
@@ -112,7 +111,6 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
                   value: bc.id
                 })) || []
               }
-              isModernTheme={isModernTheme}
             />
           </div>
         )}

@@ -1,4 +1,3 @@
-
 import { UseFormReturn, useWatch } from "react-hook-form";
 import { CustomerFormValues, CustomerType } from "../../types/customerTypes";
 import { FormSection } from "../FormSection";
@@ -11,6 +10,7 @@ import { Clock, Globe2 } from "lucide-react";
 import { SubmitButton } from "../fields/SubmitButton";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const languages = [
   { code: "en", name: "English", native: "English" },
@@ -94,12 +94,19 @@ export function PreferencesSection({
       return { isValid: true, errors: [] };
     }
 
-    // Required fields for personal customers
-    if (!data.first_name) errors.push('First Name');
-    if (!data.last_name) errors.push('Last Name');
-    if (!data.email) errors.push('Email');
-    if (!data.timezone) errors.push('Timezone');
-    if (!data.language_preference) errors.push('Language Preference');
+    const requiredFields = {
+      first_name: 'First Name',
+      last_name: 'Last Name',
+      email: 'Email',
+      timezone: 'Timezone',
+      language_preference: 'Language Preference'
+    } as const;
+
+    Object.entries(requiredFields).forEach(([field, label]) => {
+      if (!data[field as keyof typeof requiredFields]) {
+        errors.push(label);
+      }
+    });
 
     return {
       isValid: errors.length === 0,
@@ -119,7 +126,6 @@ export function PreferencesSection({
       return;
     }
 
-    // Validate personal customer data
     const { isValid, errors } = validatePersonalCustomer(data);
     if (!isValid) {
       toast({
@@ -131,12 +137,24 @@ export function PreferencesSection({
     }
 
     try {
+      const formData = form.getValues();
+      
+      if (data.customer_type === 'Personal' && (!formData.timezone || !formData.language_preference)) {
+        toast({
+          title: "Preferences Required",
+          description: "Please select both timezone and language preference",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await form.handleSubmit(() => {})();
       toast({
         title: "Success",
         description: "Preferences updated successfully",
       });
     } catch (error) {
+      console.error('Form submission error:', error);
       toast({
         title: "Error",
         description: "Failed to update preferences",
@@ -155,27 +173,19 @@ export function PreferencesSection({
         >
           <div className="space-y-6">
             {!customerType && (
-              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-yellow-700">
-                      Please select a valid customer type before updating preferences
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <Alert variant="warning" className="mb-4">
+                <AlertDescription>
+                  Please select a valid customer type before updating preferences
+                </AlertDescription>
+              </Alert>
             )}
 
             {customerType === 'Personal' && (
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700">
-                      Required fields for personal customers: First Name, Last Name, Email, Timezone, and Language Preference
-                    </p>
-                  </div>
-                </div>
-              </div>
+              <Alert className="mb-4 border-blue-200 bg-blue-50 text-blue-800">
+                <AlertDescription>
+                  Required fields for personal customers: First Name, Last Name, Email, Timezone, and Language Preference
+                </AlertDescription>
+              </Alert>
             )}
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

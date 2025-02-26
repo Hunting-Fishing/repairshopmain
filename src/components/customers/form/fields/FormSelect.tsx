@@ -1,5 +1,5 @@
 
-import { UseFormReturn } from "react-hook-form";
+import { UseFormReturn, FieldPath } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomerFormValues } from "../../types/customerTypes";
@@ -11,7 +11,7 @@ interface Option {
 
 interface FormSelectProps {
   form: UseFormReturn<CustomerFormValues>;
-  name: keyof CustomerFormValues | string;
+  name: FieldPath<CustomerFormValues>;
   label: string;
   options: Option[];
   required?: boolean;

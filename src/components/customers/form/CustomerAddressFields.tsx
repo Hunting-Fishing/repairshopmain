@@ -4,25 +4,36 @@ import { CustomerFormValues } from "../types/customerTypes";
 import { FormInput } from "./fields/FormInput";
 import { MapPin, Building2, Globe } from "lucide-react";
 
+// Define paths type for nested object access
+type PathImpl<T, K extends keyof T> = K extends string
+  ? T[K] extends Record<string, any>
+    ? T[K] extends ArrayLike<any>
+      ? K | `${K}.${PathImpl<T[K], Exclude<keyof T[K], keyof any[]>>}`
+      : K | `${K}.${PathImpl<T[K], keyof T[K]>}`
+    : K
+  : never;
+
+type Path<T> = PathImpl<T, keyof T> | keyof T;
+
 interface CustomerAddressFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
   isModernTheme?: boolean;
   required?: boolean;
-  addressIndex?: number; // Added back the addressIndex prop
+  addressIndex?: number;
 }
 
 export function CustomerAddressFields({
   form,
   isModernTheme = false,
   required = false,
-  addressIndex // Added back the addressIndex prop
+  addressIndex
 }: CustomerAddressFieldsProps) {
   // Helper function to get the correct field name based on whether we're dealing with an address book entry
-  const getFieldName = (field: string): string => {
+  const getFieldName = (field: keyof CustomerFormValues | string): Path<CustomerFormValues> => {
     if (typeof addressIndex === 'number') {
-      return `address_book.${addressIndex}.${field}`;
+      return `address_book.${addressIndex}.${field}` as Path<CustomerFormValues>;
     }
-    return field;
+    return field as keyof CustomerFormValues;
   };
 
   return (

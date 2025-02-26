@@ -6,7 +6,7 @@ import { CustomerTypeSelect } from "../fields/CustomerTypeSelect";
 import { FormInput } from "../fields/FormInput";
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Users } from "lucide-react";
+import { Building2, Users, Hash } from "lucide-react";
 
 const businessClassifications = [
   { id: "corp", name: "Corporation" },
@@ -59,6 +59,17 @@ export function CustomerTypeSection({
               icon={<Building2 className="h-4 w-4 text-gray-500" />}
             />
 
+            <FormInput
+              form={form}
+              name="pst_number"
+              label="PST Number"
+              placeholder="Enter PST number"
+              helpText="Provincial Sales Tax number"
+              required
+              isModernTheme={isModernTheme}
+              icon={<Hash className="h-4 w-4 text-gray-500" />}
+            />
+
             <FormField
               control={form.control}
               name="business_classification_id"
@@ -100,7 +111,6 @@ export function CustomerTypeSection({
                 <FormItem>
                   <FormLabel className="text-sm font-medium">
                     Company Size
-                    <span className="text-red-500 ml-1">*</span>
                   </FormLabel>
                   <Select
                     onValueChange={field.onChange}

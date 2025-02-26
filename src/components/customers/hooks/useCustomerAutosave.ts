@@ -54,7 +54,9 @@ export const useCustomerAutosave = (
       return {
         ...baseFields,
         company_name: data.company_name,
-        business_classification_id: data.business_classification_id
+        business_classification_id: data.business_classification_id,
+        // Don't include company_size if it's not provided
+        ...(data.company_size && { company_size: data.company_size })
       };
     }
 

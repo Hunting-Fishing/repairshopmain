@@ -5,6 +5,7 @@ import { FormSection } from "../FormSection";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { FormInput } from "../fields/FormInput";
+import { FormSelect } from "../fields/FormSelect";
 import { cn } from "@/lib/utils";
 import { Building2, User, Truck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -30,35 +31,31 @@ export function CustomerTypeSection({
       // Clear business-related fields and their errors
       form.setValue("company_name", "");
       form.setValue("business_classification_id", "");
-      form.setValue("company_size", "");
-      form.clearErrors(["company_name", "business_classification_id", "company_size"]);
+      form.setValue("tax_number", ""); // Updated from company_size to tax_number
+      form.clearErrors(["company_name", "business_classification_id", "tax_number"]);
     }
     
-    // Update previous type after handling the change
     previousType.current = customerType;
   }, [customerType, form]);
 
   // Handle customer type changes and validate fields
   useEffect(() => {
-    // Skip validation on initial mount
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
 
-    // Only validate and show toast for business type
     if (customerType === "Business") {
       const validateBusinessFields = () => {
-        // Only validate if we're actually in business mode
         if (form.getValues("customer_type") === "Business") {
           const companyName = form.getValues("company_name");
           const businessClassification = form.getValues("business_classification_id");
-          const companySize = form.getValues("company_size");
+          const taxNumber = form.getValues("tax_number"); // Updated from company_size
           
           const missingFields = [];
           if (!companyName) missingFields.push("Company Name");
           if (!businessClassification) missingFields.push("Business Classification");
-          if (!companySize) missingFields.push("Company Size");
+          if (!taxNumber) missingFields.push("Tax #"); // Updated label
 
           if (missingFields.length > 0) {
             toast({
@@ -71,11 +68,24 @@ export function CustomerTypeSection({
         }
       };
 
-      // Delay validation slightly to ensure form state is updated
       const timeoutId = setTimeout(validateBusinessFields, 100);
       return () => clearTimeout(timeoutId);
     }
   }, [customerType, form, toast]);
+
+  // Business classification options
+  const businessClassificationOptions = [
+    { value: "retail", label: "Retail" },
+    { value: "wholesale", label: "Wholesale" },
+    { value: "manufacturing", label: "Manufacturing" },
+    { value: "services", label: "Professional Services" },
+    { value: "construction", label: "Construction" },
+    { value: "transportation", label: "Transportation & Logistics" },
+    { value: "automotive", label: "Automotive" },
+    { value: "technology", label: "Technology" },
+    { value: "healthcare", label: "Healthcare" },
+    { value: "other", label: "Other" }
+  ];
 
   return (
     <FormSection 
@@ -90,13 +100,12 @@ export function CustomerTypeSection({
           rules={{
             required: "Customer type is required",
             validate: (value) => {
-              // Only validate business fields if the type is Business
               if (value === "Business") {
                 const companyName = form.getValues("company_name");
                 const businessClassification = form.getValues("business_classification_id");
-                const companySize = form.getValues("company_size");
+                const taxNumber = form.getValues("tax_number"); // Updated from company_size
                 
-                if (!companyName || !businessClassification || !companySize) {
+                if (!companyName || !businessClassification || !taxNumber) {
                   return "Please complete all required business information";
                 }
               }
@@ -118,7 +127,6 @@ export function CustomerTypeSection({
                     const previousValue = field.value;
                     field.onChange(value);
                     
-                    // Only show toast if there's an actual change
                     if (previousValue !== value) {
                       toast({
                         title: "Customer Type Changed",
@@ -176,22 +184,24 @@ export function CustomerTypeSection({
               isModernTheme={isModernTheme}
             />
             
-            <FormInput
+            <FormSelect
               form={form}
               name="business_classification_id"
               label="Business Classification"
               required={customerType === "Business"}
               placeholder="Select business classification"
+              options={businessClassificationOptions}
               isModernTheme={isModernTheme}
             />
 
             <FormInput
               form={form}
-              name="company_size"
-              label="Company Size"
+              name="tax_number"
+              label="Tax #"
               required={customerType === "Business"}
-              placeholder="Enter company size"
+              placeholder="Enter tax number"
               isModernTheme={isModernTheme}
+              helpText="Enter your business tax identification number"
             />
           </div>
         )}

@@ -22,31 +22,41 @@ export function CustomerTypeSection({
   const customerType = form.watch("customer_type");
   const { toast } = useToast();
 
-  // Watch for customer type changes and validate required fields
+  // Handle customer type changes and show appropriate notifications
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
-    if (customerType === "Business") {
-      // Delay validation check to prevent immediate validation on mount
+    if (customerType) {
       timeoutId = setTimeout(() => {
-        const companyName = form.getValues("company_name");
-        const businessClassification = form.getValues("business_classification_id");
-        const companySize = form.getValues("company_size");
-        
-        const missingFields = [];
-        if (!companyName) missingFields.push("Company Name");
-        if (!businessClassification) missingFields.push("Business Classification");
-        if (!companySize) missingFields.push("Company Size");
+        // Show customer type change notification
+        toast({
+          title: `Customer Type: ${customerType}`,
+          description: `Current customer is set to ${customerType === 'Personal' ? 'Personal' : 'Business'} account type`,
+          duration: 3000,
+          variant: "default"
+        });
 
-        if (missingFields.length > 0) {
-          toast({
-            title: "Business Information Required",
-            description: `Please provide: ${missingFields.join(", ")}`,
-            duration: 5000,
-            variant: "default"
-          });
+        // Additional validation for Business type
+        if (customerType === "Business") {
+          const companyName = form.getValues("company_name");
+          const businessClassification = form.getValues("business_classification_id");
+          const companySize = form.getValues("company_size");
+          
+          const missingFields = [];
+          if (!companyName) missingFields.push("Company Name");
+          if (!businessClassification) missingFields.push("Business Classification");
+          if (!companySize) missingFields.push("Company Size");
+
+          if (missingFields.length > 0) {
+            toast({
+              title: "Business Information Required",
+              description: `Please provide: ${missingFields.join(", ")}`,
+              duration: 5000,
+              variant: "destructive"
+            });
+          }
         }
-      }, 500); // Small delay to prevent immediate validation
+      }, 500);
     }
 
     return () => {
@@ -58,7 +68,7 @@ export function CustomerTypeSection({
   useEffect(() => {
     if (customerType === "Business") {
       const subscription = form.watch((value, { name, type }) => {
-        // Only validate on blur or submit, not on every change
+        // Only validate on blur or submit
         if (type === "blur" && ["company_name", "business_classification_id", "company_size"].includes(name || "")) {
           const fieldName = name?.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
           if (!value[name as keyof CustomerFormValues]) {
@@ -66,6 +76,13 @@ export function CustomerTypeSection({
               title: "Required Field",
               description: `${fieldName} is required for business customers.`,
               variant: "destructive"
+            });
+          } else {
+            // Show success toast when field is filled
+            toast({
+              title: "Field Updated",
+              description: `${fieldName} has been updated successfully.`,
+              variant: "default"
             });
           }
         }
@@ -110,7 +127,16 @@ export function CustomerTypeSection({
                 </FormLabel>
                 <FormControl>
                   <RadioGroup
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      // Show immediate feedback on type change
+                      toast({
+                        title: "Customer Type Changed",
+                        description: `Customer type has been changed to ${value}`,
+                        duration: 3000,
+                        variant: "default"
+                      });
+                    }}
                     defaultValue={field.value}
                     className="flex flex-col space-y-1"
                   >

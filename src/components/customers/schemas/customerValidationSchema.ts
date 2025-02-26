@@ -1,7 +1,27 @@
 
 import * as z from "zod";
-import { validationMessages } from "./validationMessages";
+import { supabase } from "@/integrations/supabase/client";
 import { debounce } from "lodash";
+
+// First, let's define our validation messages
+export const validationMessages = {
+  required: {
+    first_name: "First name is required",
+    last_name: "Last name is required",
+    email: "Email is required",
+    country: "Country is required",
+    timezone: "Timezone is required",
+    business_classification_id: "Business classification is required for business customers",
+    street_address: "Street address is required",
+    city: "City is required",
+    state_province: "State/Province is required",
+    postal_code: "Postal code is required"
+  },
+  format: {
+    email: "Please enter a valid email address",
+    phone: "Please enter a valid phone number"
+  }
+};
 
 export const secondaryContactSchema = z.object({
   name: z.string().optional(),
@@ -24,7 +44,9 @@ export const addressSchema = z.object({
   country: z.string().min(1, validationMessages.required.country)
 });
 
-export const customerValidationSchema = z.object({
+// Define the base schema type that includes all possible fields
+const customerBaseSchema = {
+  id: z.string().optional(),
   first_name: z.string().min(1, validationMessages.required.first_name),
   last_name: z.string().min(1, validationMessages.required.last_name),
   email: z.string().email(validationMessages.format.email),
@@ -42,31 +64,36 @@ export const customerValidationSchema = z.object({
   timezone: z.string().min(1, validationMessages.required.timezone),
   business_classification_id: z.string().optional(),
   secondary_contact: secondaryContactSchema.optional(),
-  address_book: z.array(addressSchema).optional(),
-}).refine((data) => {
-  if (data.customer_type === "Business") {
-    return !!data.business_classification_id;
-  }
-  return true;
-}, {
-  message: validationMessages.required.business_classification_id,
-  path: ["business_classification_id"]
-}).refine(async (data) => {
-  if (!data.email) return true;
-  
-  // Check for duplicate email
-  const { data: existingCustomer, error } = await supabase
-    .from('customers')
-    .select('id, email')
-    .eq('email', data.email)
-    .maybeSingle();
+  address_book: z.array(addressSchema).optional()
+};
 
-  if (error) throw error;
-  return !existingCustomer || existingCustomer.id === data.id;
-}, {
-  message: "Email address is already in use",
-  path: ["email"]
-});
+export const customerValidationSchema = z.object(customerBaseSchema)
+  .refine((data) => {
+    if (data.customer_type === "Business") {
+      return !!data.business_classification_id;
+    }
+    return true;
+  }, {
+    message: validationMessages.required.business_classification_id,
+    path: ["business_classification_id"]
+  })
+  .refine(async (data) => {
+    if (!data.email || !data.id) return true;
+    
+    // Check for duplicate email, excluding current customer
+    const { data: existingCustomer, error } = await supabase
+      .from('customers')
+      .select('id, email')
+      .eq('email', data.email)
+      .neq('id', data.id)
+      .maybeSingle();
+
+    if (error) throw error;
+    return !existingCustomer;
+  }, {
+    message: "Email address is already in use",
+    path: ["email"]
+  });
 
 export const debouncedValidation = debounce((schema: z.ZodSchema, data: any) => {
   return schema.parseAsync(data);

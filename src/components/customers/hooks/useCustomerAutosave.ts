@@ -18,7 +18,7 @@ export const useCustomerAutosave = (
   const prepareDataForSave = async (data: Partial<CustomerFormValues>) => {
     const { customer_type } = data;
 
-    // Get current user's organization_id
+    // Get current user's organization_id and id
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) throw new Error("Not authenticated");
 
@@ -46,35 +46,50 @@ export const useCustomerAutosave = (
       country: data.country,
       language_preference: data.language_preference,
       timezone: data.timezone,
+      created_by: userData.user.id,
+      updated_by: userData.user.id,
       updated_at: new Date().toISOString()
     };
 
-    // Add additional fields based on customer type
-    if (customer_type === 'Business') {
-      return {
-        ...baseFields,
-        company_name: data.company_name,
-        business_classification_id: data.business_classification_id
-      };
-    }
+    // Add type-specific fields and validation
+    switch (customer_type) {
+      case 'Business':
+        if (!data.company_name) {
+          throw new Error("Company name is required for business customers");
+        }
+        return {
+          ...baseFields,
+          company_name: data.company_name,
+          business_classification_id: data.business_classification_id
+        };
 
-    if (customer_type === 'Fleet') {
-      return {
-        ...baseFields,
-        company_name: data.company_name,
-        fleet_details: data.fleet_details
-      };
-    }
+      case 'Fleet':
+        if (!data.company_name) {
+          throw new Error("Company name is required for fleet customers");
+        }
+        return {
+          ...baseFields,
+          company_name: data.company_name,
+          fleet_details: data.fleet_details
+        };
 
-    // For Personal customers, just return base fields
-    return baseFields;
+      case 'Personal':
+        // Personal customers just use the base fields
+        if (!data.first_name || !data.last_name) {
+          throw new Error("First and last name are required for personal customers");
+        }
+        return baseFields;
+
+      default:
+        throw new Error("Invalid customer type");
+    }
   };
 
   const saveData = async (data: Partial<CustomerFormValues>) => {
     try {
       setIsSaving(true);
       
-      // Only validate customer_type as required
+      // Validate customer_type is required
       if (!data.customer_type) {
         toast({
           title: "Validation Error",

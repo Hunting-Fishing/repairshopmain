@@ -3125,6 +3125,7 @@ export type Database = {
           business_classification_id: string | null
           city: string | null
           communication_preferences: Json | null
+          company_name: string | null
           company_size: string | null
           country: string | null
           created_at: string
@@ -3137,6 +3138,7 @@ export type Database = {
             | null
           email_verified: boolean | null
           first_name: string
+          fleet_details: Json | null
           id: string
           language_preference: string | null
           last_login: string | null
@@ -3184,6 +3186,7 @@ export type Database = {
           business_classification_id?: string | null
           city?: string | null
           communication_preferences?: Json | null
+          company_name?: string | null
           company_size?: string | null
           country?: string | null
           created_at?: string
@@ -3196,6 +3199,7 @@ export type Database = {
             | null
           email_verified?: boolean | null
           first_name: string
+          fleet_details?: Json | null
           id?: string
           language_preference?: string | null
           last_login?: string | null
@@ -3243,6 +3247,7 @@ export type Database = {
           business_classification_id?: string | null
           city?: string | null
           communication_preferences?: Json | null
+          company_name?: string | null
           company_size?: string | null
           country?: string | null
           created_at?: string
@@ -3255,6 +3260,7 @@ export type Database = {
             | null
           email_verified?: boolean | null
           first_name?: string
+          fleet_details?: Json | null
           id?: string
           language_preference?: string | null
           last_login?: string | null

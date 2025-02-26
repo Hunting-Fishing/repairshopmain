@@ -1,3 +1,4 @@
+
 import { UseFormReturn, useWatch } from "react-hook-form";
 import { CustomerFormValues, CustomerType } from "../../types/customerTypes";
 import { FormSection } from "../FormSection";
@@ -173,7 +174,7 @@ export function PreferencesSection({
         >
           <div className="space-y-6">
             {!customerType && (
-              <Alert variant="warning" className="mb-4">
+              <Alert className="mb-4 border-yellow-200 bg-yellow-50 text-yellow-800">
                 <AlertDescription>
                   Please select a valid customer type before updating preferences
                 </AlertDescription>

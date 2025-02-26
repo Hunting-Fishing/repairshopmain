@@ -15,12 +15,25 @@ export const useCustomerAutosave = (
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const prepareDataForSave = (data: Partial<CustomerFormValues>) => {
+  const prepareDataForSave = async (data: Partial<CustomerFormValues>) => {
     const { customer_type } = data;
+
+    // Get current user's organization_id
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) throw new Error("Not authenticated");
+
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', userData.user.id)
+      .single();
+
+    if (!profileData) throw new Error("No profile found");
 
     // Base fields that are common to all customer types
     const baseFields = {
       id: customerId,
+      organization_id: profileData.organization_id,
       customer_type,
       first_name: data.first_name,
       last_name: data.last_name,
@@ -41,8 +54,7 @@ export const useCustomerAutosave = (
       return {
         ...baseFields,
         company_name: data.company_name,
-        business_classification_id: data.business_classification_id,
-        company_size: data.company_size
+        business_classification_id: data.business_classification_id
       };
     }
 
@@ -72,7 +84,7 @@ export const useCustomerAutosave = (
         return false;
       }
 
-      const dataToSave = prepareDataForSave(data);
+      const dataToSave = await prepareDataForSave(data);
 
       const { error } = await supabase
         .from('customers')

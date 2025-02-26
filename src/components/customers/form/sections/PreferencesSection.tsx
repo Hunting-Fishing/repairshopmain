@@ -115,6 +115,33 @@ export function PreferencesSection({
     };
   };
 
+  const validateBusinessCustomer = (data: CustomerFormValues): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    if (data.customer_type !== 'Business') {
+      return { isValid: true, errors: [] };
+    }
+
+    const requiredFields = {
+      company_name: 'Company Name',
+      email: 'Email',
+      timezone: 'Timezone',
+      business_classification_id: 'Business Classification',
+      company_size: 'Company Size'
+    } as const;
+
+    Object.entries(requiredFields).forEach(([field, label]) => {
+      if (!data[field as keyof typeof requiredFields]) {
+        errors.push(label);
+      }
+    });
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
   const handleSubmit = async (data: CustomerFormValues) => {
     const validCustomerTypes: CustomerType[] = ['Personal', 'Business', 'Fleet'];
     
@@ -127,8 +154,12 @@ export function PreferencesSection({
       return;
     }
 
-    const { isValid, errors } = validatePersonalCustomer(data);
-    if (!isValid) {
+    // Validate based on customer type
+    const personalValidation = validatePersonalCustomer(data);
+    const businessValidation = validateBusinessCustomer(data);
+
+    if (!personalValidation.isValid || !businessValidation.isValid) {
+      const errors = [...personalValidation.errors, ...businessValidation.errors];
       toast({
         title: "Required Fields Missing",
         description: `Please fill in the following required fields: ${errors.join(', ')}`,
@@ -140,7 +171,9 @@ export function PreferencesSection({
     try {
       const formData = form.getValues();
       
-      if (data.customer_type === 'Personal' && (!formData.timezone || !formData.language_preference)) {
+      // Additional validation for preferences
+      if ((data.customer_type === 'Personal' || data.customer_type === 'Business') 
+          && (!formData.timezone || !formData.language_preference)) {
         toast({
           title: "Preferences Required",
           description: "Please select both timezone and language preference",
@@ -185,6 +218,14 @@ export function PreferencesSection({
               <Alert className="mb-4 border-blue-200 bg-blue-50 text-blue-800">
                 <AlertDescription>
                   Required fields for personal customers: First Name, Last Name, Email, Timezone, and Language Preference
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {customerType === 'Business' && (
+              <Alert className="mb-4 border-green-200 bg-green-50 text-green-800">
+                <AlertDescription>
+                  Required fields for business customers: Company Name, Email, Business Classification, Company Size, Timezone, and Language Preference
                 </AlertDescription>
               </Alert>
             )}

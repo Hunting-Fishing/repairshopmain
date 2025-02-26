@@ -50,7 +50,7 @@ const businessSchema = z.object({
   ...baseSchema,
   company_name: z.string().min(2, "Company name is required and must be at least 2 characters"),
   business_classification_id: z.string().min(1, "Business classification is required"),
-  company_size: z.string().min(1, "Company size is required"),
+  tax_number: z.string().optional(),
   pst_number: z.string().optional()
 });
 
@@ -64,15 +64,6 @@ const fleetSchema = z.object({
     manager_name: z.string().min(1, "Fleet manager name is required"),
     manager_contact: z.string().min(1, "Manager contact is required"),
     service_schedule: z.string().optional()
-  }).optional(),
-  payment_billing: z.object({
-    billing_contact: z.string().min(1, "Billing contact is required"),
-    billing_email: z.string().email("Valid billing email is required"),
-    payment_terms: z.string().min(1, "Payment terms are required")
-  }).optional(),
-  insurance_compliance: z.object({
-    insurance_provider: z.string().min(1, "Insurance provider is required"),
-    policy_number: z.string().min(1, "Policy number is required")
   }).optional()
 });
 

@@ -52,10 +52,10 @@ export function AdditionalDetailsSection({
 
             <FormInput
               form={form}
-              name="company_size"
-              label="Company Size"
-              placeholder="Enter company size"
-              required={requiredFields.includes("company_size")}
+              name="tax_number"
+              label="Tax #"
+              placeholder="Enter tax number"
+              required={false}
               isModernTheme={isModernTheme}
             />
           </>

@@ -5,6 +5,7 @@ import { CustomerFormValues } from '../types/customerTypes';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
+import { logError } from '@/utils/error-handling';
 
 export function useCustomerAutosave(
   form: UseFormReturn<CustomerFormValues>,
@@ -70,6 +71,15 @@ export function useCustomerAutosave(
           });
         } catch (error: any) {
           console.error('Autosave error:', error);
+          logError(error, {
+            action_type: 'autosave',
+            table_name: 'customers',
+            level: 'error',
+            metadata: {
+              formValues,
+              customerId
+            }
+          });
           toast({
             title: "Autosave failed",
             description: "Failed to save changes. Please try again.",

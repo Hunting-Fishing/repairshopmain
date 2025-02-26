@@ -15,6 +15,49 @@ export const useCustomerAutosave = (
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
+  const prepareDataForSave = (data: Partial<CustomerFormValues>) => {
+    const { customer_type } = data;
+
+    // Base fields that are common to all customer types
+    const baseFields = {
+      id: customerId,
+      customer_type,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      phone_number: data.phone_number,
+      street_address: data.street_address,
+      city: data.city,
+      state_province: data.state_province,
+      postal_code: data.postal_code,
+      country: data.country,
+      language_preference: data.language_preference,
+      timezone: data.timezone,
+      updated_at: new Date().toISOString()
+    };
+
+    // Add additional fields based on customer type
+    if (customer_type === 'Business') {
+      return {
+        ...baseFields,
+        company_name: data.company_name,
+        business_classification_id: data.business_classification_id,
+        company_size: data.company_size
+      };
+    }
+
+    if (customer_type === 'Fleet') {
+      return {
+        ...baseFields,
+        company_name: data.company_name,
+        fleet_details: data.fleet_details
+      };
+    }
+
+    // For Personal customers, just return base fields
+    return baseFields;
+  };
+
   const saveData = async (data: Partial<CustomerFormValues>) => {
     try {
       setIsSaving(true);
@@ -29,18 +72,16 @@ export const useCustomerAutosave = (
         return false;
       }
 
+      const dataToSave = prepareDataForSave(data);
+
       const { error } = await supabase
         .from('customers')
-        .upsert({
-          id: customerId,
-          ...data,
-          updated_at: new Date().toISOString()
-        });
+        .upsert(dataToSave);
 
       if (error) throw error;
 
       setIsDirty(false);
-      console.log('Autosaved successfully:', data);
+      console.log('Autosaved successfully:', dataToSave);
       return true;
     } catch (error: any) {
       console.error('Autosave error:', error);

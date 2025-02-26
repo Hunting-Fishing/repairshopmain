@@ -8,18 +8,28 @@ interface CustomerAddressFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
   isModernTheme?: boolean;
   required?: boolean;
+  addressIndex?: number; // Added back the addressIndex prop
 }
 
 export function CustomerAddressFields({
   form,
   isModernTheme = false,
-  required = false
+  required = false,
+  addressIndex // Added back the addressIndex prop
 }: CustomerAddressFieldsProps) {
+  // Helper function to get the correct field name based on whether we're dealing with an address book entry
+  const getFieldName = (field: string): string => {
+    if (typeof addressIndex === 'number') {
+      return `address_book.${addressIndex}.${field}`;
+    }
+    return field;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <FormInput
         form={form}
-        name="street_address"
+        name={getFieldName("street_address")}
         label="Street Address"
         placeholder="Enter street address"
         icon={<MapPin className="h-4 w-4 text-gray-500" />}
@@ -28,7 +38,7 @@ export function CustomerAddressFields({
       />
       <FormInput
         form={form}
-        name="city"
+        name={getFieldName("city")}
         label="City"
         placeholder="Enter city"
         icon={<Building2 className="h-4 w-4 text-gray-500" />}
@@ -37,7 +47,7 @@ export function CustomerAddressFields({
       />
       <FormInput
         form={form}
-        name="state_province"
+        name={getFieldName("state_province")}
         label="State/Province"
         placeholder="Enter state or province"
         required={required}
@@ -45,7 +55,7 @@ export function CustomerAddressFields({
       />
       <FormInput
         form={form}
-        name="postal_code"
+        name={getFieldName("postal_code")}
         label="Postal Code"
         placeholder="Enter postal code"
         required={required}
@@ -53,7 +63,7 @@ export function CustomerAddressFields({
       />
       <FormInput
         form={form}
-        name="country"
+        name={getFieldName("country")}
         label="Country"
         placeholder="Enter country"
         icon={<Globe className="h-4 w-4 text-gray-500" />}

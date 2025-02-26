@@ -1,7 +1,8 @@
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CustomerFormValues } from "../types/customerTypes";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProfileCompleteness {
   score: number;
@@ -10,16 +11,97 @@ interface ProfileCompleteness {
 }
 
 export function useCustomerDataSave(customerId: string) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  // Field-level update mutation
   const updateField = useMutation({
     mutationFn: async ({ field, value }: { field: keyof CustomerFormValues; value: any }) => {
       const { data, error } = await supabase
         .from('customers')
         .update({ [field]: value })
-        .eq('id', customerId);
+        .eq('id', customerId)
+        .select()
+        .single();
 
       if (error) throw error;
       return data;
-    }
+    },
+    // Optimistic update
+    onMutate: async ({ field, value }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['customer', customerId] });
+
+      // Snapshot the previous value
+      const previousCustomer = queryClient.getQueryData<CustomerFormValues>(['customer', customerId]);
+
+      // Optimistically update the cache
+      if (previousCustomer) {
+        queryClient.setQueryData(['customer', customerId], {
+          ...previousCustomer,
+          [field]: value,
+        });
+      }
+
+      // Return context with the previous value
+      return { previousCustomer };
+    },
+    // If mutation fails, use context to roll back
+    onError: (err, variables, context) => {
+      if (context?.previousCustomer) {
+        queryClient.setQueryData(['customer', customerId], context.previousCustomer);
+      }
+      toast({
+        title: "Error saving changes",
+        description: "Your changes couldn't be saved. Please try again.",
+        variant: "destructive",
+      });
+    },
+    // Always refetch after error or success
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer', customerId] });
+    },
+  });
+
+  // Batch update mutation for multiple fields
+  const updateMultipleFields = useMutation({
+    mutationFn: async (updates: Partial<CustomerFormValues>) => {
+      const { data, error } = await supabase
+        .from('customers')
+        .update(updates)
+        .eq('id', customerId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onMutate: async (updates) => {
+      await queryClient.cancelQueries({ queryKey: ['customer', customerId] });
+      const previousCustomer = queryClient.getQueryData<CustomerFormValues>(['customer', customerId]);
+
+      if (previousCustomer) {
+        queryClient.setQueryData(['customer', customerId], {
+          ...previousCustomer,
+          ...updates,
+        });
+      }
+
+      return { previousCustomer };
+    },
+    onError: (err, variables, context) => {
+      if (context?.previousCustomer) {
+        queryClient.setQueryData(['customer', customerId], context.previousCustomer);
+      }
+      toast({
+        title: "Error saving changes",
+        description: "Your changes couldn't be saved. Please try again.",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['customer', customerId] });
+    },
   });
 
   const calculateProfileCompleteness = (data: CustomerFormValues): ProfileCompleteness => {
@@ -139,8 +221,9 @@ export function useCustomerDataSave(customerId: string) {
   };
 
   return {
-    isSaving: updateField.isPending,
+    isSaving: updateField.isPending || updateMultipleFields.isPending,
     updateField: updateField.mutateAsync,
+    updateMultipleFields: updateMultipleFields.mutateAsync,
     calculateProfileCompleteness,
     enrichCustomerData
   };

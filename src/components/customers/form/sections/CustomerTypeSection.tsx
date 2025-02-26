@@ -2,7 +2,11 @@
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 import { FormSection } from "../FormSection";
-import { CustomerTypeSelect } from "../fields/CustomerTypeSelect";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { FormInput } from "../fields/FormInput";
+import { cn } from "@/lib/utils";
+import { Building2, User } from "lucide-react";
 
 interface CustomerTypeSectionProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -13,18 +17,91 @@ export function CustomerTypeSection({
   form,
   isModernTheme = false,
 }: CustomerTypeSectionProps) {
+  const customerType = form.watch("customer_type");
+
   return (
-    <FormSection 
-      title="Customer Type" 
-      description="Select the type of customer account"
-      isModernTheme={isModernTheme}
-    >
-      <div className="w-full max-w-md">
-        <CustomerTypeSelect 
-          form={form} 
-          isModernTheme={isModernTheme}
-        />
-      </div>
-    </FormSection>
+    <>
+      <FormSection 
+        title="Customer Type" 
+        description="Select the type of customer account"
+        isModernTheme={isModernTheme}
+      >
+        <div className="w-full max-w-md space-y-6">
+          <FormField
+            control={form.control}
+            name="customer_type"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel className={cn(
+                  isModernTheme
+                    ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
+                    : "text-gray-700 font-medium"
+                )}>
+                  Customer Type <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    className="flex flex-col space-y-1"
+                  >
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="Personal" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Personal
+                      </FormLabel>
+                    </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="Business" />
+                      </FormControl>
+                      <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                        <Building2 className="h-4 w-4" />
+                        Business
+                      </FormLabel>
+                    </FormItem>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {customerType === "Business" && (
+            <div className="space-y-4 animate-fadeIn">
+              <FormInput
+                form={form}
+                name="company_name"
+                label="Company Name"
+                required={true}
+                placeholder="Enter company name"
+                isModernTheme={isModernTheme}
+              />
+              
+              <FormInput
+                form={form}
+                name="business_classification_id"
+                label="Business Classification"
+                required={true}
+                placeholder="Select business classification"
+                isModernTheme={isModernTheme}
+              />
+
+              <FormInput
+                form={form}
+                name="company_size"
+                label="Company Size"
+                required={true}
+                placeholder="Enter company size"
+                isModernTheme={isModernTheme}
+              />
+            </div>
+          )}
+        </div>
+      </FormSection>
+    </>
   );
 }

@@ -1,13 +1,15 @@
+
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
-import { FormInput } from "./fields/FormInput";
 import { CustomerTypeSelect } from "./fields/CustomerTypeSelect";
 import { FormSection } from "./FormSection";
 import { AddressBookSection } from "./sections/AddressBookSection";
-import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { useCustomerDataSave } from "../hooks/useCustomerDataSave";
 import { SocialProfilesSection } from "./sections/SocialProfilesSection";
+import { ProfileCompletenessSection } from "./sections/ProfileCompletenessSection";
+import { BasicInformationSection } from "./sections/BasicInformationSection";
+import { FormInput } from "./fields/FormInput";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -37,74 +39,12 @@ export function CustomerFormFields({
 
   return (
     <div className="space-y-8">
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <div className="mb-2 flex justify-between items-center">
-          <h3 className="text-sm font-medium">Profile Completeness</h3>
-          <span className="text-sm text-muted-foreground">{Math.round(completeness.score)}%</span>
-        </div>
-        <Progress value={completeness.score} className="h-2" />
-        {completeness.recommendations.length > 0 && (
-          <div className="mt-2">
-            <p className="text-sm text-muted-foreground">Recommendations:</p>
-            <ul className="text-sm text-muted-foreground list-disc list-inside">
-              {completeness.recommendations.slice(0, 3).map((rec, index) => (
-                <li key={index}>{rec}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      <ProfileCompletenessSection 
+        score={completeness.score}
+        recommendations={completeness.recommendations}
+      />
 
-      <FormSection 
-        title="Basic Information" 
-        description="Enter the customer's basic contact information"
-        isModernTheme={isModernTheme}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormInput
-            form={form}
-            name="first_name"
-            label="First Name"
-            placeholder="Enter first name"
-            helpText="Customer's legal first name as it appears on official documents"
-            required
-            isModernTheme={isModernTheme}
-          />
-          <FormInput
-            form={form}
-            name="last_name"
-            label="Last Name"
-            placeholder="Enter last name"
-            helpText="Customer's legal last name as it appears on official documents"
-            required
-            isModernTheme={isModernTheme}
-          />
-        </div>
-
-        <div className="mt-6">
-          <FormInput
-            form={form}
-            name="email"
-            label="Email Address"
-            type="email"
-            placeholder="Enter email address"
-            helpText="Primary email address for communications and notifications"
-            required
-            isModernTheme={isModernTheme}
-          />
-        </div>
-
-        <div className="mt-6">
-          <FormInput
-            form={form}
-            name="phone_number"
-            label="Phone Number"
-            placeholder="Enter phone number"
-            helpText="Primary contact number for important communications"
-            isModernTheme={isModernTheme}
-          />
-        </div>
-      </FormSection>
+      <BasicInformationSection form={form} isModernTheme={isModernTheme} />
 
       <FormSection 
         title="Primary Address" 

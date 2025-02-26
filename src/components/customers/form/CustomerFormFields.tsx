@@ -9,8 +9,7 @@ import { ProfileCompletenessSection } from "./sections/ProfileCompletenessSectio
 import { BasicInformationSection } from "./sections/BasicInformationSection";
 import { PrimaryAddressSection } from "./sections/PrimaryAddressSection";
 import { CustomerTypeSection } from "./sections/CustomerTypeSection";
-import { FormSection } from "./FormSection";
-import { FormInput } from "./fields/FormInput";
+import { AdditionalDetailsSection } from "./sections/AdditionalDetailsSection";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -55,23 +54,7 @@ export function CustomerFormFields({
 
       <AddressBookSection form={form} isModernTheme={isModernTheme} />
 
-      <FormSection 
-        title="Additional Details" 
-        description="Optional information to better serve the customer"
-        defaultExpanded={false}
-        isModernTheme={isModernTheme}
-      >
-        <div className="space-y-6">
-          <FormInput
-            form={form}
-            name="notes"
-            label="Notes"
-            placeholder="Enter any additional notes"
-            helpText="Internal notes about the customer (not visible to them)"
-            isModernTheme={isModernTheme}
-          />
-        </div>
-      </FormSection>
+      <AdditionalDetailsSection form={form} isModernTheme={isModernTheme} />
     </div>
   );
 }

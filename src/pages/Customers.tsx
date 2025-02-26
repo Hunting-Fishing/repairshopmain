@@ -19,41 +19,44 @@ import { CustomerHeader } from "@/components/customers/page/CustomerHeader";
 import { CustomerSearchBar } from "@/components/customers/page/CustomerSearchBar";
 import { CustomerViewToggle } from "@/components/customers/page/CustomerViewToggle";
 import { CustomerGrid } from "@/components/customers/page/CustomerGrid";
+import { CustomerToolbar } from "@/components/customers/page/CustomerToolbar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 
 export default function Customers() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterValue, setFilterValue] = useState("all");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const { toast } = useToast();
   const { isModernTheme } = useTheme();
 
-  const { data: userProfile } = useQuery({
-    queryKey: ["user-profile"],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) return null;
-      
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("theme_preference")
-        .eq("id", session.user.id)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const { data: customers = [], refetch, isLoading } = useQuery({
-    queryKey: ["customers"],
+    queryKey: ["customers", searchQuery, filterValue],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("customers")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
 
+      if (searchQuery) {
+        query = query.or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
+      }
+
+      if (filterValue !== "all") {
+        switch (filterValue) {
+          case "high_value":
+            query = query.gt('total_spend', 1000);
+            break;
+          case "at_risk":
+            query = query.gt('churn_risk', 50);
+            break;
+          default:
+            query = query.eq('status', filterValue);
+        }
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false });
+      
       if (error) {
         toast({
           variant: "destructive",
@@ -99,11 +102,38 @@ export default function Customers() {
     });
   };
 
-  const filteredCustomers = customers.filter(customer => 
-    customer.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    customer.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleBulkAction = async (action: string, selectedIds: string[]) => {
+    try {
+      switch (action) {
+        case "delete":
+          const { error } = await supabase
+            .from("customers")
+            .delete()
+            .in("id", selectedIds);
+
+          if (error) throw error;
+
+          toast({
+            title: "Customers deleted",
+            description: `Successfully deleted ${selectedIds.length} customers.`,
+          });
+          refetch();
+          break;
+        // Add other bulk actions here
+        default:
+          toast({
+            title: "Not implemented",
+            description: `Bulk action "${action}" is not implemented yet.`,
+          });
+      }
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error performing bulk action",
+        description: error.message,
+      });
+    }
+  };
 
   return (
     <div className="flex min-h-screen w-full">
@@ -116,52 +146,57 @@ export default function Customers() {
         }`}>
           <CustomerHeader isModernTheme={isModernTheme} />
           
-          <div className="flex items-center gap-4 mt-6">
-            <CustomerSearchBar 
+          <div className="mt-6">
+            <CustomerToolbar 
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              isModernTheme={isModernTheme}
+              onFilterChange={setFilterValue}
+              onBulkAction={handleBulkAction}
             />
-            <CustomerViewToggle 
-              viewMode={viewMode}
-              onViewChange={setViewMode}
-              isModernTheme={isModernTheme}
-            />
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button 
-                  className={`${
-                    isModernTheme
-                      ? 'bg-blue-500 hover:bg-blue-600'
-                      : 'bg-[#F97316] hover:bg-[#EA580C]'
-                  } transition-colors shadow-md hover:shadow-lg`}
-                  size="lg"
-                >
-                  <Plus className="mr-2 h-5 w-5" />
-                  Add Customer
-                </Button>
-              </DialogTrigger>
-              <DialogContent className={`sm:max-w-[800px] max-h-[90vh] ${
-                isModernTheme
-                  ? 'bg-gradient-to-b from-white to-blue-50/10 border-blue-100/20'
-                  : 'bg-white'
-              }`}>
-                <ScrollArea className="max-h-[85vh]">
-                  <DialogHeader className="p-8 rounded-t-lg">
-                    <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
-                      Add New Customer
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="p-8">
-                    <CustomerForm 
-                      onSuccess={handleCustomerAdded} 
-                      mode="create"
-                      customerId="new" // For new customers, we use a placeholder ID
-                    />
-                  </div>
-                </ScrollArea>
-              </DialogContent>
-            </Dialog>
+            
+            <div className="flex items-center justify-between mb-4">
+              <CustomerViewToggle 
+                viewMode={viewMode}
+                onViewChange={setViewMode}
+                isModernTheme={isModernTheme}
+              />
+              
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button 
+                    className={`${
+                      isModernTheme
+                        ? 'bg-blue-500 hover:bg-blue-600'
+                        : 'bg-[#F97316] hover:bg-[#EA580C]'
+                    } transition-colors shadow-md hover:shadow-lg`}
+                    size="lg"
+                  >
+                    <Plus className="mr-2 h-5 w-5" />
+                    Add Customer
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className={`sm:max-w-[800px] max-h-[90vh] ${
+                  isModernTheme
+                    ? 'bg-gradient-to-b from-white to-blue-50/10 border-blue-100/20'
+                    : 'bg-white'
+                }`}>
+                  <ScrollArea className="max-h-[85vh]">
+                    <DialogHeader className="p-8 rounded-t-lg">
+                      <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-3">
+                        Add New Customer
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="p-8">
+                      <CustomerForm 
+                        onSuccess={handleCustomerAdded} 
+                        mode="create"
+                        customerId="new"
+                      />
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
 
@@ -172,13 +207,13 @@ export default function Customers() {
         } rounded-xl shadow-lg p-6 animate-fade-in`}>
           {viewMode === "list" ? (
             <CustomerTable 
-              customers={filteredCustomers} 
+              customers={customers} 
               isLoading={isLoading}
               onDelete={handleDelete}
             />
           ) : (
             <CustomerGrid 
-              customers={filteredCustomers}
+              customers={customers}
               isModernTheme={isModernTheme}
             />
           )}

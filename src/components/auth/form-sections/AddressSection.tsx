@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UseFormRegister, FieldErrors } from "react-hook-form";
 
 interface Country {
   id: string;
@@ -17,33 +18,42 @@ interface AddressSectionProps {
   countries?: Country[];
   regions?: Region[];
   onCountryChange: (value: string) => void;
+  register: UseFormRegister<any>;
+  errors: FieldErrors<any>;
 }
 
 export function AddressSection({
   countries,
   regions,
   onCountryChange,
+  register,
+  errors
 }: AddressSectionProps) {
   return (
     <div className="space-y-2">
       <Label htmlFor="streetAddress">Address</Label>
       <Input
+        {...register("streetAddress", { required: "Street address is required" })}
         id="streetAddress"
-        name="streetAddress"
         placeholder="Street Address"
-        required
         aria-label="Street address"
       />
+      {errors.streetAddress && (
+        <p className="text-sm text-red-500">{errors.streetAddress.message as string}</p>
+      )}
+
       <Input
+        {...register("city", { required: "City is required" })}
         id="city"
-        name="city"
         placeholder="City"
-        required
         aria-label="City"
       />
+      {errors.city && (
+        <p className="text-sm text-red-500">{errors.city.message as string}</p>
+      )}
+
       <Select 
-        name="country" 
-        required
+        {...register("country")}
         onValueChange={onCountryChange}
       >
         <SelectTrigger aria-label="Select country">
@@ -57,7 +67,11 @@ export function AddressSection({
           ))}
         </SelectContent>
       </Select>
-      <Select name="stateProvince" required>
+      {errors.country && (
+        <p className="text-sm text-red-500">{errors.country.message as string}</p>
+      )}
+
+      <Select {...register("stateProvince")}>
         <SelectTrigger aria-label="Select state or province">
           <SelectValue placeholder="Select State/Province" />
         </SelectTrigger>
@@ -69,13 +83,19 @@ export function AddressSection({
           ))}
         </SelectContent>
       </Select>
+      {errors.stateProvince && (
+        <p className="text-sm text-red-500">{errors.stateProvince.message as string}</p>
+      )}
+
       <Input
+        {...register("postalCode", { required: "Postal code is required" })}
         id="postalCode"
-        name="postalCode"
         placeholder="Postal Code"
-        required
         aria-label="Postal code"
       />
+      {errors.postalCode && (
+        <p className="text-sm text-red-500">{errors.postalCode.message as string}</p>
+      )}
     </div>
   );
 }

@@ -50,18 +50,6 @@ export function CustomerFormFields({
         recommendations={completeness.recommendations}
       />
       
-      <BasicInformationSection form={form} isModernTheme={isModernTheme} />
-      
-      <PrimaryAddressSection form={form} isModernTheme={isModernTheme} />
-
-      {customerType === "Business" && (
-        <AdditionalDetailsSection 
-          form={form} 
-          isModernTheme={isModernTheme} 
-          requiredFields={["company_name", "business_classification_id", "company_size"]}
-        />
-      )}
-
       {customerType === "Fleet" && (
         <AdditionalDetailsSection 
           form={form} 
@@ -70,13 +58,17 @@ export function CustomerFormFields({
         />
       )}
 
-      {customerType === "Personal" && (
+      {customerType === "Business" && (
         <AdditionalDetailsSection 
           form={form} 
           isModernTheme={isModernTheme} 
-          requiredFields={[]}
+          requiredFields={["company_name", "business_classification_id", "tax_number"]}
         />
       )}
+
+      <BasicInformationSection form={form} isModernTheme={isModernTheme} />
+      
+      <PrimaryAddressSection form={form} isModernTheme={isModernTheme} />
 
       <PreferencesSection form={form} isModernTheme={isModernTheme} />
 

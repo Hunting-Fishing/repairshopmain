@@ -87,13 +87,44 @@ export function PreferencesSection({
     }
   }, [country, form]);
 
+  const validatePersonalCustomer = (data: CustomerFormValues): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    if (data.customer_type !== 'Personal') {
+      return { isValid: true, errors: [] };
+    }
+
+    // Required fields for personal customers
+    if (!data.first_name) errors.push('First Name');
+    if (!data.last_name) errors.push('Last Name');
+    if (!data.email) errors.push('Email');
+    if (!data.timezone) errors.push('Timezone');
+    if (!data.language_preference) errors.push('Language Preference');
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
   const handleSubmit = async (data: CustomerFormValues) => {
     const validCustomerTypes: CustomerType[] = ['Personal', 'Business', 'Fleet'];
     
     if (!validCustomerTypes.includes(data.customer_type)) {
       toast({
-        title: "Validation Error",
-        description: "Only personal, business, or fleet customers are allowed",
+        title: "Invalid Customer Type",
+        description: `Customer type must be one of: ${validCustomerTypes.join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate personal customer data
+    const { isValid, errors } = validatePersonalCustomer(data);
+    if (!isValid) {
+      toast({
+        title: "Required Fields Missing",
+        description: `Please fill in the following required fields: ${errors.join(', ')}`,
         variant: "destructive",
       });
       return;
@@ -101,6 +132,10 @@ export function PreferencesSection({
 
     try {
       await form.handleSubmit(() => {})();
+      toast({
+        title: "Success",
+        description: "Preferences updated successfully",
+      });
     } catch (error) {
       toast({
         title: "Error",
@@ -125,6 +160,18 @@ export function PreferencesSection({
                   <div className="ml-3">
                     <p className="text-sm text-yellow-700">
                       Please select a valid customer type before updating preferences
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {customerType === 'Personal' && (
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                <div className="flex">
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      Required fields for personal customers: First Name, Last Name, Email, Timezone, and Language Preference
                     </p>
                   </div>
                 </div>

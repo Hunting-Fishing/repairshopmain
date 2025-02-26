@@ -6,6 +6,17 @@ import { CustomerFormValues } from "../types/customerTypes";
 import { useCustomerFormData } from "./useCustomerFormData";
 import { useCustomerDataSave } from "./useCustomerDataSave";
 
+interface ChangeRecord {
+  old: any;
+  new: any;
+}
+
+interface PendingChanges {
+  values: CustomerFormValues;
+  changes: Record<string, ChangeRecord>;
+  userId: string;
+}
+
 export function useCustomerFormSubmit({ 
   onSuccess, 
   initialData, 
@@ -18,7 +29,7 @@ export function useCustomerFormSubmit({
   const { toast } = useToast();
   const [showNotesDialog, setShowNotesDialog] = useState(false);
   const [changeNotes, setChangeNotes] = useState("");
-  const [pendingChanges, setPendingChanges] = useState<any>(null);
+  const [pendingChanges, setPendingChanges] = useState<PendingChanges | null>(null);
 
   const { form } = useCustomerFormData({ initialData });
   const { updateField } = useCustomerDataSave(initialData?.id || "new");
@@ -31,7 +42,7 @@ export function useCustomerFormSubmit({
       }
 
       if (mode === "edit") {
-        const changes: Record<string, { old: any; new: any }> = {};
+        const changes: Record<string, ChangeRecord> = {};
         Object.keys(values).forEach((key) => {
           if (values[key as keyof CustomerFormValues] !== initialData[key]) {
             changes[key] = {

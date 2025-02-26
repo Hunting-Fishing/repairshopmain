@@ -10,6 +10,8 @@ interface CustomerAddressFieldsProps {
   addressIndex?: number;
 }
 
+type AddressField = "street_address" | "city" | "state_province" | "postal_code" | "country";
+
 export function CustomerAddressFields({ 
   form, 
   isModernTheme = false,
@@ -19,9 +21,9 @@ export function CustomerAddressFields({
     ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white transition-all duration-200 rounded-lg"
     : "bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white";
 
-  const getFieldName = (field: string) => {
+  const getFieldName = (field: AddressField): `address_book.${number}.${AddressField}` | AddressField => {
     return addressIndex !== undefined 
-      ? `address_book.${addressIndex}.${field}` 
+      ? `address_book.${addressIndex}.${field}` as const
       : field;
   };
 
@@ -30,11 +32,17 @@ export function CustomerAddressFields({
       <FormField
         control={form.control}
         name={getFieldName("street_address")}
-        render={({ field }) => (
+        render={({ field: { onChange, value, ...field } }) => (
           <FormItem>
             <FormLabel>Street Address</FormLabel>
             <FormControl>
-              <Input {...field} className={inputClasses} placeholder="Enter street address" />
+              <Input 
+                {...field}
+                value={value as string}
+                onChange={onChange}
+                className={inputClasses} 
+                placeholder="Enter street address" 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -45,11 +53,17 @@ export function CustomerAddressFields({
         <FormField
           control={form.control}
           name={getFieldName("city")}
-          render={({ field }) => (
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
               <FormLabel>City</FormLabel>
               <FormControl>
-                <Input {...field} className={inputClasses} placeholder="Enter city" />
+                <Input 
+                  {...field}
+                  value={value as string}
+                  onChange={onChange}
+                  className={inputClasses} 
+                  placeholder="Enter city" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -58,11 +72,17 @@ export function CustomerAddressFields({
         <FormField
           control={form.control}
           name={getFieldName("state_province")}
-          render={({ field }) => (
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
               <FormLabel>State/Province</FormLabel>
               <FormControl>
-                <Input {...field} className={inputClasses} placeholder="Enter state or province" />
+                <Input 
+                  {...field}
+                  value={value as string}
+                  onChange={onChange}
+                  className={inputClasses} 
+                  placeholder="Enter state or province" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -74,11 +94,17 @@ export function CustomerAddressFields({
         <FormField
           control={form.control}
           name={getFieldName("postal_code")}
-          render={({ field }) => (
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
               <FormLabel>Postal Code</FormLabel>
               <FormControl>
-                <Input {...field} className={inputClasses} placeholder="Enter postal code" />
+                <Input 
+                  {...field}
+                  value={value as string}
+                  onChange={onChange}
+                  className={inputClasses} 
+                  placeholder="Enter postal code" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -87,11 +113,17 @@ export function CustomerAddressFields({
         <FormField
           control={form.control}
           name={getFieldName("country")}
-          render={({ field }) => (
+          render={({ field: { onChange, value, ...field } }) => (
             <FormItem>
               <FormLabel>Country</FormLabel>
               <FormControl>
-                <Input {...field} className={inputClasses} placeholder="Enter country" />
+                <Input 
+                  {...field}
+                  value={value as string}
+                  onChange={onChange}
+                  className={inputClasses} 
+                  placeholder="Enter country" 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

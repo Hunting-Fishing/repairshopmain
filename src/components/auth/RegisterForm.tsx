@@ -20,29 +20,70 @@ import {
 import { BusinessInformationSection } from "./form-sections/BusinessInformationSection";
 import { PersonalInformationSection } from "./form-sections/PersonalInformationSection";
 import { AddressSection } from "./form-sections/AddressSection";
+import { useForm } from "react-hook-form";
 
 const ROLES = ['admin', 'moderator', 'user'] as const;
 type UserRole = typeof ROLES[number];
+
+interface RegisterFormData {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  organizationName: string;
+  businessPhone: string;
+  businessType: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  streetAddress: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+  country: string;
+  role: UserRole;
+}
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedBusinessType, setSelectedBusinessType] = useState<BusinessType | null>(null);
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState<UserRole>("user");
-  const formRef = useRef<HTMLFormElement>(null);
 
   const { signUp } = useAuth();
   const { countries, regions } = useLocationData(selectedCountry);
   const { businessTypes, isLoading: isLoadingTypes } = useBusinessTypes();
   const { isRateLimited, checkRateLimit } = useAuthRateLimit();
 
+  const form = useForm<RegisterFormData>({
+    defaultValues: {
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      organizationName: "",
+      businessPhone: "",
+      businessType: "",
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      streetAddress: "",
+      city: "",
+      stateProvince: "",
+      postalCode: "",
+      country: "",
+      role: "user"
+    },
+    mode: "onBlur"
+  });
+
+  const { register, handleSubmit, formState: { errors }, watch } = form;
+  const password = watch("password");
   const [passwordErrors, setPasswordErrors] = useState(validatePassword(""));
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPassword(value);
+    form.setValue("password", value);
     setPasswordErrors(validatePassword(value));
   };
 
@@ -51,10 +92,8 @@ export function RegisterForm() {
     setSelectedBusinessType(selected || null);
   };
 
-  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    if (password !== confirmPassword) {
+  const onSubmit = async (data: RegisterFormData) => {
+    if (data.password !== data.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
@@ -77,37 +116,12 @@ export function RegisterForm() {
 
     setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Please enter a valid email address");
-      setIsLoading(false);
-      return;
-    }
-
-    const signUpData = {
-      email,
-      password,
-      organizationName: formData.get("organizationName") as string,
-      businessPhone: formData.get("businessPhone") as string,
-      businessType: selectedBusinessType?.id,
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
-      phoneNumber: formData.get("phoneNumber") as string,
-      streetAddress: formData.get("streetAddress") as string,
-      city: formData.get("city") as string,
-      stateProvince: formData.get("stateProvince") as string,
-      postalCode: formData.get("postalCode") as string,
-      country: formData.get("country") as string,
-      role,
-    };
-
     try {
-      await signUp(signUpData);
-      formRef.current?.reset();
-      setPassword("");
-      setConfirmPassword("");
+      await signUp({
+        ...data,
+        businessType: selectedBusinessType?.id,
+      });
+      form.reset();
       setSelectedBusinessType(null);
       setSelectedCountry("");
       setRole("user");
@@ -131,26 +145,32 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSignUp} ref={formRef} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <BusinessInformationSection
         isLoadingTypes={isLoadingTypes}
         businessTypes={businessTypes}
         selectedBusinessType={selectedBusinessType}
         onBusinessTypeChange={handleBusinessTypeChange}
+        register={register}
+        errors={errors}
       />
 
       <PersonalInformationSection
+        register={register}
+        errors={errors}
         password={password}
-        confirmPassword={confirmPassword}
+        confirmPassword={watch("confirmPassword")}
         passwordErrors={passwordErrors}
         onPasswordChange={handlePasswordChange}
-        onConfirmPasswordChange={(e) => setConfirmPassword(e.target.value)}
+        onConfirmPasswordChange={(e) => form.setValue("confirmPassword", e.target.value)}
       />
 
       <AddressSection
         countries={countries}
         regions={regions}
         onCountryChange={setSelectedCountry}
+        register={register}
+        errors={errors}
       />
 
       <div className="space-y-2">

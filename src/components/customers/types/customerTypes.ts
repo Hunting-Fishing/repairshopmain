@@ -16,6 +16,7 @@ export interface CustomerFormValues {
   business_classification_id?: string;
   loyalty_tier?: string;
   loyalty_points?: string;
+  notes?: string;
   preferred_contact_time?: {
     start: string;
     end: string;

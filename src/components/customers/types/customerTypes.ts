@@ -1,3 +1,4 @@
+
 export interface CustomerFormValues {
   first_name: string;
   last_name: string;
@@ -17,6 +18,7 @@ export interface CustomerFormValues {
   loyalty_tier?: string;
   loyalty_points?: string;
   notes?: string;
+  pst_number?: string; // Add this line
   social_profiles?: {
     linkedin?: string;
     twitter?: string;

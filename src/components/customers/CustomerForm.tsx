@@ -1,3 +1,4 @@
+
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { CustomerFormFields } from "./form/CustomerFormFields";
@@ -26,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface CustomerFormProps {
   mode?: "create" | "edit";
@@ -39,10 +40,12 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showUnsavedChanges, setShowUnsavedChanges] = useState(false);
+  const [formErrors, setFormErrors] = useState<any>(null);
 
   const { data: customerData, isLoading, error } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
+      console.log("Fetching customer data for ID:", customerId);
       if (customerId === "new") return null;
       
       const { data, error } = await supabase
@@ -51,11 +54,16 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         .eq("id", customerId)
         .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching customer data:", error);
+        throw error;
+      }
+      
+      console.log("Fetched customer data:", data);
       return data;
     },
-    gcTime: 1000 * 60 * 60, // Cache for 1 hour
-    staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes
+    gcTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5,
   });
 
   const form = useForm<CustomerFormValues>({
@@ -69,7 +77,23 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     mode: "onChange"
   });
 
-  // Enable autosave only in edit mode
+  // Monitor form state changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      console.log("Form field changed:", { name, type, value });
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
+
+  // Monitor form errors
+  useEffect(() => {
+    const errors = form.formState.errors;
+    if (Object.keys(errors).length > 0) {
+      console.log("Form validation errors:", errors);
+      setFormErrors(errors);
+    }
+  }, [form.formState.errors]);
+
   const { isDirty, discardChanges } = useCustomerAutosave(form, customerId, mode === "edit");
 
   if (isLoading) {
@@ -81,6 +105,7 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
   }
 
   if (error) {
+    console.error("Customer loading error:", error);
     return (
       <div className="p-4 text-red-500">
         Error loading customer: {error.message}
@@ -89,13 +114,19 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
   }
 
   const onSubmit = async (values: CustomerFormValues) => {
+    console.log("Form submission started with values:", values);
     try {
       setIsSubmitting(true);
+      setFormErrors(null);
+
+      // Log customer type for debugging
+      console.log("Customer type:", values.customer_type);
 
       // Validate business rules
       const { isValid, errors } = validateCustomerBusinessRules(values, values.customer_type);
       
       if (!isValid) {
+        console.error("Business rule validation failed:", errors);
         errors.forEach(error => {
           toast({
             title: "Validation Error",
@@ -110,6 +141,7 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       // Remove fields that don't apply to the current customer type
       const cleanedValues = { ...values };
       if (values.customer_type === "Personal") {
+        console.log("Cleaning up Personal customer data...");
         delete cleanedValues.company_name;
         delete cleanedValues.business_classification_id;
         delete cleanedValues.company_size;
@@ -118,19 +150,35 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         delete cleanedValues.insurance_compliance;
       }
 
+      console.log("Cleaned form values:", cleanedValues);
+
       if (mode === "edit") {
-        const { error } = await supabase
+        console.log("Updating customer with ID:", customerId);
+        const { data, error } = await supabase
           .from("customers")
           .update(cleanedValues)
-          .eq("id", customerId);
+          .eq("id", customerId)
+          .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase update error:", error);
+          throw error;
+        }
+
+        console.log("Update response:", data);
       } else {
-        const { error } = await supabase
+        console.log("Creating new customer");
+        const { data, error } = await supabase
           .from("customers")
-          .insert([cleanedValues]);
+          .insert([cleanedValues])
+          .select();
 
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase insert error:", error);
+          throw error;
+        }
+
+        console.log("Insert response:", data);
       }
 
       // Invalidate and refetch
@@ -143,28 +191,50 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       });
     } catch (error: any) {
       console.error("Form submission error:", error);
+      console.error("Error details:", {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      
+      // Show detailed error message
       toast({
         title: "Error",
-        description: error.message,
+        description: `${error.message}${error.hint ? `\nHint: ${error.hint}` : ''}`,
         variant: "destructive",
       });
+
+      // Set form-level error if applicable
+      if (error.details) {
+        setFormErrors({
+          root: {
+            type: "server",
+            message: error.details
+          }
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleWindowClose = (e: BeforeUnloadEvent) => {
-    if (isDirty()) {
-      e.preventDefault();
-      e.returnValue = '';
-    }
-  };
+  // Log form errors if present
+  if (formErrors) {
+    console.log("Current form errors:", formErrors);
+  }
 
   return (
     <CustomerErrorBoundary>
       <FormProvider {...form}>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {formErrors?.root && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                {formErrors.root.message}
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormSection title="Personal Information">
                 <CustomerFormFields form={form} customerId={customerId} />

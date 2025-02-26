@@ -16,13 +16,13 @@ export function CustomerTypeSection({
   return (
     <FormSection 
       title="Customer Type" 
-      description="Select the type of customer and related information"
+      description="Select the type of customer account"
       isModernTheme={isModernTheme}
     >
-      <div className="space-y-6">
+      <div className="w-full max-w-md">
         <CustomerTypeSelect 
           form={form} 
-          isModernTheme={isModernTheme} 
+          isModernTheme={isModernTheme}
         />
       </div>
     </FormSection>

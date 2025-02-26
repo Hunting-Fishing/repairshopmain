@@ -15,6 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { customerFormSchema } from "./schemas/customerFormSchema";
 import { TabLoadingSkeleton } from "./loading/TabLoadingSkeleton";
 import { TabErrorState } from "./loading/TabErrorState";
+import { CustomerFeedback } from "./feedback/CustomerFeedback";
+import { LoyaltyTab } from "./loyalty/LoyaltyTab";
 import { toast } from "sonner";
 
 interface CustomerTabsProps {
@@ -79,6 +81,8 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="communications">Communications</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="loyalty">Loyalty</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback</TabsTrigger>
         </TabsList>
 
         <div className="mt-6">
@@ -118,6 +122,18 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
           <TabsContent value="analytics">
             <CustomerTabContent label="Analytics">
               <CustomerAnalyticsDashboard customerId={customerId} />
+            </CustomerTabContent>
+          </TabsContent>
+
+          <TabsContent value="loyalty">
+            <CustomerTabContent label="Loyalty & Rewards">
+              <LoyaltyTab />
+            </CustomerTabContent>
+          </TabsContent>
+
+          <TabsContent value="feedback">
+            <CustomerTabContent label="Feedback">
+              <CustomerFeedback customerId={customerId} />
             </CustomerTabContent>
           </TabsContent>
         </div>

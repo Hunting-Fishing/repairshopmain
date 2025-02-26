@@ -9,6 +9,11 @@ import { CustomerAnalyticsDashboard } from "./analytics/CustomerAnalyticsDashboa
 import { CustomerCommunications } from "./communications/CustomerCommunications";
 import { useForm } from "react-hook-form";
 import { CustomerFormValues } from "./types/customerTypes";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { customerFormSchema } from "./schemas/customerFormSchema";
+import { Skeleton } from "../ui/skeleton";
 
 interface CustomerTabsProps {
   customerId: string;
@@ -16,7 +21,35 @@ interface CustomerTabsProps {
 }
 
 export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTabsProps) {
-  const form = useForm<CustomerFormValues>();
+  const { data: customerData, isLoading } = useQuery({
+    queryKey: ["customer", customerId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("customers")
+        .select("*")
+        .eq("id", customerId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    }
+  });
+
+  const form = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerFormSchema),
+    defaultValues: customerData || {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+      customer_type: "Personal",
+    },
+    values: customerData
+  });
+
+  if (isLoading) {
+    return <Skeleton className="w-full h-[200px]" />;
+  }
 
   return (
     <Tabs defaultValue={defaultTab} className="w-full">

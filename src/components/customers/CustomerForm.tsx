@@ -38,7 +38,7 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       if (error) throw error;
       return data;
     },
-    cacheTime: 1000 * 60 * 60, // Cache for 1 hour
+    gcTime: 1000 * 60 * 60, // Cache for 1 hour
     staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes
   });
 
@@ -77,7 +77,7 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       }
 
       // Invalidate and refetch
-      queryClient.invalidateQueries(["customer", customerId]);
+      queryClient.invalidateQueries({ queryKey: ["customer", customerId] });
       onSuccess();
     } catch (error: any) {
       console.error("Form submission error:", error);
@@ -93,17 +93,17 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormSection title="Personal Information">
-                <CustomerFormFields customerId={customerId} />
+                <CustomerFormFields form={form} customerId={customerId} />
               </FormSection>
 
               <FormSection title="Address Information">
-                <CustomerAddressFields />
+                <CustomerAddressFields form={form} />
               </FormSection>
             </div>
 
             <Separator className="my-8" />
             
-            <AddressBookSection />
+            <AddressBookSection form={form} />
 
             <div className="flex justify-end mt-8">
               <SubmitButton 

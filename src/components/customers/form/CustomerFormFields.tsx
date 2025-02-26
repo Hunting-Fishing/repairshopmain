@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { FormSelect } from "./fields/FormSelect";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { SecondaryContactSection } from "./sections/SecondaryContactSection";
+import { AddressBookSection } from "./sections/AddressBookSection";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -117,9 +119,13 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
       </div>
 
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Address Information</h3>
+        <h3 className="text-lg font-semibold">Primary Address</h3>
         <CustomerAddressFields form={form} isModernTheme={isModernTheme} />
       </div>
+
+      <AddressBookSection form={form} isModernTheme={isModernTheme} />
+      
+      <SecondaryContactSection form={form} isModernTheme={isModernTheme} />
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Loyalty Information</h3>

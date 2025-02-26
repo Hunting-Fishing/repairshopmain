@@ -17,6 +17,7 @@ interface FormInputProps {
   placeholder?: string;
   isModernTheme?: boolean;
   required?: boolean;
+  readOnly?: boolean;
 }
 
 export function FormInput({
@@ -26,7 +27,8 @@ export function FormInput({
   type = "text",
   placeholder,
   isModernTheme = false,
-  required = false
+  required = false,
+  readOnly = false
 }: FormInputProps) {
   const error = form.formState.errors[name];
   const isTouched = form.formState.touchedFields[name];
@@ -39,7 +41,8 @@ export function FormInput({
       ? "bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white rounded-lg"
       : "bg-white/80 border-[#FEC6A1]/30 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white",
     error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
-    isEmpty && "border-red-500 bg-red-50/50"
+    isEmpty && "border-red-500 bg-red-50/50",
+    readOnly && "bg-gray-100 cursor-not-allowed"
   );
 
   const labelClasses = cn(
@@ -72,6 +75,7 @@ export function FormInput({
               className={inputClasses}
               aria-required={required}
               aria-invalid={!!error || isEmpty}
+              readOnly={readOnly}
             />
           </FormControl>
           {error && <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />}

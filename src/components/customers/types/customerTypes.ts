@@ -31,13 +31,7 @@ export interface CustomerFormValues {
     sms: boolean;
     phone: boolean;
   };
-  id?: string;
-}
-
-export interface Customer extends CustomerFormValues {
-  id: string;
-  created_at: string;
-  address_book: Array<{
+  address_book?: Array<{
     type: string;
     street_address: string;
     city: string;
@@ -45,6 +39,12 @@ export interface Customer extends CustomerFormValues {
     postal_code: string;
     country: string;
   }>;
+  id?: string;
+}
+
+export interface Customer extends CustomerFormValues {
+  id: string;
+  created_at: string;
 }
 
 export interface BusinessClassification {

@@ -11,3 +11,11 @@ export interface CustomerSegment {
   description: string | null;
   criteria: Record<string, string>;
 }
+
+export interface TagAssignment {
+  tag: CustomerTag;
+}
+
+export interface SegmentAssignment {
+  segment: CustomerSegment;
+}

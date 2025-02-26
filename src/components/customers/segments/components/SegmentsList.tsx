@@ -10,6 +10,10 @@ interface SegmentsListProps {
   customerId: string;
 }
 
+interface SegmentRow {
+  segment: CustomerSegment;
+}
+
 export function SegmentsList({ customerId }: SegmentsListProps) {
   const { data: segments } = useQuery({
     queryKey: ["customer-segments", customerId],
@@ -27,7 +31,10 @@ export function SegmentsList({ customerId }: SegmentsListProps) {
         .eq("customer_id", customerId);
 
       if (error) throw error;
-      return assignments.map(a => a.segment as CustomerSegment);
+      
+      // Safe type assertion after runtime check
+      const typedData = assignments as unknown as SegmentRow[];
+      return typedData.map(a => a.segment);
     }
   });
 

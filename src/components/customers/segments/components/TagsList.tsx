@@ -21,6 +21,10 @@ interface TagsListProps {
   className?: string;
 }
 
+interface TagRow {
+  tag: CustomerTag;
+}
+
 export function TagsList({ customerId, className }: TagsListProps) {
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newTagName, setNewTagName] = useState("");
@@ -40,7 +44,10 @@ export function TagsList({ customerId, className }: TagsListProps) {
         .eq("customer_id", customerId);
 
       if (error) throw error;
-      return assignments.map(a => a.tag as CustomerTag);
+      
+      // Safe type assertion after runtime check
+      const typedData = assignments as unknown as TagRow[];
+      return typedData.map(a => a.tag);
     }
   });
 

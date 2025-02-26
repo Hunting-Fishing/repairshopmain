@@ -1,10 +1,12 @@
-
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 import { FormInput } from "./fields/FormInput";
 import { CustomerTypeSelect } from "./fields/CustomerTypeSelect";
 import { FormSection } from "./FormSection";
 import { AddressBookSection } from "./sections/AddressBookSection";
+import { Progress } from "@/components/ui/progress";
+import { useEffect, useState } from "react";
+import { useCustomerDataSave } from "../hooks/useCustomerDataSave";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -17,8 +19,41 @@ export function CustomerFormFields({
   customerId,
   isModernTheme = false,
 }: CustomerFormFieldsProps) {
+  const [completeness, setCompleteness] = useState({ score: 0, recommendations: [] });
+  const { calculateProfileCompleteness } = useCustomerDataSave(customerId);
+
+  useEffect(() => {
+    const subscription = form.watch((data) => {
+      const result = calculateProfileCompleteness(data as CustomerFormValues);
+      setCompleteness({
+        score: result.score,
+        recommendations: result.recommendations
+      });
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, calculateProfileCompleteness]);
+
   return (
     <div className="space-y-8">
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="mb-2 flex justify-between items-center">
+          <h3 className="text-sm font-medium">Profile Completeness</h3>
+          <span className="text-sm text-muted-foreground">{Math.round(completeness.score)}%</span>
+        </div>
+        <Progress value={completeness.score} className="h-2" />
+        {completeness.recommendations.length > 0 && (
+          <div className="mt-2">
+            <p className="text-sm text-muted-foreground">Recommendations:</p>
+            <ul className="text-sm text-muted-foreground list-disc list-inside">
+              {completeness.recommendations.slice(0, 3).map((rec, index) => (
+                <li key={index}>{rec}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
       <FormSection 
         title="Basic Information" 
         description="Enter the customer's basic contact information"
@@ -146,6 +181,31 @@ export function CustomerFormFields({
               />
             </>
           )}
+        </div>
+      </FormSection>
+
+      <FormSection 
+        title="Social Profiles" 
+        description="Link social media accounts for enhanced customer insights"
+        isModernTheme={isModernTheme}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormInput
+            form={form}
+            name="social_profiles.linkedin"
+            label="LinkedIn Profile"
+            placeholder="Enter LinkedIn username or URL"
+            helpText="Add LinkedIn profile for professional networking"
+            isModernTheme={isModernTheme}
+          />
+          <FormInput
+            form={form}
+            name="social_profiles.twitter"
+            label="Twitter/X Handle"
+            placeholder="Enter Twitter/X username"
+            helpText="Add Twitter/X handle for social engagement"
+            isModernTheme={isModernTheme}
+          />
         </div>
       </FormSection>
 

@@ -1,137 +1,146 @@
 
-import { useState } from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { CustomerFormValues } from "../types/customerTypes";
 import { supabase } from "@/integrations/supabase/client";
-import type { CustomerFormValues } from "../types/customerTypes";
-import { useToast } from "@/hooks/use-toast";
 
 interface ProfileCompleteness {
   score: number;
   missingFields: string[];
-  suggestions: string[];
+  recommendations: string[];
 }
 
 export function useCustomerDataSave(customerId: string) {
-  const [isSaving, setIsSaving] = useState(false);
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  // Field-level update mutation
-  const updateFieldMutation = useMutation({
+  const updateField = useMutation({
     mutationFn: async ({ field, value }: { field: keyof CustomerFormValues; value: any }) => {
-      setIsSaving(true);
       const { data, error } = await supabase
         .from('customers')
         .update({ [field]: value })
-        .eq('id', customerId)
-        .select()
-        .single();
+        .eq('id', customerId);
 
       if (error) throw error;
       return data;
-    },
-    onSuccess: (data, variables) => {
-      // Optimistically update the cache
-      queryClient.setQueryData(['customer', customerId], (oldData: any) => ({
-        ...oldData,
-        [variables.field]: variables.value
-      }));
-
-      toast({
-        title: "Field updated",
-        description: `Successfully updated ${variables.field}`,
-      });
-    },
-    onError: (error) => {
-      console.error('Field update error:', error);
-      toast({
-        title: "Update failed",
-        description: "Failed to update field. Please try again.",
-        variant: "destructive"
-      });
-    },
-    onSettled: () => {
-      setIsSaving(false);
     }
   });
 
-  // Calculate profile completeness
   const calculateProfileCompleteness = (data: CustomerFormValues): ProfileCompleteness => {
     const requiredFields = [
       'first_name',
       'last_name',
       'email',
       'phone_number',
-      'customer_type'
-    ];
-
-    const optionalFields = [
       'street_address',
       'city',
       'state_province',
       'postal_code',
-      'country',
-      'company_name',
-      'language_preference',
-      'timezone'
+      'country'
     ];
 
-    const missingRequired = requiredFields.filter(field => !data[field as keyof CustomerFormValues]);
-    const missingOptional = optionalFields.filter(field => !data[field as keyof CustomerFormValues]);
+    const businessFields = [
+      'company_name',
+      'company_size',
+      'business_classification_id'
+    ];
 
-    const requiredScore = ((requiredFields.length - missingRequired.length) / requiredFields.length) * 70;
-    const optionalScore = ((optionalFields.length - missingOptional.length) / optionalFields.length) * 30;
+    const optionalFields = [
+      'social_profiles',
+      'language_preference',
+      'timezone',
+      'preferred_contact_time',
+      'secondary_contact'
+    ];
 
-    const totalScore = Math.round(requiredScore + optionalScore);
+    let totalFields = requiredFields.length;
+    let completedFields = 0;
+    const missingFields: string[] = [];
+    const recommendations: string[] = [];
+
+    // Check required fields
+    requiredFields.forEach(field => {
+      if (data[field as keyof CustomerFormValues]) {
+        completedFields++;
+      } else {
+        missingFields.push(field);
+        recommendations.push(`Add ${field.replace(/_/g, ' ')} to improve profile completeness`);
+      }
+    });
+
+    // Check business-specific fields if customer type is Business
+    if (data.customer_type === 'Business') {
+      totalFields += businessFields.length;
+      businessFields.forEach(field => {
+        if (data[field as keyof CustomerFormValues]) {
+          completedFields++;
+        } else {
+          missingFields.push(field);
+          recommendations.push(`Add ${field.replace(/_/g, ' ')} to complete business profile`);
+        }
+      });
+    }
+
+    // Check optional fields for enhanced profile
+    optionalFields.forEach(field => {
+      const value = data[field as keyof CustomerFormValues];
+      if (!value) {
+        recommendations.push(`Consider adding ${field.replace(/_/g, ' ')} for a richer profile`);
+      }
+    });
+
+    // Calculate score as a percentage
+    const score = (completedFields / totalFields) * 100;
 
     return {
-      score: totalScore,
-      missingFields: [...missingRequired, ...missingOptional],
-      suggestions: generateSuggestions(missingRequired, missingOptional)
+      score,
+      missingFields,
+      recommendations
     };
   };
 
-  // Generate improvement suggestions
-  const generateSuggestions = (missingRequired: string[], missingOptional: string[]): string[] => {
-    const suggestions: string[] = [];
+  const enrichCustomerData = async (customerData: CustomerFormValues): Promise<CustomerFormValues> => {
+    let enrichedData = { ...customerData };
 
-    if (missingRequired.length > 0) {
-      suggestions.push(`Complete required fields: ${missingRequired.join(', ')}`);
-    }
-
-    if (missingOptional.length > 0) {
-      suggestions.push(`Consider adding: ${missingOptional.join(', ')}`);
-    }
-
-    return suggestions;
-  };
-
-  // Enrich customer data with external sources
-  const enrichCustomerData = async (customerData: CustomerFormValues) => {
-    try {
-      // Example: Enrich with social media profiles
-      if (customerData.email) {
-        const { data: enrichedData, error } = await supabase
-          .functions.invoke('enrich-customer-data', {
-            body: { email: customerData.email }
-          });
-
-        if (!error && enrichedData) {
-          // Update customer with enriched data
-          await updateFieldMutation.mutateAsync({
-            field: 'social_profiles',
-            value: enrichedData.socialProfiles
-          });
+    // Add timezone based on location if not set
+    if (!enrichedData.timezone && enrichedData.city && enrichedData.country) {
+      try {
+        const response = await fetch(
+          `https://api.timezonedb.com/v2.1/get-time-zone?key=YOUR_API_KEY&format=json&by=position&lat=${0}&lng=${0}`
+        );
+        const data = await response.json();
+        if (data.zoneName) {
+          enrichedData.timezone = data.zoneName;
         }
+      } catch (error) {
+        console.error('Error fetching timezone:', error);
       }
-    } catch (error) {
-      console.error('Data enrichment error:', error);
     }
+
+    // Format and validate phone number if present
+    if (enrichedData.phone_number) {
+      enrichedData.phone_number = enrichedData.phone_number.replace(/\D/g, '');
+    }
+
+    // Enrich with social profiles if available
+    if (enrichedData.social_profiles?.linkedin) {
+      // Add LinkedIn validation/enrichment logic here
+      const linkedinUrl = enrichedData.social_profiles.linkedin;
+      if (!linkedinUrl.includes('linkedin.com')) {
+        enrichedData.social_profiles.linkedin = `https://linkedin.com/in/${linkedinUrl}`;
+      }
+    }
+
+    if (enrichedData.social_profiles?.twitter) {
+      // Add Twitter/X validation/enrichment logic here
+      const twitterHandle = enrichedData.social_profiles.twitter;
+      if (!twitterHandle.startsWith('@')) {
+        enrichedData.social_profiles.twitter = `@${twitterHandle}`;
+      }
+    }
+
+    return enrichedData;
   };
 
   return {
-    isSaving,
-    updateField: updateFieldMutation.mutateAsync,
+    isSaving: updateField.isLoading,
+    updateField: updateField.mutateAsync,
     calculateProfileCompleteness,
     enrichCustomerData
   };

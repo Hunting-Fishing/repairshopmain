@@ -27,11 +27,14 @@ export function CustomerTypeSection({
   // Reset business fields when changing away from business type
   useEffect(() => {
     if (!isInitialMount.current && previousType.current === "Business" && customerType !== "Business") {
+      // Clear business-related fields and their errors
       form.setValue("company_name", "");
       form.setValue("business_classification_id", "");
       form.setValue("company_size", "");
       form.clearErrors(["company_name", "business_classification_id", "company_size"]);
     }
+    
+    // Update previous type after handling the change
     previousType.current = customerType;
   }, [customerType, form]);
 
@@ -43,29 +46,32 @@ export function CustomerTypeSection({
       return;
     }
 
-    // Only validate business fields if customer type is Business
+    // Only validate and show toast for business type
     if (customerType === "Business") {
       const validateBusinessFields = () => {
-        const companyName = form.getValues("company_name");
-        const businessClassification = form.getValues("business_classification_id");
-        const companySize = form.getValues("company_size");
-        
-        const missingFields = [];
-        if (!companyName) missingFields.push("Company Name");
-        if (!businessClassification) missingFields.push("Business Classification");
-        if (!companySize) missingFields.push("Company Size");
+        // Only validate if we're actually in business mode
+        if (form.getValues("customer_type") === "Business") {
+          const companyName = form.getValues("company_name");
+          const businessClassification = form.getValues("business_classification_id");
+          const companySize = form.getValues("company_size");
+          
+          const missingFields = [];
+          if (!companyName) missingFields.push("Company Name");
+          if (!businessClassification) missingFields.push("Business Classification");
+          if (!companySize) missingFields.push("Company Size");
 
-        if (missingFields.length > 0) {
-          toast({
-            title: "Business Information Required",
-            description: `Please provide: ${missingFields.join(", ")}`,
-            duration: 5000,
-            variant: "destructive"
-          });
+          if (missingFields.length > 0) {
+            toast({
+              title: "Business Information Required",
+              description: `Please provide: ${missingFields.join(", ")}`,
+              duration: 5000,
+              variant: "destructive"
+            });
+          }
         }
       };
 
-      // Set a small delay to ensure form values are updated
+      // Delay validation slightly to ensure form state is updated
       const timeoutId = setTimeout(validateBusinessFields, 100);
       return () => clearTimeout(timeoutId);
     }
@@ -84,12 +90,12 @@ export function CustomerTypeSection({
           rules={{
             required: "Customer type is required",
             validate: (value) => {
+              // Only validate business fields if the type is Business
               if (value === "Business") {
                 const companyName = form.getValues("company_name");
                 const businessClassification = form.getValues("business_classification_id");
                 const companySize = form.getValues("company_size");
                 
-                // Only validate business fields if we're submitting as a business
                 if (!companyName || !businessClassification || !companySize) {
                   return "Please complete all required business information";
                 }
@@ -165,7 +171,7 @@ export function CustomerTypeSection({
               form={form}
               name="company_name"
               label="Company Name"
-              required={true}
+              required={customerType === "Business"}
               placeholder="Enter company name"
               isModernTheme={isModernTheme}
             />
@@ -174,7 +180,7 @@ export function CustomerTypeSection({
               form={form}
               name="business_classification_id"
               label="Business Classification"
-              required={true}
+              required={customerType === "Business"}
               placeholder="Select business classification"
               isModernTheme={isModernTheme}
             />
@@ -183,7 +189,7 @@ export function CustomerTypeSection({
               form={form}
               name="company_size"
               label="Company Size"
-              required={true}
+              required={customerType === "Business"}
               placeholder="Enter company size"
               isModernTheme={isModernTheme}
             />

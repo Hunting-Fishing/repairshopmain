@@ -1,4 +1,3 @@
-
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { CustomerFormFields } from "./form/CustomerFormFields";
@@ -14,7 +13,7 @@ import { useCustomerAutosave } from "./hooks/useCustomerAutosave";
 import { CustomerErrorBoundary } from "./error-boundary/CustomerErrorBoundary";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { validateCustomerBusinessRules, handleCustomerDataChanges } from "./rules/customerBusinessRules";
+import { validateCustomerBusinessRules } from "./rules/customerBusinessRules";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -57,8 +56,6 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     },
     gcTime: 1000 * 60 * 60, // Cache for 1 hour
     staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const form = useForm<CustomerFormValues>({
@@ -69,6 +66,7 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       email: "",
       customer_type: "Personal",
     },
+    mode: "onChange"
   });
 
   // Enable autosave only in edit mode
@@ -109,30 +107,28 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         return;
       }
 
+      // Remove fields that don't apply to the current customer type
+      const cleanedValues = { ...values };
+      if (values.customer_type === "Personal") {
+        delete cleanedValues.company_name;
+        delete cleanedValues.business_classification_id;
+        delete cleanedValues.company_size;
+        delete cleanedValues.fleet_details;
+        delete cleanedValues.payment_billing;
+        delete cleanedValues.insurance_compliance;
+      }
+
       if (mode === "edit") {
-        // Get existing data for change detection
-        const { data: existingData } = await supabase
-          .from("customers")
-          .select("*")
-          .eq("id", customerId)
-          .single();
-
-        // Handle lifecycle and workflow triggers
-        await handleCustomerDataChanges(existingData, values);
-
         const { error } = await supabase
           .from("customers")
-          .update(values)
+          .update(cleanedValues)
           .eq("id", customerId);
 
         if (error) throw error;
       } else {
-        // Handle lifecycle and workflow triggers for new customer
-        await handleCustomerDataChanges(null, values);
-
         const { error } = await supabase
           .from("customers")
-          .insert([values]);
+          .insert([cleanedValues]);
 
         if (error) throw error;
       }

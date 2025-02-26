@@ -36,9 +36,9 @@ export const customerBusinessRules: BusinessRuleValidation[] = [
         errorMessage: "Business classification is required for business customers"
       },
       {
-        field: "company_size",
+        field: "tax_number",
         validate: (value) => !!value,
-        errorMessage: "Company size is required for business customers"
+        errorMessage: "Tax number is required for business customers"
       }
     ]
   },
@@ -116,7 +116,6 @@ export function determineCustomerLifecycleStage(data: CustomerFormValues): strin
   }
 }
 
-// Workflow automation triggers
 export async function handleCustomerDataChanges(
   oldData: CustomerFormValues | null,
   newData: CustomerFormValues

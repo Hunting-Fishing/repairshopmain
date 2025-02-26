@@ -1,30 +1,25 @@
+
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { CustomerFormValues } from "../types/customerTypes";
-import { customerValidationSchema, getRequiredFieldsForType } from "../schemas/customerValidationSchema";
+import { customerValidationSchema } from "../schemas/customerValidationSchema";
 import { supabase } from "@/integrations/supabase/client";
 
-interface PendingChanges {
-  values: CustomerFormValues;
-  type: "create" | "update";
+interface UseCustomerFormSubmitProps {
+  onSuccess: () => void;
+  initialData?: Partial<CustomerFormValues>;
+  mode: "create" | "edit";
 }
 
 export function useCustomerFormSubmit({ 
   onSuccess, 
-  initialData, 
+  initialData,
   mode 
-}: {
-  onSuccess: () => void;
-  initialData?: Partial<CustomerFormValues>;
-  mode: "create" | "edit";
-}) {
+}: UseCustomerFormSubmitProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showNotesDialog, setShowNotesDialog] = useState(false);
-  const [changeNotes, setChangeNotes] = useState("");
-  const [pendingChanges, setPendingChanges] = useState<PendingChanges | null>(null);
   const [formErrors, setFormErrors] = useState<any>(null);
 
   const form = useForm<CustomerFormValues>({
@@ -38,7 +33,7 @@ export function useCustomerFormSubmit({
       language_preference: initialData?.language_preference || "en",
       company_name: initialData?.company_name || "",
       business_classification_id: initialData?.business_classification_id || "",
-      company_size: initialData?.company_size || "",
+      tax_number: initialData?.tax_number || "",
       marketing_preferences: initialData?.marketing_preferences || {
         email: false,
         sms: false,
@@ -50,52 +45,30 @@ export function useCustomerFormSubmit({
   });
 
   const handleSubmit = async (values: CustomerFormValues) => {
-    console.log("Starting form submission with values:", values);
     setIsSubmitting(true);
     setFormErrors(null);
 
     try {
-      const requiredFields = getRequiredFieldsForType(values.customer_type);
-      const missingFields = requiredFields.filter(field => !values[field as keyof CustomerFormValues]);
-
-      if (missingFields.length > 0) {
-        toast({
-          variant: "destructive",
-          title: "Required Fields Missing",
-          description: `Please fill in: ${missingFields.join(', ')}`
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
       if (mode === "edit" && values.id) {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from("customers")
           .update(values)
-          .eq("id", values.id)
-          .select();
+          .eq("id", values.id);
 
         if (error) throw error;
-
-        toast({
-          title: "Customer Updated",
-          description: "Customer information has been successfully updated."
-        });
       } else {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from("customers")
-          .insert([values])
-          .select();
+          .insert([values]);
 
         if (error) throw error;
-
-        toast({
-          title: "Customer Created",
-          description: "New customer has been successfully created."
-        });
       }
 
       onSuccess();
+      toast({
+        title: mode === "create" ? "Customer Created" : "Customer Updated",
+        description: "Customer information has been successfully saved."
+      });
     } catch (error: any) {
       console.error("Form submission error:", error);
       
@@ -113,35 +86,13 @@ export function useCustomerFormSubmit({
       });
     } finally {
       setIsSubmitting(false);
-      setShowNotesDialog(false);
-      setChangeNotes("");
-      setPendingChanges(null);
     }
-  };
-
-  const handleFormSubmit = (values: CustomerFormValues) => {
-    if (mode === "edit" && !changeNotes) {
-      setPendingChanges({ values, type: "update" });
-      setShowNotesDialog(true);
-      return;
-    }
-
-    handleSubmit(values);
   };
 
   return {
     form,
     isSubmitting,
     formErrors,
-    showNotesDialog,
-    changeNotes,
-    setChangeNotes,
-    setShowNotesDialog,
-    handleSubmit: handleFormSubmit,
-    submitPendingChanges: () => {
-      if (pendingChanges) {
-        handleSubmit(pendingChanges.values);
-      }
-    }
+    handleSubmit: form.handleSubmit(handleSubmit)
   };
 }

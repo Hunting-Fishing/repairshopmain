@@ -77,7 +77,6 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     mode: "onChange"
   });
 
-  // Monitor form state changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
       console.log("Form field changed:", { name, type, value });
@@ -85,7 +84,6 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     return () => subscription.unsubscribe();
   }, [form.watch]);
 
-  // Monitor form errors
   useEffect(() => {
     const errors = form.formState.errors;
     if (Object.keys(errors).length > 0) {
@@ -119,10 +117,8 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       setIsSubmitting(true);
       setFormErrors(null);
 
-      // Log customer type for debugging
       console.log("Customer type:", values.customer_type);
 
-      // Validate business rules
       const { isValid, errors } = validateCustomerBusinessRules(values, values.customer_type);
       
       if (!isValid) {
@@ -138,16 +134,13 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         return;
       }
 
-      // Remove fields that don't apply to the current customer type
       const cleanedValues = { ...values };
       if (values.customer_type === "Personal") {
         console.log("Cleaning up Personal customer data...");
         delete cleanedValues.company_name;
         delete cleanedValues.business_classification_id;
-        delete cleanedValues.company_size;
+        delete cleanedValues.tax_number;
         delete cleanedValues.fleet_details;
-        delete cleanedValues.payment_billing;
-        delete cleanedValues.insurance_compliance;
       }
 
       console.log("Cleaned form values:", cleanedValues);
@@ -181,7 +174,6 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         console.log("Insert response:", data);
       }
 
-      // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["customer", customerId] });
       onSuccess();
       
@@ -198,14 +190,12 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         hint: error.hint
       });
       
-      // Show detailed error message
       toast({
         title: "Error",
         description: `${error.message}${error.hint ? `\nHint: ${error.hint}` : ''}`,
         variant: "destructive",
       });
 
-      // Set form-level error if applicable
       if (error.details) {
         setFormErrors({
           root: {
@@ -218,11 +208,6 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       setIsSubmitting(false);
     }
   };
-
-  // Log form errors if present
-  if (formErrors) {
-    console.log("Current form errors:", formErrors);
-  }
 
   return (
     <CustomerErrorBoundary>

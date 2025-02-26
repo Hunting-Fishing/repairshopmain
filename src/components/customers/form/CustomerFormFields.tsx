@@ -10,6 +10,7 @@ import { BasicInformationSection } from "./sections/BasicInformationSection";
 import { PrimaryAddressSection } from "./sections/PrimaryAddressSection";
 import { CustomerTypeSection } from "./sections/CustomerTypeSection";
 import { AdditionalDetailsSection } from "./sections/AdditionalDetailsSection";
+import { PreferencesSection } from "./sections/PreferencesSection";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -49,6 +50,8 @@ export function CustomerFormFields({
       <PrimaryAddressSection form={form} isModernTheme={isModernTheme} />
       
       <CustomerTypeSection form={form} isModernTheme={isModernTheme} />
+
+      <PreferencesSection form={form} isModernTheme={isModernTheme} />
 
       <SocialProfilesSection form={form} isModernTheme={isModernTheme} />
 

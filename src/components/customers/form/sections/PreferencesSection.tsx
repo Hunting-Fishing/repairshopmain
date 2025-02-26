@@ -1,5 +1,5 @@
 import { UseFormReturn, useWatch } from "react-hook-form";
-import { CustomerFormValues } from "../../types/customerTypes";
+import { CustomerFormValues, CustomerType } from "../../types/customerTypes";
 import { FormSection } from "../FormSection";
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,11 +9,7 @@ import { useEffect } from "react";
 import { Clock, Globe2 } from "lucide-react";
 import { SubmitButton } from "../fields/SubmitButton";
 import { Form } from "@/components/ui/form";
-
-interface PreferencesSectionProps {
-  form: UseFormReturn<CustomerFormValues>;
-  isModernTheme?: boolean;
-}
+import { useToast } from "@/hooks/use-toast";
 
 const languages = [
   { code: "en", name: "English", native: "English" },
@@ -35,11 +31,11 @@ const timezones = [
   { value: "America/Denver", label: "Mountain Time (MT)", country: "US" },
   { value: "America/Los_Angeles", label: "Pacific Time (PT)", country: "US" },
   { value: "America/Phoenix", label: "Arizona Time", country: "US" },
-  { value: "Europe/London", label: "London", country: "GB" },
-  { value: "Europe/Paris", label: "Paris", country: "FR" },
-  { value: "Asia/Tokyo", label: "Tokyo", country: "JP" },
-  { value: "Asia/Shanghai", label: "Shanghai", country: "CN" },
-  { value: "Australia/Sydney", label: "Sydney", country: "AU" }
+  { code: "Europe/London", label: "London", country: "GB" },
+  { code: "Europe/Paris", label: "Paris", country: "FR" },
+  { code: "Asia/Tokyo", label: "Tokyo", country: "JP" },
+  { code: "Asia/Shanghai", label: "Shanghai", country: "CN" },
+  { code: "Australia/Sydney", label: "Sydney", country: "AU" }
 ];
 
 const countryTimezoneMap: Record<string, string> = {
@@ -64,13 +60,24 @@ const getCurrentTimeInTimezone = (timezone: string) => {
   }
 };
 
+interface PreferencesSectionProps {
+  form: UseFormReturn<CustomerFormValues>;
+  isModernTheme?: boolean;
+}
+
 export function PreferencesSection({
   form,
   isModernTheme = false,
 }: PreferencesSectionProps) {
+  const { toast } = useToast();
   const country = useWatch({
     control: form.control,
     name: "country"
+  });
+
+  const customerType = useWatch({
+    control: form.control,
+    name: "customer_type"
   });
 
   useEffect(() => {
@@ -79,15 +86,50 @@ export function PreferencesSection({
     }
   }, [country, form]);
 
+  const handleSubmit = async (data: CustomerFormValues) => {
+    const validCustomerTypes: CustomerType[] = ['Personal', 'Business', 'Fleet'];
+    
+    if (!validCustomerTypes.includes(data.customer_type)) {
+      toast({
+        title: "Validation Error",
+        description: "Only personal, business, or fleet customers are allowed",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await form.handleSubmit(() => {})();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update preferences",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(() => {})}>
+      <form onSubmit={form.handleSubmit(handleSubmit)}>
         <FormSection 
           title="Preferences & Contact Settings" 
           description="Customer communication and account preferences"
           isModernTheme={isModernTheme}
         >
           <div className="space-y-6">
+            {!customerType && (
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div className="flex">
+                  <div className="ml-3">
+                    <p className="text-sm text-yellow-700">
+                      Please select a valid customer type before updating preferences
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}

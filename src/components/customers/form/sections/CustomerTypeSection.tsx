@@ -6,7 +6,7 @@ import { CustomerTypeSelect } from "../fields/CustomerTypeSelect";
 import { FormInput } from "../fields/FormInput";
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Users, Hash } from "lucide-react";
+import { Building2, Users, Hash, Truck, Phone, Mail } from "lucide-react";
 
 const businessClassifications = [
   { id: "corp", name: "Corporation" },
@@ -34,6 +34,8 @@ export function CustomerTypeSection({
   form,
   isModernTheme = false,
 }: CustomerTypeSectionProps) {
+  const customerType = form.watch("customer_type");
+
   return (
     <FormSection 
       title="Customer Type" 
@@ -46,7 +48,7 @@ export function CustomerTypeSection({
           isModernTheme={isModernTheme} 
         />
 
-        {form.watch("customer_type") === "Business" && (
+        {customerType === "Business" && (
           <div className="space-y-6 animate-in fade-in-50 duration-500">
             <FormInput
               form={form}
@@ -121,6 +123,83 @@ export function CustomerTypeSection({
                         <SelectValue placeholder="Select company size">
                           <span className="flex items-center gap-2">
                             <Users className="h-4 w-4 text-gray-500" />
+                            {field.value}
+                          </span>
+                        </SelectValue>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {companySizes.map((size) => (
+                        <SelectItem
+                          key={size.value}
+                          value={size.value}
+                          className="cursor-pointer"
+                        >
+                          {size.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+          </div>
+        )}
+
+        {customerType === "Fleet" && (
+          <div className="space-y-6 animate-in fade-in-50 duration-500">
+            <FormInput
+              form={form}
+              name="company_name"
+              label="Fleet Name"
+              placeholder="Enter fleet name"
+              helpText="Name of the fleet organization"
+              required
+              isModernTheme={isModernTheme}
+              icon={<Truck className="h-4 w-4 text-gray-500" />}
+            />
+
+            <FormInput
+              form={form}
+              name="phone_number"
+              label="Primary Contact Number"
+              placeholder="Enter contact number"
+              helpText="Main contact number for fleet management"
+              required
+              isModernTheme={isModernTheme}
+              icon={<Phone className="h-4 w-4 text-gray-500" />}
+            />
+
+            <FormInput
+              form={form}
+              name="email"
+              label="Fleet Management Email"
+              placeholder="Enter email address"
+              helpText="Primary email for fleet communications"
+              required
+              type="email"
+              isModernTheme={isModernTheme}
+              icon={<Mail className="h-4 w-4 text-gray-500" />}
+            />
+
+            <FormField
+              control={form.control}
+              name="company_size"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">
+                    Fleet Size
+                    <span className="text-red-500 ml-1">*</span>
+                  </FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="bg-white/80 border-orange-200/50 focus:border-[#F97316] focus:ring-[#F97316]/20 hover:bg-white rounded-lg">
+                        <SelectValue placeholder="Select fleet size">
+                          <span className="flex items-center gap-2">
+                            <Truck className="h-4 w-4 text-gray-500" />
                             {field.value}
                           </span>
                         </SelectValue>

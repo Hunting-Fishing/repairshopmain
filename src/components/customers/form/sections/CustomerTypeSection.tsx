@@ -22,20 +22,12 @@ export function CustomerTypeSection({
   const customerType = form.watch("customer_type");
   const { toast } = useToast();
 
-  // Handle customer type changes and show appropriate notifications
+  // Handle customer type changes and validate fields
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
     if (customerType) {
       timeoutId = setTimeout(() => {
-        // Show customer type change notification
-        toast({
-          title: `Customer Type: ${customerType}`,
-          description: `Current customer is set to ${customerType === 'Personal' ? 'Personal' : 'Business'} account type`,
-          duration: 3000,
-          variant: "default"
-        });
-
         // Additional validation for Business type
         if (customerType === "Business") {
           const companyName = form.getValues("company_name");
@@ -76,13 +68,6 @@ export function CustomerTypeSection({
               title: "Required Field",
               description: `${fieldName} is required for business customers.`,
               variant: "destructive"
-            });
-          } else {
-            // Show success toast when field is filled
-            toast({
-              title: "Field Updated",
-              description: `${fieldName} has been updated successfully.`,
-              variant: "default"
             });
           }
         }
@@ -129,10 +114,9 @@ export function CustomerTypeSection({
                   <RadioGroup
                     onValueChange={(value) => {
                       field.onChange(value);
-                      // Show immediate feedback on type change
                       toast({
                         title: "Customer Type Changed",
-                        description: `Customer type has been changed to ${value}`,
+                        description: `Current customer type: ${value}`,
                         duration: 3000,
                         variant: "default"
                       });

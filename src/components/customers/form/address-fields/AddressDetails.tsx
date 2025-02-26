@@ -11,10 +11,8 @@ interface AddressDetailsProps {
 }
 
 export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDetailsProps) {
-  const getFieldName = (field: string): string => {
-    return addressIndex !== undefined 
-      ? `address_book.${addressIndex}.${field}` 
-      : field;
+  const getFieldName = (field: keyof CustomerFormValues['address_book'][0]): `address_book.${number}.${keyof CustomerFormValues['address_book'][0]}` => {
+    return `address_book.${addressIndex}.${field}` as const;
   };
 
   const inputClasses = isModernTheme
@@ -30,7 +28,12 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
           <FormItem>
             <FormLabel>City</FormLabel>
             <FormControl>
-              <Input {...field} className={inputClasses} placeholder="Enter city" />
+              <Input 
+                {...field} 
+                value={field.value?.toString() || ''} 
+                className={inputClasses} 
+                placeholder="Enter city" 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -43,7 +46,12 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
           <FormItem>
             <FormLabel>State/Province</FormLabel>
             <FormControl>
-              <Input {...field} className={inputClasses} placeholder="Enter state" />
+              <Input 
+                {...field} 
+                value={field.value?.toString() || ''} 
+                className={inputClasses} 
+                placeholder="Enter state" 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -56,7 +64,12 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
           <FormItem>
             <FormLabel>Postal Code</FormLabel>
             <FormControl>
-              <Input {...field} className={inputClasses} placeholder="Enter postal code" />
+              <Input 
+                {...field} 
+                value={field.value?.toString() || ''} 
+                className={inputClasses} 
+                placeholder="Enter postal code" 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -69,7 +82,12 @@ export function AddressDetails({ form, addressIndex, isModernTheme }: AddressDet
           <FormItem>
             <FormLabel>Country</FormLabel>
             <FormControl>
-              <Input {...field} className={inputClasses} placeholder="Enter country" />
+              <Input 
+                {...field} 
+                value={field.value?.toString() || ''} 
+                className={inputClasses} 
+                placeholder="Enter country" 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

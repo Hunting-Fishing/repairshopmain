@@ -31,21 +31,21 @@ export function AddressSearchField({ form, addressIndex, isModernTheme }: Addres
   const [open, setOpen] = useState(false);
   const { suggestions, isLoading, updateSearch } = useAddressLookup(addressSearch);
 
-  const getFieldName = (field: string): string => {
-    return addressIndex !== undefined 
-      ? `address_book.${addressIndex}.${field}` 
-      : field;
+  const getFieldName = (field: keyof CustomerFormValues['address_book'][0]): `address_book.${number}.${keyof CustomerFormValues['address_book'][0]}` => {
+    return `address_book.${addressIndex}.${field}` as const;
   };
 
   const handleAddressSelect = (suggestion: any) => {
     const address = suggestion.address;
     
-    form.setValue(getFieldName("street_address"), 
-      `${address.house_number || ''} ${address.road || ''}`.trim());
-    form.setValue(getFieldName("city"), address.city || '');
-    form.setValue(getFieldName("state_province"), address.state || '');
-    form.setValue(getFieldName("postal_code"), address.postcode || '');
-    form.setValue(getFieldName("country"), address.country || '');
+    if (addressIndex !== undefined) {
+      form.setValue(getFieldName("street_address"), 
+        `${address.house_number || ''} ${address.road || ''}`.trim());
+      form.setValue(getFieldName("city"), address.city || '');
+      form.setValue(getFieldName("state_province"), address.state || '');
+      form.setValue(getFieldName("postal_code"), address.postcode || '');
+      form.setValue(getFieldName("country"), address.country || '');
+    }
     
     setOpen(false);
   };
@@ -66,6 +66,7 @@ export function AddressSearchField({ form, addressIndex, isModernTheme }: Addres
               <FormControl>
                 <Input
                   {...field}
+                  value={field.value?.toString() || ''}
                   className={inputClasses}
                   placeholder="Search address..."
                   onChange={(e) => {

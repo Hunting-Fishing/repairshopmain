@@ -4,6 +4,7 @@ import { CustomerFormValues } from "../types/customerTypes";
 import { FormInput } from "./fields/FormInput";
 import { CustomerTypeSelect } from "./fields/CustomerTypeSelect";
 import { FormSection } from "./FormSection";
+import { AddressBookSection } from "./sections/AddressBookSection";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -70,6 +71,50 @@ export function CustomerFormFields({
       </FormSection>
 
       <FormSection 
+        title="Primary Address" 
+        description="Enter the customer's primary address information"
+        isModernTheme={isModernTheme}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormInput
+            form={form}
+            name="street_address"
+            label="Street Address"
+            placeholder="Enter street address"
+            isModernTheme={isModernTheme}
+          />
+          <FormInput
+            form={form}
+            name="city"
+            label="City"
+            placeholder="Enter city"
+            isModernTheme={isModernTheme}
+          />
+          <FormInput
+            form={form}
+            name="state_province"
+            label="State/Province"
+            placeholder="Enter state or province"
+            isModernTheme={isModernTheme}
+          />
+          <FormInput
+            form={form}
+            name="postal_code"
+            label="Postal Code"
+            placeholder="Enter postal code"
+            isModernTheme={isModernTheme}
+          />
+          <FormInput
+            form={form}
+            name="country"
+            label="Country"
+            placeholder="Enter country"
+            isModernTheme={isModernTheme}
+          />
+        </div>
+      </FormSection>
+
+      <FormSection 
         title="Customer Type" 
         description="Select the type of customer and related information"
         isModernTheme={isModernTheme}
@@ -103,6 +148,11 @@ export function CustomerFormFields({
           )}
         </div>
       </FormSection>
+
+      <AddressBookSection 
+        form={form}
+        isModernTheme={isModernTheme}
+      />
 
       <FormSection 
         title="Additional Details" 

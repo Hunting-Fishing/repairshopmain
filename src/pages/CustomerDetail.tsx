@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CustomerTabs } from "@/components/customers/CustomerTabs";
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { CustomerHistoryList } from "@/components/customers/history/CustomerHistoryList";
 
 export default function CustomerDetail() {
   const { id } = useParams();

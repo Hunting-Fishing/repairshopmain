@@ -15,13 +15,16 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-type AllowedFields = {
-  [K in keyof CustomerFormValues]: CustomerFormValues[K] extends string | undefined ? K : never;
-}[keyof CustomerFormValues];
+// Updated type to allow nested paths
+type NestedKeys<T> = {
+  [K in keyof T]: T[K] extends object
+    ? `${K & string}.${NestedKeys<T[K]> & string}`
+    : K
+}[keyof T];
 
 interface FormInputProps {
   form: UseFormReturn<CustomerFormValues>;
-  name: AllowedFields;
+  name: NestedKeys<CustomerFormValues>;
   label: string;
   type?: string;
   placeholder?: string;

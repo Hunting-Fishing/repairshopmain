@@ -693,6 +693,58 @@ export type Database = {
           },
         ]
       }
+      business_classification_others: {
+        Row: {
+          classification_type: string
+          created_at: string | null
+          customer_id: string
+          id: string
+          organization_id: string
+          other_description: string
+          updated_at: string | null
+        }
+        Insert: {
+          classification_type: string
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          organization_id: string
+          other_description: string
+          updated_at?: string | null
+        }
+        Update: {
+          classification_type?: string
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          organization_id?: string
+          other_description?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_classification_others_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "business_classification_others_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics_dashboard"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "business_classification_others_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_classifications: {
         Row: {
           created_at: string | null

@@ -55,13 +55,26 @@ export function CustomerTypeSection({
   const saveOtherClassification = async () => {
     if (businessClassification === "other" && otherClassification) {
       try {
+        const customerId = form.getValues("id");
+        // Get organization_id from profile
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("No authenticated user");
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('organization_id')
+          .eq('id', user.id)
+          .single();
+
+        if (!profile?.organization_id) throw new Error("No organization found");
+
         const { error } = await supabase
           .from('business_classification_others')
           .insert({
-            customer_id: form.getValues("id"),
+            customer_id: customerId,
             classification_type: "business",
             other_description: otherClassification,
-            organization_id: form.getValues("organization_id")
+            organization_id: profile.organization_id
           });
 
         if (error) throw error;
@@ -236,20 +249,12 @@ export function CustomerTypeSection({
               placeholder="Select business classification"
               options={businessClassificationOptions}
               isModernTheme={isModernTheme}
-              onChange={(value) => {
-                if (value === "other") {
-                  setShowOtherField(true);
-                } else {
-                  setShowOtherField(false);
-                  setOtherClassification("");
-                }
-              }}
             />
 
             {showOtherField && (
               <FormInput
                 form={form}
-                name="other_classification"
+                name="business_classification_other"
                 label="Other Classification"
                 required={true}
                 placeholder="Please specify the business classification"

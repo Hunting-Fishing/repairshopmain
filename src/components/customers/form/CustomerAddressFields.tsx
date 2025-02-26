@@ -13,7 +13,7 @@ interface CustomerAddressFieldsProps {
 export function CustomerAddressFields({ 
   form, 
   isModernTheme = false,
-  addressIndex
+  addressIndex 
 }: CustomerAddressFieldsProps) {
   return (
     <div className="space-y-4">

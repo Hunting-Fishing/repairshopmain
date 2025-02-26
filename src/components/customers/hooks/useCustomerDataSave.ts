@@ -139,7 +139,7 @@ export function useCustomerDataSave(customerId: string) {
   };
 
   return {
-    isSaving: updateField.isLoading,
+    isSaving: updateField.isPending,
     updateField: updateField.mutateAsync,
     calculateProfileCompleteness,
     enrichCustomerData

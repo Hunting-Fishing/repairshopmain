@@ -7,6 +7,7 @@ import { AddressBookSection } from "./sections/AddressBookSection";
 import { Progress } from "@/components/ui/progress";
 import { useEffect, useState } from "react";
 import { useCustomerDataSave } from "../hooks/useCustomerDataSave";
+import { SocialProfilesSection } from "./sections/SocialProfilesSection";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -184,30 +185,7 @@ export function CustomerFormFields({
         </div>
       </FormSection>
 
-      <FormSection 
-        title="Social Profiles" 
-        description="Link social media accounts for enhanced customer insights"
-        isModernTheme={isModernTheme}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormInput
-            form={form}
-            name="social_profiles.linkedin"
-            label="LinkedIn Profile"
-            placeholder="Enter LinkedIn username or URL"
-            helpText="Add LinkedIn profile for professional networking"
-            isModernTheme={isModernTheme}
-          />
-          <FormInput
-            form={form}
-            name="social_profiles.twitter"
-            label="Twitter/X Handle"
-            placeholder="Enter Twitter/X username"
-            helpText="Add Twitter/X handle for social engagement"
-            isModernTheme={isModernTheme}
-          />
-        </div>
-      </FormSection>
+      <SocialProfilesSection form={form} isModernTheme={isModernTheme} />
 
       <AddressBookSection 
         form={form}

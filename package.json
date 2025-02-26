@@ -58,6 +58,7 @@
     "file-saver": "^2.0.5",
     "input-otp": "^1.2.4",
     "libphonenumber-js": "^1.11.19",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "papaparse": "^5.5.2",

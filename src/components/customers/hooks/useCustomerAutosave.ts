@@ -4,20 +4,39 @@ import { UseFormReturn } from 'react-hook-form';
 import { CustomerFormValues } from '../types/customerTypes';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useCustomerAutosave(
   form: UseFormReturn<CustomerFormValues>,
   customerId: string,
-  enabled: boolean = true
+  enabled: boolean = true,
+  autosaveDelay: number = 3000
 ) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const timeoutRef = useRef<NodeJS.Timeout>();
   const lastSavedRef = useRef<CustomerFormValues>();
+  const isDirtyRef = useRef(false);
+
+  // Setup beforeunload handler for unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirtyRef.current) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
 
     const subscription = form.watch((value) => {
+      isDirtyRef.current = true;
+
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -39,6 +58,10 @@ export function useCustomerAutosave(
           if (error) throw error;
 
           lastSavedRef.current = formValues;
+          isDirtyRef.current = false;
+          
+          // Update cache
+          queryClient.setQueryData(['customer', customerId], formValues);
           
           toast({
             title: "Changes saved",
@@ -53,7 +76,7 @@ export function useCustomerAutosave(
             variant: "destructive"
           });
         }
-      }, 5000); // 5 second delay
+      }, autosaveDelay);
     });
 
     return () => {
@@ -62,5 +85,15 @@ export function useCustomerAutosave(
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [form, customerId, enabled, toast]);
+  }, [form, customerId, enabled, toast, queryClient, autosaveDelay]);
+
+  return {
+    isDirty: () => isDirtyRef.current,
+    discardChanges: () => {
+      isDirtyRef.current = false;
+      if (lastSavedRef.current) {
+        form.reset(lastSavedRef.current);
+      }
+    }
+  };
 }

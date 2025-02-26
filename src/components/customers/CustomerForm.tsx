@@ -14,6 +14,19 @@ import { useCustomerAutosave } from "./hooks/useCustomerAutosave";
 import { CustomerErrorBoundary } from "./error-boundary/CustomerErrorBoundary";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface CustomerFormProps {
   mode?: "create" | "edit";
@@ -23,8 +36,11 @@ interface CustomerFormProps {
 
 export function CustomerForm({ mode = "create", onSuccess, customerId }: CustomerFormProps) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showUnsavedChanges, setShowUnsavedChanges] = useState(false);
 
-  const { data: customerData, isLoading } = useQuery({
+  const { data: customerData, isLoading, error } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
       if (customerId === "new") return null;
@@ -33,13 +49,15 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         .from("customers")
         .select("*")
         .eq("id", customerId)
-        .single();
+        .maybeSingle();
       
       if (error) throw error;
       return data;
     },
     gcTime: 1000 * 60 * 60, // Cache for 1 hour
     staleTime: 1000 * 60 * 5, // Consider data stale after 5 minutes
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const form = useForm<CustomerFormValues>({
@@ -53,14 +71,28 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
   });
 
   // Enable autosave only in edit mode
-  useCustomerAutosave(form, customerId, mode === "edit");
+  const { isDirty, discardChanges } = useCustomerAutosave(form, customerId, mode === "edit");
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-red-500">
+        Error loading customer: {error.message}
+      </div>
+    );
   }
 
   const onSubmit = async (values: CustomerFormValues) => {
     try {
+      setIsSubmitting(true);
+
       if (mode === "edit") {
         const { error } = await supabase
           .from("customers")
@@ -79,10 +111,27 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ["customer", customerId] });
       onSuccess();
+      
+      toast({
+        title: mode === "create" ? "Customer created" : "Customer updated",
+        description: "Changes have been saved successfully.",
+      });
     } catch (error: any) {
       console.error("Form submission error:", error);
-      // Error will be handled by the form's error handling
-      throw error;
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleWindowClose = (e: BeforeUnloadEvent) => {
+    if (isDirty()) {
+      e.preventDefault();
+      e.returnValue = '';
     }
   };
 
@@ -107,12 +156,37 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
 
             <div className="flex justify-end mt-8">
               <SubmitButton 
-                label={mode === "create" ? "Add Customer" : "Update Customer"} 
+                label={mode === "create" ? "Add Customer" : "Update Customer"}
+                isSubmitting={isSubmitting}
               />
             </div>
           </form>
         </Form>
       </FormProvider>
+
+      <AlertDialog open={showUnsavedChanges} onOpenChange={setShowUnsavedChanges}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
+            <AlertDialogDescription>
+              You have unsaved changes. Are you sure you want to leave?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowUnsavedChanges(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                discardChanges();
+                setShowUnsavedChanges(false);
+              }}
+            >
+              Discard Changes
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </CustomerErrorBoundary>
   );
 }

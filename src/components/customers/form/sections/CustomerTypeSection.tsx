@@ -24,27 +24,42 @@ export function CustomerTypeSection({
 
   // Watch for customer type changes and validate required fields
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     if (customerType === "Business") {
-      const companyName = form.getValues("company_name");
-      const businessClassification = form.getValues("business_classification_id");
-      const companySize = form.getValues("company_size");
+      // Delay validation check to prevent immediate validation on mount
+      timeoutId = setTimeout(() => {
+        const companyName = form.getValues("company_name");
+        const businessClassification = form.getValues("business_classification_id");
+        const companySize = form.getValues("company_size");
+        
+        const missingFields = [];
+        if (!companyName) missingFields.push("Company Name");
+        if (!businessClassification) missingFields.push("Business Classification");
+        if (!companySize) missingFields.push("Company Size");
 
-      if (!companyName || !businessClassification || !companySize) {
-        toast({
-          title: "Business Information Required",
-          description: "When selecting Business type, please provide the company name and other business details.",
-          duration: 5000,
-          variant: "default"
-        });
-      }
+        if (missingFields.length > 0) {
+          toast({
+            title: "Business Information Required",
+            description: `Please provide: ${missingFields.join(", ")}`,
+            duration: 5000,
+            variant: "default"
+          });
+        }
+      }, 500); // Small delay to prevent immediate validation
     }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [customerType, form, toast]);
 
-  // Watch for changes in business-related fields
+  // Handle field changes for business type
   useEffect(() => {
     if (customerType === "Business") {
-      const subscription = form.watch((value, { name }) => {
-        if (["company_name", "business_classification_id", "company_size"].includes(name || "")) {
+      const subscription = form.watch((value, { name, type }) => {
+        // Only validate on blur or submit, not on every change
+        if (type === "blur" && ["company_name", "business_classification_id", "company_size"].includes(name || "")) {
           const fieldName = name?.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
           if (!value[name as keyof CustomerFormValues]) {
             toast({
@@ -71,6 +86,19 @@ export function CustomerTypeSection({
           <FormField
             control={form.control}
             name="customer_type"
+            rules={{
+              validate: (value) => {
+                if (value === "Business") {
+                  const companyName = form.getValues("company_name");
+                  const businessClassification = form.getValues("business_classification_id");
+                  const companySize = form.getValues("company_size");
+                  if (!companyName || !businessClassification || !companySize) {
+                    return "Please complete all required business information";
+                  }
+                }
+                return true;
+              }
+            }}
             render={({ field }) => (
               <FormItem className="space-y-3">
                 <FormLabel className={cn(

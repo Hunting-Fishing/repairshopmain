@@ -22,25 +22,18 @@ export function CustomerTypeSelect({ form, isModernTheme = false }: CustomerType
       : "text-gray-700 font-medium"
   );
 
-  const getCustomerTypeIcon = (type: string) => {
-    switch (type) {
-      case "Personal":
-        return <User className="h-4 w-4 mr-2" />;
-      case "Fleet":
-        return <UsersRound className="h-4 w-4 mr-2" />;
-      case "Business":
-        return <Users className="h-4 w-4 mr-2" />;
-      default:
-        return null;
-    }
-  };
+  const customerTypes = [
+    { value: "Personal", icon: User },
+    { value: "Fleet", icon: UsersRound },
+    { value: "Business", icon: Users }
+  ];
 
   return (
     <FormField
       control={form.control}
       name="customer_type"
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="w-full">
           <FormLabel className={labelClasses}>
             <span className="flex items-center gap-1">
               Customer Type
@@ -49,39 +42,44 @@ export function CustomerTypeSelect({ form, isModernTheme = false }: CustomerType
           </FormLabel>
           <Select onValueChange={field.onChange} defaultValue={field.value}>
             <FormControl>
-              <SelectTrigger className={selectTriggerClasses}>
+              <SelectTrigger className={cn(selectTriggerClasses, "w-full")}>
                 <SelectValue placeholder="Select customer type">
                   {field.value && (
                     <div className="flex items-center">
-                      {getCustomerTypeIcon(field.value)}
-                      <span>{field.value}</span>
+                      {(() => {
+                        const type = customerTypes.find(t => t.value === field.value);
+                        if (type) {
+                          const Icon = type.icon;
+                          return (
+                            <>
+                              <Icon className="h-4 w-4 mr-2" />
+                              <span>{field.value}</span>
+                            </>
+                          );
+                        }
+                        return field.value;
+                      })()}
                     </div>
                   )}
                 </SelectValue>
               </SelectTrigger>
             </FormControl>
-            <SelectContent className={cn(
-              "bg-white/95 backdrop-blur-lg",
-              isModernTheme ? "border-orange-200/50" : ""
-            )}>
-              <SelectItem value="Personal" className="flex items-center py-3">
-                <div className="flex items-center">
-                  <User className="h-4 w-4 mr-2" />
-                  <span>Personal</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="Fleet" className="flex items-center py-3">
-                <div className="flex items-center">
-                  <UsersRound className="h-4 w-4 mr-2" />
-                  <span>Fleet</span>
-                </div>
-              </SelectItem>
-              <SelectItem value="Business" className="flex items-center py-3">
-                <div className="flex items-center">
-                  <Users className="h-4 w-4 mr-2" />
-                  <span>Business</span>
-                </div>
-              </SelectItem>
+            <SelectContent 
+              className={cn(
+                "bg-white/95 backdrop-blur-lg w-full min-w-[200px]",
+                isModernTheme ? "border-orange-200/50" : ""
+              )}
+            >
+              {customerTypes.map(({ value, icon: Icon }) => (
+                <SelectItem 
+                  key={value} 
+                  value={value} 
+                  className="flex items-center py-3 cursor-pointer"
+                >
+                  <Icon className="h-4 w-4 mr-2" />
+                  <span>{value}</span>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <FormMessage className="text-red-500 text-sm font-medium" />

@@ -21,7 +21,7 @@ export function useCustomerFormSubmit({
   const [pendingChanges, setPendingChanges] = useState<any>(null);
 
   const { form } = useCustomerFormData({ initialData });
-  const { saveCustomer } = useCustomerDataSave();
+  const { updateField } = useCustomerDataSave(initialData?.id || "new");
 
   const handleSubmit = async (values: CustomerFormValues) => {
     try {
@@ -52,7 +52,25 @@ export function useCustomerFormSubmit({
         }
       }
 
-      await saveCustomer(values, session.user.id, "", mode, initialData);
+      // For edit mode, update each changed field individually
+      if (mode === "edit" && initialData?.id) {
+        for (const [key, value] of Object.entries(values)) {
+          if (value !== initialData[key]) {
+            await updateField({ 
+              field: key as keyof CustomerFormValues, 
+              value 
+            });
+          }
+        }
+      } else {
+        // For create mode, insert new customer
+        const { error } = await supabase
+          .from('customers')
+          .insert([values]);
+        
+        if (error) throw error;
+      }
+
       onSuccess();
     } catch (error: any) {
       toast({
@@ -67,18 +85,14 @@ export function useCustomerFormSubmit({
     if (!pendingChanges) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id) {
-        throw new Error("User session not found");
+      // Update each changed field with the notes
+      for (const [key, change] of Object.entries(pendingChanges.changes)) {
+        await updateField({ 
+          field: key as keyof CustomerFormValues, 
+          value: change.new 
+        });
       }
 
-      await saveCustomer(
-        pendingChanges.values,
-        session.user.id,
-        changeNotes,
-        mode,
-        initialData
-      );
       setShowNotesDialog(false);
       setPendingChanges(null);
       setChangeNotes("");

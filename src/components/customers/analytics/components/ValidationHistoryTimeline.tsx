@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ValidationStatus } from "../../ValidationStatus";
 import { TimelineItem } from "./TimelineItem";
+import { Check, X, AlertTriangle, Info } from "lucide-react";
 
 interface ValidationHistoryTimelineProps {
   customerId: string;
@@ -37,6 +38,19 @@ export function ValidationHistoryTimeline({ customerId }: ValidationHistoryTimel
       return data;
     }
   });
+
+  const getValidationIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'success':
+        return <Check className="h-4 w-4 text-green-500" />;
+      case 'error':
+        return <X className="h-4 w-4 text-red-500" />;
+      case 'warning':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      default:
+        return <Info className="h-4 w-4 text-blue-500" />;
+    }
+  };
 
   return (
     <Card>
@@ -79,8 +93,10 @@ export function ValidationHistoryTimeline({ customerId }: ValidationHistoryTimel
               />
             </div>
             <TimelineItem 
-              label={log.error_message || `${log.validation_type} validation ${log.status}`}
-              date={log.created_at}
+              title={`${log.validation_type} Validation`}
+              description={log.error_message || `${log.validation_type} validation ${log.status}`}
+              date={new Date(log.created_at)}
+              icon={getValidationIcon(log.status)}
             />
           </div>
         ))}

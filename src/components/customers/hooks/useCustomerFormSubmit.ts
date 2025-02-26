@@ -5,6 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { CustomerFormValues } from "../types/customerTypes";
 import { useCustomerFormData } from "./useCustomerFormData";
 import { useCustomerDataSave } from "./useCustomerDataSave";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { customerValidationSchema } from "../schemas/customerValidationSchema";
 
 interface ChangeRecord {
   old: any;
@@ -23,7 +26,7 @@ export function useCustomerFormSubmit({
   mode 
 }: {
   onSuccess: () => void;
-  initialData?: any;
+  initialData?: CustomerFormValues;
   mode: "create" | "edit";
 }) {
   const { toast } = useToast();
@@ -31,7 +34,26 @@ export function useCustomerFormSubmit({
   const [changeNotes, setChangeNotes] = useState("");
   const [pendingChanges, setPendingChanges] = useState<PendingChanges | null>(null);
 
-  const { form } = useCustomerFormData({ initialData });
+  // Initialize form with react-hook-form
+  const form = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerValidationSchema),
+    defaultValues: initialData || {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+      customer_type: "Personal",
+      language_preference: "en",
+      marketing_preferences: {
+        email: false,
+        sms: false,
+        phone: false
+      }
+    }
+  });
+
+  // Initialize form monitoring
+  const formMonitoring = useCustomerFormData(form);
   const { updateField } = useCustomerDataSave(initialData?.id || "new");
 
   const handleSubmit = async (values: CustomerFormValues) => {
@@ -41,12 +63,12 @@ export function useCustomerFormSubmit({
         throw new Error("User session not found");
       }
 
-      if (mode === "edit") {
+      if (mode === "edit" && initialData?.id) {
         const changes: Record<string, ChangeRecord> = {};
         Object.keys(values).forEach((key) => {
-          if (values[key as keyof CustomerFormValues] !== initialData[key]) {
+          if (values[key as keyof CustomerFormValues] !== initialData[key as keyof CustomerFormValues]) {
             changes[key] = {
-              old: initialData[key],
+              old: initialData[key as keyof CustomerFormValues],
               new: values[key as keyof CustomerFormValues],
             };
           }
@@ -66,7 +88,7 @@ export function useCustomerFormSubmit({
       // For edit mode, update each changed field individually
       if (mode === "edit" && initialData?.id) {
         for (const [key, value] of Object.entries(values)) {
-          if (value !== initialData[key]) {
+          if (value !== initialData[key as keyof CustomerFormValues]) {
             await updateField({ 
               field: key as keyof CustomerFormValues, 
               value 
@@ -128,5 +150,6 @@ export function useCustomerFormSubmit({
     },
     handleNotesSubmit,
     pendingChanges,
+    formState: formMonitoring
   };
 }

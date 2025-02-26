@@ -11,6 +11,10 @@ import { PrimaryAddressSection } from "./sections/PrimaryAddressSection";
 import { CustomerTypeSection } from "./sections/CustomerTypeSection";
 import { AdditionalDetailsSection } from "./sections/AdditionalDetailsSection";
 import { PreferencesSection } from "./sections/PreferencesSection";
+import { useCustomerAutosave } from "../hooks/useCustomerAutosave";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -25,6 +29,22 @@ export function CustomerFormFields({
 }: CustomerFormFieldsProps) {
   const [completeness, setCompleteness] = useState({ score: 0, recommendations: [] });
   const { calculateProfileCompleteness } = useCustomerDataSave(customerId);
+  const { isDirty, isSaving } = useCustomerAutosave(form, customerId, true);
+  const { toast } = useToast();
+  
+  // Get the current customer type
+  const customerType = form.watch("customer_type");
+  const formErrors = form.formState.errors;
+
+  useEffect(() => {
+    if (!customerType) {
+      toast({
+        title: "Customer Type Required",
+        description: "Please select a customer type to continue",
+        variant: "destructive",
+      });
+    }
+  }, [customerType]);
 
   useEffect(() => {
     const subscription = form.watch((data) => {
@@ -38,18 +58,24 @@ export function CustomerFormFields({
     return () => subscription.unsubscribe();
   }, [form, calculateProfileCompleteness]);
 
-  // Get the current customer type
-  const customerType = form.watch("customer_type");
-
   return (
     <div className="space-y-8">
+      {!customerType && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Please select a customer type to continue
+          </AlertDescription>
+        </Alert>
+      )}
+
       <CustomerTypeSection form={form} isModernTheme={isModernTheme} />
       
       {customerType === "Fleet" && (
         <AdditionalDetailsSection 
           form={form} 
           isModernTheme={isModernTheme} 
-          requiredFields={["company_name"]}
+          requiredFields={[]}
         />
       )}
 
@@ -57,7 +83,7 @@ export function CustomerFormFields({
         <AdditionalDetailsSection 
           form={form} 
           isModernTheme={isModernTheme} 
-          requiredFields={["company_name", "business_classification_id", "tax_number"]}
+          requiredFields={[]}
         />
       )}
 
@@ -75,6 +101,12 @@ export function CustomerFormFields({
         score={completeness.score}
         recommendations={completeness.recommendations}
       />
+
+      {isSaving && (
+        <div className="fixed bottom-4 right-4 bg-primary text-white px-4 py-2 rounded-md shadow-lg">
+          Saving changes...
+        </div>
+      )}
     </div>
   );
 }

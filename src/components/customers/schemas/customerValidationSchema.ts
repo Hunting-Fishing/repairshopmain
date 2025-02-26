@@ -1,20 +1,19 @@
-
 import * as z from "zod";
 import { validationMessages } from "./validationMessages";
 
 const baseSchema = {
-  first_name: z.string().min(1, validationMessages.required.first_name),
-  last_name: z.string().min(1, validationMessages.required.last_name),
-  email: z.string().email(validationMessages.format.email),
+  customer_type: z.enum(["Personal", "Fleet", "Business"]),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
+  email: z.string().email(validationMessages.format.email).optional(),
   phone_number: z.string().optional(),
   street_address: z.string().optional(),
   city: z.string().optional(),
   state_province: z.string().optional(),
   postal_code: z.string().optional(),
-  country: z.string().min(1, validationMessages.required.country),
-  customer_type: z.enum(["Personal", "Fleet", "Business"]),
+  country: z.string().optional(),
   language_preference: z.string().optional(),
-  timezone: z.string().min(1, validationMessages.required.timezone),
+  timezone: z.string().optional(),
 };
 
 // Personal customer schema (base schema only)
@@ -59,14 +58,5 @@ export const customerValidationSchema = z.discriminatedUnion("customer_type", [
 
 // Add helper function to check which fields are required based on customer type
 export const getRequiredFieldsForType = (customerType: "Personal" | "Business" | "Fleet") => {
-  const baseFields = ["first_name", "last_name", "email", "country", "timezone"];
-  
-  switch (customerType) {
-    case "Business":
-      return [...baseFields, "company_name", "business_classification_id", "company_size"];
-    case "Fleet":
-      return [...baseFields, "company_name"];
-    default:
-      return baseFields;
-  }
+  return ["customer_type"];
 };

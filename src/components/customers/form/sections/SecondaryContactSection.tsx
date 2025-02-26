@@ -53,9 +53,9 @@ export function SecondaryContactSection({ form, isModernTheme = false }: Seconda
               <div className="flex items-center justify-between">
                 <FormLabel>Phone Number</FormLabel>
                 <ValidationStatus 
-                  status="pending"
+                  status="info"
                   type="Phone"
-                  message="Phone number validation pending"
+                  message="Enter phone number to validate"
                 />
               </div>
               <FormControl>
@@ -73,9 +73,9 @@ export function SecondaryContactSection({ form, isModernTheme = false }: Seconda
               <div className="flex items-center justify-between">
                 <FormLabel>Email</FormLabel>
                 <ValidationStatus 
-                  status="pending"
+                  status="info"
                   type="Email"
-                  message="Email validation pending"
+                  message="Enter email to validate"
                 />
               </div>
               <FormControl>

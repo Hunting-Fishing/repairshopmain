@@ -1,12 +1,12 @@
 
-import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumber, isValidPhoneNumber, CountryCode } from 'libphonenumber-js';
 
 export interface ValidationResult {
   isValid: boolean;
   message?: string;
 }
 
-export function validatePhoneNumber(phone: string, country?: string): ValidationResult {
+export function validatePhoneNumber(phone: string, country?: CountryCode): ValidationResult {
   try {
     if (!phone) {
       return { isValid: false, message: "Phone number is required" };
@@ -23,7 +23,7 @@ export function validatePhoneNumber(phone: string, country?: string): Validation
       };
     }
 
-    const phoneNumber = parsePhoneNumber(phone, country);
+    const phoneNumber = parsePhoneNumber(phone, country as CountryCode);
     return { 
       isValid: true, 
       message: phoneNumber ? phoneNumber.formatInternational() : undefined 

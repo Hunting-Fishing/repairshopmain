@@ -123,7 +123,13 @@ export function AddressBookSection({ form, isModernTheme = false }: AddressBookS
   };
 
   if (error) {
-    return <TabErrorState error={error} resetError={() => setError(null)} />;
+    return (
+      <TabErrorState 
+        message="Failed to manage address book. Please try again."
+        error={error}
+        resetError={() => setError(null)}
+      />
+    );
   }
 
   return (

@@ -13,7 +13,11 @@ export const CustomerTabContent = ({ children, label }: CustomerTabContentProps)
   return (
     <ErrorBoundary
       fallbackComponent={({ error, reset }) => (
-        <TabErrorState error={error} resetError={reset} />
+        <TabErrorState 
+          message={`Failed to load ${label}. Please try again later.`}
+          error={error}
+          resetError={reset}
+        />
       )}
     >
       <Suspense fallback={<TabLoadingSkeleton />}>

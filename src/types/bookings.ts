@@ -1,4 +1,3 @@
-
 import { Json } from "./database/shared/json";
 import { BookingStatus } from "./database/enums";
 
@@ -34,6 +33,17 @@ export interface BookingBase {
 
 export interface BookingFormValues {
   customerName: string;
+  customer?: {
+    email?: string;
+    phone?: string;
+    name?: string;
+  };
+  vehicle?: {
+    make?: string;
+    model?: string;
+    info?: string;
+  };
+  duration?: number;
   vehicleInfo: string;
   jobDescription: string;
   assignedTechnicianId: string;

@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { SecondaryContactSection } from "./sections/SecondaryContactSection";
 import { AddressBookSection } from "./sections/AddressBookSection";
+import { CustomerSegments } from "../segments/CustomerSegments";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -155,6 +156,8 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
           </Alert>
         )}
       </div>
+
+      <CustomerSegments customerId={customerId} />
     </div>
   );
 };

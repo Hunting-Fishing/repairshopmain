@@ -21,7 +21,8 @@ export function PrimaryAddressSection({
     >
       <CustomerAddressFields 
         form={form} 
-        isModernTheme={isModernTheme} 
+        isModernTheme={isModernTheme}
+        required={true}
       />
     </FormSection>
   );

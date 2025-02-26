@@ -26,6 +26,7 @@ export function BasicInformationSection({
           name="first_name"
           label="First Name"
           required
+          placeholder="Enter first name"
           icon={<User className="h-4 w-4 text-gray-500" />}
           isModernTheme={isModernTheme}
         />
@@ -34,6 +35,7 @@ export function BasicInformationSection({
           name="last_name"
           label="Last Name"
           required
+          placeholder="Enter last name"
           icon={<User className="h-4 w-4 text-gray-500" />}
           isModernTheme={isModernTheme}
         />
@@ -43,6 +45,7 @@ export function BasicInformationSection({
           label="Email"
           type="email"
           required
+          placeholder="Enter email address"
           icon={<Mail className="h-4 w-4 text-gray-500" />}
           isModernTheme={isModernTheme}
         />
@@ -50,6 +53,7 @@ export function BasicInformationSection({
           form={form}
           name="phone_number"
           label="Phone Number"
+          placeholder="Enter phone number"
           icon={<Phone className="h-4 w-4 text-gray-500" />}
           isModernTheme={isModernTheme}
         />

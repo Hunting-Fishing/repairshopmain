@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../types/customerTypes";
 import { FormInput } from "./fields/FormInput";
@@ -12,6 +11,7 @@ import { AlertCircle } from "lucide-react";
 import { SecondaryContactSection } from "./sections/SecondaryContactSection";
 import { AddressBookSection } from "./sections/AddressBookSection";
 import { CustomerSegments } from "../segments/CustomerSegments";
+import { CommunicationPreferences } from "./CommunicationPreferences";
 
 interface CustomerFormFieldsProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -19,7 +19,15 @@ interface CustomerFormFieldsProps {
   isModernTheme?: boolean;
 }
 
-export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: CustomerFormFieldsProps) => {
+export function CustomerFormFields({
+  form,
+  customerId,
+  isModernTheme = false,
+}: {
+  form: UseFormReturn<CustomerFormValues>;
+  customerId?: string;
+  isModernTheme?: boolean;
+}) {
   const { data: customer } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
@@ -124,6 +132,8 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
         <CustomerAddressFields form={form} isModernTheme={isModernTheme} />
       </div>
 
+      <CommunicationPreferences form={form} isModernTheme={isModernTheme} />
+      
       <AddressBookSection form={form} isModernTheme={isModernTheme} />
       
       <SecondaryContactSection form={form} isModernTheme={isModernTheme} />
@@ -160,4 +170,4 @@ export const CustomerFormFields = ({ form, customerId, isModernTheme = false }: 
       <CustomerSegments customerId={customerId} />
     </div>
   );
-};
+}

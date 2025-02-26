@@ -8,7 +8,7 @@ import { FormInput } from "../fields/FormInput";
 import { cn } from "@/lib/utils";
 import { Building2, User, Truck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface CustomerTypeSectionProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -21,32 +21,36 @@ export function CustomerTypeSection({
 }: CustomerTypeSectionProps) {
   const customerType = form.watch("customer_type");
   const { toast } = useToast();
+  const isInitialMount = useRef(true);
 
   // Handle customer type changes and validate fields
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
     
-    if (customerType) {
-      timeoutId = setTimeout(() => {
-        // Additional validation for Business type
-        if (customerType === "Business") {
-          const companyName = form.getValues("company_name");
-          const businessClassification = form.getValues("business_classification_id");
-          const companySize = form.getValues("company_size");
-          
-          const missingFields = [];
-          if (!companyName) missingFields.push("Company Name");
-          if (!businessClassification) missingFields.push("Business Classification");
-          if (!companySize) missingFields.push("Company Size");
+    // Skip validation on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
 
-          if (missingFields.length > 0) {
-            toast({
-              title: "Business Information Required",
-              description: `Please provide: ${missingFields.join(", ")}`,
-              duration: 5000,
-              variant: "destructive"
-            });
-          }
+    if (customerType === "Business") {
+      timeoutId = setTimeout(() => {
+        const companyName = form.getValues("company_name");
+        const businessClassification = form.getValues("business_classification_id");
+        const companySize = form.getValues("company_size");
+        
+        const missingFields = [];
+        if (!companyName) missingFields.push("Company Name");
+        if (!businessClassification) missingFields.push("Business Classification");
+        if (!companySize) missingFields.push("Company Size");
+
+        if (missingFields.length > 0) {
+          toast({
+            title: "Business Information Required",
+            description: `Please provide: ${missingFields.join(", ")}`,
+            duration: 5000,
+            variant: "destructive"
+          });
         }
       }, 500);
     }
@@ -58,23 +62,22 @@ export function CustomerTypeSection({
 
   // Handle field changes for business type
   useEffect(() => {
-    if (customerType === "Business") {
-      const subscription = form.watch((value, { name, type }) => {
-        // Only validate on blur or submit
-        if (type === "blur" && ["company_name", "business_classification_id", "company_size"].includes(name || "")) {
-          const fieldName = name?.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-          if (!value[name as keyof CustomerFormValues]) {
-            toast({
-              title: "Required Field",
-              description: `${fieldName} is required for business customers.`,
-              variant: "destructive"
-            });
+    const subscription = customerType === "Business" 
+      ? form.watch((value, { name, type }) => {
+          if (type === "blur" && ["company_name", "business_classification_id", "company_size"].includes(name || "")) {
+            const fieldName = name?.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+            if (!value[name as keyof CustomerFormValues]) {
+              toast({
+                title: "Required Field",
+                description: `${fieldName} is required for business customers.`,
+                variant: "destructive"
+              });
+            }
           }
-        }
-      });
+        })
+      : undefined;
 
-      return () => subscription.unsubscribe();
-    }
+    return () => subscription?.unsubscribe();
   }, [customerType, form, toast]);
 
   return (

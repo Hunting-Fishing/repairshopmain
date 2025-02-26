@@ -45,11 +45,6 @@ export function CustomerFormFields({
     <div className="space-y-8">
       <CustomerTypeSection form={form} isModernTheme={isModernTheme} />
       
-      <ProfileCompletenessSection 
-        score={completeness.score}
-        recommendations={completeness.recommendations}
-      />
-      
       {customerType === "Fleet" && (
         <AdditionalDetailsSection 
           form={form} 
@@ -75,6 +70,11 @@ export function CustomerFormFields({
       <SocialProfilesSection form={form} isModernTheme={isModernTheme} />
 
       <AddressBookSection form={form} isModernTheme={isModernTheme} />
+
+      <ProfileCompletenessSection 
+        score={completeness.score}
+        recommendations={completeness.recommendations}
+      />
     </div>
   );
 }

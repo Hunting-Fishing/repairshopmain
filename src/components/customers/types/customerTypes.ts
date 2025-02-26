@@ -1,4 +1,3 @@
-
 export interface CustomerFormValues {
   first_name: string;
   last_name: string;
@@ -18,7 +17,7 @@ export interface CustomerFormValues {
   loyalty_tier?: string;
   loyalty_points?: string;
   notes?: string;
-  pst_number?: string; // Add this line
+  pst_number?: string;
   social_profiles?: {
     linkedin?: string;
     twitter?: string;
@@ -44,6 +43,38 @@ export interface CustomerFormValues {
   region_code?: string;
   customer_since?: string;
   loyalty_join_date?: string;
+  fleet_details?: {
+    account_number?: string;
+    vehicle_count?: number;
+    manager_name?: string;
+    manager_contact?: string;
+    service_schedule?: string;
+    vehicles?: FleetVehicle[];
+  };
+  payment_billing?: {
+    fleet_card_provider?: string;
+    fleet_card_number?: string;
+    billing_contact?: string;
+    billing_email?: string;
+    payment_terms?: string;
+    po_required?: boolean;
+    tax_exempt_number?: string;
+    credit_limit?: number;
+    billing_method?: 'email' | 'mail' | 'portal';
+  };
+  service_preferences?: {
+    authorized_service_limit?: number;
+    preferred_parts?: string;
+    preferred_fluids?: string;
+    emergency_contacts?: string[];
+    roadside_provider?: string;
+  };
+  insurance_compliance?: {
+    insurance_provider?: string;
+    policy_number?: string;
+    dot_number?: string;
+    safety_inspection_due?: string;
+  };
 }
 
 export interface Customer extends CustomerFormValues {
@@ -105,4 +136,13 @@ export interface CustomerRelationshipFormValues {
   related_customer_id: string;
   is_primary: boolean;
   notes?: string;
+}
+
+export interface FleetVehicle {
+  vin: string;
+  plate_number: string;
+  assigned_driver: string;
+  make?: string;
+  model?: string;
+  year?: string;
 }

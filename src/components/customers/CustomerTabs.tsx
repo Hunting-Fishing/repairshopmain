@@ -1,4 +1,3 @@
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CustomerTabContent } from "./CustomerTabContent";
 import { CustomerFormFields } from "./form/CustomerFormFields";
@@ -18,6 +17,7 @@ import { TabErrorState } from "./loading/TabErrorState";
 import { CustomerFeedback } from "./feedback/CustomerFeedback";
 import { LoyaltyTab } from "./loyalty/LoyaltyTab";
 import { toast } from "sonner";
+import { CustomerRelationships } from "./relationships/CustomerRelationships";
 
 interface CustomerTabsProps {
   customerId: string;
@@ -74,13 +74,14 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
   return (
     <FormProvider {...form}>
       <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-7">
+        <TabsList className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8">
           <TabsTrigger value="details">Details</TabsTrigger>
           <TabsTrigger value="vehicles">Vehicles</TabsTrigger>
           <TabsTrigger value="documents">Documents</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="communications">Communications</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="relationships">Relationships</TabsTrigger>
           <TabsTrigger value="loyalty">Loyalty</TabsTrigger>
           <TabsTrigger value="feedback">Feedback</TabsTrigger>
         </TabsList>
@@ -122,6 +123,12 @@ export function CustomerTabs({ customerId, defaultTab = "details" }: CustomerTab
           <TabsContent value="analytics">
             <CustomerTabContent label="Analytics">
               <CustomerAnalyticsDashboard customerId={customerId} />
+            </CustomerTabContent>
+          </TabsContent>
+          
+          <TabsContent value="relationships">
+            <CustomerTabContent label="Relationships">
+              <CustomerRelationships customerId={customerId} />
             </CustomerTabContent>
           </TabsContent>
 

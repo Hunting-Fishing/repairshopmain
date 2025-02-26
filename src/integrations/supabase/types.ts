@@ -2441,6 +2441,101 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_relationships: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          hierarchy_level: number
+          id: string
+          is_primary: boolean | null
+          metadata: Json | null
+          notes: string | null
+          organization_id: string
+          parent_customer_id: string
+          related_customer_id: string
+          relationship_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          hierarchy_level?: number
+          id?: string
+          is_primary?: boolean | null
+          metadata?: Json | null
+          notes?: string | null
+          organization_id: string
+          parent_customer_id: string
+          related_customer_id: string
+          relationship_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          hierarchy_level?: number
+          id?: string
+          is_primary?: boolean | null
+          metadata?: Json | null
+          notes?: string | null
+          organization_id?: string
+          parent_customer_id?: string
+          related_customer_id?: string
+          relationship_type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_relationships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_relationships_parent_customer_id_fkey"
+            columns: ["parent_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_relationships_parent_customer_id_fkey"
+            columns: ["parent_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics_dashboard"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_relationships_parent_customer_id_fkey"
+            columns: ["parent_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_relationships_related_customer_id_fkey"
+            columns: ["related_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_relationships_related_customer_id_fkey"
+            columns: ["related_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customer_analytics_dashboard"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_relationships_related_customer_id_fkey"
+            columns: ["related_customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_repair_jobs: {
         Row: {
           actual_amount: number | null
@@ -9622,6 +9717,21 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      customer_relationship_hierarchy: {
+        Row: {
+          depth: number | null
+          hierarchy_level: number | null
+          parent_customer_id: string | null
+          parent_first_name: string | null
+          parent_last_name: string | null
+          path: string[] | null
+          related_customer_id: string | null
+          related_first_name: string | null
+          related_last_name: string | null
+          relationship_type: string | null
+        }
+        Relationships: []
       }
       staff_details_view: {
         Row: {

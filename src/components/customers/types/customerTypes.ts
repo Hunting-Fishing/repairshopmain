@@ -14,6 +14,7 @@ export interface CustomerFormValues {
   timezone?: string;
   company_name?: string;
   business_classification_id?: string;
+  company_size?: string;  // Added this field explicitly
   tax_number?: string;
   loyalty_tier?: string;
   loyalty_points?: string;

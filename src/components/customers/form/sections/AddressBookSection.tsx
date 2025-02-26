@@ -3,12 +3,12 @@ import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useVirtualizer } from "@tanstack/react-virtual";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { TabErrorState } from "../../loading/TabErrorState";
 import { AddressCard } from "./address/AddressCard";
 import { ReorderDialog } from "./address/ReorderDialog";
+import { useAddressVirtualizer } from "../../hooks/useAddressVirtualizer";
 
 interface AddressBookSectionProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -21,13 +21,8 @@ export function AddressBookSection({ form, isModernTheme = false }: AddressBookS
   const [error, setError] = useState<Error | null>(null);
   const addresses = form.watch("address_book") || [];
   const parentRef = useRef<HTMLDivElement>(null);
-
-  const virtualizer = useVirtualizer({
-    count: addresses.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => 280,
-    overscan: 5,
-  });
+  
+  const virtualizer = useAddressVirtualizer({ parentRef, addresses });
 
   const handleAdd = () => {
     try {

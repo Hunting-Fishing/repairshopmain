@@ -266,15 +266,17 @@ export function PreferencesSection({
                 />
               </div>
             </div>
-
-            <div className="flex justify-end mt-6 pt-4 border-t">
-              <SubmitButton 
-                label="Update Preferences"
-                isSubmitting={form.formState.isSubmitting}
-              />
-            </div>
           </div>
         </FormSection>
+
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-sm border-t shadow-lg z-50 transition-all duration-200">
+          <div className="container max-w-7xl mx-auto flex justify-end">
+            <SubmitButton 
+              label="Update Preferences"
+              isSubmitting={form.formState.isSubmitting}
+            />
+          </div>
+        </div>
       </form>
     </Form>
   );

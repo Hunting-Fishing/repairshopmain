@@ -1,70 +1,64 @@
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { format } from "date-fns";
+import { useState, useEffect } from "react";
+import { format, addDays, startOfWeek, endOfWeek, isToday, isSameDay } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Settings2, Search, Filter, MoreVertical } from "lucide-react";
 import { BookingDialog } from "@/components/calendar/BookingDialog";
-import { DayView } from "@/components/calendar/DayView";
-import { WeekView } from "@/components/calendar/WeekView";
-import { MonthView } from "@/components/calendar/MonthView";
-import { CalendarNavigation } from "@/components/calendar/CalendarNavigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Booking } from "@/types/calendar";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 
 export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [view, setView] = useState<"day" | "week" | "month">("day");
+  const [view, setView] = useState<"day" | "week" | "month">("week");
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<{
     start: Date;
     end: Date;
   } | null>(null);
+  const [technicians, setTechnicians] = useState<{ id: string; name: string; hours_allocated: number }[]>([
+    { id: "1", name: "Christian Amland", hours_allocated: 100 },
+    { id: "2", name: "Jane Doe", hours_allocated: 100 },
+    { id: "3", name: "John Smith", hours_allocated: 100 },
+    { id: "4", name: "Michael Mills", hours_allocated: 100 },
+    { id: "5", name: "Michaela Gonzalez", hours_allocated: 100 }
+  ]);
+  const [filteredTechnicians, setFilteredTechnicians] = useState(technicians);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Generate week days based on selected date
+  const weekStart = startOfWeek(selectedDate);
+  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+
+  useEffect(() => {
+    if (searchQuery) {
+      setFilteredTechnicians(technicians.filter(tech => 
+        tech.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
+    } else {
+      setFilteredTechnicians(technicians);
+    }
+  }, [searchQuery, technicians]);
 
   const { data: bookings, isLoading } = useQuery({
-    queryKey: ["bookings", format(selectedDate, "yyyy-MM-dd")],
+    queryKey: ["bookings", format(selectedDate, "yyyy-MM-dd"), view],
     queryFn: async () => {
       try {
-        const startOfDay = new Date(selectedDate);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(selectedDate);
-        endOfDay.setHours(23, 59, 59, 999);
-
-        // Set the range based on the current view
-        let startDate = startOfDay;
-        let endDate = endOfDay;
+        // Get date range based on current view
+        const rangeStart = startOfWeek(selectedDate);
+        const rangeEnd = endOfWeek(selectedDate);
         
-        if (view === "week") {
-          // For week view, get 7 days
-          const startOfWeek = new Date(selectedDate);
-          startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-          startOfWeek.setHours(0, 0, 0, 0);
-          
-          const endOfWeek = new Date(startOfWeek);
-          endOfWeek.setDate(endOfWeek.getDate() + 6);
-          endOfWeek.setHours(23, 59, 59, 999);
-          
-          startDate = startOfWeek;
-          endDate = endOfWeek;
-        } else if (view === "month") {
-          // For month view, get entire month
-          const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-          startOfMonth.setHours(0, 0, 0, 0);
-          
-          const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
-          endOfMonth.setHours(23, 59, 59, 999);
-          
-          startDate = startOfMonth;
-          endDate = endOfMonth;
-        }
-
         const { data, error } = await supabase
           .from("bookings")
           .select("*")
-          .gte("start_time", startDate.toISOString())
-          .lte("start_time", endDate.toISOString())
+          .gte("start_time", rangeStart.toISOString())
+          .lte("start_time", rangeEnd.toISOString())
           .order("start_time");
 
         if (error) {
@@ -93,88 +87,234 @@ export default function Calendar() {
     toast.success("Booking created successfully");
   };
 
-  const { data: settings } = useQuery({
-    queryKey: ["calendar-settings"],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return null;
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('calendar_settings')
-        .eq('id', session.user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching calendar settings:', error);
-        return null;
-      }
-
-      return data?.calendar_settings || null;
-    }
-  });
-
-  const workingHours = {
-    start: settings?.workingHoursStart ? parseInt(settings.workingHoursStart) : 8,
-    end: settings?.workingHoursEnd ? parseInt(settings.workingHoursEnd) : 18,
+  const handlePreviousWeek = () => {
+    setSelectedDate(prevDate => addDays(prevDate, -7));
   };
 
-  const use24HourTime = settings?.use24HourTime ?? false;
+  const handleNextWeek = () => {
+    setSelectedDate(prevDate => addDays(prevDate, 7));
+  };
 
-  const renderCalendarView = () => {
-    const viewProps = {
-      date: selectedDate,
-      bookings: bookings || [],
-      isLoading,
-      onTimeSlotClick: handleTimeSlotClick,
-      workingHours,
-      use24HourTime,
-    };
+  const navigateToToday = () => {
+    setSelectedDate(new Date());
+  };
 
-    switch (view) {
-      case "week":
-        return <WeekView {...viewProps} />;
-      case "month":
-        return <MonthView {...viewProps} />;
-      default:
-        return <DayView {...viewProps} />;
-    }
+  // Helper to get bookings for a specific day and technician
+  const getTechnicianBookingsForDay = (techId: string, day: Date): Booking[] => {
+    if (!bookings) return [];
+    
+    return bookings.filter(booking => {
+      const bookingDate = new Date(booking.start_time);
+      return (
+        booking.assigned_technician_id === techId && 
+        isSameDay(bookingDate, day)
+      );
+    });
   };
 
   return (
-    <div className="space-y-6 p-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Calendar</h1>
-        <p className="text-muted-foreground">
-          Manage your repair shop's schedule
-        </p>
+    <div className="flex flex-col h-full">
+      <header className="bg-[#333] text-white p-4 flex justify-between items-center">
+        <h1 className="text-xl font-semibold">Scheduler</h1>
+        <div className="flex space-x-2">
+          <Button variant="outline" className="text-white border-white hover:bg-white/20">
+            Color Legend
+          </Button>
+          <Button variant="outline" className="text-white border-white hover:bg-white/20">
+            <Settings2 className="h-5 w-5" />
+          </Button>
+        </div>
+      </header>
+
+      <div className="flex border-b">
+        <div className="w-full p-3 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handlePreviousWeek}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleNextWeek}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium">
+              {format(weekStart, "d")} - {format(endOfWeek(selectedDate), "d MMMM yyyy")}
+            </span>
+            <Button variant="outline" size="sm" className="ml-2 flex items-center gap-1">
+              <CalendarIcon className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={navigateToToday}>
+              Today
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button variant="primary">Publish</Button>
+            <Select
+              defaultValue={view}
+              onValueChange={(value: "day" | "week" | "month") => setView(value)}
+            >
+              <SelectTrigger className="w-[160px]">
+                <SelectValue placeholder="Select View" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="day">Day View</SelectItem>
+                <SelectItem value="week">Week View</SelectItem>
+                <SelectItem value="month">Month View</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Schedule</CardTitle>
-          <CalendarNavigation
-            selectedDate={selectedDate}
-            onDateChange={(date) => date && setSelectedDate(date)}
-            view={view}
-            onViewChange={setView}
-          />
-        </CardHeader>
-        <CardContent>
-          <ErrorBoundary
-            fallback={
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  An error occurred while displaying the calendar. Please try refreshing the page.
-                </AlertDescription>
-              </Alert>
-            }
-          >
-            {renderCalendarView()}
-          </ErrorBoundary>
-        </CardContent>
-      </Card>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left sidebar with unassigned work */}
+        <div className="w-64 border-r overflow-y-auto flex flex-col">
+          <div className="p-3 border-b">
+            <h2 className="font-semibold mb-2">UNASSIGNED WORK</h2>
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                placeholder="Search" 
+                className="pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="p-3 border-b">
+            <div className="flex justify-between items-center">
+              <h3 className="font-medium text-sm text-muted-foreground">OVERDUE (18)</h3>
+              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex-1 p-3">
+            <div className="space-y-4">
+              <div className="border rounded p-3 bg-muted/10">
+                <div className="flex justify-between">
+                  <h4 className="font-medium">Spiral Freezer Preventative Maintenance Checklist</h4>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">Spiral Freezer</p>
+                <div className="mt-2 text-right">
+                  <Button variant="link" size="sm" className="h-6 text-blue-500">view</Button>
+                </div>
+              </div>
+              <div className="border rounded p-3 bg-muted/10">
+                <div className="flex justify-between">
+                  <h4 className="font-medium">Monthly Conveyor Downtime Inspection</h4>
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">Alco - Food Processing Line #22</p>
+                <div className="mt-2 text-right">
+                  <Button variant="link" size="sm" className="h-6 text-blue-500">view</Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main calendar grid */}
+        <div className="flex-1 overflow-auto">
+          <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] min-w-[800px]">
+            {/* Header row with days */}
+            <div className="sticky top-0 z-10 bg-white border-b">
+              <div className="border-r p-2 h-14 flex items-center justify-center font-semibold">
+                DEFAULT
+              </div>
+            </div>
+            {weekDays.map((day, index) => (
+              <div 
+                key={day.toISOString()} 
+                className={`sticky top-0 z-10 bg-white border-b border-r p-2 text-center ${isToday(day) ? 'bg-blue-50' : ''}`}
+              >
+                <div className="font-medium text-blue-600">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][day.getDay()]} {day.getDate()}</div>
+              </div>
+            ))}
+
+            {/* Rows for each technician */}
+            {filteredTechnicians.map((tech) => (
+              <React.Fragment key={tech.id}>
+                <div className="border-b border-r p-2 sticky left-0 bg-white flex items-center">
+                  <div>
+                    <div className="font-medium">{tech.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {tech.id}/{tech.hours_allocated} hours allocated
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Days cells for this technician */}
+                {weekDays.map((day) => {
+                  const dayBookings = getTechnicianBookingsForDay(tech.id, day);
+                  const isCurrentDay = isToday(day);
+                  
+                  return (
+                    <div 
+                      key={`${tech.id}-${day.toISOString()}`} 
+                      className={`border-b border-r min-h-[80px] p-1 ${isCurrentDay ? 'bg-blue-50' : ''}`}
+                      onClick={() => {
+                        const start = new Date(day);
+                        start.setHours(9, 0, 0);
+                        const end = new Date(day);
+                        end.setHours(10, 0, 0);
+                        handleTimeSlotClick(start, end);
+                      }}
+                    >
+                      {dayBookings.map((booking) => (
+                        <div 
+                          key={booking.id}
+                          className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTimeSlotClick(
+                              new Date(booking.start_time),
+                              new Date(booking.end_time)
+                            );
+                          }}
+                        >
+                          {booking.customer_name || 'Scheduled Job'}
+                        </div>
+                      ))}
+                      
+                      {/* Example scheduled events - these would be dynamically generated from real data */}
+                      {tech.id === "1" && day.getDay() === 4 && (
+                        <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
+                          Spiral Freezer Service
+                        </div>
+                      )}
+                      {tech.id === "2" && day.getDay() === 1 && (
+                        <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
+                          Monthly Conveyor Inspection
+                        </div>
+                      )}
+                      {tech.id === "3" && day.getDay() === 4 && (
+                        <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
+                          Spiral Freezer Service
+                        </div>
+                      )}
+                      {tech.id === "5" && day.getDay() === 3 && (
+                        <div className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs">
+                          Conveyor Belt Maintenance
+                        </div>
+                      )}
+                      {tech.id === "5" && day.getDay() === 5 && (
+                        <div className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs">
+                          Annual Conveyor Inspection
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <BookingDialog
         open={isBookingDialogOpen}

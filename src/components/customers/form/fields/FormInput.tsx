@@ -127,70 +127,76 @@ export function FormInput({
     <FormField
       control={form.control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="relative">
-          <div className="flex items-center gap-2">
-            <FormLabel className={labelClasses}>
-              <span className="flex items-center gap-1">
-                {label}
-                {required && (
-                  <span 
-                    className="text-red-500 text-sm font-bold ml-0.5" 
-                    aria-label="required field"
-                  >*</span>
-                )}
-              </span>
-            </FormLabel>
-            {helpText && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="w-[200px] text-sm">{helpText}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </div>
-          <FormControl>
-            <div className="relative">
-              {icon && (
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  {icon}
-                </div>
+      render={({ field }) => {
+        // Ensure the field value is always a string or number
+        const inputValue = field.value != null ? String(field.value) : '';
+        
+        return (
+          <FormItem className="relative">
+            <div className="flex items-center gap-2">
+              <FormLabel className={labelClasses}>
+                <span className="flex items-center gap-1">
+                  {label}
+                  {required && (
+                    <span 
+                      className="text-red-500 text-sm font-bold ml-0.5" 
+                      aria-label="required field"
+                    >*</span>
+                  )}
+                </span>
+              </FormLabel>
+              {helpText && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="w-[200px] text-sm">{helpText}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
-              <Input
-                {...field}
-                type={type}
-                placeholder={required ? `${placeholder} *` : placeholder}
-                className={cn(inputClasses, icon && "pl-10")}
-                aria-required={required}
-                aria-invalid={!!error || isEmpty}
-                readOnly={readOnly}
-                onBlur={handleBlur}
-              />
             </div>
-          </FormControl>
-          {error && (
-            <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />
-          )}
-          {isEmpty && !error && (
-            <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
-              {label} is required
-            </FormMessage>
-          )}
-          {validation && (
-            <ValidationStatus 
-              status={validation.type || (validation.isValid ? 'success' : 'error')}
-              type={type === "email" ? "Email" : "Phone"}
-              message={validation.message || ''}
-              details={validation.details}
-            />
-          )}
-        </FormItem>
-      )}
+            <FormControl>
+              <div className="relative">
+                {icon && (
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                    {icon}
+                  </div>
+                )}
+                <Input
+                  {...field}
+                  value={inputValue}
+                  type={type}
+                  placeholder={required ? `${placeholder} *` : placeholder}
+                  className={cn(inputClasses, icon && "pl-10")}
+                  aria-required={required}
+                  aria-invalid={!!error || isEmpty}
+                  readOnly={readOnly}
+                  onBlur={handleBlur}
+                />
+              </div>
+            </FormControl>
+            {error && (
+              <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />
+            )}
+            {isEmpty && !error && (
+              <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
+                {label} is required
+              </FormMessage>
+            )}
+            {validation && (
+              <ValidationStatus 
+                status={validation.type || (validation.isValid ? 'success' : 'error')}
+                type={type === "email" ? "Email" : "Phone"}
+                message={validation.message || ''}
+                details={validation.details}
+              />
+            )}
+          </FormItem>
+        );
+      }}
     />
   );
 }

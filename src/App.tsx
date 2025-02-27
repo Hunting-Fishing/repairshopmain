@@ -22,7 +22,7 @@ import SystemAlerts from "@/pages/SystemAlerts";
 import JobTemplates from "@/pages/JobTemplates";
 import ApplicationControl from "@/pages/ApplicationControl";
 import ShopSettings from "@/pages/ShopSettings";
-import { Loader2, Users } from "lucide-react";
+import { Loader2, Users, BarChart2 } from "lucide-react";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -221,6 +221,14 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
+                      <Route 
+                        path="/reports" 
+                        element={
+                          <ProtectedRoute>
+                            <ReportsPage />
+                          </ProtectedRoute>
+                        } 
+                      />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                     <Toaster />
@@ -254,6 +262,31 @@ function StaffPage() {
           </div>
           
           <StaffList />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ReportsPage() {
+  return (
+    <div className="flex min-h-screen w-full">
+      <AppSidebar />
+      <div className="flex-1 p-4 md:p-6 lg:p-8">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <BarChart2 className="h-8 w-8" />
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
+                <p className="text-muted-foreground">
+                  View and generate business reports
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <PlaceholderPage title="Reports" />
         </div>
       </div>
     </div>

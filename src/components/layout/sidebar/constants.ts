@@ -1,12 +1,16 @@
 
-import { BarChart2, Calendar, FileText, ShoppingCart, Users, Settings2, MessageSquare, Home, Wrench } from "lucide-react";
+import { BarChart2, Calendar, FileText, ShoppingCart, Users, Settings2, MessageSquare, Home, Wrench, Archive, Car, ShieldAlert, Bell } from "lucide-react";
 
 export function getBaseMenuItems() {
   return [
     { title: "Dashboard", icon: Home, path: "/" },
     { title: "Calendar", icon: Calendar, path: "/calendar" },
     { title: "Customers", icon: Users, path: "/customers" },
-    { title: "Shop", icon: ShoppingCart, path: "/shop" },
+    { title: "Work Orders", icon: Wrench, path: "/work-orders" },
+    { title: "Inventory", icon: Archive, path: "/inventory" },
+    { title: "Vehicles", icon: Car, path: "/vehicles" },
+    { title: "Shop Items", icon: ShoppingCart, path: "/shop-items" },
+    { title: "System Alerts", icon: Bell, path: "/alerts" },
     { title: "Job Templates", icon: FileText, path: "/job-templates" },
     { title: "Staff", icon: Users, path: "/staff" },
     { title: "Reports", icon: BarChart2, path: "/reports" }

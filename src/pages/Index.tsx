@@ -1,6 +1,6 @@
 
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { Suspense } from "react";
+import { Suspense, useCallback, memo } from "react";
 import { LoadingScreen } from "@/components/dashboard/components/LoadingScreen";
 import { ErrorBoundaryWrapper } from "@/components/layout/ErrorBoundaryWrapper";
 import { useNavigate } from "react-router-dom";
@@ -11,11 +11,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StatsProvider } from "@/contexts/StatsContext";
 
-export default function Index() {
-  const navigate = useNavigate();
-  const { session } = useAuth();
-  
-  const handleGenerateDemoData = async () => {
+// Memoize the demo buttons to prevent unnecessary re-renders
+const DemoButtons = memo(function DemoButtons() {
+  const handleGenerateDemoData = useCallback(async () => {
     try {
       const { data: profile } = await supabase
         .from('profiles')
@@ -36,9 +34,9 @@ export default function Index() {
       console.error('Error generating demo data:', error);
       toast.error(error.message || 'Failed to generate demo data');
     }
-  };
+  }, []);
 
-  const handleCleanupDemoData = async () => {
+  const handleCleanupDemoData = useCallback(async () => {
     try {
       const { data: profile } = await supabase
         .from('profiles')
@@ -58,8 +56,30 @@ export default function Index() {
       console.error('Error cleaning up demo data:', error);
       toast.error(error.message || 'Failed to clean up demo data');
     }
-  };
+  }, []);
 
+  return (
+    <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+      <Button 
+        variant="outline"
+        onClick={handleGenerateDemoData}
+      >
+        Generate Demo Data
+      </Button>
+      <Button 
+        variant="outline"
+        onClick={handleCleanupDemoData}
+      >
+        Clean Up Demo Data
+      </Button>
+    </div>
+  );
+});
+
+export default function Index() {
+  const navigate = useNavigate();
+  const { session } = useAuth();
+  
   if (!session) {
     navigate('/auth');
     return null;
@@ -71,20 +91,7 @@ export default function Index() {
         <StatsProvider>
           <DashboardContextProvider>
             <main className="min-h-screen">
-              <div className="fixed bottom-4 right-4 z-50 flex gap-2">
-                <Button 
-                  variant="outline"
-                  onClick={handleGenerateDemoData}
-                >
-                  Generate Demo Data
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={handleCleanupDemoData}
-                >
-                  Clean Up Demo Data
-                </Button>
-              </div>
+              <DemoButtons />
               <DashboardLayout />
             </main>
           </DashboardContextProvider>

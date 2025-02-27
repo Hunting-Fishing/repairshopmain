@@ -38,8 +38,11 @@ export function useStatsQuery() {
         throw error;
       }
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    cacheTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    refetchOnWindowFocus: false, // Prevent unnecessary refetches
+    refetchOnMount: false,
   });
 }

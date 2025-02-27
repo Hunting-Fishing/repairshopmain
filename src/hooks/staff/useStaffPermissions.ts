@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 
-// Define a type for the roles to ensure type safety
-type UserRole = 'owner' | 'manager' | 'service_advisor' | 'technician' | 'admin' | 'custom' | string;
+// Define a union type for all possible roles
+type SystemRole = 'hr' | 'service_advisor' | 'technician' | 'custom' | 'management' | 'parts' | 'owner' | 'manager' | 'admin';
 
 export function useStaffPermissions() {
   const { user } = useAuth();
@@ -16,8 +16,10 @@ export function useStaffPermissions() {
     queryFn: async () => {
       if (!userProfile) return defaultPermissions;
       
+      const currentRole = userProfile.role as SystemRole;
+      
       // Owner and managers have all permissions
-      if (userProfile.role === 'owner' || userProfile.role === 'manager') {
+      if (currentRole === 'owner' || currentRole === 'manager') {
         return allPermissions;
       }
       
@@ -47,17 +49,18 @@ export function useStaffPermissions() {
       }
       
       // For system roles, use predefined permissions
-      const role = userProfile.role as string;
-      return rolePermissions[role] || defaultPermissions;
+      return rolePermissions[currentRole] || defaultPermissions;
     },
     enabled: !profileLoading && !!userProfile,
   });
+  
+  const currentRole = userProfile?.role as SystemRole;
   
   return {
     permissions,
     isLoading: isLoading || profileLoading,
     can: (permission: string) => !!permissions[permission],
-    isOwnerOrManager: userProfile?.role === 'owner' || userProfile?.role === 'manager',
+    isOwnerOrManager: currentRole === 'owner' || currentRole === 'manager',
   };
 }
 
@@ -84,7 +87,7 @@ const allPermissions: Record<string, boolean> = {
 };
 
 // Role-specific permission presets
-const rolePermissions: Record<string, Record<string, boolean>> = {
+const rolePermissions: Record<SystemRole, Record<string, boolean>> = {
   'service_advisor': {
     ...defaultPermissions,
     'view-staff': true,
@@ -100,5 +103,27 @@ const rolePermissions: Record<string, Record<string, boolean>> = {
     'add-staff': true,
     'edit-staff': true,
     'view-organization': true,
+  },
+  'hr': {
+    ...defaultPermissions,
+    'view-staff': true,
+    'add-staff': true,
+    'edit-staff': true,
+  },
+  'management': {
+    ...allPermissions,
+  },
+  'parts': {
+    ...defaultPermissions,
+    'view-staff': true,
+  },
+  'custom': {
+    ...defaultPermissions,
+  },
+  'owner': {
+    ...allPermissions,
+  },
+  'manager': {
+    ...allPermissions,
   }
 };

@@ -46,35 +46,13 @@ export function useJobTemplates() {
         const organizationId = profile.organization_id || null;
         console.log('User organization_id:', organizationId);
 
-        // Check if job_templates table exists
-        try {
-          // Try a simple query first to check if the table exists and is accessible
-          const { count, error: countError } = await supabase
-            .from('job_templates')
-            .select('*', { count: 'exact', head: true });
-            
-          if (countError) {
-            console.error('Table check error:', countError);
-            throw new Error(`Table access error: ${countError.message}`);
-          }
-          
-          console.log('Job templates table accessible, count:', count);
-        } catch (tableError) {
-          console.error('Table check failed:', tableError);
-          throw new Error('Job templates table may not exist or is not accessible');
-        }
-
-        // Fetch templates with more robust error handling
+        // Fetch templates - MODIFIED to remove problematic joins
         let query = supabase
           .from('job_templates')
           .select(`
             *,
             template_vehicle_compatibility (
               id, make, model, year_start, year_end
-            ),
-            template_feedback (
-              id, rating, comments,
-              technician:profiles (first_name, last_name)
             ),
             template_usage_stats (
               use_count, avg_completion_time, success_rate
@@ -104,13 +82,35 @@ export function useJobTemplates() {
           return [];
         }
 
+        // Try to fetch feedback separately if possible
+        let feedbackByTemplateId: Record<string, any[]> = {};
+        try {
+          const { data: feedbackData, error: feedbackError } = await supabase
+            .from('template_feedback')
+            .select('id, template_id, rating, comments');
+          
+          if (!feedbackError && feedbackData) {
+            // Group feedback by template_id
+            feedbackByTemplateId = feedbackData.reduce((acc, item) => {
+              if (!acc[item.template_id]) {
+                acc[item.template_id] = [];
+              }
+              acc[item.template_id].push(item);
+              return acc;
+            }, {} as Record<string, any[]>);
+          }
+        } catch (feedbackErr) {
+          console.warn('Could not fetch template feedback:', feedbackErr);
+          // Continue without feedback data
+        }
+
         // Transform the data to match our type
         const templates = data.map((template: any): JobTemplate => {
           try {
             return {
               ...template,
               compatibility: template.template_vehicle_compatibility || [],
-              feedback: template.template_feedback || [],
+              feedback: feedbackByTemplateId[template.id] || [],
               usage_stats: template.template_usage_stats?.[0] || {
                 use_count: 0,
                 avg_completion_time: null,

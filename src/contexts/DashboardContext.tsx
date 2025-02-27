@@ -6,6 +6,7 @@ import { useViewState } from "@/hooks/useViewState";
 import { useStats } from "./StatsContext";
 import { useAuth } from "./AuthContext";
 import { DashboardContextValue, DashboardProfile } from "@/types/dashboard/consolidated";
+import { ViewState } from "@/types/dashboard";
 
 const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
 
@@ -61,31 +62,27 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
 
   // Optimized action callbacks with stable references
   const setView = useCallback((view: "day" | "week" | "month") => {
-    updateViewState(prev => ({
-      ...prev,
-      state: { ...prev?.state, defaultView: view }
-    }));
-  }, [updateViewState]);
+    updateViewState({
+      state: { ...viewState?.state, defaultView: view }
+    });
+  }, [updateViewState, viewState?.state]);
 
   const setViewMode = useCallback((mode: "calendar" | "grid" | "list") => {
-    updateViewState(prev => ({
-      ...prev,
+    updateViewState({
       view_mode: mode
-    }));
+    });
   }, [updateViewState]);
 
   const setSelectedDate = useCallback((date: Date) => {
-    updateViewState(prev => ({
-      ...prev,
-      state: { ...prev?.state, selectedDate: date }
-    }));
-  }, [updateViewState]);
+    updateViewState({
+      state: { ...viewState?.state, selectedDate: date }
+    });
+  }, [updateViewState, viewState?.state]);
 
   const setIsCalendarExpanded = useCallback((expanded: boolean) => {
-    updateViewState(prev => ({
-      ...prev,
+    updateViewState({
       is_calendar_expanded: expanded
-    }));
+    });
   }, [updateViewState]);
 
   // Memoized actions with stable references

@@ -8,15 +8,41 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoyaltyTab } from "@/components/customers/loyalty/LoyaltyTab";
 import { CustomerFeedback } from "@/components/customers/feedback/CustomerFeedback";
 import { LogOut, User, Star, MessageSquare, ShoppingBag } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function CustomerPortal() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-    }
+    const checkUserAccess = async () => {
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+
+      try {
+        // Check if user has a profile and their role
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        // If user is not a customer, redirect to Index
+        if (!profile || profile.role !== 'customer') {
+          toast.info("Redirecting to dashboard...");
+          navigate("/");
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking user access:", error);
+        navigate("/");
+      }
+    };
+
+    checkUserAccess();
   }, [user, navigate]);
 
   const handleSignOut = async () => {
@@ -27,6 +53,9 @@ export default function CustomerPortal() {
       console.error("Error signing out:", error);
     }
   };
+
+  // If there's no user, don't render anything while redirecting
+  if (!user) return null;
 
   return (
     <div className="container mx-auto py-6 space-y-6">

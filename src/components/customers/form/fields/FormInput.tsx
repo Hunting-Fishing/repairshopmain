@@ -70,11 +70,22 @@ export function FormInput({
   // Use watch instead of getValues to react to changes
   const value = form.watch(name);
 
+  // Add detailed logging for form changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name, type }) => {
+      console.log("Form field changed:", { name, type, value });
+      console.log("Current form values:", form.getValues());
+      console.log("Form state:", form.formState);
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch]);
+
   useEffect(() => {
     console.log('Input value details:', {
       name,
       value,
       type: typeof value,
+      formValue: form.getValues(name),
       isTouched,
       error
     });

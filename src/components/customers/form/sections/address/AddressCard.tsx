@@ -13,7 +13,7 @@ interface AddressCardProps {
   isModernTheme?: boolean;
   onRemove: (index: number) => void;
   onSetPrimary: (index: number) => void;
-  onTypeChange: (index: number, type: 'home' | 'work' | 'other') => void;
+  onTypeChange: (index: number, type: 'billing' | 'shipping' | 'other') => void;
   isLoading?: boolean;
 }
 
@@ -31,8 +31,9 @@ export function AddressCard({
     <div className="relative border rounded-lg p-4 space-y-4 m-2">
       <div className="flex items-center justify-between mb-4">
         <AddressTypeSelector
-          type={address.type}
-          onChange={(type) => onTypeChange(index, type)}
+          value={address.type}
+          onValueChange={(value) => onTypeChange(index, value)}
+          disabled={isLoading}
         />
 
         <div className="flex items-center gap-2">

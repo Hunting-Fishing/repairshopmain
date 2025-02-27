@@ -1,6 +1,7 @@
 
 import { UseFormReturn } from "react-hook-form";
 
+// Explicitly define the form values interface to match the one in TechnicianTabs
 interface TechnicianSettingsFormValues {
   showTechnicianWorkload: boolean;
   showTechnicianAvailability: boolean;

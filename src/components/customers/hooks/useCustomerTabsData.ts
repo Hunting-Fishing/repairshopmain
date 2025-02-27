@@ -45,12 +45,26 @@ export function useCustomerTabsData(customerId: string) {
   });
 
   // Handle retry button click in error state
-  const handleRetry = () => {
-    toast.promise(refetch(), {
-      loading: "Retrying...",
-      success: "Successfully loaded customer data",
-      error: "Failed to load customer data"
+  const handleRetry = async () => {
+    toast({ 
+      title: "Retrying...",
+      description: "Attempting to reload customer data"
     });
+    
+    try {
+      await refetch();
+      toast({
+        title: "Success!",
+        description: "Successfully loaded customer data",
+        variant: "default"
+      });
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to load customer data",
+        variant: "destructive"
+      });
+    }
   };
 
   return {

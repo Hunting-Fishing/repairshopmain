@@ -18,6 +18,7 @@ import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
 import { toast } from "@/hooks/use-toast";
 import { DeleteStaffDialog } from "./DeleteStaffDialog";
 import { EditStaffDialog } from "./EditStaffDialog";
+import { AddStaffMemberDialog } from "./AddStaffMemberDialog";
 import { StaffMember } from "@/types/staff";
 
 export function StaffList() {
@@ -25,6 +26,7 @@ export function StaffList() {
   const [selectedMember, setSelectedMember] = useState<StaffMember | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   if (error) {
     console.error("Error loading staff members:", error);
@@ -46,10 +48,14 @@ export function StaffList() {
   };
 
   const handleAddStaffClick = () => {
-    // Navigate to or open add staff form
+    setIsAddDialogOpen(true);
+  };
+
+  const handleAddSuccess = () => {
+    setIsAddDialogOpen(false);
     toast({
-      title: "Feature coming soon",
-      description: "Adding new staff members will be available in the next update.",
+      title: "Success",
+      description: "Staff member added successfully",
       variant: "default"
     });
   };
@@ -153,6 +159,12 @@ export function StaffList() {
       </Card>
 
       {/* Dialogs */}
+      <AddStaffMemberDialog
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onSuccess={handleAddSuccess}
+      />
+
       <EditStaffDialog 
         isOpen={isEditDialogOpen}
         staffMember={selectedMember}

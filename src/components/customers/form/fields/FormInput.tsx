@@ -66,15 +66,15 @@ export function FormInput({
   const [shake, setShake] = useState(false);
   const error = form.formState.errors[name as keyof CustomerFormValues];
   const isTouched = form.formState.touchedFields[name as keyof CustomerFormValues];
-  const value = form.getValues(name);
+  
+  // Use watch instead of getValues to react to changes
+  const value = form.watch(name);
 
-  // Add detailed logging for input value changes
   useEffect(() => {
     console.log('Input value details:', {
       name,
       value,
       type: typeof value,
-      formValue: form.getValues(name),
       isTouched,
       error
     });
@@ -123,8 +123,6 @@ export function FormInput({
     return null;
   })();
 
-  const stringValue = typeof value === 'string' ? value : '';
-
   return (
     <FormField
       control={form.control}
@@ -165,7 +163,6 @@ export function FormInput({
               )}
               <Input
                 {...field}
-                value={stringValue}
                 type={type}
                 placeholder={required ? `${placeholder} *` : placeholder}
                 className={cn(inputClasses, icon && "pl-10")}

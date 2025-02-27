@@ -219,6 +219,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
+                    {/* Replace CardTitle with a heading element to avoid the ReactElement type restriction */}
                     <h3 className="text-2xl font-semibold leading-none tracking-tight">Report Format</h3>
                   </CardHeader>
                   <CardContent>

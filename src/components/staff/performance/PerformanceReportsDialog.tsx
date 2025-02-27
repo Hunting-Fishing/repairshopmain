@@ -1,6 +1,6 @@
 
 import React, { ReactNode } from 'react';
-import { PerformanceReports } from '../PerformanceReports';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface PerformanceReportsDialogProps {
   isOpen: boolean;
@@ -14,11 +14,15 @@ export function PerformanceReportsDialog({
   children 
 }: PerformanceReportsDialogProps) {
   return (
-    <PerformanceReports isOpen={isOpen} onClose={onClose}>
-      {/* Wrap children in a single div element to satisfy the type requirement */}
-      <div className="performance-reports-content">
-        {children}
-      </div>
-    </PerformanceReports>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+        <DialogHeader>
+          <DialogTitle>Performance Reports</DialogTitle>
+        </DialogHeader>
+        <div className="performance-reports-content">
+          {children}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

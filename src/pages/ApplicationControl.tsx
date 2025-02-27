@@ -10,9 +10,11 @@ import { InventoryTab } from "@/components/application-control/inventory/Invento
 import { CommunicationsTab } from "@/components/application-control/communications/CommunicationsTab";
 import { IntegrationsTab } from "@/components/application-control/IntegrationsTab";
 import { DatabaseTab } from "@/components/application-control/database/DatabaseTab";
+import { Server } from "lucide-react";
 
 // Lazy-loaded components
-const SystemStatus = lazy(() => import("@/components/application-control/SystemStatus"));
+// Fix: SystemStatus needs to be imported with the correct default export pattern
+const SystemStatus = lazy(() => import("@/components/application-control/SystemStatus").then(module => ({ default: module.SystemStatus })));
 
 export default function ApplicationControl() {
   const location = useLocation();
@@ -100,7 +102,16 @@ export default function ApplicationControl() {
             </nav>
           </div>
           
-          <Suspense fallback={<ControlPanel />}>
+          {/* Fix: Add required props to the ControlPanel component in the fallback */}
+          <Suspense fallback={
+            <ControlPanel 
+              title="Loading..." 
+              description="Please wait while the content loads" 
+              icon={Server} 
+              action={() => {}} 
+              buttonText="Refresh"
+            />
+          }>
             <Routes>
               <Route path="/" element={<OverviewTab />} />
               <Route path="/customers" element={<CustomerControl />} />

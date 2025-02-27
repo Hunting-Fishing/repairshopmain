@@ -4,6 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useProfile";
 
+// Define a type for the roles to ensure type safety
+type UserRole = 'owner' | 'manager' | 'service_advisor' | 'technician' | 'admin' | 'custom' | string;
+
 export function useStaffPermissions() {
   const { user } = useAuth();
   const { data: userProfile, isLoading: profileLoading } = useProfile(user?.id);
@@ -44,7 +47,8 @@ export function useStaffPermissions() {
       }
       
       // For system roles, use predefined permissions
-      return rolePermissions[userProfile.role] || defaultPermissions;
+      const role = userProfile.role as string;
+      return rolePermissions[role] || defaultPermissions;
     },
     enabled: !profileLoading && !!userProfile,
   });

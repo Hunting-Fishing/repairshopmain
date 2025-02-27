@@ -7,10 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAddStaffMember } from "@/hooks/staff/useAddStaffMember";
-import { toast } from "@/hooks/use-toast";
+import { useAddStaffMember, StaffMemberFormValues } from "@/hooks/staff/useAddStaffMember";
+import { toast } from "@/components/ui/use-toast";
 import { roles } from "./role-management/types";
-import type { StaffMember } from "@/types/staff";
 
 interface AddStaffMemberDialogProps {
   isOpen: boolean;
@@ -27,17 +26,25 @@ export function AddStaffMemberDialog({
   const { data: userProfile } = useProfile(user?.id);
   const { addStaffMember, isLoading } = useAddStaffMember();
   
-  const [formData, setFormData] = useState<Partial<StaffMember>>({
-    first_name: '',
-    last_name: '',
-    phone_number: '',
+  const [formData, setFormData] = useState<StaffMemberFormValues>({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
     role: 'technician',
-    status: 'active'
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Map the form field names to the StaffMemberFormValues property names
+    const fieldMap: Record<string, keyof StaffMemberFormValues> = {
+      'first_name': 'firstName',
+      'last_name': 'lastName',
+      'phone_number': 'phoneNumber',
+    };
+    
+    const propertyName = fieldMap[name] || name as keyof StaffMemberFormValues;
+    setFormData(prev => ({ ...prev, [propertyName]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -63,17 +70,16 @@ export function AddStaffMemberDialog({
       });
       toast({
         title: "Staff member added",
-        description: `${formData.first_name} ${formData.last_name} has been added to your organization.`,
+        description: `${formData.firstName} ${formData.lastName} has been added to your organization.`,
         variant: "default"
       });
       onSuccess();
       // Reset form
       setFormData({
-        first_name: '',
-        last_name: '',
-        phone_number: '',
+        firstName: '',
+        lastName: '',
+        phoneNumber: '',
         role: 'technician',
-        status: 'active'
       });
     } catch (error) {
       console.error("Error adding staff member:", error);
@@ -98,7 +104,7 @@ export function AddStaffMemberDialog({
               <Input
                 id="first_name"
                 name="first_name"
-                value={formData.first_name}
+                value={formData.firstName}
                 onChange={handleChange}
                 required
               />
@@ -108,7 +114,7 @@ export function AddStaffMemberDialog({
               <Input
                 id="last_name"
                 name="last_name"
-                value={formData.last_name}
+                value={formData.lastName}
                 onChange={handleChange}
                 required
               />
@@ -120,7 +126,7 @@ export function AddStaffMemberDialog({
             <Input
               id="phone_number"
               name="phone_number"
-              value={formData.phone_number}
+              value={formData.phoneNumber || ''}
               onChange={handleChange}
             />
           </div>
@@ -147,7 +153,7 @@ export function AddStaffMemberDialog({
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
             <Select 
-              value={formData.status || 'active'} 
+              defaultValue="active" 
               onValueChange={(value) => handleSelectChange('status', value)}
             >
               <SelectTrigger>
@@ -172,10 +178,8 @@ export function AddStaffMemberDialog({
             <Button 
               type="submit" 
               disabled={isLoading}
-              loading={isLoading}
-              loadingText="Adding..."
             >
-              Add Staff Member
+              {isLoading ? "Adding..." : "Add Staff Member"}
             </Button>
           </div>
         </form>

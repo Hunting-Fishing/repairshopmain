@@ -32,15 +32,27 @@ export function AddStaffMemberForm({ organizationId, customRoles }: AddStaffMemb
   });
 
   const onSubmit = async (data: StaffMemberFormValues) => {
+    // Use spread to ensure we're passing all required fields
     const staffData = {
       ...data,
-      organization_id: organizationId
+      // Ensure all required fields are included and correctly typed
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: data.role,
+      phoneNumber: data.phoneNumber,
+      notes: data.notes,
+      email: data.email,
+      organization_id: organizationId,
     };
     
-    const success = await addStaffMember(staffData);
-    if (success) {
+    try {
+      await addStaffMember(staffData);
       form.reset();
       closeButtonRef.current?.click();
+      return true;
+    } catch (error) {
+      console.error("Failed to add staff member:", error);
+      return false;
     }
   };
 

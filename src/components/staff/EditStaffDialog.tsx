@@ -163,10 +163,8 @@ export function EditStaffDialog({
             <Button 
               type="submit" 
               disabled={isSubmitting}
-              loading={isSubmitting}
-              loadingText="Saving..."
             >
-              Save Changes
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         </form>

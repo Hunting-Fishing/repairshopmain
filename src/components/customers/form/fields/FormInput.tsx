@@ -1,3 +1,4 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -5,9 +6,8 @@ import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 import { ValidationStatus } from "../../ValidationStatus";
 import { validateEmail, validatePhoneNumber } from "@/utils/validation/fieldValidation";
-import { useState, useEffect, forwardRef, useImperativeHandle, useRef } from "react";
+import { useState, useEffect } from "react";
 import { HelpCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import {
   Tooltip,
   TooltipContent,
@@ -15,6 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+// Define paths type for nested object access
 type PathImpl<T, K extends keyof T> = K extends string
   ? T[K] extends Record<string, any>
     ? T[K] extends ArrayLike<any>
@@ -49,12 +50,7 @@ interface FormInputProps {
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-export interface FormInputRef {
-  focus: () => void;
-  scrollIntoView: () => void;
-}
-
-export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
+export function FormInput({
   form,
   name,
   label,
@@ -66,24 +62,15 @@ export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
   helpText,
   icon,
   onBlur
-}, ref) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+}: FormInputProps) {
   const [shake, setShake] = useState(false);
   const error = form.formState.errors[name as keyof CustomerFormValues];
   const isTouched = form.formState.touchedFields[name as keyof CustomerFormValues];
   
+  // Use watch instead of getValues to react to changes
   const value = form.watch(name);
 
-  useImperativeHandle(ref, () => ({
-    focus: () => {
-      inputRef.current?.focus();
-    },
-    scrollIntoView: () => {
-      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-  }));
-
+  // Add detailed logging for form changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
       console.log("Form field changed:", { name, type, value });
@@ -92,6 +79,17 @@ export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);
+
+  useEffect(() => {
+    console.log('Input value details:', {
+      name,
+      value,
+      type: typeof value,
+      formValue: form.getValues(name),
+      isTouched,
+      error
+    });
+  }, [value, name, isTouched, error]);
 
   const isEmpty = required && (!value || (typeof value === 'string' && value.trim() === ""));
   
@@ -106,15 +104,18 @@ export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
     shake && "animate-shake"
   );
 
+  const labelClasses = cn(
+    isModernTheme
+      ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
+      : "text-gray-700 font-medium",
+    error && "text-red-500",
+    isEmpty && "text-red-500"
+  );
+
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     if (required && !event.target.value) {
       setShake(true);
       setTimeout(() => setShake(false), 650);
-      toast({
-        title: "Required Field",
-        description: `Please fill in the ${label.toLowerCase()} field`,
-        variant: "destructive",
-      });
     }
     form.register(name).onBlur(event);
     if (onBlur) {
@@ -138,18 +139,13 @@ export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
       control={form.control}
       name={name}
       render={({ field }) => {
+        // Ensure the field value is always a string or number
         const inputValue = field.value != null ? String(field.value) : '';
         
         return (
           <FormItem className="relative">
             <div className="flex items-center gap-2">
-              <FormLabel className={cn(
-                isModernTheme
-                  ? "text-gray-700 font-medium text-sm uppercase tracking-wide"
-                  : "text-gray-700 font-medium",
-                error && "text-red-500",
-                isEmpty && "text-red-500"
-              )}>
+              <FormLabel className={labelClasses}>
                 <span className="flex items-center gap-1">
                   {label}
                   {required && (
@@ -182,7 +178,6 @@ export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
                 )}
                 <Input
                   {...field}
-                  ref={inputRef}
                   value={inputValue}
                   type={type}
                   placeholder={required ? `${placeholder} *` : placeholder}
@@ -195,13 +190,11 @@ export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
               </div>
             </FormControl>
             {error && (
-              <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
-                {error.message || `Please fill in the ${label.toLowerCase()} field`}
-              </FormMessage>
+              <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />
             )}
             {isEmpty && !error && (
               <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
-                {`Please fill in the ${label.toLowerCase()} field`}
+                {label} is required
               </FormMessage>
             )}
             {validation && (
@@ -217,6 +210,4 @@ export const FormInput = forwardRef<FormInputRef, FormInputProps>(({
       }}
     />
   );
-});
-
-FormInput.displayName = "FormInput";
+}

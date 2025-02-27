@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -31,7 +32,6 @@ export function CustomerRelationshipDialog({
 
   const form = useForm<CustomerRelationshipFormValues>({
     defaultValues: {
-      customer_id: customerId,
       relationship_type: "family",
       is_primary: false,
       notes: ""
@@ -96,7 +96,7 @@ export function CustomerRelationshipDialog({
               <div className="space-y-2">
                 <Label>Relationship Type</Label>
                 <Select
-                  onValueChange={(value) => form.setValue("relationship_type", value)}
+                  onValueChange={(value) => form.setValue("relationship_type", value as any)}
                   defaultValue={form.getValues("relationship_type")}
                 >
                   <SelectTrigger>

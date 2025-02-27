@@ -1,65 +1,46 @@
 
-import { CheckCircle, AlertCircle, AlertTriangle } from "lucide-react";
+import { CheckCircle, AlertCircle, AlertTriangle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ValidationStatusProps {
-  status: 'success' | 'error' | 'warning';
+  status: 'success' | 'warning' | 'error' | 'info';
   type: string;
   message: string;
   details?: string[];
 }
 
-export function ValidationStatus({ 
-  status, 
-  type, 
-  message, 
-  details 
-}: ValidationStatusProps) {
-  const getIcon = () => {
-    switch (status) {
-      case 'success':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      default:
-        return null;
-    }
+export function ValidationStatus({ status, type, message, details }: ValidationStatusProps) {
+  const iconMap = {
+    success: CheckCircle,
+    warning: AlertTriangle,
+    error: AlertCircle,
+    info: Info
   };
 
-  const getStatusColor = () => {
-    switch (status) {
-      case 'success':
-        return 'text-green-700 bg-green-50 border-green-200';
-      case 'error':
-        return 'text-red-700 bg-red-50 border-red-200';
-      case 'warning':
-        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
-      default:
-        return '';
-    }
+  const Icon = iconMap[status];
+
+  const statusStyles = {
+    success: "text-green-500",
+    warning: "text-yellow-500",
+    error: "text-red-500",
+    info: "text-blue-500"
   };
 
   return (
-    <div className={cn(
-      "mt-2 p-2 rounded-md border text-sm animate-slideDown",
-      getStatusColor()
-    )}>
-      <div className="flex items-start gap-2">
-        {getIcon()}
-        <div className="flex-1">
-          <p className="font-medium">{type} {status}</p>
-          <p className="text-sm opacity-90">{message}</p>
-          {details && details.length > 0 && (
-            <ul className="mt-1 list-disc list-inside text-sm opacity-75">
-              {details.map((detail, index) => (
-                <li key={index}>{detail}</li>
-              ))}
-            </ul>
-          )}
-        </div>
+    <div className="space-y-1">
+      <div className={cn("flex items-center gap-1 text-sm", statusStyles[status])}>
+        <Icon className="h-4 w-4" />
+        <span>
+          {type}: {message}
+        </span>
       </div>
+      {details && details.length > 0 && (
+        <ul className={cn("text-xs pl-6 list-disc", statusStyles[status])}>
+          {details.map((detail, index) => (
+            <li key={index}>{detail}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

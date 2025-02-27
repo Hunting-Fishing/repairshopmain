@@ -8,14 +8,52 @@ import { AlertCircle } from "lucide-react";
 import { formatStatTitle } from "../../utils/statsFormatters";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { toast } from "sonner";
-import { useMemo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
+import { StatData } from "../../hooks/useStatsQuery";
 
 interface StatCardGridProps {
   isModernTheme?: boolean;
 }
 
+// Define preferred order of stats
+const PREFERRED_STAT_ORDER = [
+  'total_work_orders',
+  'active_customers',
+  'pending_jobs',
+  'average_service_time',
+  'customer_satisfaction',
+  // Add any other stats in preferred order
+];
+
+// Memoize each individual card to prevent unnecessary re-renders
+const MemoizedStatCard = memo(function MemoizedStatCard({
+  stat,
+  icon,
+  isModernTheme,
+  index
+}: {
+  stat: StatData;
+  icon: React.ElementType;
+  isModernTheme: boolean;
+  index: number;
+}) {
+  return (
+    <StatCard
+      key={`${stat.type}-${stat.id}`}
+      title={formatStatTitle(stat.type)}
+      value={stat.value}
+      type={stat.type}
+      trend={stat.trend}
+      trendDirection={stat.trend_direction}
+      icon={icon}
+      isModernTheme={isModernTheme}
+      index={index}
+    />
+  );
+});
+
 export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
-  const { stats, isLoading, error } = useStats();
+  const { uniqueStats, isLoading, error } = useStats();
   const statIcons = useStatsIcons();
 
   const handleStatsError = useCallback((error: Error) => {
@@ -23,32 +61,29 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
     toast.error("Failed to load statistics");
   }, []);
 
-  const uniqueStats = useMemo(() => {
-    if (!stats) return [];
+  // Order stats according to preferred order
+  const orderedStats = useMemo(() => {
+    if (!uniqueStats?.length) return [];
     
-    // Define the order of stats we want to display
-    const statOrder = [
-      'total_work_orders',
-      'active_customers',
-      'pending_jobs',
-      'average_service_time',
-      'customer_satisfaction'
-    ];
+    // Create a map for O(1) lookups
+    const statsMap = new Map(uniqueStats.map(stat => [stat.type, stat]));
     
-    // Create a map of the most recent stat for each type
-    const statsMap = new Map();
-    stats.forEach(stat => {
-      if (!statsMap.has(stat.type) || 
-          new Date(stat.created_at) > new Date(statsMap.get(stat.type).created_at)) {
-        statsMap.set(stat.type, stat);
+    // First, add stats in the preferred order if they exist
+    const result: StatData[] = [];
+    
+    PREFERRED_STAT_ORDER.forEach(type => {
+      const stat = statsMap.get(type);
+      if (stat) {
+        result.push(stat);
+        statsMap.delete(type);
       }
     });
     
-    // Return stats in the specified order
-    return statOrder
-      .map(type => statsMap.get(type))
-      .filter(Boolean); // Remove any undefined entries
-  }, [stats]);
+    // Then add any remaining stats
+    statsMap.forEach(stat => result.push(stat));
+    
+    return result;
+  }, [uniqueStats]);
 
   if (error) {
     return (
@@ -72,16 +107,12 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
   return (
     <ErrorBoundary onError={handleStatsError}>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        {uniqueStats.map((stat, index) => {
-          const Icon = statIcons[stat.type];
+        {orderedStats.map((stat, index) => {
+          const Icon = statIcons[stat.type] || statIcons.default;
           return (
-            <StatCard
-              key={`${stat.type}-${stat.created_at}`}
-              title={formatStatTitle(stat.type)}
-              value={stat.value}
-              type={stat.type}
-              trend={stat.trend}
-              trendDirection={stat.trend_direction}
+            <MemoizedStatCard 
+              key={stat.id}
+              stat={stat}
               icon={Icon}
               isModernTheme={isModernTheme}
               index={index}

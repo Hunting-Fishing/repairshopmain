@@ -1,5 +1,5 @@
 
-import { memo } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { CalendarContainer } from "./calendar/CalendarContainer";
 import { GridView } from "./views/GridView";
@@ -12,6 +12,54 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { LoadingScreen } from "./components/LoadingScreen";
 
+// Memoized TabContent components to prevent unnecessary renders
+const CalendarTabContent = memo(function CalendarTabContent({
+  selectedDate,
+  view,
+  bookings,
+  isBookingsLoading,
+  isCalendarExpanded,
+  onDateChange,
+  onViewChange,
+  toggleCalendarSize,
+  colorPreferences,
+  isModernTheme,
+}) {
+  return (
+    <TabsContent value="calendar" className="mt-0 h-full">
+      <CalendarContainer
+        selectedDate={selectedDate}
+        view={view}
+        bookings={bookings}
+        isLoading={isBookingsLoading}
+        isCalendarExpanded={isCalendarExpanded}
+        onDateChange={onDateChange}
+        onViewChange={onViewChange}
+        toggleCalendarSize={toggleCalendarSize}
+        colorPreferences={colorPreferences}
+        isModernTheme={isModernTheme}
+      />
+    </TabsContent>
+  );
+});
+
+const GridTabContent = memo(function GridTabContent() {
+  return (
+    <TabsContent value="grid" className="mt-0">
+      <GridView />
+    </TabsContent>
+  );
+});
+
+const ListTabContent = memo(function ListTabContent() {
+  return (
+    <TabsContent value="list" className="mt-0">
+      <ListView />
+    </TabsContent>
+  );
+});
+
+// Main DashboardContent component
 export const DashboardContent = memo(function DashboardContent() {
   const { state, actions } = useDashboard();
   const {
@@ -26,9 +74,28 @@ export const DashboardContent = memo(function DashboardContent() {
   const isLoading = isBookingsLoading || isProfileLoading;
   const error = bookingsError || profileError;
 
-  const handleError = (error: Error) => {
+  const handleError = useCallback((error: Error) => {
     console.error("Dashboard error:", error);
-  };
+  }, []);
+
+  // Memoize color preferences to prevent object recreation
+  const colorPreferences = useMemo(() => 
+    userProfile?.color_preferences || {
+      primary_color: "#0EA5E9",
+      secondary_color: "#EFF6FF",
+      border_color: "#0EA5E9",
+      background_color: "bg-background/95"
+    }
+  , [userProfile?.color_preferences]);
+
+  // Memoize callback handlers
+  const handleDateChange = useCallback((date?: Date) => {
+    if (date) setSelectedDate(date);
+  }, [setSelectedDate]);
+
+  const handleToggleCalendarSize = useCallback(() => {
+    setIsCalendarExpanded(!isCalendarExpanded);
+  }, [isCalendarExpanded, setIsCalendarExpanded]);
 
   if (error) {
     return (
@@ -55,33 +122,22 @@ export const DashboardContent = memo(function DashboardContent() {
           onValueChange={(value) => setViewMode(value as "calendar" | "grid" | "list")}
           className="space-y-6 flex-1"
         >
-          <TabsContent value="calendar" className="mt-0 h-full">
-            <CalendarContainer
-              selectedDate={selectedDate}
-              view={view}
-              bookings={bookings}
-              isLoading={isBookingsLoading}
-              isCalendarExpanded={isCalendarExpanded}
-              onDateChange={(date) => date && setSelectedDate(date)}
-              onViewChange={setView}
-              toggleCalendarSize={() => setIsCalendarExpanded(!isCalendarExpanded)}
-              colorPreferences={userProfile?.color_preferences || {
-                primary_color: "#0EA5E9",
-                secondary_color: "#EFF6FF",
-                border_color: "#0EA5E9",
-                background_color: "bg-background/95"
-              }}
-              isModernTheme={isModernTheme}
-            />
-          </TabsContent>
+          <CalendarTabContent 
+            selectedDate={selectedDate}
+            view={view}
+            bookings={bookings}
+            isBookingsLoading={isBookingsLoading}
+            isCalendarExpanded={isCalendarExpanded}
+            onDateChange={handleDateChange}
+            onViewChange={setView}
+            toggleCalendarSize={handleToggleCalendarSize}
+            colorPreferences={colorPreferences}
+            isModernTheme={isModernTheme}
+          />
 
-          <TabsContent value="grid" className="mt-0">
-            <GridView />
-          </TabsContent>
+          <GridTabContent />
 
-          <TabsContent value="list" className="mt-0">
-            <ListView />
-          </TabsContent>
+          <ListTabContent />
         </Tabs>
 
         <div className="mt-auto pt-6">

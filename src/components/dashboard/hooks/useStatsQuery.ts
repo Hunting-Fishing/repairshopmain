@@ -13,9 +13,17 @@ export interface StatData {
   updated_at: string;
 }
 
+// Cache key factory to ensure consistent keys
+export const statsQueryKeys = {
+  all: ['stats'] as const,
+  lists: () => [...statsQueryKeys.all, 'list'] as const,
+  detail: (id: string) => [...statsQueryKeys.all, 'detail', id] as const,
+  byType: (type: string) => [...statsQueryKeys.all, 'by-type', type] as const,
+};
+
 export function useStatsQuery() {
   return useQuery({
-    queryKey: ['stats'],
+    queryKey: statsQueryKeys.lists(),
     queryFn: async () => {
       try {
         const { data, error } = await supabase
@@ -25,8 +33,21 @@ export function useStatsQuery() {
         
         if (error) throw error;
 
-        console.log('Fetched stats:', data);
-        return data as StatData[];
+        // Early return empty array if no data
+        if (!data || data.length === 0) {
+          return [] as StatData[];
+        }
+
+        // Type safety transformation with improved performance
+        return data.map(item => ({
+          id: item.id,
+          type: item.type,
+          value: Number(item.value),
+          trend: Number(item.trend),
+          trend_direction: Boolean(item.trend_direction),
+          created_at: item.created_at,
+          updated_at: item.updated_at
+        })) as StatData[];
       } catch (error: unknown) {
         if (error instanceof Error) {
           await logError(error, {
@@ -39,7 +60,7 @@ export function useStatsQuery() {
       }
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in garbage collection for 30 minutes (formerly cacheTime)
+    gcTime: 1000 * 60 * 30, // Keep in garbage collection for 30 minutes
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     refetchOnWindowFocus: false,

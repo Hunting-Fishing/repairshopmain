@@ -51,9 +51,11 @@ export function AppSidebar() {
     return null; // Let the error boundary handle it
   }
 
-  const additionalMenuItems = profile?.role === 'owner' || profile?.role === 'management' 
-    ? [{ title: "Application Control", icon: Settings2, path: "/application-control" }] 
-    : [];
+  // Only show certain menu items based on user role
+  const isAdmin = profile?.role === 'owner' || profile?.role === 'management';
+  
+  // Regular users don't need to see these items
+  const hideItems = isAdmin ? [] : ['Application Control'];
 
   return (
     <Sidebar>
@@ -70,7 +72,7 @@ export function AppSidebar() {
               </div>
             ) : (
               <NavigationMenu 
-                additionalItems={additionalMenuItems}
+                hideItems={hideItems}
                 unreadCount={unreadCount}
                 onChatClick={() => setUnreadCount(0)}
               />

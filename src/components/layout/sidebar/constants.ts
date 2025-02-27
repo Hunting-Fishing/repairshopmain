@@ -13,7 +13,9 @@ export function getBaseMenuItems() {
     { title: "System Alerts", icon: Bell, path: "/alerts" },
     { title: "Job Templates", icon: FileText, path: "/job-templates" },
     { title: "Staff", icon: Users, path: "/staff" },
-    { title: "Reports", icon: BarChart2, path: "/reports" }
+    { title: "Reports", icon: BarChart2, path: "/reports" },
+    { title: "Settings", icon: Settings2, path: "/settings" },
+    { title: "Application Control", icon: Settings2, path: "/application-control" }
   ];
 }
 

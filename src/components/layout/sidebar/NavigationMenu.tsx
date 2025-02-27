@@ -17,17 +17,27 @@ interface NavigationMenuProps {
   }>;
   unreadCount: number;
   onChatClick: () => void;
+  hideItems?: string[];
 }
 
-export function NavigationMenu({ additionalItems = [], unreadCount, onChatClick }: NavigationMenuProps) {
-  const menuItems = [...getBaseMenuItems(), ...additionalItems];
+export function NavigationMenu({ 
+  additionalItems = [], 
+  unreadCount, 
+  onChatClick,
+  hideItems = []
+}: NavigationMenuProps) {
+  // Filter out items that should be hidden
+  const baseMenuItems = getBaseMenuItems().filter(
+    item => !hideItems.includes(item.title)
+  );
+  const menuItems = [...baseMenuItems, ...additionalItems];
   const location = useLocation();
 
   return (
     <SidebarMenu>
       {menuItems.map((item) => (
         <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild isActive={location.pathname === item.path}>
+          <SidebarMenuButton asChild isActive={location.pathname.startsWith(item.path)}>
             <Link to={item.path} className="flex items-center gap-3">
               <item.icon className="h-4 w-4" />
               <span>{item.title}</span>

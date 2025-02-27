@@ -38,15 +38,20 @@ export const useCustomerAutosave = (
         await previousSavePromise.current;
       }
 
-      const savePromise = supabase
-        .from('customers')
-        .upsert(dataToSave)
-        .then(({ error }) => {
-          if (error) throw error;
-          setState(prev => ({ ...prev, isDirty: false }));
-          console.log('Autosaved successfully:', dataToSave);
-          return true;
-        });
+      const savePromise = new Promise<boolean>(async (resolve, reject) => {
+        const { error } = await supabase
+          .from('customers')
+          .upsert(dataToSave);
+
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        setState(prev => ({ ...prev, isDirty: false }));
+        console.log('Autosaved successfully:', dataToSave);
+        resolve(true);
+      });
 
       previousSavePromise.current = savePromise;
       return await savePromise;

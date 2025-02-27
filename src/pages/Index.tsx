@@ -10,9 +10,13 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StatsProvider } from "@/contexts/StatsContext";
+import { Session } from "@supabase/supabase-js";
 
-// Memoize the demo buttons to prevent unnecessary re-renders
-const DemoButtons = memo(function DemoButtons() {
+interface DemoButtonsProps {
+  session: Session | null;
+}
+
+const DemoButtons = memo(function DemoButtons({ session }: DemoButtonsProps) {
   const handleGenerateDemoData = useCallback(async () => {
     try {
       const { data: profile } = await supabase
@@ -34,7 +38,7 @@ const DemoButtons = memo(function DemoButtons() {
       console.error('Error generating demo data:', error);
       toast.error(error.message || 'Failed to generate demo data');
     }
-  }, []);
+  }, [session]);
 
   const handleCleanupDemoData = useCallback(async () => {
     try {
@@ -56,7 +60,7 @@ const DemoButtons = memo(function DemoButtons() {
       console.error('Error cleaning up demo data:', error);
       toast.error(error.message || 'Failed to clean up demo data');
     }
-  }, []);
+  }, [session]);
 
   return (
     <div className="fixed bottom-4 right-4 z-50 flex gap-2">
@@ -91,7 +95,7 @@ export default function Index() {
         <StatsProvider>
           <DashboardContextProvider>
             <main className="min-h-screen">
-              <DemoButtons />
+              <DemoButtons session={session} />
               <DashboardLayout />
             </main>
           </DashboardContextProvider>

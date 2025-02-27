@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -27,6 +28,7 @@ import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { StaffList } from "@/components/staff/StaffList";
+import Calendar from "@/pages/Calendar"; // Make sure this import is properly added
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -207,7 +209,7 @@ function App() {
                         path="/calendar" 
                         element={
                           <ProtectedRoute>
-                            <PlaceholderPage title="Calendar" />
+                            <Calendar />
                           </ProtectedRoute>
                         } 
                       />

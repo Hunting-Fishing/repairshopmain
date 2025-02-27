@@ -13,6 +13,7 @@ import { Booking } from "@/types/calendar";
 import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { AppSidebar } from "@/components/layout/AppSidebar";
 
 export default function Calendar() {
   console.log("Calendar component rendering");
@@ -108,215 +109,218 @@ export default function Calendar() {
   });
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-white" style={{ height: "100vh" }}>
-      <header className="bg-[#333] text-white p-4 flex justify-between items-center">
-        <h1 className="text-xl font-semibold">Scheduler</h1>
-        <div className="flex space-x-2">
-          <Button variant="outline" className="text-white border-white hover:bg-white/20">
-            Color Legend
-          </Button>
-          <Button variant="outline" className="text-white border-white hover:bg-white/20">
-            <Settings2 className="h-5 w-5" />
-          </Button>
-        </div>
-      </header>
-
-      <div className="flex border-b">
-        <div className="w-full p-3 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handlePreviousWeek}>
-              <ChevronLeft className="h-4 w-4" />
+    <div className="flex min-h-screen w-full">
+      <AppSidebar />
+      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-background">
+        <header className="bg-[#333] text-white p-4 flex justify-between items-center">
+          <h1 className="text-xl font-semibold">Scheduler</h1>
+          <div className="flex space-x-2">
+            <Button variant="outline" className="text-white border-white hover:bg-white/20">
+              Color Legend
             </Button>
-            <Button variant="outline" size="sm" onClick={handleNextWeek}>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium">
-              {format(weekStart, "d")} - {format(endOfWeek(selectedDate), "d MMMM yyyy")}
-            </span>
-            <Button variant="outline" size="sm" className="ml-2 flex items-center gap-1">
-              <CalendarIcon className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={navigateToToday}>
-              Today
+            <Button variant="outline" className="text-white border-white hover:bg-white/20">
+              <Settings2 className="h-5 w-5" />
             </Button>
           </div>
+        </header>
 
-          <div className="flex items-center gap-2">
-            <Button variant="default">Publish</Button>
-            <Select
-              defaultValue={view}
-              onValueChange={(value: "day" | "week" | "month") => setView(value)}
-            >
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Select View" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="day">Day View</SelectItem>
-                <SelectItem value="week">Week View</SelectItem>
-                <SelectItem value="month">Month View</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left sidebar with unassigned work */}
-        <div className="w-64 border-r overflow-y-auto flex flex-col">
-          <div className="p-3 border-b">
-            <h2 className="font-semibold mb-2">UNASSIGNED WORK</h2>
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search" 
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="p-3 border-b">
-            <div className="flex justify-between items-center">
-              <h3 className="font-medium text-sm text-muted-foreground">OVERDUE (18)</h3>
-              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+        <div className="flex border-b bg-white">
+          <div className="w-full p-3 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handlePreviousWeek}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleNextWeek}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
+              <span className="text-sm font-medium">
+                {format(weekStart, "d")} - {format(endOfWeek(selectedDate), "d MMMM yyyy")}
+              </span>
+              <Button variant="outline" size="sm" className="ml-2 flex items-center gap-1">
+                <CalendarIcon className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={navigateToToday}>
+                Today
+              </Button>
             </div>
-          </div>
-          <div className="flex-1 p-3">
-            <div className="space-y-4">
-              <div className="border rounded p-3 bg-muted/10">
-                <div className="flex justify-between">
-                  <h4 className="font-medium">Spiral Freezer Preventative Maintenance Checklist</h4>
-                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-sm text-muted-foreground">Spiral Freezer</p>
-                <div className="mt-2 text-right">
-                  <Button variant="link" size="sm" className="h-6 text-blue-500">view</Button>
-                </div>
-              </div>
-              <div className="border rounded p-3 bg-muted/10">
-                <div className="flex justify-between">
-                  <h4 className="font-medium">Monthly Conveyor Downtime Inspection</h4>
-                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </div>
-                <p className="text-sm text-muted-foreground">Alco - Food Processing Line #22</p>
-                <div className="mt-2 text-right">
-                  <Button variant="link" size="sm" className="h-6 text-blue-500">view</Button>
-                </div>
-              </div>
+
+            <div className="flex items-center gap-2">
+              <Button variant="default">Publish</Button>
+              <Select
+                defaultValue={view}
+                onValueChange={(value: "day" | "week" | "month") => setView(value)}
+              >
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Select View" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="day">Day View</SelectItem>
+                  <SelectItem value="week">Week View</SelectItem>
+                  <SelectItem value="month">Month View</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
-        {/* Main calendar grid */}
-        <div className="flex-1 overflow-auto">
-          <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] min-w-[800px]">
-            {/* Header row with days */}
-            <div className="sticky top-0 z-10 bg-white border-b">
-              <div className="border-r p-2 h-14 flex items-center justify-center font-semibold">
-                DEFAULT
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left sidebar with unassigned work */}
+          <div className="w-64 border-r overflow-y-auto flex flex-col bg-white">
+            <div className="p-3 border-b">
+              <h2 className="font-semibold mb-2">UNASSIGNED WORK</h2>
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input 
+                  placeholder="Search" 
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
             </div>
-            {weekDays.map((day, index) => (
-              <div 
-                key={day.toISOString()} 
-                className={`sticky top-0 z-10 bg-white border-b border-r p-2 text-center ${isToday(day) ? 'bg-blue-50' : ''}`}
-              >
-                <div className="font-medium text-blue-600">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][day.getDay()]} {day.getDate()}</div>
+            <div className="p-3 border-b">
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium text-sm text-muted-foreground">OVERDUE (18)</h3>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
               </div>
-            ))}
-
-            {/* Rows for each technician */}
-            {filteredTechnicians.map((tech) => (
-              <React.Fragment key={tech.id}>
-                <div className="border-b border-r p-2 sticky left-0 bg-white flex items-center">
-                  <div>
-                    <div className="font-medium">{tech.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {tech.id}/{tech.hours_allocated} hours allocated
-                    </div>
+            </div>
+            <div className="flex-1 p-3">
+              <div className="space-y-4">
+                <div className="border rounded p-3 bg-muted/10">
+                  <div className="flex justify-between">
+                    <h4 className="font-medium">Spiral Freezer Preventative Maintenance Checklist</h4>
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Spiral Freezer</p>
+                  <div className="mt-2 text-right">
+                    <Button variant="link" size="sm" className="h-6 text-blue-500">view</Button>
                   </div>
                 </div>
-                
-                {/* Days cells for this technician */}
-                {weekDays.map((day) => {
-                  const dayBookings = getTechnicianBookingsForDay(tech.id, day);
-                  const isCurrentDay = isToday(day);
-                  
-                  return (
-                    <div 
-                      key={`${tech.id}-${day.toISOString()}`} 
-                      className={`border-b border-r min-h-[80px] p-1 ${isCurrentDay ? 'bg-blue-50' : ''}`}
-                      onClick={() => {
-                        const start = new Date(day);
-                        start.setHours(9, 0, 0);
-                        const end = new Date(day);
-                        end.setHours(10, 0, 0);
-                        handleTimeSlotClick(start, end);
-                      }}
-                    >
-                      {dayBookings.map((booking) => (
-                        <div 
-                          key={booking.id}
-                          className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleTimeSlotClick(
-                              new Date(booking.start_time),
-                              new Date(booking.end_time)
-                            );
-                          }}
-                        >
-                          {booking.customer_name || 'Scheduled Job'}
-                        </div>
-                      ))}
-                      
-                      {/* Example scheduled events - these would be dynamically generated from real data */}
-                      {tech.id === "1" && day.getDay() === 4 && (
-                        <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
-                          Spiral Freezer Service
-                        </div>
-                      )}
-                      {tech.id === "2" && day.getDay() === 1 && (
-                        <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
-                          Monthly Conveyor Inspection
-                        </div>
-                      )}
-                      {tech.id === "3" && day.getDay() === 4 && (
-                        <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
-                          Spiral Freezer Service
-                        </div>
-                      )}
-                      {tech.id === "5" && day.getDay() === 3 && (
-                        <div className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs">
-                          Conveyor Belt Maintenance
-                        </div>
-                      )}
-                      {tech.id === "5" && day.getDay() === 5 && (
-                        <div className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs">
-                          Annual Conveyor Inspection
-                        </div>
-                      )}
+                <div className="border rounded p-3 bg-muted/10">
+                  <div className="flex justify-between">
+                    <h4 className="font-medium">Monthly Conveyor Downtime Inspection</h4>
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-sm text-muted-foreground">Alco - Food Processing Line #22</p>
+                  <div className="mt-2 text-right">
+                    <Button variant="link" size="sm" className="h-6 text-blue-500">view</Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main calendar grid */}
+          <div className="flex-1 overflow-auto bg-white">
+            <div className="grid grid-cols-[auto_1fr_1fr_1fr_1fr_1fr_1fr_1fr] min-w-[800px]">
+              {/* Header row with days */}
+              <div className="sticky top-0 z-10 bg-white border-b">
+                <div className="border-r p-2 h-14 flex items-center justify-center font-semibold">
+                  DEFAULT
+                </div>
+              </div>
+              {weekDays.map((day, index) => (
+                <div 
+                  key={day.toISOString()} 
+                  className={`sticky top-0 z-10 bg-white border-b border-r p-2 text-center ${isToday(day) ? 'bg-blue-50' : ''}`}
+                >
+                  <div className="font-medium text-blue-600">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][day.getDay()]} {day.getDate()}</div>
+                </div>
+              ))}
+
+              {/* Rows for each technician */}
+              {filteredTechnicians.map((tech) => (
+                <React.Fragment key={tech.id}>
+                  <div className="border-b border-r p-2 sticky left-0 bg-white flex items-center">
+                    <div>
+                      <div className="font-medium">{tech.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {tech.id}/{tech.hours_allocated} hours allocated
+                      </div>
                     </div>
-                  );
-                })}
-              </React.Fragment>
-            ))}
+                  </div>
+                  
+                  {/* Days cells for this technician */}
+                  {weekDays.map((day) => {
+                    const dayBookings = getTechnicianBookingsForDay(tech.id, day);
+                    const isCurrentDay = isToday(day);
+                    
+                    return (
+                      <div 
+                        key={`${tech.id}-${day.toISOString()}`} 
+                        className={`border-b border-r min-h-[80px] p-1 ${isCurrentDay ? 'bg-blue-50' : ''}`}
+                        onClick={() => {
+                          const start = new Date(day);
+                          start.setHours(9, 0, 0);
+                          const end = new Date(day);
+                          end.setHours(10, 0, 0);
+                          handleTimeSlotClick(start, end);
+                        }}
+                      >
+                        {dayBookings.map((booking) => (
+                          <div 
+                            key={booking.id}
+                            className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleTimeSlotClick(
+                                new Date(booking.start_time),
+                                new Date(booking.end_time)
+                              );
+                            }}
+                          >
+                            {booking.customer_name || 'Scheduled Job'}
+                          </div>
+                        ))}
+                        
+                        {/* Example scheduled events - these would be dynamically generated from real data */}
+                        {tech.id === "1" && day.getDay() === 4 && (
+                          <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
+                            Spiral Freezer Service
+                          </div>
+                        )}
+                        {tech.id === "2" && day.getDay() === 1 && (
+                          <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
+                            Monthly Conveyor Inspection
+                          </div>
+                        )}
+                        {tech.id === "3" && day.getDay() === 4 && (
+                          <div className="bg-blue-100 border border-blue-300 rounded p-1 my-1 text-xs">
+                            Spiral Freezer Service
+                          </div>
+                        )}
+                        {tech.id === "5" && day.getDay() === 3 && (
+                          <div className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs">
+                            Conveyor Belt Maintenance
+                          </div>
+                        )}
+                        {tech.id === "5" && day.getDay() === 5 && (
+                          <div className="bg-green-100 border border-green-300 rounded p-1 my-1 text-xs">
+                            Annual Conveyor Inspection
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <BookingDialog
-        open={isBookingDialogOpen}
-        onOpenChange={setIsBookingDialogOpen}
-        selectedTimeSlot={selectedTimeSlot}
-        onBookingCreated={handleBookingCreated}
-      />
+        <BookingDialog
+          open={isBookingDialogOpen}
+          onOpenChange={setIsBookingDialogOpen}
+          selectedTimeSlot={selectedTimeSlot}
+          onBookingCreated={handleBookingCreated}
+        />
+      </div>
     </div>
   );
 }

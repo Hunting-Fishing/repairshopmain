@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -29,7 +28,6 @@ import { toast } from "@/hooks/use-toast";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { StaffList } from "@/components/staff/StaffList";
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -39,13 +37,11 @@ const queryClient = new QueryClient({
   },
 });
 
-// Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, isLoading } = useAuth();
   const isMobile = useIsMobile();
   
   useEffect(() => {
-    // Add a class to the body when on mobile
     if (isMobile) {
       document.body.classList.add('is-mobile-device');
     } else {
@@ -68,7 +64,6 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-// Placeholder component for routes that are not yet implemented
 function PlaceholderPage({ title }: { title: string }) {
   useEffect(() => {
     toast({
@@ -104,7 +99,6 @@ function App() {
                     <Routes>
                       <Route path="/auth" element={<Auth />} />
                       
-                      {/* Protected Routes */}
                       <Route 
                         path="/" 
                         element={
@@ -153,8 +147,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Inventory route - using the actual component */}
                       <Route 
                         path="/inventory" 
                         element={
@@ -163,8 +155,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Vehicles route - using the actual component */}
                       <Route 
                         path="/vehicles" 
                         element={
@@ -173,8 +163,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Shop Items route - using the actual component */}
                       <Route 
                         path="/shop-items" 
                         element={
@@ -183,8 +171,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* System Alerts route - using the actual component */}
                       <Route 
                         path="/alerts" 
                         element={
@@ -193,8 +179,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Job Templates route - using the actual component */}
                       <Route 
                         path="/job-templates" 
                         element={
@@ -203,8 +187,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Application Control route */}
                       <Route 
                         path="/application-control/*" 
                         element={
@@ -213,8 +195,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Shop Settings route */}
                       <Route 
                         path="/settings" 
                         element={
@@ -223,8 +203,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Add routes for other non-working sidebar items */}
                       <Route 
                         path="/calendar" 
                         element={
@@ -241,8 +219,6 @@ function App() {
                           </ProtectedRoute>
                         } 
                       />
-                      
-                      {/* Catch-all route for unmatched paths */}
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                     <Toaster />
@@ -257,7 +233,6 @@ function App() {
   );
 }
 
-// Create a new Staff page component
 function StaffPage() {
   return (
     <div className="flex min-h-screen w-full">

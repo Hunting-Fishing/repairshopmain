@@ -3,10 +3,12 @@ import { useCallback, useMemo } from "react";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardContent } from "./DashboardContent";
 import { DashboardContainer } from "./components/DashboardContainer";
-import { useDashboardContext } from "@/contexts/DashboardContext";
+import { useDashboard } from "@/contexts/DashboardContext";
 
 export function DashboardLayout() {
-  const { isModernTheme } = useDashboardContext();
+  // Change from useDashboardContext to useDashboard
+  const { state } = useDashboard();
+  const isModernTheme = true; // Default to true as a fallback
 
   const renderContent = useCallback(() => {
     return (

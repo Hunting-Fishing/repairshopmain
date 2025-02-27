@@ -109,11 +109,18 @@ export function determineCustomerLifecycleStage(data: CustomerFormValues): strin
     return 'onboarding';
   } else if (daysSinceJoining < 90) {
     return 'active';
-  } else if (data.loyalty_points && parseInt(data.loyalty_points) > 1000) {
-    return 'loyal';
-  } else {
-    return 'established';
+  } else if (data.loyalty_points) {
+    // Fix the type issue by ensuring we're handling both string and number
+    const points = typeof data.loyalty_points === 'string' 
+      ? parseInt(data.loyalty_points, 10) 
+      : data.loyalty_points;
+      
+    if (points > 1000) {
+      return 'loyal';
+    }
   }
+  
+  return 'established';
 }
 
 export async function handleCustomerDataChanges(

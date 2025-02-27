@@ -15,9 +15,15 @@ const baseSchema = {
   country: z.string().optional(),
   language_preference: z.string().optional(),
   timezone: z.string().optional(),
-  // Fixed: properly handle numeric values with coercion
-  loyalty_points: z.union([z.number(), z.string().transform(val => Number(val) || 0)]).optional(),
-  total_spend: z.union([z.number(), z.string().transform(val => Number(val) || 0)]).optional(),
+  // Accept both string and number types for numeric fields
+  loyalty_points: z.union([
+    z.number(), 
+    z.string()
+  ]).optional(),
+  total_spend: z.union([
+    z.number(), 
+    z.string()
+  ]).optional(),
   // Ensure object fields are properly typed
   marketing_preferences: z.object({
     email: z.boolean().optional().default(false),
@@ -68,8 +74,8 @@ const fleetSchema = z.object({
   fleet_details: z.object({
     account_number: z.string().optional(),
     vehicle_count: z.union([
-      z.number().min(1, "Number of vehicles is required"), 
-      z.string().transform(val => Number(val) || 0)
+      z.number(), 
+      z.string()
     ]).optional(),
     manager_name: z.string().min(1, "Fleet manager name is required").optional(),
     manager_contact: z.string().min(1, "Manager contact is required").optional(),

@@ -28,6 +28,7 @@ import {
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 
 interface CustomerFormProps {
   mode?: "create" | "edit";
@@ -65,9 +66,8 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         // Ensure numerical fields are properly typed
         const cleanedData = {
           ...data,
-          loyalty_points: data.loyalty_points ? Number(data.loyalty_points) : undefined,
-          lifetime_points: data.lifetime_points ? Number(data.lifetime_points) : undefined,
-          total_spend: data.total_spend ? Number(data.total_spend) : undefined,
+          loyalty_points: data.loyalty_points !== undefined ? data.loyalty_points : "",
+          total_spend: data.total_spend !== undefined ? data.total_spend : "",
         };
 
         // Ensure array fields are properly initialized
@@ -205,14 +205,9 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       // Clean up values before submission
       const cleanedValues = { ...values };
       
-      // Convert numeric string fields to numbers
-      if (typeof cleanedValues.loyalty_points === 'string') {
-        cleanedValues.loyalty_points = Number(cleanedValues.loyalty_points) || 0;
-      }
-      
-      if (typeof cleanedValues.total_spend === 'string') {
-        cleanedValues.total_spend = Number(cleanedValues.total_spend) || 0;
-      }
+      // Ensure values are in the correct format for the API
+      // Don't convert to numbers to maintain type safety with the form
+      // The API will handle the type conversion
 
       // Remove fields that don't apply to the current customer type
       if (values.customer_type === "Personal") {
@@ -358,6 +353,3 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     </CustomerErrorBoundary>
   );
 }
-
-// Add a Button component import that was missing
-import { Button } from "@/components/ui/button";

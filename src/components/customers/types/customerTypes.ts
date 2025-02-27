@@ -17,7 +17,8 @@ export interface CustomerFormValues {
   business_classification_other?: string;  // Added this field explicitly
   tax_number?: string;
   loyalty_tier?: string;
-  loyalty_points?: string;
+  loyalty_points?: string | number;  // Updated to accept both string and number
+  total_spend?: string | number;     // Added this missing field
   notes?: string;
   pst_number?: string;
   social_profiles?: {
@@ -45,6 +46,7 @@ export interface CustomerFormValues {
   region_code?: string;
   customer_since?: string;
   loyalty_join_date?: string;
+  tags?: string[];  // Added this missing field
   fleet_details?: {
     account_number?: string;
     vehicle_count?: number;

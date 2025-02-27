@@ -1,6 +1,7 @@
+
 import { Tabs } from "@/components/ui/tabs";
 import { TechnicianFormWrapper } from "./TechnicianFormWrapper";
-import { TechnicianTabs } from "./TechnicianTabs";
+import TechnicianTabs from "./TechnicianTabs";
 import { UseFormReturn } from "react-hook-form";
 import { TechnicianSettingsFormValues } from "./types";
 import { useQuery } from "@tanstack/react-query";
@@ -51,7 +52,7 @@ export function TechnicianManagement() {
       <Tabs defaultValue="roles" className="w-full">
         <TechnicianFormWrapper>
           {(form: UseFormReturn<TechnicianSettingsFormValues>) => (
-            <TechnicianTabs form={form} />
+            <TechnicianTabs />
           )}
         </TechnicianFormWrapper>
       </Tabs>

@@ -82,7 +82,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
   };
 
   // Render the appropriate chart title based on report type
-  const renderChartTitle = () => {
+  const getChartTitle = () => {
     if (reportType === 'efficiency') return 'Staff Efficiency Analysis';
     if (reportType === 'historical') return 'Historical Performance Metrics';
     return 'Workload Distribution by Role';
@@ -145,7 +145,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
             <TabsContent value="chart" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>{renderChartTitle()}</CardTitle>
+                  <CardTitle>{getChartTitle()}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[400px]">
@@ -219,7 +219,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Report Format</CardTitle>
+                    <CardTitle>Report Format</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
                 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Top Performer</CardTitle>
+                    <CardTitle>Top Performer</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">John D.</div>
@@ -249,7 +249,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
                 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm font-medium">Team Average</CardTitle>
+                    <CardTitle>Team Average</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">82%</div>

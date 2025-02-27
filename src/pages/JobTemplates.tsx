@@ -2,7 +2,7 @@
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle, FileText, Filter, Plus, Search } from "lucide-react";
+import { AlertTriangle, FileText, Filter, Plus, Search, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useJobTemplates, useTemplateCategories } from "@/hooks/use-job-templates";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
 
 export default function JobTemplates() {
   const { data: templates = [], isLoading, error, refetch } = useJobTemplates();
@@ -58,7 +59,16 @@ export default function JobTemplates() {
     return colors[level as keyof typeof colors] || colors[3];
   };
 
+  const handleRefresh = () => {
+    refetch();
+    toast({
+      title: "Refreshing templates",
+      description: "Fetching the latest job templates"
+    });
+  };
+
   if (error) {
+    console.error("Template loading error:", error);
     return (
       <div className="flex min-h-screen w-full">
         <AppSidebar />
@@ -74,6 +84,10 @@ export default function JobTemplates() {
                   </p>
                 </div>
               </div>
+              <Button onClick={handleRefresh} variant="outline" className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                <span>Retry</span>
+              </Button>
             </div>
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
@@ -222,6 +236,32 @@ export default function JobTemplates() {
                                 </Badge>
                               )}
                             </div>
+                            
+                            {/* Display more template details */}
+                            {(template.required_certifications?.length > 0 || 
+                              template.compatibility?.length > 0 || 
+                              template.feedback?.length > 0) && (
+                              <div className="pt-2 mt-2 border-t text-xs text-muted-foreground">
+                                {template.required_certifications?.length > 0 && (
+                                  <div className="mt-1">
+                                    <span className="font-medium">Required certifications:</span> {template.required_certifications.join(", ")}
+                                  </div>
+                                )}
+                                
+                                {template.compatibility?.length > 0 && (
+                                  <div className="mt-1">
+                                    <span className="font-medium">Compatible with:</span> {template.compatibility.map(c => 
+                                      `${c.make || ''} ${c.model || ''} ${c.year_start ? `(${c.year_start}-${c.year_end || 'present'})` : ''}`).join(", ")}
+                                  </div>
+                                )}
+                                
+                                {template.feedback?.length > 0 && (
+                                  <div className="mt-1">
+                                    <span className="font-medium">Feedback:</span> {template.feedback.length} reviews
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       ))}
@@ -253,32 +293,57 @@ export default function JobTemplates() {
                     <h2 className="text-xl font-semibold tracking-tight">{category}</h2>
                     <div className="divide-y rounded-md border">
                       {items.map((template) => (
-                        <div key={template.id} className="flex items-center justify-between p-4 hover:bg-muted/50">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-medium">{template.name}</h3>
-                              {template.difficulty_level && (
-                                <Badge className={getDifficultyColor(template.difficulty_level)}>
-                                  Level {template.difficulty_level}
+                        <div key={template.id} className="flex flex-col p-4 hover:bg-muted/50">
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-medium">{template.name}</h3>
+                                {template.difficulty_level && (
+                                  <Badge className={getDifficultyColor(template.difficulty_level)}>
+                                    Level {template.difficulty_level}
+                                  </Badge>
+                                )}
+                              </div>
+                              {template.description && (
+                                <p className="text-sm text-muted-foreground line-clamp-1">
+                                  {template.description}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
+                              {template.estimated_duration_range && (
+                                <Badge variant="outline">
+                                  {template.estimated_duration_range.min}-{template.estimated_duration_range.max} min
+                                </Badge>
+                              )}
+                              {template.usage_stats?.success_rate && (
+                                <Badge variant="secondary">
+                                  {Math.round(template.usage_stats.success_rate)}% success
                                 </Badge>
                               )}
                             </div>
-                            {template.description && (
-                              <p className="text-sm text-muted-foreground line-clamp-1">
-                                {template.description}
-                              </p>
-                            )}
                           </div>
-                          <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
-                            {template.estimated_duration_range && (
-                              <Badge variant="outline">
-                                {template.estimated_duration_range.min}-{template.estimated_duration_range.max} min
-                              </Badge>
+                          
+                          {/* Additional details section */}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3 pt-2 border-t text-xs text-muted-foreground">
+                            {template.required_tools && template.required_tools.length > 0 && (
+                              <div>
+                                <span className="font-medium">Required tools:</span> {template.required_tools.join(", ")}
+                              </div>
                             )}
-                            {template.usage_stats?.success_rate && (
-                              <Badge variant="secondary">
-                                {Math.round(template.usage_stats.success_rate)}% success
-                              </Badge>
+                            
+                            {template.required_certifications?.length > 0 && (
+                              <div>
+                                <span className="font-medium">Certifications:</span> {template.required_certifications.join(", ")}
+                              </div>
+                            )}
+                            
+                            {template.compatibility?.length > 0 && (
+                              <div>
+                                <span className="font-medium">Compatible:</span> {template.compatibility.map(c => 
+                                  `${c.make || ''} ${c.model || ''} ${c.year_start ? `(${c.year_start}-${c.year_end || 'present'})` : ''}`).slice(0, 2).join(", ")}
+                                {template.compatibility.length > 2 && ` +${template.compatibility.length - 2} more`}
+                              </div>
                             )}
                           </div>
                         </div>

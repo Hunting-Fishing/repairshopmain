@@ -22,7 +22,7 @@ export function useJobTemplates() {
         .from('profiles')
         .select('organization_id')
         .eq('id', user.user.id)
-        .single();
+        .maybeSingle();
 
       if (profileError) {
         console.error('Error fetching user profile:', profileError);
@@ -30,12 +30,8 @@ export function useJobTemplates() {
         throw new Error('Failed to load user profile');
       }
 
-      if (!profile?.organization_id) {
-        console.log('No organization ID found for user');
-        throw new Error('No organization found for your account');
-      }
-
-      console.log('User organization_id:', profile.organization_id);
+      const organizationId = profile?.organization_id || null;
+      console.log('User organization_id:', organizationId);
 
       // Fetch templates with related data
       const { data, error } = await supabase
@@ -54,7 +50,7 @@ export function useJobTemplates() {
           )
         `)
         .eq('is_active', true)
-        .or(`organization_id.is.null,organization_id.eq.${profile.organization_id}`)
+        .or(`organization_id.is.null,organization_id.eq.${organizationId || '00000000-0000-0000-0000-000000000000'}`)
         .order('name');
       
       if (error) {
@@ -90,30 +86,37 @@ export function useTemplateCategories() {
   return useQuery({
     queryKey: ['template-categories'],
     queryFn: async () => {
-      const { data: user } = await supabase.auth.getUser();
-      
-      if (!user.user) {
-        throw new Error('You must be logged in to view template categories');
+      try {
+        const { data: user } = await supabase.auth.getUser();
+        
+        if (!user.user) {
+          throw new Error('You must be logged in to view template categories');
+        }
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('organization_id')
+          .eq('id', user.user.id)
+          .maybeSingle();
+
+        const organizationId = profile?.organization_id || null;
+
+        const { data, error } = await supabase
+          .from('template_categories')
+          .select('*')
+          .or(`organization_id.is.null,organization_id.eq.${organizationId || '00000000-0000-0000-0000-000000000000'}`)
+          .order('name');
+
+        if (error) {
+          toast.error('Error loading template categories');
+          throw new Error('Failed to load template categories');
+        }
+
+        return data as TemplateCategory[];
+      } catch (err) {
+        console.error('Error in useTemplateCategories:', err);
+        return [];
       }
-
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('organization_id')
-        .eq('id', user.user.id)
-        .single();
-
-      const { data, error } = await supabase
-        .from('template_categories')
-        .select('*')
-        .eq('organization_id', profile?.organization_id)
-        .order('name');
-
-      if (error) {
-        toast.error('Error loading template categories');
-        throw new Error('Failed to load template categories');
-      }
-
-      return data as TemplateCategory[];
     }
   });
 }

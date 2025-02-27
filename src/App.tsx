@@ -21,6 +21,7 @@ import ShopItems from "@/pages/ShopItems";
 import SystemAlerts from "@/pages/SystemAlerts";
 import JobTemplates from "@/pages/JobTemplates";
 import ApplicationControl from "@/pages/ApplicationControl";
+import ShopSettings from "@/pages/ShopSettings";
 import { Loader2, Users } from "lucide-react";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useEffect } from "react";
@@ -203,12 +204,22 @@ function App() {
                         } 
                       />
                       
-                      {/* Application Control (Settings) route - using the actual component */}
+                      {/* Application Control route */}
                       <Route 
                         path="/application-control/*" 
                         element={
                           <ProtectedRoute>
                             <ApplicationControl />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      
+                      {/* Shop Settings route */}
+                      <Route 
+                        path="/settings" 
+                        element={
+                          <ProtectedRoute>
+                            <ShopSettings />
                           </ProtectedRoute>
                         } 
                       />

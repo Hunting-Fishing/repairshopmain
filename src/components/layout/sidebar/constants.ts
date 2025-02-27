@@ -9,7 +9,8 @@ import {
   Building2,
   Car,
   ClipboardList,
-  ShoppingBag
+  ShoppingBag,
+  Cog
 } from "lucide-react";
 
 interface MarketingItem {
@@ -92,8 +93,13 @@ export const getBaseMenuItems = () => [
     path: "/job-templates",
   },
   {
-    title: "Settings",
+    title: "Shop Settings",
     icon: Settings,
+    path: "/settings",
+  },
+  {
+    title: "Application Control",
+    icon: Cog,
     path: "/application-control",
   },
 ];

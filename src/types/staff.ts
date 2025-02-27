@@ -9,7 +9,9 @@ export type StaffMember = {
   role: string;
   hire_date: string | null;
   status: string | null;
+  custom_role_id?: string | null;
   custom_roles: {
+    id?: string | null;
     name: string | null;
   } | null;
   notes?: string | null;

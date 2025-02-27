@@ -1,9 +1,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import type { CustomRole } from "@/components/staff/role-management/types";
 
 export function useOrganizationData() {
+  const { user } = useAuth();
+
   const { data: session, isLoading: sessionLoading } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -25,7 +28,7 @@ export function useOrganizationData() {
       console.log("useOrganizationData - Fetching profile for user:", session.user.id);
       const { data, error } = await supabase
         .from("profiles")
-        .select("organization_id")
+        .select("organization_id, role, custom_role_id")
         .eq('id', session.user.id)
         .maybeSingle();
       
@@ -40,7 +43,33 @@ export function useOrganizationData() {
     enabled: !!session?.user.id,
   });
 
-  const { data: customRoles = [] } = useQuery({
+  const { data: organizationDetails, isLoading: orgDetailsLoading } = useQuery({
+    queryKey: ["organization-details", userProfile?.organization_id],
+    queryFn: async () => {
+      if (!userProfile?.organization_id) {
+        console.log("useOrganizationData - No organization ID for details");
+        return null;
+      }
+
+      console.log("useOrganizationData - Fetching org details for:", userProfile.organization_id);
+      const { data, error } = await supabase
+        .from("organizations")
+        .select("*")
+        .eq('id', userProfile.organization_id)
+        .maybeSingle();
+      
+      if (error) {
+        console.error("useOrganizationData - Error fetching org details:", error);
+        throw error;
+      }
+
+      console.log("useOrganizationData - Organization details:", data);
+      return data;
+    },
+    enabled: !!userProfile?.organization_id,
+  });
+
+  const { data: customRoles = [], isLoading: rolesLoading } = useQuery({
     queryKey: ["custom-roles", userProfile?.organization_id],
     queryFn: async () => {
       if (!userProfile?.organization_id) {
@@ -65,12 +94,46 @@ export function useOrganizationData() {
     enabled: !!userProfile?.organization_id,
   });
 
+  const { data: staffCount, isLoading: staffCountLoading } = useQuery({
+    queryKey: ["staff-count", userProfile?.organization_id],
+    queryFn: async () => {
+      if (!userProfile?.organization_id) return 0;
+      
+      const { count, error } = await supabase
+        .from("profiles")
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', userProfile.organization_id);
+      
+      if (error) {
+        console.error("useOrganizationData - Error fetching staff count:", error);
+        return 0;
+      }
+      
+      return count || 0;
+    },
+    enabled: !!userProfile?.organization_id,
+  });
+
   console.log("useOrganizationData - Final state:", {
     sessionLoading,
     profileLoading,
+    orgDetailsLoading,
+    rolesLoading,
+    staffCountLoading,
     userProfile,
-    customRoles: customRoles.length
+    organization: organizationDetails,
+    customRoles: customRoles.length,
+    staffCount
   });
 
-  return { userProfile, customRoles };
+  return { 
+    userProfile, 
+    organization: organizationDetails,
+    customRoles,
+    staffCount,
+    isLoading: sessionLoading || profileLoading || orgDetailsLoading || rolesLoading || staffCountLoading,
+    userRole: userProfile?.role || 'unknown',
+    isOwner: userProfile?.role === 'owner',
+    isManager: userProfile?.role === 'owner' || userProfile?.role === 'manager'
+  };
 }

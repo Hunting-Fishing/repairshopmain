@@ -5,4 +5,6 @@ export * from './useUpdateStaffMember';
 export * from './useDeleteStaffMember';
 export * from './useOrganizationData';
 export * from './useGetOrganizationUserEmails';
-// Re-export any other staff-related hooks here
+export * from './useStaffMemberById';
+export * from './useOrganizationRoles';
+export * from './useStaffPermissions';

@@ -1,3 +1,4 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -68,27 +69,24 @@ export function FormInput({
   
   const value = form.watch(name);
 
-  useEffect(() => {
-    const subscription = form.watch((value, { name, type }) => {
-      console.log("Form field changed:", { name, type, value });
-      console.log("Current form values:", form.getValues());
-      console.log("Form state:", form.formState);
-    });
-    return () => subscription.unsubscribe();
-  }, [form.watch]);
-
+  // Fixed console logging to handle undefined values safely
   useEffect(() => {
     console.log('Input value details:', {
       name,
-      value,
+      value: value === undefined ? 'undefined' : value,
       type: typeof value,
       formValue: form.getValues(name),
       isTouched,
-      error
+      error: error || 'none'
     });
-  }, [value, name, isTouched, error]);
+  }, [value, name, isTouched, error, form]);
 
-  const isEmpty = required && (!value || (typeof value === 'string' && value.trim() === ""));
+  // Safe check for empty values
+  const isEmpty = required && (
+    value === undefined || 
+    value === null || 
+    (typeof value === 'string' && value.trim() === "")
+  );
   
   const inputClasses = cn(
     "transition-all duration-200",
@@ -120,8 +118,9 @@ export function FormInput({
     }
   };
 
+  // Improved validation handling
   const validation = (() => {
-    if (!isTouched || !value) return null;
+    if (!isTouched || value === undefined || value === null || value === '') return null;
 
     if (type === "email") {
       return validateEmail(String(value));
@@ -137,7 +136,12 @@ export function FormInput({
         control={form.control}
         name={name}
         render={({ field }) => {
-          const inputValue = field.value != null ? String(field.value) : '';
+          // Fix for field handling, ensuring safe string conversion
+          let inputValue: string = '';
+          
+          if (field.value !== undefined && field.value !== null) {
+            inputValue = String(field.value);
+          }
           
           return (
             <FormItem className="relative">

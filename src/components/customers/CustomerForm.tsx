@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface CustomerFormProps {
   mode?: "create" | "edit";
@@ -42,6 +42,7 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
   const [showUnsavedChanges, setShowUnsavedChanges] = useState(false);
   const [formErrors, setFormErrors] = useState<any>(null);
 
+  // Improved query with better error handling
   const { data: customerData, isLoading, error } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
@@ -59,34 +60,83 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         throw error;
       }
       
-      console.log("Fetched customer data:", data);
+      // Clean up the data before returning it to ensure it matches the expected form structure
+      if (data) {
+        // Ensure numerical fields are properly typed
+        const cleanedData = {
+          ...data,
+          loyalty_points: data.loyalty_points ? Number(data.loyalty_points) : undefined,
+          lifetime_points: data.lifetime_points ? Number(data.lifetime_points) : undefined,
+          total_spend: data.total_spend ? Number(data.total_spend) : undefined,
+        };
+
+        // Ensure array fields are properly initialized
+        if (!cleanedData.address_book) cleanedData.address_book = [];
+        if (!cleanedData.tags) cleanedData.tags = [];
+
+        // Ensure nested objects are properly initialized
+        if (!cleanedData.marketing_preferences) {
+          cleanedData.marketing_preferences = { email: false, sms: false, phone: false };
+        }
+        
+        if (!cleanedData.secondary_contact) {
+          cleanedData.secondary_contact = {};
+        }
+
+        // Ensure customer_type is valid
+        if (!cleanedData.customer_type || 
+            !['Personal', 'Fleet', 'Business'].includes(cleanedData.customer_type)) {
+          cleanedData.customer_type = 'Personal';
+        }
+
+        console.log("Cleaned customer data:", cleanedData);
+        return cleanedData;
+      }
+      
       return data;
     },
     gcTime: 1000 * 60 * 60,
     staleTime: 1000 * 60 * 5,
   });
 
+  // Fix default values to ensure form is properly initialized
+  const defaultValues: Partial<CustomerFormValues> = {
+    first_name: "",
+    last_name: "",
+    email: "",
+    customer_type: "Personal",
+    marketing_preferences: { email: false, sms: false, phone: false },
+    address_book: [],
+    tags: [],
+    secondary_contact: {},
+  };
+
+  // Set up form with proper validation and defaults
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerValidationSchema),
-    defaultValues: customerData || {
-      first_name: "",
-      last_name: "",
-      email: "",
-      customer_type: "Personal",
-    },
+    defaultValues: customerData || defaultValues,
     mode: "onChange"
   });
+
+  // Set form values when customer data is loaded
+  useEffect(() => {
+    if (customerData && !isLoading) {
+      // Reset form with fetched data, properly handling potential type issues
+      form.reset(customerData);
+    }
+  }, [customerData, isLoading, form]);
 
   // Add detailed logging for form changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
-      console.log("Form field changed:", { name, type, value });
-      console.log("Current form values:", form.getValues());
-      console.log("Form state:", form.formState);
+      if (name) {  // Only log changes to specific fields
+        console.log("Form field changed:", { name, type, value: value[name as keyof typeof value] });
+      }
     });
     return () => subscription.unsubscribe();
-  }, [form.watch]);
+  }, [form]);
 
+  // Monitor form errors
   useEffect(() => {
     const errors = form.formState.errors;
     if (Object.keys(errors).length > 0) {
@@ -96,6 +146,16 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
   }, [form.formState.errors]);
 
   const { isDirty, discardChanges } = useCustomerAutosave(form, customerId, mode === "edit");
+  
+  // Cancel handler with error handling
+  const handleCancel = useCallback(() => {
+    if (isDirty) {
+      setShowUnsavedChanges(true);
+    } else {
+      // Just navigate back or reset
+      form.reset();
+    }
+  }, [isDirty, form]);
 
   if (isLoading) {
     return (
@@ -120,6 +180,11 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
       setIsSubmitting(true);
       setFormErrors(null);
 
+      // Type safety: Ensure customer_type is valid
+      if (!values.customer_type || !['Personal', 'Fleet', 'Business'].includes(values.customer_type)) {
+        values.customer_type = 'Personal';
+      }
+
       console.log("Customer type:", values.customer_type);
 
       const { isValid, errors } = validateCustomerBusinessRules(values, values.customer_type);
@@ -137,7 +202,19 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
         return;
       }
 
+      // Clean up values before submission
       const cleanedValues = { ...values };
+      
+      // Convert numeric string fields to numbers
+      if (typeof cleanedValues.loyalty_points === 'string') {
+        cleanedValues.loyalty_points = Number(cleanedValues.loyalty_points) || 0;
+      }
+      
+      if (typeof cleanedValues.total_spend === 'string') {
+        cleanedValues.total_spend = Number(cleanedValues.total_spend) || 0;
+      }
+
+      // Remove fields that don't apply to the current customer type
       if (values.customer_type === "Personal") {
         console.log("Cleaning up Personal customer data...");
         delete cleanedValues.company_name;
@@ -237,7 +314,15 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
             
             <AddressBookSection form={form} />
 
-            <div className="flex justify-end mt-8">
+            <div className="flex justify-between mt-8">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleCancel}
+                className="bg-gray-100 border-gray-300"
+              >
+                Cancel
+              </Button>
               <SubmitButton 
                 label={mode === "create" ? "Add Customer" : "Update Customer"}
                 isSubmitting={isSubmitting}
@@ -273,3 +358,6 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     </CustomerErrorBoundary>
   );
 }
+
+// Add a Button component import that was missing
+import { Button } from "@/components/ui/button";

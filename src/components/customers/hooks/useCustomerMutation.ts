@@ -21,9 +21,11 @@ export function useCustomerMutation(customerId: string) {
       return data;
     },
     onMutate: async ({ field, value }) => {
+      // Cancel outgoing refetches to avoid overwriting optimistic update
       await queryClient.cancelQueries({ queryKey: ['customer', customerId] });
       const previousCustomer = queryClient.getQueryData<CustomerFormValues>(['customer', customerId]);
 
+      // Optimistically update the customer data
       if (previousCustomer) {
         queryClient.setQueryData(['customer', customerId], {
           ...previousCustomer,
@@ -34,6 +36,7 @@ export function useCustomerMutation(customerId: string) {
       return { previousCustomer };
     },
     onError: (err, variables, context) => {
+      // On error, rollback the optimistic update
       if (context?.previousCustomer) {
         queryClient.setQueryData(['customer', customerId], context.previousCustomer);
       }
@@ -61,9 +64,11 @@ export function useCustomerMutation(customerId: string) {
       return data;
     },
     onMutate: async (updates) => {
+      // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['customer', customerId] });
       const previousCustomer = queryClient.getQueryData<CustomerFormValues>(['customer', customerId]);
 
+      // Optimistically update
       if (previousCustomer) {
         queryClient.setQueryData(['customer', customerId], {
           ...previousCustomer,
@@ -74,6 +79,7 @@ export function useCustomerMutation(customerId: string) {
       return { previousCustomer };
     },
     onError: (err, variables, context) => {
+      // Rollback on error
       if (context?.previousCustomer) {
         queryClient.setQueryData(['customer', customerId], context.previousCustomer);
       }

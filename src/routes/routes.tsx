@@ -1,11 +1,11 @@
 
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import { RootLayout } from "../components/layout/RootLayout";
 import { AppLayout } from "../components/layout/AppLayout";
 
 import Index from "../pages/Index";
 import Auth from "../pages/Auth";
-import SetPassword from "../pages/SetPassword";
+import { SetPassword } from "../pages/SetPassword"; // Changed to named import
 import Customers from "../pages/Customers";
 import CustomerDetail from "../pages/CustomerDetail";
 import CustomerPortal from "../pages/CustomerPortal";
@@ -16,7 +16,7 @@ import InventorySuppliers from "../pages/InventorySuppliers";
 import Shops from "../pages/Shops";
 import ShopItems from "../pages/ShopItems";
 import ShopSettings from "../pages/ShopSettings";
-import NotFoundPage from "../pages/NotFoundPage";
+import { NotFoundPage } from "../pages/NotFoundPage"; // Changed to named import
 import WorkOrders from "../pages/WorkOrders";
 import Staff from "../pages/Staff";
 import Vehicles from "../pages/Vehicles";
@@ -28,10 +28,10 @@ import SystemAlerts from "../pages/SystemAlerts";
 
 export const router = createBrowserRouter([
   {
-    element: <RootLayout />,
+    element: <RootLayout><Outlet /></RootLayout>, // Added children
     children: [
       {
-        element: <AppLayout />,
+        element: <AppLayout><Outlet /></AppLayout>, // Added children
         children: [
           {
             path: "/",

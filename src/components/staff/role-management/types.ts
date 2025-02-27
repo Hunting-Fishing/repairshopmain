@@ -8,6 +8,22 @@ export type StaffRole =
   | "accountant" 
   | "customer_service";
 
+export type StaffMember = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  role: string;
+  custom_role_id?: string | null;
+};
+
+export type CustomRole = {
+  id: string;
+  name: string;
+  organization_id: string;
+};
+
+export const roles = ['owner', 'management', 'service_advisor', 'technician', 'custom'] as const;
+
 /**
  * Determines the CSS class for role badges based on the role type
  */

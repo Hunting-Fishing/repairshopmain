@@ -15,6 +15,7 @@ import CustomerDetail from "@/pages/CustomerDetail";
 import CustomerManagement from "@/pages/CustomerManagement";
 import WorkOrders from "@/pages/WorkOrders";
 import Index from "@/pages/Index";
+import Inventory from "@/pages/Inventory";
 import { Loader2 } from "lucide-react";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useEffect } from "react";
@@ -145,7 +146,17 @@ function App() {
                         } 
                       />
                       
-                      {/* Add routes for previously non-working sidebar items */}
+                      {/* Inventory route - using the actual component */}
+                      <Route 
+                        path="/inventory" 
+                        element={
+                          <ProtectedRoute>
+                            <Inventory />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      
+                      {/* Add routes for other non-working sidebar items */}
                       <Route 
                         path="/calendar" 
                         element={
@@ -175,14 +186,6 @@ function App() {
                         element={
                           <ProtectedRoute>
                             <PlaceholderPage title="Shop Items" />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/inventory" 
-                        element={
-                          <ProtectedRoute>
-                            <PlaceholderPage title="Inventory" />
                           </ProtectedRoute>
                         } 
                       />

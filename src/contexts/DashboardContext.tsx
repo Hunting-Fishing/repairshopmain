@@ -6,7 +6,6 @@ import { useViewState } from "@/hooks/useViewState";
 import { useStats } from "./StatsContext";
 import { useAuth } from "./AuthContext";
 import { DashboardContextValue, DashboardProfile } from "@/types/dashboard/consolidated";
-import { toast } from "sonner";
 
 const DashboardContext = createContext<DashboardContextValue | undefined>(undefined);
 
@@ -34,6 +33,43 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
       } : null
     };
   }, [profile]);
+
+  // Define all actions before any conditional returns
+  const setView = useCallback((view: "day" | "week" | "month") => {
+    updateViewState({
+      ...viewState,
+      state: { ...viewState?.state, defaultView: view }
+    });
+  }, [viewState, updateViewState]);
+
+  const setViewMode = useCallback((mode: "calendar" | "grid" | "list") => {
+    updateViewState({
+      ...viewState,
+      view_mode: mode
+    });
+  }, [viewState, updateViewState]);
+
+  const setSelectedDate = useCallback((date: Date) => {
+    updateViewState({
+      ...viewState,
+      state: { ...viewState?.state, selectedDate: date }
+    });
+  }, [viewState, updateViewState]);
+
+  const setIsCalendarExpanded = useCallback((expanded: boolean) => {
+    updateViewState({
+      ...viewState,
+      is_calendar_expanded: expanded
+    });
+  }, [viewState, updateViewState]);
+
+  // Memoize actions object after defining all callbacks
+  const actions = useMemo(() => ({
+    setView,
+    setViewMode,
+    setSelectedDate,
+    setIsCalendarExpanded,
+  }), [setView, setViewMode, setSelectedDate, setIsCalendarExpanded]);
 
   // Memoize state object
   const state = useMemo(() => ({
@@ -70,37 +106,6 @@ export function DashboardContextProvider({ children }: { children: ReactNode }) 
     dashboardProfile, profileLoading, profileError,
     viewState
   ]);
-
-  // Memoize actions
-  const actions = useMemo(() => ({
-    setView: useCallback((view: "day" | "week" | "month") => {
-      updateViewState({
-        ...viewState,
-        state: { ...viewState?.state, defaultView: view }
-      });
-    }, [viewState, updateViewState]),
-
-    setViewMode: useCallback((mode: "calendar" | "grid" | "list") => {
-      updateViewState({
-        ...viewState,
-        view_mode: mode
-      });
-    }, [viewState, updateViewState]),
-
-    setSelectedDate: useCallback((date: Date) => {
-      updateViewState({
-        ...viewState,
-        state: { ...viewState?.state, selectedDate: date }
-      });
-    }, [viewState, updateViewState]),
-
-    setIsCalendarExpanded: useCallback((expanded: boolean) => {
-      updateViewState({
-        ...viewState,
-        is_calendar_expanded: expanded
-      });
-    }, [viewState, updateViewState]),
-  }), [viewState, updateViewState]);
 
   return (
     <DashboardContext.Provider value={{ state, actions }}>

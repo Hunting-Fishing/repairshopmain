@@ -13,51 +13,22 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { UserPlus, Edit, Trash2 } from "lucide-react";
-import { getRoleBadgeColor } from "../staff/role-management/types";
-
-// Sample data - would be replaced with actual data from API
-const demoStaffMembers = [
-  { 
-    id: "1", 
-    first_name: "John", 
-    last_name: "Smith", 
-    role: "owner", 
-    email: "john.smith@example.com",
-    phone: "555-123-4567",
-    status: "active"
-  },
-  { 
-    id: "2", 
-    first_name: "Jane", 
-    last_name: "Doe", 
-    role: "management", 
-    email: "jane.doe@example.com",
-    phone: "555-987-6543",
-    status: "active"
-  },
-  { 
-    id: "3", 
-    first_name: "Michael", 
-    last_name: "Johnson", 
-    role: "technician", 
-    email: "michael.j@example.com",
-    phone: "555-456-7890",
-    status: "active"
-  },
-  { 
-    id: "4", 
-    first_name: "Sarah", 
-    last_name: "Williams", 
-    role: "service_advisor", 
-    email: "sarah.w@example.com",
-    phone: "555-789-0123",
-    status: "inactive"
-  }
-];
+import { getRoleBadgeColor } from "./role-management/types";
+import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
+import { toast } from "@/hooks/use-toast";
 
 export function StaffList() {
-  const [isLoading, setIsLoading] = useState(false);
-  const staffMembers = demoStaffMembers;
+  const { data: staffMembers, isLoading, error } = useStaffMembers();
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+
+  if (error) {
+    console.error("Error loading staff members:", error);
+    toast({
+      title: "Error",
+      description: "Failed to load staff members",
+      variant: "destructive"
+    });
+  }
 
   return (
     <div className="space-y-4">
@@ -93,18 +64,18 @@ export function StaffList() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {staffMembers.map((staff) => (
+                {staffMembers?.map((staff) => (
                   <TableRow key={staff.id}>
                     <TableCell className="font-medium">
                       {staff.first_name} {staff.last_name}
                     </TableCell>
                     <TableCell>
                       <Badge className={getRoleBadgeColor(staff.role)}>
-                        {staff.role.replace('_', ' ')}
+                        {staff.custom_roles?.name || staff.role.replace('_', ' ')}
                       </Badge>
                     </TableCell>
                     <TableCell>{staff.email}</TableCell>
-                    <TableCell>{staff.phone}</TableCell>
+                    <TableCell>{staff.phone_number}</TableCell>
                     <TableCell>
                       <Badge variant={staff.status === 'active' ? 'success' : 'secondary'}>
                         {staff.status}

@@ -13,7 +13,7 @@ import { BusinessDetailsSection } from "./BusinessDetailsSection";
 interface CustomerTypeOption {
   value: string;
   label: string;
-  icon: React.ComponentType;
+  icon: React.ComponentType<{ className?: string }>;  // Updated to accept className prop
   description?: string;
 }
 
@@ -174,12 +174,14 @@ export function CustomerTypeSection({
                         </FormControl>
                         <div className="flex-1 space-y-1">
                           <FormLabel className="flex items-center gap-2">
-                            <Icon className={cn(
-                              "h-4 w-4",
-                              field.value === option.value
-                                ? "text-orange-500"
-                                : "text-gray-500"
-                            )} />
+                            <Icon 
+                              className={cn(
+                                "h-4 w-4",
+                                field.value === option.value
+                                  ? "text-orange-500"
+                                  : "text-gray-500"
+                              )} 
+                            />
                             <span className={cn(
                               "font-medium",
                               field.value === option.value

@@ -1,4 +1,3 @@
-
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 import { FormSection } from "../FormSection";
@@ -27,16 +26,15 @@ export function CustomerTypeSection({
   const isInitialMount = useRef(true);
   const previousType = useRef(customerType);
   const [showOtherField, setShowOtherField] = useState(false);
-  const [otherClassification, setOtherClassification] = useState("");
 
   // Reset business fields when changing away from business type
   useEffect(() => {
     if (!isInitialMount.current && previousType.current === "Business" && customerType !== "Business") {
       form.setValue("company_name", "");
       form.setValue("business_classification_id", "");
+      form.setValue("business_classification_other", "");
       form.setValue("tax_number", "");
       form.clearErrors(["company_name", "business_classification_id", "tax_number"]);
-      setOtherClassification("");
       setShowOtherField(false);
     }
     
@@ -47,13 +45,13 @@ export function CustomerTypeSection({
   useEffect(() => {
     setShowOtherField(businessClassification === "other");
     if (businessClassification !== "other") {
-      setOtherClassification("");
+      form.setValue("business_classification_other", "");
     }
-  }, [businessClassification]);
+  }, [businessClassification, form]);
 
   // Save other classification to database
-  const saveOtherClassification = async () => {
-    if (businessClassification === "other" && otherClassification) {
+  const saveOtherClassification = async (otherValue: string) => {
+    if (businessClassification === "other" && otherValue) {
       try {
         const customerId = form.getValues("id");
         // Get organization_id from profile
@@ -73,7 +71,7 @@ export function CustomerTypeSection({
           .insert({
             customer_id: customerId,
             classification_type: "business",
-            other_description: otherClassification,
+            other_description: otherValue,
             organization_id: profile.organization_id
           });
 
@@ -101,6 +99,7 @@ export function CustomerTypeSection({
         if (form.getValues("customer_type") === "Business") {
           const companyName = form.getValues("company_name");
           const businessClassification = form.getValues("business_classification_id");
+          const otherClassification = form.getValues("business_classification_other");
           const taxNumber = form.getValues("tax_number");
           
           const missingFields = [];
@@ -125,7 +124,7 @@ export function CustomerTypeSection({
       const timeoutId = setTimeout(validateBusinessFields, 100);
       return () => clearTimeout(timeoutId);
     }
-  }, [customerType, form, toast, otherClassification]);
+  }, [customerType, form, toast]);
 
   // Business classification options
   const businessClassificationOptions = [
@@ -258,13 +257,11 @@ export function CustomerTypeSection({
                 label="Other Classification"
                 required={true}
                 placeholder="Please specify the business classification"
-                value={otherClassification}
-                onChange={(e) => {
-                  setOtherClassification(e.target.value);
-                  saveOtherClassification();
-                }}
                 isModernTheme={isModernTheme}
                 helpText="Please provide details about your business classification"
+                onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+                  saveOtherClassification(e.target.value);
+                }}
               />
             )}
 

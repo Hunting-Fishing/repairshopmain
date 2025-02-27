@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
@@ -31,7 +32,12 @@ export function AddStaffMemberForm({ organizationId, customRoles }: AddStaffMemb
   });
 
   const onSubmit = async (data: StaffMemberFormValues) => {
-    const success = await addStaffMember(data, organizationId);
+    const staffData = {
+      ...data,
+      organization_id: organizationId
+    };
+    
+    const success = await addStaffMember(staffData);
     if (success) {
       form.reset();
       closeButtonRef.current?.click();

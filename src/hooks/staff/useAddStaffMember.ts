@@ -7,7 +7,7 @@ export function useAddStaffMember() {
   const queryClient = useQueryClient();
 
   const { mutateAsync: addStaffMemberAsync, isPending } = useMutation({
-    mutationFn: async (newStaffData: Partial<StaffMember>) => {
+    mutationFn: async (newStaffData: Partial<StaffMember> & { organization_id: string }) => {
       // 1. First, create the auth user (this would typically be done by an Edge Function)
       // For now, we'll simulate by just adding to the profiles table
       
@@ -29,11 +29,12 @@ export function useAddStaffMember() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["staff-members"] });
+      return true;
     },
   });
 
   return { 
-    addStaffMember: (staffData: Partial<StaffMember>) => 
+    addStaffMember: (staffData: Partial<StaffMember> & { organization_id: string }) => 
       addStaffMemberAsync(staffData),
     isLoading: isPending
   };

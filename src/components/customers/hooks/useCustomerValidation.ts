@@ -1,5 +1,6 @@
 
 import { CustomerFormValues } from "../types/customerTypes";
+import { ValidationService } from "../validation/validationService";
 
 export interface ValidationResult {
   isValid: boolean;
@@ -8,33 +9,17 @@ export interface ValidationResult {
 
 export function useCustomerValidation() {
   const validatePhoneNumber = (phoneNumber: string, country?: string): boolean => {
-    if (!phoneNumber) return true;
-    // Basic validation - can be enhanced with proper phone validation library
-    const phoneRegex = /^\+?[\d\s-]{10,}$/;
-    return phoneRegex.test(phoneNumber);
+    const result = ValidationService.validateField('phone_number', phoneNumber, 'Personal');
+    return result.isValid;
   };
 
   const validateEmail = (email: string): boolean => {
-    if (!email) return true;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    const result = ValidationService.validateField('email', email, 'Personal');
+    return result.isValid;
   };
 
   const validateCustomerData = (data: Partial<CustomerFormValues>): ValidationResult => {
-    const errors: Record<string, string> = {};
-
-    if (data.email && !validateEmail(data.email)) {
-      errors.email = "Please enter a valid email address";
-    }
-
-    if (data.phone_number && !validatePhoneNumber(data.phone_number, data.country)) {
-      errors.phone_number = "Please enter a valid phone number";
-    }
-
-    return {
-      isValid: Object.keys(errors).length === 0,
-      errors
-    };
+    return ValidationService.validateCustomerData(data as CustomerFormValues);
   };
 
   return {

@@ -14,7 +14,7 @@ import { useCustomerAutosave } from "./hooks/useCustomerAutosave";
 import { CustomerErrorBoundary } from "./error-boundary/CustomerErrorBoundary";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { validateCustomerBusinessRules } from "./rules/customerBusinessRules";
+import { ValidationProvider } from "./validation/ValidationContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -187,21 +187,6 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
 
       console.log("Customer type:", values.customer_type);
 
-      const { isValid, errors } = validateCustomerBusinessRules(values, values.customer_type);
-      
-      if (!isValid) {
-        console.error("Business rule validation failed:", errors);
-        errors.forEach(error => {
-          toast({
-            title: "Validation Error",
-            description: error,
-            variant: "destructive",
-          });
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
       // Clean up values before submission
       const cleanedValues = { ...values };
       
@@ -286,46 +271,48 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
 
   return (
     <CustomerErrorBoundary>
-      <FormProvider {...form}>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            {formErrors?.root && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
-                {formErrors.root.message}
+      <ValidationProvider initialCustomerType={form.watch("customer_type")}>
+        <FormProvider {...form}>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              {formErrors?.root && (
+                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md">
+                  {formErrors.root.message}
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <FormSection title="Personal Information">
+                  <CustomerFormFields form={form} customerId={customerId} />
+                </FormSection>
+
+                <FormSection title="Address Information">
+                  <CustomerAddressFields form={form} />
+                </FormSection>
               </div>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <FormSection title="Personal Information">
-                <CustomerFormFields form={form} customerId={customerId} />
-              </FormSection>
 
-              <FormSection title="Address Information">
-                <CustomerAddressFields form={form} />
-              </FormSection>
-            </div>
+              <Separator className="my-8" />
+              
+              <AddressBookSection form={form} />
 
-            <Separator className="my-8" />
-            
-            <AddressBookSection form={form} />
-
-            <div className="flex justify-between mt-8">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleCancel}
-                className="bg-gray-100 border-gray-300"
-              >
-                Cancel
-              </Button>
-              <SubmitButton 
-                label={mode === "create" ? "Add Customer" : "Update Customer"}
-                isSubmitting={isSubmitting}
-              />
-            </div>
-          </form>
-        </Form>
-      </FormProvider>
+              <div className="flex justify-between mt-8">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={handleCancel}
+                  className="bg-gray-100 border-gray-300"
+                >
+                  Cancel
+                </Button>
+                <SubmitButton 
+                  label={mode === "create" ? "Add Customer" : "Update Customer"}
+                  isSubmitting={isSubmitting}
+                />
+              </div>
+            </form>
+          </Form>
+        </FormProvider>
+      </ValidationProvider>
 
       <AlertDialog open={showUnsavedChanges} onOpenChange={setShowUnsavedChanges}>
         <AlertDialogContent>

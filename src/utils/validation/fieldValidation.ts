@@ -1,9 +1,52 @@
 
+export const FILE_RESTRICTIONS = {
+  maxSize: 5 * 1024 * 1024, // 5MB
+  allowedTypes: {
+    image: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
+    document: ['.pdf', '.doc', '.docx', '.xls', '.xlsx'],
+    generic: ['.txt', '.csv']
+  }
+} as const;
+
 type ValidationResult = {
   isValid: boolean;
   type?: 'success' | 'error' | 'warning';
   message?: string;
   details?: string[];
+};
+
+export const validateFile = (file: File): ValidationResult => {
+  // Check file size
+  if (file.size > FILE_RESTRICTIONS.maxSize) {
+    return {
+      isValid: false,
+      type: 'error',
+      message: `File size exceeds ${FILE_RESTRICTIONS.maxSize / 1024 / 1024}MB limit`,
+      details: [`Current file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`]
+    };
+  }
+
+  // Check file type
+  const extension = `.${file.name.split('.').pop()?.toLowerCase()}`;
+  const allowedTypes = Object.values(FILE_RESTRICTIONS.allowedTypes).flat();
+  
+  if (!allowedTypes.includes(extension)) {
+    return {
+      isValid: false,
+      type: 'error',
+      message: 'Unsupported file type',
+      details: [
+        `Allowed types: ${allowedTypes.join(', ')}`,
+        `Current file type: ${extension}`
+      ]
+    };
+  }
+
+  return {
+    isValid: true,
+    type: 'success',
+    message: 'File is valid'
+  };
 };
 
 export const validateEmail = (email: string): ValidationResult => {

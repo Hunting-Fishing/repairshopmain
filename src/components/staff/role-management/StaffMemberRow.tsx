@@ -1,8 +1,9 @@
 
+import React from "react";
 import { PencilIcon, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { type StaffMember, type CustomRole, getRoleBadgeColor } from "./types";
+import { StaffMember, CustomRole, getRoleBadgeColor } from "./types";
 import { RoleSelect } from "./components/RoleSelect";
 import { CustomRoleSelect } from "./components/CustomRoleSelect";
 import { StaffMemberInfo } from "./components/StaffMemberInfo";
@@ -13,7 +14,7 @@ interface StaffMemberRowProps {
   isEditing: boolean;
   onEdit: () => void;
   onCancelEdit: () => void;
-  onRoleChange: (role: StaffMember["role"], customRoleId?: string) => void;
+  onRoleChange: (role: string, customRoleId?: string) => void;
 }
 
 export function StaffMemberRow({ 
@@ -26,10 +27,10 @@ export function StaffMemberRow({
 }: StaffMemberRowProps) {
   const displayRole = member.role === 'custom' && member.custom_role_id
     ? customRoles.find(r => r.id === member.custom_role_id)?.name || 'Custom Role'
-    : member.role.replace("_", " ").toUpperCase();
+    : member.role.replace("_", " ");
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between p-3 border-b">
       <StaffMemberInfo member={member} />
       <div>
         {isEditing ? (

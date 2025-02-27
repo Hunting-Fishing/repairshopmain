@@ -1,5 +1,6 @@
-import { UserCircle } from "lucide-react";
-import type { StaffMember } from "../types";
+
+import React from 'react';
+import { StaffMember } from '../types';
 
 interface StaffMemberInfoProps {
   member: StaffMember;
@@ -7,13 +8,9 @@ interface StaffMemberInfoProps {
 
 export function StaffMemberInfo({ member }: StaffMemberInfoProps) {
   return (
-    <div className="flex items-center space-x-4">
-      <UserCircle className="h-10 w-10 text-muted-foreground" />
-      <div>
-        <p className="font-medium">
-          {member.first_name} {member.last_name}
-        </p>
-      </div>
+    <div className="flex flex-col">
+      <div className="font-medium">{member.first_name} {member.last_name}</div>
+      <div className="text-sm text-muted-foreground">{member.email}</div>
     </div>
   );
 }

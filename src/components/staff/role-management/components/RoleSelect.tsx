@@ -1,26 +1,28 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type StaffMember, roles } from "../types";
+
+import React from 'react';
+import { StaffMember, roles } from '../types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface RoleSelectProps {
   defaultValue: string;
-  onRoleChange: (role: StaffMember["role"]) => void;
+  onRoleChange: (role: string) => void;
 }
 
 export function RoleSelect({ defaultValue, onRoleChange }: RoleSelectProps) {
   return (
-    <Select
-      defaultValue={defaultValue}
-      onValueChange={(value: StaffMember["role"]) => onRoleChange(value)}
-    >
-      <SelectTrigger className="w-[180px]">
-        <SelectValue />
+    <Select defaultValue={defaultValue} onValueChange={onRoleChange}>
+      <SelectTrigger className="w-36">
+        <SelectValue placeholder="Select role" />
       </SelectTrigger>
       <SelectContent>
         {roles.map((role) => (
           <SelectItem key={role} value={role}>
-            {role === 'custom' ? 'CUSTOM ROLES' : role.replace("_", " ").toUpperCase()}
+            {role.replace('_', ' ')}
           </SelectItem>
         ))}
+        <SelectItem value="owner">Owner</SelectItem>
+        <SelectItem value="manager">Manager</SelectItem>
+        <SelectItem value="admin">Admin</SelectItem>
       </SelectContent>
     </Select>
   );

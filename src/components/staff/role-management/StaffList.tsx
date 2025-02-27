@@ -1,4 +1,5 @@
 
+import React from "react";
 import { StaffMemberRow } from "./StaffMemberRow";
 import type { StaffMember, CustomRole } from "./types";
 
@@ -8,7 +9,7 @@ interface StaffListProps {
   editingId: string | null;
   onEdit: (id: string) => void;
   onCancelEdit: () => void;
-  onRoleChange: (userId: string, newRole: StaffMember["role"], customRoleId?: string) => void;
+  onRoleChange: (userId: string, newRole: string, customRoleId?: string) => void;
 }
 
 export function StaffList({ 

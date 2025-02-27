@@ -18,23 +18,29 @@ const validationUtils = {
 
 // Common schema fragments
 const contactInfoSchema = {
-  email: z.string().email(validationMessages.format.email),
-  phone_number: z.string().optional(),
+  email: z.string()
+    .min(1, validationMessages.required.email)
+    .email(validationMessages.format.email),
+  phone_number: z.string()
+    .optional()
+    .refine((val) => !val || validationUtils.phoneNumber(val), {
+      message: validationMessages.format.phone
+    }),
 };
 
 const addressSchema = {
-  street_address: z.string().optional(),
-  city: z.string().optional(),
-  state_province: z.string().optional(),
-  postal_code: z.string().optional(),
+  street_address: z.string().min(1, validationMessages.required.address_required),
+  city: z.string().min(1, "City is required"),
+  state_province: z.string().min(1, "State/Province is required"),
+  postal_code: z.string().min(1, "Postal code is required"),
   country: z.string({
     required_error: validationMessages.required.country,
   }).min(1, validationMessages.required.country),
 };
 
 const personSchema = {
-  first_name: z.string().min(1, validationMessages.required.first_name),
-  last_name: z.string().min(1, validationMessages.required.last_name),
+  first_name: z.string().min(2, validationMessages.length.min_name),
+  last_name: z.string().min(2, validationMessages.length.min_name),
 };
 
 const preferenceSchema = {
@@ -66,9 +72,9 @@ const personalSchema = z.object({
 const businessSchema = z.object({
   ...baseSchema,
   customer_type: z.literal("Business"),
-  company_name: z.string().min(2, "Company name is required and must be at least 2 characters"),
-  business_classification_id: z.string().min(1, "Business classification is required"),
-  company_size: z.string().min(1, "Company size is required"),
+  company_name: z.string().min(2, validationMessages.length.company_name),
+  business_classification_id: z.string().min(1, validationMessages.required.business_classification_id),
+  company_size: z.string().min(1, validationMessages.required.company_size),
   fleet_details: z.any().optional()
 });
 

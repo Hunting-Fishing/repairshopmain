@@ -1,4 +1,3 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -14,8 +13,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { CustomerErrorBoundary } from "../../error-boundary/CustomerErrorBoundary";
 
-// Define paths type for nested object access
 type PathImpl<T, K extends keyof T> = K extends string
   ? T[K] extends Record<string, any>
     ? T[K] extends ArrayLike<any>
@@ -67,10 +66,8 @@ export function FormInput({
   const error = form.formState.errors[name as keyof CustomerFormValues];
   const isTouched = form.formState.touchedFields[name as keyof CustomerFormValues];
   
-  // Use watch instead of getValues to react to changes
   const value = form.watch(name);
 
-  // Add detailed logging for form changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
       console.log("Form field changed:", { name, type, value });
@@ -135,79 +132,80 @@ export function FormInput({
   })();
 
   return (
-    <FormField
-      control={form.control}
-      name={name}
-      render={({ field }) => {
-        // Ensure the field value is always a string or number
-        const inputValue = field.value != null ? String(field.value) : '';
-        
-        return (
-          <FormItem className="relative">
-            <div className="flex items-center gap-2">
-              <FormLabel className={labelClasses}>
-                <span className="flex items-center gap-1">
-                  {label}
-                  {required && (
-                    <span 
-                      className="text-red-500 text-sm font-bold ml-0.5" 
-                      aria-label="required field"
-                    >*</span>
-                  )}
-                </span>
-              </FormLabel>
-              {helpText && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="w-[200px] text-sm">{helpText}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-            <FormControl>
-              <div className="relative">
-                {icon && (
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                    {icon}
-                  </div>
+    <CustomerErrorBoundary>
+      <FormField
+        control={form.control}
+        name={name}
+        render={({ field }) => {
+          const inputValue = field.value != null ? String(field.value) : '';
+          
+          return (
+            <FormItem className="relative">
+              <div className="flex items-center gap-2">
+                <FormLabel className={labelClasses}>
+                  <span className="flex items-center gap-1">
+                    {label}
+                    {required && (
+                      <span 
+                        className="text-red-500 text-sm font-bold ml-0.5" 
+                        aria-label="required field"
+                      >*</span>
+                    )}
+                  </span>
+                </FormLabel>
+                {helpText && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <HelpCircle className="h-4 w-4 text-muted-foreground hover:text-foreground transition-colors" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="w-[200px] text-sm">{helpText}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
-                <Input
-                  {...field}
-                  value={inputValue}
-                  type={type}
-                  placeholder={required ? `${placeholder} *` : placeholder}
-                  className={cn(inputClasses, icon && "pl-10")}
-                  aria-required={required}
-                  aria-invalid={!!error || isEmpty}
-                  readOnly={readOnly}
-                  onBlur={handleBlur}
-                />
               </div>
-            </FormControl>
-            {error && (
-              <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />
-            )}
-            {isEmpty && !error && (
-              <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
-                {label} is required
-              </FormMessage>
-            )}
-            {validation && (
-              <ValidationStatus 
-                status={validation.type || (validation.isValid ? 'success' : 'error')}
-                type={type === "email" ? "Email" : "Phone"}
-                message={validation.message || ''}
-                details={validation.details}
-              />
-            )}
-          </FormItem>
-        );
-      }}
-    />
+              <FormControl>
+                <div className="relative">
+                  {icon && (
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                      {icon}
+                    </div>
+                  )}
+                  <Input
+                    {...field}
+                    value={inputValue}
+                    type={type}
+                    placeholder={required ? `${placeholder} *` : placeholder}
+                    className={cn(inputClasses, icon && "pl-10")}
+                    aria-required={required}
+                    aria-invalid={!!error || isEmpty}
+                    readOnly={readOnly}
+                    onBlur={handleBlur}
+                  />
+                </div>
+              </FormControl>
+              {error && (
+                <FormMessage className="text-red-500 text-sm font-medium animate-slideDown" />
+              )}
+              {isEmpty && !error && (
+                <FormMessage className="text-red-500 text-sm font-medium animate-slideDown">
+                  {label} is required
+                </FormMessage>
+              )}
+              {validation && (
+                <ValidationStatus 
+                  status={validation.type || (validation.isValid ? 'success' : 'error')}
+                  type={type === "email" ? "Email" : "Phone"}
+                  message={validation.message || ''}
+                  details={validation.details}
+                />
+              )}
+            </FormItem>
+          );
+        }}
+      />
+    </CustomerErrorBoundary>
   );
 }

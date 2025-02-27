@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { format, addDays, startOfWeek, endOfWeek, isToday, isSameDay } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -147,7 +147,7 @@ export default function Calendar() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="primary">Publish</Button>
+            <Button variant="default">Publish</Button>
             <Select
               defaultValue={view}
               onValueChange={(value: "day" | "week" | "month") => setView(value)}

@@ -4,7 +4,7 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Suspense } from "react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 interface ErrorBoundaryWrapperProps {
   children: React.ReactNode;
@@ -13,7 +13,11 @@ interface ErrorBoundaryWrapperProps {
 export function ErrorBoundaryWrapper({ children }: ErrorBoundaryWrapperProps) {
   const handleError = async (error: Error) => {
     console.error('Global error:', error);
-    toast.error('An unexpected error occurred. Please try again.');
+    toast({
+      title: "Error",
+      description: 'An unexpected error occurred. Please try again.',
+      variant: "destructive"
+    });
   };
 
   const errorFallback = (

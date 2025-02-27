@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { DashboardContextProvider } from "@/contexts/DashboardContext";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { StatsProvider } from "@/contexts/StatsContext";
 import { Session } from "@supabase/supabase-js";
 
@@ -33,10 +33,17 @@ const DemoButtons = memo(function DemoButtons({ session }: DemoButtonsProps) {
       });
       
       if (error) throw error;
-      toast.success('Demo work orders generated successfully');
+      toast({
+        title: 'Success',
+        description: 'Demo work orders generated successfully'
+      });
     } catch (error: any) {
       console.error('Error generating demo data:', error);
-      toast.error(error.message || 'Failed to generate demo data');
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to generate demo data',
+        variant: 'destructive'
+      });
     }
   }, [session]);
 
@@ -55,10 +62,17 @@ const DemoButtons = memo(function DemoButtons({ session }: DemoButtonsProps) {
       });
       
       if (error) throw error;
-      toast.success('Demo data cleaned up successfully');
+      toast({
+        title: 'Success',
+        description: 'Demo data cleaned up successfully'
+      });
     } catch (error: any) {
       console.error('Error cleaning up demo data:', error);
-      toast.error(error.message || 'Failed to clean up demo data');
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to clean up demo data',
+        variant: 'destructive'
+      });
     }
   }, [session]);
 

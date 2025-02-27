@@ -1,20 +1,27 @@
 
-import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
-import { useViewState } from "@/hooks/useViewState";
+import { useCallback, useMemo } from "react";
 import { DashboardHeader } from "./DashboardHeader";
 import { DashboardContent } from "./DashboardContent";
 import { DashboardContainer } from "./components/DashboardContainer";
+import { useDashboardContext } from "@/contexts/DashboardContext";
 
 export function DashboardLayout() {
-  const { viewState, updateViewState } = useViewState('dashboard');
-  const isModernTheme = true;
+  const { isModernTheme } = useDashboardContext();
 
-  return (
-    <ErrorBoundary>
-      <DashboardContainer isModernTheme={isModernTheme}>
+  const renderContent = useCallback(() => {
+    return (
+      <>
         <DashboardHeader />
         <DashboardContent />
-      </DashboardContainer>
-    </ErrorBoundary>
+      </>
+    );
+  }, []);
+
+  const content = useMemo(() => renderContent(), [renderContent]);
+
+  return (
+    <DashboardContainer isModernTheme={isModernTheme}>
+      {content}
+    </DashboardContainer>
   );
 }

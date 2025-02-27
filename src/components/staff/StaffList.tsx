@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -12,7 +12,21 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Edit, Trash2, Search, Filter, MoreVertical, Download } from "lucide-react";
+import { 
+  UserPlus, 
+  Edit, 
+  Trash2, 
+  Search, 
+  MoreVertical, 
+  Download, 
+  BarChart,
+  Table2, 
+  Eye,
+  ChevronDown,
+  CheckCircle2,
+  XCircle,
+  Mail
+} from "lucide-react";
 import { getRoleBadgeColor } from "./role-management/types";
 import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
 import { toast } from "@/hooks/use-toast";
@@ -29,6 +43,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { StaffMetrics } from "./StaffMetrics";
+import { AdvancedFilters, StaffFilters } from "./AdvancedFilters";
+import { RoleDistributionChart } from "./RoleDistributionChart";
+import { StatusDistributionChart } from "./StatusDistributionChart";
+import { format } from "date-fns";
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
 
 export function StaffList() {
   const { data: staffMembers, isLoading, error } = useStaffMembers();
@@ -37,8 +62,11 @@ export function StaffList() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState<{ role?: string, status?: string }>({});
-
+  const [viewMode, setViewMode] = useState<"table" | "analytics">("table");
+  const [filters, setFilters] = useState<StaffFilters>({
+    searchFields: ['name', 'email', 'phone']
+  });
+  
   if (error) {
     console.error("Error loading staff members:", error);
     toast({
@@ -93,7 +121,7 @@ export function StaffList() {
     // Basic CSV export functionality
     if (!staffMembers || staffMembers.length === 0) return;
     
-    const headers = ["Name", "Role", "Email", "Phone", "Status"];
+    const headers = ["Name", "Role", "Email", "Phone", "Status", "Hire Date"];
     const csvContent = [
       headers.join(","),
       ...filteredStaffMembers.map(staff => [
@@ -101,7 +129,8 @@ export function StaffList() {
         staff.custom_roles?.name || staff.role,
         staff.email,
         staff.phone_number || "",
-        staff.status || ""
+        staff.status || "",
+        staff.hire_date || ""
       ].join(","))
     ].join("\n");
     
@@ -116,177 +145,259 @@ export function StaffList() {
     document.body.removeChild(link);
   };
 
-  // Filter staff members based on search query and filters
-  const filteredStaffMembers = staffMembers?.filter(staff => {
-    const matchesSearch = searchQuery === "" || 
-      `${staff.first_name} ${staff.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      staff.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      staff.phone_number?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesRoleFilter = !filter.role || staff.role === filter.role;
-    const matchesStatusFilter = !filter.status || staff.status === filter.status;
-    
-    return matchesSearch && matchesRoleFilter && matchesStatusFilter;
-  }) || [];
-
   // Extract unique roles and statuses for filters
-  const uniqueRoles = [...new Set(staffMembers?.map(staff => staff.role) || [])];
-  const uniqueStatuses = [...new Set(staffMembers?.map(staff => staff.status) || [])];
+  const uniqueRoles = useMemo(() => [
+    ...new Set(staffMembers?.map(staff => staff.role) || [])
+  ], [staffMembers]);
+  
+  const uniqueStatuses = useMemo(() => [
+    ...new Set(staffMembers?.map(staff => staff.status) || [])
+  ], [staffMembers]);
+
+  // Filter staff members based on search query and filters
+  const filteredStaffMembers = useMemo(() => {
+    return staffMembers?.filter(staff => {
+      // Search query filtering
+      let matchesSearch = true;
+      if (searchQuery) {
+        matchesSearch = false;
+        const query = searchQuery.toLowerCase();
+        
+        if (filters.searchFields?.includes('name') && 
+            `${staff.first_name} ${staff.last_name}`.toLowerCase().includes(query)) {
+          matchesSearch = true;
+        }
+        
+        if (filters.searchFields?.includes('email') && 
+            staff.email?.toLowerCase().includes(query)) {
+          matchesSearch = true;
+        }
+        
+        if (filters.searchFields?.includes('phone') && 
+            staff.phone_number?.toLowerCase().includes(query)) {
+          matchesSearch = true;
+        }
+        
+        if (filters.searchFields?.includes('notes') && 
+            staff.notes?.toLowerCase().includes(query)) {
+          matchesSearch = true;
+        }
+      }
+      
+      // Role filtering
+      const matchesRoleFilter = !filters.role || staff.role === filters.role;
+      
+      // Status filtering
+      const matchesStatusFilter = !filters.status || staff.status === filters.status;
+      
+      // Hire date filtering
+      let matchesHireDateFilter = true;
+      if (filters.hireDate) {
+        if (filters.hireDate.after && staff.hire_date) {
+          matchesHireDateFilter = matchesHireDateFilter && 
+            new Date(staff.hire_date) >= new Date(filters.hireDate.after);
+        }
+        
+        if (filters.hireDate.before && staff.hire_date) {
+          matchesHireDateFilter = matchesHireDateFilter && 
+            new Date(staff.hire_date) <= new Date(filters.hireDate.before);
+        }
+        
+        // If hire date filter is active but staff has no hire date, exclude them
+        if ((filters.hireDate.after || filters.hireDate.before) && !staff.hire_date) {
+          matchesHireDateFilter = false;
+        }
+      }
+      
+      // Specialties filtering
+      let matchesSpecialtiesFilter = true;
+      if (filters.hasSpecialties === true) {
+        matchesSpecialtiesFilter = Array.isArray(staff.skills) && staff.skills.length > 0;
+      }
+      
+      return matchesSearch && 
+             matchesRoleFilter && 
+             matchesStatusFilter && 
+             matchesHireDateFilter &&
+             matchesSpecialtiesFilter;
+    }) || [];
+  }, [staffMembers, searchQuery, filters]);
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h2 className="text-xl font-semibold">Staff Members</h2>
+        <h2 className="text-xl font-semibold">Staff Management</h2>
         <Button className="flex items-center gap-2" onClick={handleAddStaffClick}>
           <UserPlus className="h-4 w-4" />
           <span>Add Staff Member</span>
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
-        <div className="relative w-full sm:w-auto sm:min-w-[300px]">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search staff..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="flex items-center gap-1">
-                <Filter className="h-4 w-4" />
-                <span>Filter</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filter by Role</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setFilter(f => ({ ...f, role: undefined }))}>
-                All Roles
-              </DropdownMenuItem>
-              {uniqueRoles.map(role => (
-                <DropdownMenuItem key={role} onClick={() => setFilter(f => ({ ...f, role }))}>
-                  {role}
-                </DropdownMenuItem>
-              ))}
-              
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setFilter(f => ({ ...f, status: undefined }))}>
-                All Statuses
-              </DropdownMenuItem>
-              {uniqueStatuses.map(status => (
-                <DropdownMenuItem key={status} onClick={() => setFilter(f => ({ ...f, status }))}>
-                  {status}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+      <Tabs defaultValue="table" onValueChange={(value) => setViewMode(value as "table" | "analytics")}>
+        <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center mb-4">
+          <div className="relative w-full sm:w-auto sm:min-w-[300px]">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search staff..."
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+            <TabsList>
+              <TabsTrigger value="table" className="flex items-center gap-1">
+                <Table2 className="h-4 w-4" />
+                <span>Table</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-1">
+                <BarChart className="h-4 w-4" />
+                <span>Analytics</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <AdvancedFilters 
+              filters={filters}
+              onFiltersChange={setFilters}
+              availableRoles={uniqueRoles}
+              availableStatuses={uniqueStatuses}
+            />
 
-          <Button variant="outline" size="sm" onClick={exportStaffList}>
-            <Download className="h-4 w-4 mr-1" />
-            Export
-          </Button>
+            <Button variant="outline" size="sm" onClick={exportStaffList}>
+              <Download className="h-4 w-4 mr-1" />
+              Export
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle>All Staff</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="space-y-2">
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-              <Skeleton className="h-12 w-full" />
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredStaffMembers.map((staff) => (
-                    <TableRow key={staff.id}>
-                      <TableCell className="font-medium">
-                        {staff.first_name} {staff.last_name}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getRoleBadgeColor(staff.role)}>
-                          {staff.custom_roles?.name || staff.role.replace('_', ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{staff.email}</TableCell>
-                      <TableCell>{staff.phone_number}</TableCell>
-                      <TableCell>
-                        <Badge variant={staff.status === 'active' ? 'success' : 'secondary'}>
-                          {staff.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleEditClick(staff)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleDeleteClick(staff)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
+        <StaffMetrics staffMembers={filteredStaffMembers} />
+
+        <TabsContent value="table" className="mt-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>All Staff ({filteredStaffMembers.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Hire Date</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredStaffMembers.map((staff) => (
+                        <TableRow key={staff.id}>
+                          <TableCell className="font-medium">
+                            {staff.first_name} {staff.last_name}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={getRoleBadgeColor(staff.role)}>
+                              {staff.custom_roles?.name || staff.role.replace('_', ' ')}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {staff.email ? (
+                              <a href={`mailto:${staff.email}`} className="flex items-center gap-1 text-blue-600 hover:text-blue-800">
+                                <Mail className="h-3 w-3" />
+                                {staff.email}
+                              </a>
+                            ) : "-"}
+                          </TableCell>
+                          <TableCell>{staff.phone_number || "-"}</TableCell>
+                          <TableCell>
+                            <Badge variant={staff.status === 'active' ? 'success' : 'secondary'}>
+                              {staff.status === 'active' ? (
+                                <span className="flex items-center gap-1">
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  Active
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-1">
+                                  <XCircle className="h-3 w-3" />
+                                  {staff.status || "Inactive"}
+                                </span>
+                              )}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {staff.hire_date ? format(new Date(staff.hire_date), 'MMM d, yyyy') : "-"}
+                          </TableCell>
+                          <TableCell className="text-right space-x-1">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              title="View Details"
+                            >
+                              <Eye className="h-4 w-4" />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>View Performance</DropdownMenuItem>
-                            <DropdownMenuItem>Assign Tasks</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => handleDeleteClick(staff)} className="text-destructive">
-                              Remove
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {filteredStaffMembers.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                        {staffMembers?.length === 0 
-                          ? "No staff members found."
-                          : "No matching staff members found."
-                        }
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleEditClick(staff)}
+                              title="Edit"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem>View Profile</DropdownMenuItem>
+                                <DropdownMenuItem>View Performance</DropdownMenuItem>
+                                <DropdownMenuItem>Assign Tasks</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => handleDeleteClick(staff)} className="text-destructive">
+                                  Remove
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {filteredStaffMembers.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                            {staffMembers?.length === 0 
+                              ? "No staff members found."
+                              : "No matching staff members found."
+                            }
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="mt-4">
+          <div className="grid gap-4 md:grid-cols-3">
+            <RoleDistributionChart staffMembers={filteredStaffMembers} />
+            <StatusDistributionChart staffMembers={filteredStaffMembers} />
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Dialogs */}
       <AddStaffMemberDialog

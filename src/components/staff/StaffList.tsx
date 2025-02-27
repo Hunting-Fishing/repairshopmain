@@ -25,7 +25,9 @@ import {
   ChevronDown,
   CheckCircle2,
   XCircle,
-  Mail
+  Mail,
+  Settings,
+  FileLineChart
 } from "lucide-react";
 import { getRoleBadgeColor } from "./role-management/types";
 import { useStaffMembers } from "@/hooks/staff/useStaffMembers";
@@ -47,6 +49,9 @@ import { StaffMetrics } from "./StaffMetrics";
 import { AdvancedFilters, StaffFilters } from "./AdvancedFilters";
 import { RoleDistributionChart } from "./RoleDistributionChart";
 import { StatusDistributionChart } from "./StatusDistributionChart";
+import { StaffProfileView } from "./StaffProfileView";
+import { RoleManagement } from "./RoleManagement";
+import { PerformanceReports } from "./PerformanceReports";
 import { format } from "date-fns";
 import { 
   Tabs, 
@@ -61,6 +66,9 @@ export function StaffList() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isProfileViewOpen, setIsProfileViewOpen] = useState(false);
+  const [isRoleManagementOpen, setIsRoleManagementOpen] = useState(false);
+  const [isPerformanceReportsOpen, setIsPerformanceReportsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"table" | "analytics">("table");
   const [filters, setFilters] = useState<StaffFilters>({
@@ -84,6 +92,11 @@ export function StaffList() {
   const handleDeleteClick = (staffMember: StaffMember) => {
     setSelectedMember(staffMember);
     setIsDeleteDialogOpen(true);
+  };
+
+  const handleViewProfileClick = (staffMember: StaffMember) => {
+    setSelectedMember(staffMember);
+    setIsProfileViewOpen(true);
   };
 
   const handleAddStaffClick = () => {
@@ -227,10 +240,34 @@ export function StaffList() {
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h2 className="text-xl font-semibold">Staff Management</h2>
-        <Button className="flex items-center gap-2" onClick={handleAddStaffClick}>
-          <UserPlus className="h-4 w-4" />
-          <span>Add Staff Member</span>
-        </Button>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="flex items-center gap-1">
+                <Settings className="h-4 w-4" />
+                <span className="hidden sm:inline">Management</span>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsRoleManagementOpen(true)}>
+                Role & Permission Management
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsPerformanceReportsOpen(true)}>
+                Performance Reports
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={exportStaffList}>
+                Export Staff Data
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          
+          <Button className="flex items-center gap-2" onClick={handleAddStaffClick}>
+            <UserPlus className="h-4 w-4" />
+            <span>Add Staff Member</span>
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="table" onValueChange={(value) => setViewMode(value as "table" | "analytics")}>
@@ -264,9 +301,9 @@ export function StaffList() {
               availableStatuses={uniqueStatuses}
             />
 
-            <Button variant="outline" size="sm" onClick={exportStaffList}>
-              <Download className="h-4 w-4 mr-1" />
-              Export
+            <Button variant="outline" size="sm" onClick={() => setIsPerformanceReportsOpen(true)}>
+              <FileLineChart className="h-4 w-4 mr-1" />
+              Reports
             </Button>
           </div>
         </div>
@@ -342,6 +379,7 @@ export function StaffList() {
                               variant="ghost" 
                               size="icon"
                               title="View Details"
+                              onClick={() => handleViewProfileClick(staff)}
                             >
                               <Eye className="h-4 w-4" />
                             </Button>
@@ -361,7 +399,7 @@ export function StaffList() {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                <DropdownMenuItem>View Profile</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleViewProfileClick(staff)}>View Profile</DropdownMenuItem>
                                 <DropdownMenuItem>View Performance</DropdownMenuItem>
                                 <DropdownMenuItem>Assign Tasks</DropdownMenuItem>
                                 <DropdownMenuSeparator />
@@ -418,6 +456,22 @@ export function StaffList() {
         staffMember={selectedMember}
         onClose={() => setIsDeleteDialogOpen(false)}
         onSuccess={handleDeleteSuccess}
+      />
+
+      <StaffProfileView
+        isOpen={isProfileViewOpen}
+        onClose={() => setIsProfileViewOpen(false)}
+        staffMember={selectedMember}
+      />
+
+      <RoleManagement
+        isOpen={isRoleManagementOpen}
+        onClose={() => setIsRoleManagementOpen(false)}
+      />
+
+      <PerformanceReports
+        isOpen={isPerformanceReportsOpen}
+        onClose={() => setIsPerformanceReportsOpen(false)}
       />
     </div>
   );

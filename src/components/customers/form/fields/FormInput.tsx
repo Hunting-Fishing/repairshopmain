@@ -6,7 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 import { ValidationStatus } from "../../ValidationStatus";
 import { validateEmail, validatePhoneNumber } from "@/utils/validation/fieldValidation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { HelpCircle } from "lucide-react";
 import {
   Tooltip,

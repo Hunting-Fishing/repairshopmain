@@ -9,6 +9,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarSettingsFormValues } from "../calendar/settings/types";
 import { cn } from "@/lib/utils";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface CalendarSectionProps {
   selectedDate: Date;
@@ -101,7 +104,18 @@ export function CalendarSection({
         />
       </CardHeader>
       <CardContent>
-        {renderCalendarView()}
+        <ErrorBoundary
+          fallback={
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                An error occurred while displaying the calendar. Please try refreshing the page.
+              </AlertDescription>
+            </Alert>
+          }
+        >
+          {renderCalendarView()}
+        </ErrorBoundary>
       </CardContent>
     </Card>
   );

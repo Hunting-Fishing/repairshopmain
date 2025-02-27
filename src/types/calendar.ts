@@ -58,6 +58,9 @@ export interface Booking {
     sms: boolean;
     push: boolean;
   };
+  is_multi_day?: boolean;
+  sequence_number?: number;
+  remaining_minutes?: number;
 }
 
 export interface TimeSlot {
@@ -68,8 +71,8 @@ export interface TimeSlot {
 
 export interface CalendarViewProps {
   date: Date;
-  bookings: Booking[];
-  isLoading: boolean;
+  bookings?: Booking[];
+  isLoading?: boolean;
   onTimeSlotClick: (start: Date, end: Date) => void;
   workingHours?: {
     start: number;

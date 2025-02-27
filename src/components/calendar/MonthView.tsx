@@ -9,7 +9,7 @@ import { DayCell } from "./DayCell";
 
 export function MonthView({
   date,
-  bookings,
+  bookings = [],
   isLoading,
   onTimeSlotClick,
 }: CalendarViewProps) {
@@ -29,6 +29,10 @@ export function MonthView({
         ))}
       </div>
     );
+  }
+
+  if (!date) {
+    return <div>Please select a date to view the calendar.</div>;
   }
 
   const days = eachDayOfInterval({
@@ -52,7 +56,7 @@ export function MonthView({
             day={day}
             currentDate={date}
             currentTime={currentTime}
-            bookings={bookings}
+            bookings={bookings || []}
             onTimeSlotClick={onTimeSlotClick}
             pastColor={selectedPastColor[0]}
           />

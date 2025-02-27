@@ -12,146 +12,92 @@ import {
   TimeSlotData 
 } from "./utils/timeSlotUtils";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
-import { LoadingScreen } from "../dashboard/components/LoadingScreen";
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { Badge } from "../ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export function DayView({
   date,
-  bookings,
+  bookings = [],
   isLoading,
   onTimeSlotClick,
+  workingHours = { start: 8, end: 18 },
+  use24HourTime = false,
 }: CalendarViewProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedPastColor, setSelectedPastColor] = useState<[string, string]>([PAST_APPOINTMENT_COLORS[0], `${PAST_APPOINTMENT_COLORS[0]}80`]);
   const [timeSlots, setTimeSlots] = useState<TimeSlotData[]>([]);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const parentRef = React.useRef<HTMLDivElement>(null);
-
-  // Memoize time slots generation
-  const generateTimeSlotsCallback = useCallback(async () => {
-    setIsLoadingSlots(true);
-    setError(null);
-    try {
-      const slots = await generateTimeSlots(date, bookings);
-      setTimeSlots(slots);
-    } catch (error) {
-      console.error('Error generating time slots:', error);
-      setError(error instanceof Error ? error : new Error('Failed to load time slots'));
-    } finally {
-      setIsLoadingSlots(false);
-    }
-  }, [date, bookings]);
-
-  // Update current time every minute with debounce
+  // Update current time every minute
   useEffect(() => {
-    const updateCurrentTime = () => {
-      const now = new Date();
-      if (Math.abs(now.getTime() - currentTime.getTime()) >= 60000) {
-        setCurrentTime(now);
-      }
-    };
-    const interval = setInterval(updateCurrentTime, 60000);
+    const interval = setInterval(() => setCurrentTime(new Date()), 60000);
     return () => clearInterval(interval);
-  }, [currentTime]);
+  }, []);
 
   // Generate time slots when date or bookings change
   useEffect(() => {
-    generateTimeSlotsCallback();
-  }, [generateTimeSlotsCallback]);
+    const fetchTimeSlots = async () => {
+      try {
+        if (!date) return;
+        const slots = await generateTimeSlots(date, bookings || []);
+        setTimeSlots(slots);
+      } catch (error) {
+        console.error('Error generating time slots:', error);
+      }
+    };
+    
+    fetchTimeSlots();
+  }, [date, bookings]);
 
-  // Memoize virtualizer configuration
-  const estimateSize = useCallback(() => 64, []);
-  
-  const virtualizer = useVirtualizer({
-    count: timeSlots.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize,
-    overscan: 5,
-  });
-
-  const renderMultiDayIndicator = useCallback((booking: any) => {
-    if (!booking.is_multi_day) return null;
+  if (isLoading) {
     return (
-      <Badge 
-        variant="secondary" 
-        className="ml-2 text-xs animate-fade-in"
-      >
-        {booking.sequence_number > 1 ? 'Continued' : 'Multi-day'} 
-        {booking.remaining_minutes ? ` (${Math.ceil(booking.remaining_minutes / 60)}h remaining)` : ''}
-      </Badge>
-    );
-  }, []);
-
-  if (isLoading || isLoadingSlots) {
-    return (
-      <div className="space-y-4 transition-all duration-300 ease-in-out animate-fade-in">
-        <div className="h-[calc(100vh-320px)] min-h-[500px] max-h-[800px] overflow-hidden rounded-lg border">
-          <LoadingScreen />
-        </div>
+      <div className="space-y-4">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Skeleton key={i} className="h-20 w-full" />
+        ))}
       </div>
     );
   }
 
-  if (error) {
-    throw error;
+  if (!timeSlots.length) {
+    return (
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          No time slots available for this date. Please try another date.
+        </AlertDescription>
+      </Alert>
+    );
   }
 
   return (
-    <ErrorBoundary>
-      <div className="space-y-4 transition-all duration-300 ease-in-out">
-        <div 
-          ref={parentRef}
-          className="h-[calc(100vh-320px)] min-h-[500px] max-h-[800px] overflow-y-auto backdrop-blur-sm bg-background/95 rounded-lg border shadow-sm transition-all duration-300"
-          style={{ willChange: 'transform' }}
-        >
-          <div
-            style={{
-              height: `${virtualizer.getTotalSize()}px`,
-              width: '100%',
-              position: 'relative',
-            }}
-            className="transition-all duration-300"
+    <div className="space-y-4">
+      <ColorPalette 
+        selectedColors={selectedPastColor}
+        onColorSelect={setSelectedPastColor}
+        activeColorIndex={0}
+        onActiveColorChange={() => {}}
+      />
+      <div className="space-y-4">
+        {timeSlots.map((slot) => (
+          <TimeSlot
+            key={slot.time.toISOString()}
+            isPast={isPastTimeSlot(slot.time, currentTime)}
+            isCurrentTimeSlot={isCurrentTimeSlot(slot.time, slot.end, currentTime)}
+            hasBookings={slot.bookings.length > 0}
+            pastColors={selectedPastColor}
+            onClick={() => onTimeSlotClick(slot.time, slot.end)}
+            startTime={slot.time}
+            endTime={slot.end}
+            className="flex min-h-[4rem] items-start gap-4 rounded-lg border p-3"
           >
-            {virtualizer.getVirtualItems().map((virtualItem) => {
-              const slot = timeSlots[virtualItem.index];
-              return (
-                <div
-                  key={virtualItem.key}
-                  data-index={virtualItem.index}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: `${virtualItem.size}px`,
-                    transform: `translateY(${virtualItem.start}px)`,
-                    willChange: 'transform',
-                  }}
-                  className="transition-transform duration-300 ease-in-out animate-fade-in"
-                >
-                  <TimeSlot
-                    isPast={isPastTimeSlot(slot.time, currentTime)}
-                    isCurrentTimeSlot={isCurrentTimeSlot(slot.time, slot.end, currentTime)}
-                    hasBookings={slot.bookings.length > 0}
-                    pastColors={[PAST_APPOINTMENT_COLORS[0], PAST_APPOINTMENT_COLORS[1]]}
-                    onClick={() => onTimeSlotClick(slot.time, slot.end)}
-                    className="flex min-h-[4rem] items-start gap-4 rounded-lg border p-3 m-1 transition-all duration-300 hover:shadow-md"
-                  >
-                    <TimeSlotContent
-                      slot={slot}
-                      isPast={isPastTimeSlot(slot.time, currentTime)}
-                      pastColors={[PAST_APPOINTMENT_COLORS[0], PAST_APPOINTMENT_COLORS[1]]}
-                      renderExtra={(booking) => renderMultiDayIndicator(booking)}
-                    />
-                  </TimeSlot>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+            <TimeSlotContent
+              slot={slot}
+              isPast={isPastTimeSlot(slot.time, currentTime)}
+              pastColors={selectedPastColor}
+            />
+          </TimeSlot>
+        ))}
       </div>
-    </ErrorBoundary>
+    </div>
   );
 }

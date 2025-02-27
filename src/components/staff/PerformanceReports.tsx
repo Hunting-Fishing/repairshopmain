@@ -219,7 +219,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
-                    <div className="text-2xl font-semibold leading-none tracking-tight">Report Format</div>
+                    <CardTitle>Report Format</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
                 
                 <Card>
                   <CardHeader className="pb-2">
-                    <div className="text-2xl font-semibold leading-none tracking-tight">Top Performer</div>
+                    <CardTitle>Top Performer</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">John D.</div>
@@ -249,7 +249,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
                 
                 <Card>
                   <CardHeader className="pb-2">
-                    <div className="text-2xl font-semibold leading-none tracking-tight">Team Average</div>
+                    <CardTitle>Team Average</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">82%</div>

@@ -1,46 +1,34 @@
 
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { StaffMemberData } from "@/components/staff/staff-details/types";
-
-export type UpdateStaffMemberData = StaffMemberData;
+import type { StaffMember } from "@/types/staff";
 
 export function useUpdateStaffMember() {
-  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  const updateStaffMember = async (data: UpdateStaffMemberData) => {
-    setIsLoading(true);
-    try {
-      const { error } = await supabase
+  const { mutateAsync: updateStaffMember } = useMutation({
+    mutationFn: async (params: { id: string; updates: Partial<StaffMember> }) => {
+      const { data, error } = await supabase
         .from("profiles")
         .update({
-          first_name: data.first_name,
-          last_name: data.last_name,
-          phone_number: data.phone_number,
-          notes: data.notes,
-          emergency_contact: data.emergency_contact,
-          skills: data.skills,
+          first_name: params.updates.first_name,
+          last_name: params.updates.last_name,
+          role: params.updates.role,
+          phone_number: params.updates.phone_number,
+          status: params.updates.status
         })
-        .eq("id", data.id);
+        .eq("id", params.id);
 
       if (error) throw error;
-
-      toast.success("Staff member updated successfully");
+      return data;
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["staff-members"] });
-      queryClient.invalidateQueries({ queryKey: ["staff-member", data.id] });
-      
-      return true;
-    } catch (error) {
-      console.error("Error updating staff member:", error);
-      toast.error(error.message || "Failed to update staff member");
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
-  return { updateStaffMember, isLoading };
+  return { 
+    updateStaffMember: (id: string, updates: Partial<StaffMember>) => 
+      updateStaffMember({ id, updates }) 
+  };
 }

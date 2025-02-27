@@ -1,21 +1,13 @@
 
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { RadioGroup } from "@/components/ui/radio-group";
 import { cn } from "@/lib/utils";
-import { Building2, Users2, Store } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { CustomerTypeOptionItem } from "./customer-type/CustomerTypeOption";
+import { defaultOptions, CustomerTypeOption } from "./customer-type/options";
+import { useCustomerType } from "./customer-type/useCustomerType";
 import { BusinessDetailsSection } from "./BusinessDetailsSection";
-
-interface CustomerTypeOption {
-  value: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  description?: string;
-}
 
 interface CustomerTypeSectionProps {
   form: UseFormReturn<CustomerFormValues>;
@@ -25,27 +17,6 @@ interface CustomerTypeSectionProps {
   isModernTheme?: boolean;
 }
 
-const defaultOptions: CustomerTypeOption[] = [
-  {
-    value: "Personal",
-    label: "Personal Account",
-    icon: Users2,
-    description: "For individual customers"
-  },
-  {
-    value: "Business",
-    label: "Business Account",
-    icon: Building2,
-    description: "For business customers"
-  },
-  {
-    value: "Fleet",
-    label: "Fleet Account",
-    icon: Store,
-    description: "For fleet management customers"
-  }
-];
-
 export function CustomerTypeSection({
   form,
   title = "Account Type",
@@ -53,72 +24,7 @@ export function CustomerTypeSection({
   options = defaultOptions,
   isModernTheme = false
 }: CustomerTypeSectionProps) {
-  const customerType = form.watch("customer_type");
-  const businessClassification = form.watch("business_classification_id");
-  const { toast } = useToast();
-  const isInitialMount = useRef(true);
-  const previousType = useRef(customerType);
-  const [showOtherField, setShowOtherField] = useState(false);
-
-  // Reset business fields when changing away from business type
-  useEffect(() => {
-    if (!isInitialMount.current && previousType.current === "Business" && customerType !== "Business") {
-      form.setValue("company_name", "");
-      form.setValue("business_classification_id", "");
-      form.setValue("business_classification_other", "");
-      form.setValue("tax_number", "");
-      form.clearErrors(["company_name", "business_classification_id", "tax_number"]);
-      setShowOtherField(false);
-    }
-    
-    previousType.current = customerType;
-  }, [customerType, form]);
-
-  // Handle business classification changes
-  useEffect(() => {
-    setShowOtherField(businessClassification === "other");
-    if (businessClassification !== "other") {
-      form.setValue("business_classification_other", "");
-    }
-  }, [businessClassification, form]);
-
-  // Save other classification to database
-  const saveOtherClassification = async (otherValue: string) => {
-    if (businessClassification === "other" && otherValue) {
-      try {
-        const customerId = form.getValues("id");
-        // Get organization_id from profile
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("No authenticated user");
-
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('organization_id')
-          .eq('id', user.id)
-          .single();
-
-        if (!profile?.organization_id) throw new Error("No organization found");
-
-        const { error } = await supabase
-          .from('business_classification_others')
-          .insert({
-            customer_id: customerId,
-            classification_type: "business",
-            other_description: otherValue,
-            organization_id: profile.organization_id
-          });
-
-        if (error) throw error;
-      } catch (error) {
-        console.error("Error saving other classification:", error);
-        toast({
-          title: "Error saving classification",
-          description: "There was an error saving the other classification",
-          variant: "destructive"
-        });
-      }
-    }
-  };
+  const { customerType, showOtherField, saveOtherClassification } = useCustomerType(form);
 
   return (
     <div className="w-full max-w-md mx-auto p-4">
@@ -143,70 +49,23 @@ export function CustomerTypeSection({
         <FormField
           control={form.control}
           name="customer_type"
-          rules={{
-            required: "Please select a customer type"
-          }}
+          rules={{ required: "Please select a customer type" }}
           render={({ field }) => (
             <FormItem className="space-y-3">
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="grid gap-4 pt-2"
-                >
-                  {options.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <FormItem
-                        key={option.value}
-                        className={cn(
-                          "flex items-center space-x-3 space-y-0 rounded-lg border p-4",
-                          "transition-all duration-200",
-                          field.value === option.value
-                            ? isModernTheme
-                              ? "border-orange-500 bg-orange-50/50"
-                              : "border-orange-200 bg-orange-50/30"
-                            : "hover:border-gray-300"
-                        )}
-                      >
-                        <FormControl>
-                          <RadioGroupItem value={option.value} />
-                        </FormControl>
-                        <div className="flex-1 space-y-1">
-                          <FormLabel className="flex items-center gap-2">
-                            <Icon 
-                              className={cn(
-                                "h-4 w-4",
-                                field.value === option.value
-                                  ? "text-orange-500"
-                                  : "text-gray-500"
-                              )} 
-                            />
-                            <span className={cn(
-                              "font-medium",
-                              field.value === option.value
-                                ? "text-orange-900"
-                                : "text-gray-900"
-                            )}>
-                              {option.label}
-                            </span>
-                          </FormLabel>
-                          {option.description && (
-                            <p className={cn(
-                              "text-sm",
-                              field.value === option.value
-                                ? "text-orange-700"
-                                : "text-gray-500"
-                            )}>
-                              {option.description}
-                            </p>
-                          )}
-                        </div>
-                      </FormItem>
-                    );
-                  })}
-                </RadioGroup>
-              </FormControl>
+              <RadioGroup
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                className="grid gap-4 pt-2"
+              >
+                {options.map((option) => (
+                  <CustomerTypeOptionItem
+                    key={option.value}
+                    option={option}
+                    isSelected={field.value === option.value}
+                    isModernTheme={isModernTheme}
+                  />
+                ))}
+              </RadioGroup>
               <FormMessage className="text-red-500 text-sm" />
             </FormItem>
           )}

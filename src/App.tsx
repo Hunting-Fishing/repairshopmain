@@ -18,6 +18,7 @@ import Index from "@/pages/Index";
 import Inventory from "@/pages/Inventory";
 import Vehicles from "@/pages/Vehicles";
 import ShopItems from "@/pages/ShopItems";
+import SystemAlerts from "@/pages/SystemAlerts";
 import { Loader2, Users } from "lucide-react";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useEffect } from "react";
@@ -180,6 +181,16 @@ function App() {
                         } 
                       />
                       
+                      {/* System Alerts route - using the actual component */}
+                      <Route 
+                        path="/alerts" 
+                        element={
+                          <ProtectedRoute>
+                            <SystemAlerts />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      
                       {/* Add routes for other non-working sidebar items */}
                       <Route 
                         path="/calendar" 
@@ -194,14 +205,6 @@ function App() {
                         element={
                           <ProtectedRoute>
                             <StaffPage />
-                          </ProtectedRoute>
-                        } 
-                      />
-                      <Route 
-                        path="/alerts" 
-                        element={
-                          <ProtectedRoute>
-                            <PlaceholderPage title="System Alerts" />
                           </ProtectedRoute>
                         } 
                       />

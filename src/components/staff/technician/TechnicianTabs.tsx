@@ -7,11 +7,11 @@ import { TechnicianSpecialties } from "./TechnicianSpecialties";
 import { TechnicianAvailability } from "./TechnicianAvailability";
 import { TechnicianHeader } from "./components/TechnicianHeader";
 import { TechnicianTabsList } from "./components/TechnicianTabsList";
-import { useTechnicianTabs } from "./hooks/useTechnicianTabs";
+import { useTechnicianForm } from "./hooks/useTechnicianForm";
 import { RoleManagement } from "../RoleManagement";
 
 export default function TechnicianTabs() {
-  const form = useTechnicianTabs();
+  const form = useTechnicianForm();
   const [isRoleManagementOpen, setIsRoleManagementOpen] = useState(false);
 
   return (

@@ -1,27 +1,9 @@
 
 import { UseFormReturn } from "react-hook-form";
-import { Form } from "@/components/ui/form";
-
-interface TechnicianSettingsFormValues {
-  showTechnicianWorkload: boolean;
-  showTechnicianAvailability: boolean;
-  showTechnicianStats: boolean;
-  enableAutoAssignment: boolean;
-  enableTechnicianSpecialties: boolean;
-  technicianScheduleConflictHandling: string;
-  enableTechnicianColors: boolean;
-  technicianViewMode: string;
-  maxDailyBookings: number;
-  preferredWorkTypes: string[];
-  autoAssignmentPreferences: {
-    considerSpecialties: boolean;
-    considerWorkload: boolean;
-    considerLocation: boolean;
-  };
-}
+import { TechnicianFormValues } from "./hooks/useTechnicianForm";
 
 interface TechnicianSettingsProps {
-  form: UseFormReturn<TechnicianSettingsFormValues>;
+  form: UseFormReturn<TechnicianFormValues>;
 }
 
 export function TechnicianSettings({ form }: TechnicianSettingsProps) {

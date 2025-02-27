@@ -1,36 +1,61 @@
 
 import { CustomerFormValues, CustomerType } from "../types/customerTypes";
 
+interface ValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
 export class CustomerValidationService {
   static validateRequiredFields(data: CustomerFormValues): void {
-    const baseValidation = this.validateBaseFields(data);
-    const typeSpecificValidation = this.validateByCustomerType(data);
-    
-    if (!baseValidation.isValid) throw new Error(baseValidation.error);
-    if (!typeSpecificValidation.isValid) throw new Error(typeSpecificValidation.error);
+    const validationResults = [
+      this.validateBaseFields(data),
+      this.validateByCustomerType(data)
+    ];
+
+    const failedValidation = validationResults.find(result => !result.isValid);
+    if (failedValidation) {
+      throw new Error(failedValidation.error);
+    }
   }
 
-  private static validateBaseFields(data: CustomerFormValues): { isValid: boolean; error?: string } {
-    if (!data.first_name || !data.last_name) {
-      return {
-        isValid: false,
-        error: "First name and last name are required"
-      };
+  private static validateBaseFields(data: CustomerFormValues): ValidationResult {
+    const requiredBaseFields = {
+      first_name: "First name",
+      last_name: "Last name"
+    };
+
+    for (const [field, label] of Object.entries(requiredBaseFields)) {
+      if (!data[field as keyof CustomerFormValues]) {
+        return {
+          isValid: false,
+          error: `${label} is required`
+        };
+      }
     }
+
     return { isValid: true };
   }
 
-  private static validateByCustomerType(data: CustomerFormValues): { isValid: boolean; error?: string } {
-    const validationMap: Record<CustomerType, () => { isValid: boolean; error?: string }> = {
-      'Business': () => this.validateBusinessCustomer(data),
-      'Fleet': () => this.validateFleetCustomer(data),
+  private static validateByCustomerType(data: CustomerFormValues): ValidationResult {
+    const validators: Record<CustomerType, (data: CustomerFormValues) => ValidationResult> = {
+      'Business': this.validateBusinessCustomer,
+      'Fleet': this.validateFleetCustomer,
       'Personal': () => ({ isValid: true })
     };
 
-    return validationMap[data.customer_type]();
+    const validator = validators[data.customer_type];
+    if (!validator) {
+      return {
+        isValid: false,
+        error: "Invalid customer type"
+      };
+    }
+
+    return validator(data);
   }
 
-  private static validateBusinessCustomer(data: CustomerFormValues): { isValid: boolean; error?: string } {
+  private static validateBusinessCustomer(data: CustomerFormValues): ValidationResult {
     if (!data.company_name) {
       return {
         isValid: false,
@@ -46,7 +71,7 @@ export class CustomerValidationService {
     return { isValid: true };
   }
 
-  private static validateFleetCustomer(data: CustomerFormValues): { isValid: boolean; error?: string } {
+  private static validateFleetCustomer(data: CustomerFormValues): ValidationResult {
     if (!data.company_name) {
       return {
         isValid: false,

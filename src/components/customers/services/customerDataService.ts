@@ -2,6 +2,17 @@
 import { CustomerFormValues, CustomerType } from "../types/customerTypes";
 import { supabase } from "@/integrations/supabase/client";
 
+interface UserData {
+  userData: {
+    user: {
+      id: string;
+    };
+  };
+  profileData: {
+    organization_id: string;
+  };
+}
+
 export class CustomerDataService {
   static async prepareDataForSave(data: Partial<CustomerFormValues>, customerId: string) {
     const { userData, profileData } = await this.getUserData();
@@ -9,7 +20,7 @@ export class CustomerDataService {
     return this.addTypeSpecificFields(data.customer_type as CustomerType, baseFields, data);
   }
 
-  private static async getUserData() {
+  private static async getUserData(): Promise<UserData> {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) throw new Error("Not authenticated");
 
@@ -30,7 +41,7 @@ export class CustomerDataService {
     userId: string,
     organizationId: string
   ) {
-    return {
+    const baseFields = {
       id: customerId,
       organization_id: organizationId,
       customer_type: data.customer_type,
@@ -49,6 +60,10 @@ export class CustomerDataService {
       updated_by: userId,
       updated_at: new Date().toISOString()
     };
+
+    return Object.fromEntries(
+      Object.entries(baseFields).filter(([_, value]) => value !== undefined)
+    );
   }
 
   private static addTypeSpecificFields(

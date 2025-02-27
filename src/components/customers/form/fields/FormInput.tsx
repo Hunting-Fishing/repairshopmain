@@ -46,7 +46,8 @@ interface FormInputProps {
   required?: boolean;
   readOnly?: boolean;
   helpText?: string;
-  icon?: React.ReactNode; // Add this line to accept an icon prop
+  icon?: React.ReactNode;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 export function FormInput({
@@ -59,7 +60,8 @@ export function FormInput({
   required = false,
   readOnly = false,
   helpText,
-  icon // Add this to the destructured props
+  icon,
+  onBlur
 }: FormInputProps) {
   const [shake, setShake] = useState(false);
   const error = form.formState.errors[name as keyof CustomerFormValues];
@@ -92,6 +94,9 @@ export function FormInput({
       setTimeout(() => setShake(false), 650);
     }
     form.register(name).onBlur(event);
+    if (onBlur) {
+      onBlur(event);
+    }
   };
 
   const validation = (() => {

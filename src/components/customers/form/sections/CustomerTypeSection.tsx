@@ -1,3 +1,4 @@
+
 import { UseFormReturn } from "react-hook-form";
 import { CustomerFormValues } from "../../types/customerTypes";
 import { FormSection } from "../FormSection";
@@ -99,14 +100,14 @@ export function CustomerTypeSection({
         if (form.getValues("customer_type") === "Business") {
           const companyName = form.getValues("company_name");
           const businessClassification = form.getValues("business_classification_id");
-          const otherClassification = form.getValues("business_classification_other");
+          const otherClassificationValue = form.getValues("business_classification_other");
           const taxNumber = form.getValues("tax_number");
           
           const missingFields = [];
           if (!companyName) missingFields.push("Company Name");
           if (!businessClassification) missingFields.push("Business Classification");
           if (!taxNumber) missingFields.push("Tax #");
-          if (businessClassification === "other" && !otherClassification) {
+          if (businessClassification === "other" && !otherClassificationValue) {
             missingFields.push("Other Classification Description");
           }
 
@@ -157,11 +158,12 @@ export function CustomerTypeSection({
                 const companyName = form.getValues("company_name");
                 const businessClassification = form.getValues("business_classification_id");
                 const taxNumber = form.getValues("tax_number");
+                const otherClassificationValue = form.getValues("business_classification_other");
                 
                 if (!companyName || !businessClassification || !taxNumber) {
                   return "Please complete all required business information";
                 }
-                if (businessClassification === "other" && !otherClassification) {
+                if (businessClassification === "other" && !otherClassificationValue) {
                   return "Please provide a description for Other classification";
                 }
               }

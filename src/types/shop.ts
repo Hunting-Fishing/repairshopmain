@@ -1,20 +1,33 @@
 
-export type ProductCategory = {
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  stock: number;
+  status: 'active' | 'low' | 'outOfStock';
+  image?: string;
+}
+
+export interface ProductCategory {
   id: string;
   name: string;
   keywords: string[];
-  directLinks?: Array<{
-    url: string;
-    title?: string;
-    description?: string;
-    asin?: string;
-  }>;
-};
+  directLinks?: AffiliateLink[];
+}
 
-export type FeaturedProduct = {
+export interface AffiliateLink {
+  url: string;
+  asin?: string;
   title: string;
-  description?: string;
-  image?: string;
+  description: string;
+}
+
+export interface FeaturedProduct {
+  title: string;
+  description: string;
   price?: string;
-  url?: string;
+  image?: string;
+  url: string;
 }

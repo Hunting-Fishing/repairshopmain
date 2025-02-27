@@ -10,7 +10,8 @@ export const validationMessages = {
     company_size: "Company size is required for business customers",
     business_classification_id: "Business classification is required for business customers",
     company_name: "Company name is required for business customers",
-    phone_number: "Phone number is required"
+    phone_number: "Phone number is required",
+    address_required: "Address is required"
   },
   format: {
     email: "Please enter a valid email address",

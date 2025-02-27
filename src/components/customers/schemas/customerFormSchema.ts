@@ -15,12 +15,6 @@ const validatePhoneWithRegion = (phone: string, region?: string) => {
   }
 };
 
-// Helper to validate company name
-const validateCompanyName = (value: string | undefined) => {
-  if (!value) return false;
-  return value.length >= 2 && value.length <= 100;
-};
-
 // Base schema with common fields for all customer types
 const baseSchema = {
   first_name: z.string().min(1, validationMessages.required.first_name),
@@ -34,7 +28,6 @@ const baseSchema = {
   country: z.string({
     required_error: validationMessages.required.country,
   }).min(1, validationMessages.required.country),
-  customer_type: z.enum(["Personal", "Fleet", "Business"]),
   language_preference: z.string().optional(),
   timezone: z.string({
     required_error: validationMessages.required.timezone,
@@ -42,36 +35,47 @@ const baseSchema = {
   id: z.string().optional()
 };
 
-// Personal customer schema
-const personalSchema = z.object(baseSchema);
+// Personal customer schema (base schema only)
+const personalSchema = z.object({
+  ...baseSchema,
+  customer_type: z.literal("Personal"),
+  company_name: z.string().optional(),
+  business_classification_id: z.string().optional(),
+  company_size: z.string().optional(),
+  fleet_details: z.any().optional()
+});
 
-// Business customer schema
+// Business customer schema (includes business-specific fields)
 const businessSchema = z.object({
   ...baseSchema,
+  customer_type: z.literal("Business"),
   company_name: z.string().min(2, "Company name is required and must be at least 2 characters"),
   business_classification_id: z.string().min(1, "Business classification is required"),
-  tax_number: z.string().optional(),
-  pst_number: z.string().optional()
+  company_size: z.string().min(1, "Company size is required"),
+  fleet_details: z.any().optional()
 });
 
 // Fleet customer schema
 const fleetSchema = z.object({
   ...baseSchema,
+  customer_type: z.literal("Fleet"),
   company_name: z.string().min(2, "Fleet name is required"),
+  business_classification_id: z.string().optional(),
+  company_size: z.string().optional(),
   fleet_details: z.object({
     account_number: z.string().optional(),
     vehicle_count: z.number().min(1, "Number of vehicles is required"),
     manager_name: z.string().min(1, "Fleet manager name is required"),
     manager_contact: z.string().min(1, "Manager contact is required"),
     service_schedule: z.string().optional()
-  }).optional()
+  }).optional(),
 });
 
 // Combined schema that validates based on customer type
 export const customerFormSchema = z.discriminatedUnion("customer_type", [
-  personalSchema.extend({ customer_type: z.literal("Personal") }),
-  businessSchema.extend({ customer_type: z.literal("Business") }),
-  fleetSchema.extend({ customer_type: z.literal("Fleet") })
+  personalSchema,
+  businessSchema,
+  fleetSchema
 ]);
 
 export const debouncedValidation = (data: any) => {

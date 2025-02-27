@@ -91,16 +91,16 @@ export default function Index() {
 
   return (
     <ErrorBoundaryWrapper>
-      <Suspense fallback={<LoadingScreen />}>
-        <StatsProvider>
+      <StatsProvider>
+        <Suspense fallback={<LoadingScreen />}>
           <DashboardContextProvider>
             <main className="min-h-screen">
               <DemoButtons session={session} />
               <DashboardLayout />
             </main>
           </DashboardContextProvider>
-        </StatsProvider>
-      </Suspense>
+        </Suspense>
+      </StatsProvider>
     </ErrorBoundaryWrapper>
   );
 }

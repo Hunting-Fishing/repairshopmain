@@ -42,7 +42,7 @@ export function StaffDetailsForm({ staffMember, onClose }: StaffDetailsFormProps
         skills: values.skills ?? []
       };
 
-      await updateStaffMember(updateData);
+      await updateStaffMember(staffMember.id, updateData);
       toast.success("Staff member updated successfully");
       onClose();
     } catch (error) {

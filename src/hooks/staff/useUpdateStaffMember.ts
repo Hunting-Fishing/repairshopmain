@@ -6,7 +6,7 @@ import type { StaffMember } from "@/types/staff";
 export function useUpdateStaffMember() {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: updateStaffMember } = useMutation({
+  const { mutateAsync: updateStaffMemberAsync, isPending } = useMutation({
     mutationFn: async (params: { id: string; updates: Partial<StaffMember> }) => {
       const { data, error } = await supabase
         .from("profiles")
@@ -29,6 +29,7 @@ export function useUpdateStaffMember() {
 
   return { 
     updateStaffMember: (id: string, updates: Partial<StaffMember>) => 
-      updateStaffMember({ id, updates }) 
+      updateStaffMemberAsync({ id, updates }),
+    isLoading: isPending
   };
 }

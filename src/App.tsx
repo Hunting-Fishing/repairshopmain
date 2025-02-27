@@ -16,6 +16,9 @@ import CustomerManagement from "@/pages/CustomerManagement";
 import WorkOrders from "@/pages/WorkOrders";
 import Index from "@/pages/Index";
 import { Loader2 } from "lucide-react";
+import { useIsMobile } from "./hooks/use-mobile";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -30,6 +33,16 @@ const queryClient = new QueryClient({
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { session, isLoading } = useAuth();
+  const isMobile = useIsMobile();
+  
+  useEffect(() => {
+    // Add a class to the body when on mobile
+    if (isMobile) {
+      document.body.classList.add('is-mobile-device');
+    } else {
+      document.body.classList.remove('is-mobile-device');
+    }
+  }, [isMobile]);
   
   if (isLoading) {
     return (
@@ -44,6 +57,26 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
   
   return <>{children}</>;
+}
+
+// Placeholder component for routes that are not yet implemented
+function PlaceholderPage({ title }: { title: string }) {
+  useEffect(() => {
+    toast.info(`${title} page is under development`);
+  }, [title]);
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-6">
+      <h1 className="text-3xl font-bold mb-4">{title}</h1>
+      <p className="text-lg text-muted-foreground mb-8">This page is under development</p>
+      <div className="p-6 border rounded-lg bg-background max-w-lg w-full">
+        <h2 className="text-xl font-semibold mb-4">Coming Soon</h2>
+        <p className="mb-4">
+          The {title.toLowerCase()} functionality is still being built. Check back soon for updates!
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function App() {
@@ -105,6 +138,72 @@ function App() {
                         element={
                           <ProtectedRoute>
                             <WorkOrders />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      
+                      {/* Add routes for previously non-working sidebar items */}
+                      <Route 
+                        path="/calendar" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="Calendar" />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/vehicles" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="Vehicles" />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/staff" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="Staff" />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/shop-items" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="Shop Items" />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/inventory" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="Inventory" />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/alerts" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="System Alerts" />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/job-templates" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="Job Templates" />
+                          </ProtectedRoute>
+                        } 
+                      />
+                      <Route 
+                        path="/application-control/*" 
+                        element={
+                          <ProtectedRoute>
+                            <PlaceholderPage title="Settings" />
                           </ProtectedRoute>
                         } 
                       />

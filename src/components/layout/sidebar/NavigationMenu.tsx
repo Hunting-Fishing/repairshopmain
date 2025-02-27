@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,12 +21,13 @@ interface NavigationMenuProps {
 
 export function NavigationMenu({ additionalItems = [], unreadCount, onChatClick }: NavigationMenuProps) {
   const menuItems = [...getBaseMenuItems(), ...additionalItems];
+  const location = useLocation();
 
   return (
     <SidebarMenu>
       {menuItems.map((item) => (
         <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild>
+          <SidebarMenuButton asChild isActive={location.pathname === item.path}>
             <Link to={item.path} className="flex items-center gap-3">
               <item.icon className="h-4 w-4" />
               <span>{item.title}</span>
@@ -36,7 +37,7 @@ export function NavigationMenu({ additionalItems = [], unreadCount, onChatClick 
       ))}
 
       <SidebarMenuItem>
-        <SidebarMenuButton asChild>
+        <SidebarMenuButton asChild isActive={location.pathname.includes("/application-control/communications")}>
           <Link 
             to="/application-control/communications" 
             className="flex items-center gap-3 relative"

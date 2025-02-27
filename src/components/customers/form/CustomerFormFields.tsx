@@ -6,14 +6,7 @@ import { useCustomerDataSave } from "../hooks/useCustomerDataSave";
 import { useCustomerAutosave } from "../hooks/useCustomerAutosave";
 import { useToast } from "@/hooks/use-toast";
 import { FormNotifications } from "./components/FormNotifications";
-import { CustomerTypeContent } from "./components/CustomerTypeContent";
-import { CustomerTypeSection } from "./sections/CustomerTypeSection";
-import { BasicInformationSection } from "./sections/BasicInformationSection";
-import { PrimaryAddressSection } from "./sections/PrimaryAddressSection";
-import { PreferencesSection } from "./sections/PreferencesSection";
-import { SocialProfilesSection } from "./sections/SocialProfilesSection";
-import { AddressBookSection } from "./sections/AddressBookSection";
-import { ProfileCompletenessSection } from "./sections/ProfileCompletenessSection";
+import { CustomerFormContent } from "./components/CustomerFormContent";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,19 +37,6 @@ export function CustomerFormFields({
   const customerType = form.watch("customer_type");
   const dirtyFields = Object.keys(form.formState.dirtyFields).length;
 
-  // Show warning when navigating away with unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isDirty) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isDirty]);
-
   useEffect(() => {
     if (!customerType) {
       toast({
@@ -75,10 +55,6 @@ export function CustomerFormFields({
     return () => subscription.unsubscribe();
   }, [form, calculateProfileCompleteness]);
 
-  const handleDiscardChanges = () => {
-    setShowDiscardDialog(true);
-  };
-
   return (
     <div className="space-y-8">
       <FormNotifications 
@@ -88,19 +64,12 @@ export function CustomerFormFields({
         dirtyFields={dirtyFields}
       />
 
-      <div role="form" aria-label="Customer Information Form">
-        <CustomerTypeSection form={form} isModernTheme={isModernTheme} />
-        <CustomerTypeContent form={form} customerType={customerType} isModernTheme={isModernTheme} />
-        <BasicInformationSection form={form} isModernTheme={isModernTheme} />
-        <PrimaryAddressSection form={form} isModernTheme={isModernTheme} />
-        <PreferencesSection form={form} isModernTheme={isModernTheme} />
-        <SocialProfilesSection form={form} isModernTheme={isModernTheme} />
-        <AddressBookSection form={form} isModernTheme={isModernTheme} />
-        <ProfileCompletenessSection 
-          score={completeness.score}
-          recommendations={completeness.recommendations}
-        />
-      </div>
+      <CustomerFormContent
+        form={form}
+        customerType={customerType}
+        completeness={completeness}
+        isModernTheme={isModernTheme}
+      />
 
       <AlertDialog open={showDiscardDialog} onOpenChange={setShowDiscardDialog}>
         <AlertDialogContent>

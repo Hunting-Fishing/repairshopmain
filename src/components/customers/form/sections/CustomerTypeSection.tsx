@@ -13,7 +13,7 @@ import { BusinessDetailsSection } from "./BusinessDetailsSection";
 interface CustomerTypeOption {
   value: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;  // Updated to accept className prop
+  icon: React.ComponentType<{ className?: string }>;
   description?: string;
 }
 
@@ -27,29 +27,29 @@ interface CustomerTypeSectionProps {
 
 const defaultOptions: CustomerTypeOption[] = [
   {
-    value: "B2B",
-    label: "Business to Business",
-    icon: Building2,
-    description: "For companies selling to other businesses"
-  },
-  {
-    value: "B2C",
-    label: "Business to Consumer",
+    value: "Personal",
+    label: "Personal Account",
     icon: Users2,
-    description: "For companies selling directly to consumers"
+    description: "For individual customers"
   },
   {
-    value: "Both",
-    label: "Both B2B and B2C",
+    value: "Business",
+    label: "Business Account",
+    icon: Building2,
+    description: "For business customers"
+  },
+  {
+    value: "Fleet",
+    label: "Fleet Account",
     icon: Store,
-    description: "For companies serving both businesses and consumers"
+    description: "For fleet management customers"
   }
 ];
 
 export function CustomerTypeSection({
   form,
-  title = "Customer Type",
-  description = "Select your primary business model",
+  title = "Account Type",
+  description = "Select your account type",
   options = defaultOptions,
   isModernTheme = false
 }: CustomerTypeSectionProps) {

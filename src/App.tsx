@@ -17,10 +17,12 @@ import WorkOrders from "@/pages/WorkOrders";
 import Index from "@/pages/Index";
 import Inventory from "@/pages/Inventory";
 import Vehicles from "@/pages/Vehicles";
-import { Loader2 } from "lucide-react";
+import { Loader2, Users } from "lucide-react";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import { AppSidebar } from "@/components/layout/AppSidebar";
+import { StaffList } from "@/components/staff/StaffList";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -180,7 +182,7 @@ function App() {
                         path="/staff" 
                         element={
                           <ProtectedRoute>
-                            <PlaceholderPage title="Staff" />
+                            <StaffPage />
                           </ProtectedRoute>
                         } 
                       />
@@ -229,6 +231,32 @@ function App() {
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundaryWrapper>
+  );
+}
+
+// Create a new Staff page component
+function StaffPage() {
+  return (
+    <div className="flex min-h-screen w-full">
+      <AppSidebar />
+      <div className="flex-1 p-4 md:p-6 lg:p-8">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Users className="h-8 w-8" />
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Staff Management</h1>
+                <p className="text-muted-foreground">
+                  Manage staff members and roles
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <StaffList />
+        </div>
+      </div>
+    </div>
   );
 }
 

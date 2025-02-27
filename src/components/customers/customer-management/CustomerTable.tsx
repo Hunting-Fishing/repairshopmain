@@ -11,7 +11,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmailDialog } from "../communications/components/EmailDialog";
 import { SMSDialog } from "../communications/components/SMSDialog";
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CustomerTableHeader } from "./CustomerTableHeader";
@@ -32,6 +32,50 @@ interface CustomerTableProps {
   isLoading?: boolean;
 }
 
+// Memoized table body component to prevent re-renders
+const MemoizedTableBody = memo(function MemoizedTableBody({
+  customers,
+  lastCommunications,
+  onEdit,
+  onDelete,
+  onEmailClick,
+  onSMSClick,
+  onRowClick
+}: {
+  customers: Customer[];
+  lastCommunications: Record<string, any>;
+  onEdit?: (customer: Customer) => void;
+  onDelete?: (customer: Customer) => void;
+  onEmailClick: (id: string) => void;
+  onSMSClick: (id: string) => void;
+  onRowClick: (id: string) => void;
+}) {
+  return (
+    <TableBody>
+      {customers.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+            No customers found
+          </TableCell>
+        </TableRow>
+      ) : (
+        customers.map((customer) => (
+          <CustomerTableRow
+            key={customer.id}
+            customer={customer}
+            lastCommunication={lastCommunications?.[customer.id]}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onEmailClick={onEmailClick}
+            onSMSClick={onSMSClick}
+            onRowClick={onRowClick}
+          />
+        ))
+      )}
+    </TableBody>
+  );
+});
+
 export function CustomerTable({ customers, onEdit, onDelete, isLoading }: CustomerTableProps) {
   const navigate = useNavigate();
   const [selectedCustomer, setSelectedCustomer] = useState<{
@@ -39,9 +83,12 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
     type: "email" | "sms" | null;
   }>({ id: "", type: null });
 
-  const { data: lastCommunications } = useQuery({
+  // Optimize communications query with proper cache configuration
+  const { data: lastCommunications = {} } = useQuery({
     queryKey: ["last-communications", customers.map(c => c.id)],
     queryFn: async () => {
+      if (customers.length === 0) return {};
+      
       const { data, error } = await supabase
         .from("unified_communications")
         .select("customer_id, type, status, sent_at")
@@ -50,6 +97,7 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
 
       if (error) throw error;
 
+      // Use reduce for efficient grouping in a single pass
       const latestByCustomer = data.reduce((acc, curr) => {
         if (!acc[curr.customer_id] || new Date(curr.sent_at) > new Date(acc[curr.customer_id].sent_at)) {
           acc[curr.customer_id] = curr;
@@ -59,12 +107,26 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
 
       return latestByCustomer;
     },
-    enabled: customers.length > 0
+    enabled: customers.length > 0,
+    staleTime: 1000 * 60 * 5, // 5 minutes, since communications don't change frequently
   });
 
-  const handleRowClick = (customerId: string) => {
+  // Memoized event handlers to prevent recreation
+  const handleRowClick = useCallback((customerId: string) => {
     navigate(`/customers/${customerId}`);
-  };
+  }, [navigate]);
+
+  const handleEmailClick = useCallback((id: string) => {
+    setSelectedCustomer({ id, type: "email" });
+  }, []);
+
+  const handleSMSClick = useCallback((id: string) => {
+    setSelectedCustomer({ id, type: "sms" });
+  }, []);
+
+  const handleDialogClose = useCallback(() => {
+    setSelectedCustomer({ id: "", type: null });
+  }, []);
 
   if (isLoading) {
     return (
@@ -76,51 +138,43 @@ export function CustomerTable({ customers, onEdit, onDelete, isLoading }: Custom
     );
   }
 
+  // Find selected customer for dialog
+  const selectedCustomerData = selectedCustomer.id 
+    ? customers.find(c => c.id === selectedCustomer.id) 
+    : undefined;
+
   return (
     <>
       <Table>
         <TableHeader>
           <CustomerTableHeader />
         </TableHeader>
-        <TableBody>
-          {customers.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                No customers found
-              </TableCell>
-            </TableRow>
-          ) : (
-            customers.map((customer) => (
-              <CustomerTableRow
-                key={customer.id}
-                customer={customer}
-                lastCommunication={lastCommunications?.[customer.id]}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onEmailClick={(id) => setSelectedCustomer({ id, type: "email" })}
-                onSMSClick={(id) => setSelectedCustomer({ id, type: "sms" })}
-                onRowClick={handleRowClick}
-              />
-            ))
-          )}
-        </TableBody>
+        <MemoizedTableBody
+          customers={customers}
+          lastCommunications={lastCommunications}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          onEmailClick={handleEmailClick}
+          onSMSClick={handleSMSClick}
+          onRowClick={handleRowClick}
+        />
       </Table>
 
-      {selectedCustomer.type === "email" && (
+      {selectedCustomer.type === "email" && selectedCustomerData && (
         <EmailDialog
           customerId={selectedCustomer.id}
-          customerEmail={customers.find(c => c.id === selectedCustomer.id)?.email}
+          customerEmail={selectedCustomerData.email}
           isOpen={true}
-          onOpenChange={() => setSelectedCustomer({ id: "", type: null })}
+          onOpenChange={handleDialogClose}
         />
       )}
 
-      {selectedCustomer.type === "sms" && (
+      {selectedCustomer.type === "sms" && selectedCustomerData && (
         <SMSDialog
           customerId={selectedCustomer.id}
-          customerPhoneNumber={customers.find(c => c.id === selectedCustomer.id)?.phone_number}
+          customerPhoneNumber={selectedCustomerData.phone_number}
           isOpen={true}
-          onOpenChange={() => setSelectedCustomer({ id: "", type: null })}
+          onOpenChange={handleDialogClose}
         />
       )}
     </>

@@ -11,7 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useJobTemplates, useTemplateCategories } from "@/hooks/use-job-templates";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 export default function JobTemplates() {
   const { data: templates = [], isLoading, error, refetch } = useJobTemplates();
@@ -61,8 +62,7 @@ export default function JobTemplates() {
 
   const handleRefresh = () => {
     refetch();
-    toast({
-      title: "Refreshing templates",
+    toast("Refreshing templates", {
       description: "Fetching the latest job templates"
     });
   };
@@ -174,186 +174,188 @@ export default function JobTemplates() {
             <span>New Template</span>
           </Button>
 
-          <Tabs defaultValue="grid" className="space-y-4">
-            <TabsList>
-              <TabsTrigger value="grid">Grid View</TabsTrigger>
-              <TabsTrigger value="list">List View</TabsTrigger>
-            </TabsList>
+          <ErrorBoundary>
+            <Tabs defaultValue="grid" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="grid">Grid View</TabsTrigger>
+                <TabsTrigger value="list">List View</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="grid" className="space-y-8">
-              {isLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {[...Array(6)].map((_, i) => (
-                    <Skeleton key={i} className="h-[220px] w-full" />
-                  ))}
-                </div>
-              ) : Object.keys(groupedTemplates).length === 0 ? (
-                <Alert>
-                  <AlertTitle>No templates found</AlertTitle>
-                  <AlertDescription>
-                    {searchQuery || difficultyFilter !== "all" || categoryFilter !== "all" 
-                      ? "No templates match your current filters. Try adjusting your search criteria."
-                      : "No job templates are currently available. Click 'New Template' to add one."}
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                Object.entries(groupedTemplates).map(([category, items]) => (
-                  <div key={category} className="space-y-4">
-                    <h2 className="text-xl font-semibold tracking-tight">{category}</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {items.map((template) => (
-                        <Card key={template.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                          <CardHeader className="pb-2">
-                            <div className="flex justify-between items-start">
-                              <CardTitle className="text-lg">{template.name}</CardTitle>
-                              {template.difficulty_level && (
-                                <Badge className={getDifficultyColor(template.difficulty_level)}>
-                                  Level {template.difficulty_level}
-                                </Badge>
-                              )}
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-3">
-                            {template.description && (
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {template.description}
-                              </p>
-                            )}
-                            <div className="flex flex-wrap gap-2">
-                              {template.estimated_duration_range && (
-                                <Badge variant="outline">
-                                  {template.estimated_duration_range.min}-{template.estimated_duration_range.max} min
-                                </Badge>
-                              )}
-                              {template.required_tools && template.required_tools.length > 0 && (
-                                <Badge variant="outline">
-                                  {template.required_tools.length} tools
-                                </Badge>
-                              )}
-                              {template.usage_stats?.success_rate && (
-                                <Badge variant="secondary">
-                                  {Math.round(template.usage_stats.success_rate)}% success
-                                </Badge>
-                              )}
-                            </div>
-                            
-                            {/* Display more template details */}
-                            {(template.required_certifications?.length > 0 || 
-                              template.compatibility?.length > 0 || 
-                              template.feedback?.length > 0) && (
-                              <div className="pt-2 mt-2 border-t text-xs text-muted-foreground">
-                                {template.required_certifications?.length > 0 && (
-                                  <div className="mt-1">
-                                    <span className="font-medium">Required certifications:</span> {template.required_certifications.join(", ")}
-                                  </div>
-                                )}
-                                
-                                {template.compatibility?.length > 0 && (
-                                  <div className="mt-1">
-                                    <span className="font-medium">Compatible with:</span> {template.compatibility.map(c => 
-                                      `${c.make || ''} ${c.model || ''} ${c.year_start ? `(${c.year_start}-${c.year_end || 'present'})` : ''}`).join(", ")}
-                                  </div>
-                                )}
-                                
-                                {template.feedback?.length > 0 && (
-                                  <div className="mt-1">
-                                    <span className="font-medium">Feedback:</span> {template.feedback.length} reviews
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+              <TabsContent value="grid" className="space-y-8">
+                {isLoading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                      <Skeleton key={i} className="h-[220px] w-full" />
+                    ))}
                   </div>
-                ))
-              )}
-            </TabsContent>
-
-            <TabsContent value="list" className="space-y-4">
-              {isLoading ? (
-                <div className="space-y-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-16 w-full" />
-                  ))}
-                </div>
-              ) : Object.keys(groupedTemplates).length === 0 ? (
-                <Alert>
-                  <AlertTitle>No templates found</AlertTitle>
-                  <AlertDescription>
-                    {searchQuery || difficultyFilter !== "all" || categoryFilter !== "all" 
-                      ? "No templates match your current filters. Try adjusting your search criteria."
-                      : "No job templates are currently available. Click 'New Template' to add one."}
-                  </AlertDescription>
-                </Alert>
-              ) : (
-                Object.entries(groupedTemplates).map(([category, items]) => (
-                  <div key={category} className="space-y-2">
-                    <h2 className="text-xl font-semibold tracking-tight">{category}</h2>
-                    <div className="divide-y rounded-md border">
-                      {items.map((template) => (
-                        <div key={template.id} className="flex flex-col p-4 hover:bg-muted/50">
-                          <div className="flex items-center justify-between">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <h3 className="font-medium">{template.name}</h3>
+                ) : Object.keys(groupedTemplates).length === 0 ? (
+                  <Alert>
+                    <AlertTitle>No templates found</AlertTitle>
+                    <AlertDescription>
+                      {searchQuery || difficultyFilter !== "all" || categoryFilter !== "all" 
+                        ? "No templates match your current filters. Try adjusting your search criteria."
+                        : "No job templates are currently available. Click 'New Template' to add one."}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  Object.entries(groupedTemplates).map(([category, items]) => (
+                    <div key={category} className="space-y-4">
+                      <h2 className="text-xl font-semibold tracking-tight">{category}</h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {items.map((template) => (
+                          <Card key={template.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                            <CardHeader className="pb-2">
+                              <div className="flex justify-between items-start">
+                                <CardTitle className="text-lg">{template.name}</CardTitle>
                                 {template.difficulty_level && (
                                   <Badge className={getDifficultyColor(template.difficulty_level)}>
                                     Level {template.difficulty_level}
                                   </Badge>
                                 )}
                               </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
                               {template.description && (
-                                <p className="text-sm text-muted-foreground line-clamp-1">
+                                <p className="text-sm text-muted-foreground line-clamp-2">
                                   {template.description}
                                 </p>
                               )}
-                            </div>
-                            <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
-                              {template.estimated_duration_range && (
-                                <Badge variant="outline">
-                                  {template.estimated_duration_range.min}-{template.estimated_duration_range.max} min
-                                </Badge>
+                              <div className="flex flex-wrap gap-2">
+                                {template.estimated_duration_range && (
+                                  <Badge variant="outline">
+                                    {template.estimated_duration_range.min}-{template.estimated_duration_range.max} min
+                                  </Badge>
+                                )}
+                                {template.required_tools && template.required_tools.length > 0 && (
+                                  <Badge variant="outline">
+                                    {template.required_tools.length} tools
+                                  </Badge>
+                                )}
+                                {template.usage_stats?.success_rate && (
+                                  <Badge variant="secondary">
+                                    {Math.round(template.usage_stats.success_rate)}% success
+                                  </Badge>
+                                )}
+                              </div>
+                              
+                              {/* Display more template details */}
+                              {(template.required_certifications?.length > 0 || 
+                                template.compatibility?.length > 0 || 
+                                template.feedback?.length > 0) && (
+                                <div className="pt-2 mt-2 border-t text-xs text-muted-foreground">
+                                  {template.required_certifications?.length > 0 && (
+                                    <div className="mt-1">
+                                      <span className="font-medium">Required certifications:</span> {template.required_certifications.join(", ")}
+                                    </div>
+                                  )}
+                                  
+                                  {template.compatibility?.length > 0 && (
+                                    <div className="mt-1">
+                                      <span className="font-medium">Compatible with:</span> {template.compatibility.map(c => 
+                                        `${c.make || ''} ${c.model || ''} ${c.year_start ? `(${c.year_start}-${c.year_end || 'present'})` : ''}`).join(", ")}
+                                    </div>
+                                  )}
+                                  
+                                  {template.feedback?.length > 0 && (
+                                    <div className="mt-1">
+                                      <span className="font-medium">Feedback:</span> {template.feedback.length} reviews
+                                    </div>
+                                  )}
+                                </div>
                               )}
-                              {template.usage_stats?.success_rate && (
-                                <Badge variant="secondary">
-                                  {Math.round(template.usage_stats.success_rate)}% success
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Additional details section */}
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3 pt-2 border-t text-xs text-muted-foreground">
-                            {template.required_tools && template.required_tools.length > 0 && (
-                              <div>
-                                <span className="font-medium">Required tools:</span> {template.required_tools.join(", ")}
-                              </div>
-                            )}
-                            
-                            {template.required_certifications?.length > 0 && (
-                              <div>
-                                <span className="font-medium">Certifications:</span> {template.required_certifications.join(", ")}
-                              </div>
-                            )}
-                            
-                            {template.compatibility?.length > 0 && (
-                              <div>
-                                <span className="font-medium">Compatible:</span> {template.compatibility.map(c => 
-                                  `${c.make || ''} ${c.model || ''} ${c.year_start ? `(${c.year_start}-${c.year_end || 'present'})` : ''}`).slice(0, 2).join(", ")}
-                                {template.compatibility.length > 2 && ` +${template.compatibility.length - 2} more`}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="list" className="space-y-4">
+                {isLoading ? (
+                  <div className="space-y-4">
+                    {[...Array(5)].map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full" />
+                    ))}
                   </div>
-                ))
-              )}
-            </TabsContent>
-          </Tabs>
+                ) : Object.keys(groupedTemplates).length === 0 ? (
+                  <Alert>
+                    <AlertTitle>No templates found</AlertTitle>
+                    <AlertDescription>
+                      {searchQuery || difficultyFilter !== "all" || categoryFilter !== "all" 
+                        ? "No templates match your current filters. Try adjusting your search criteria."
+                        : "No job templates are currently available. Click 'New Template' to add one."}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  Object.entries(groupedTemplates).map(([category, items]) => (
+                    <div key={category} className="space-y-2">
+                      <h2 className="text-xl font-semibold tracking-tight">{category}</h2>
+                      <div className="divide-y rounded-md border">
+                        {items.map((template) => (
+                          <div key={template.id} className="flex flex-col p-4 hover:bg-muted/50">
+                            <div className="flex items-center justify-between">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-medium">{template.name}</h3>
+                                  {template.difficulty_level && (
+                                    <Badge className={getDifficultyColor(template.difficulty_level)}>
+                                      Level {template.difficulty_level}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {template.description && (
+                                  <p className="text-sm text-muted-foreground line-clamp-1">
+                                    {template.description}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex flex-col sm:flex-row gap-2 items-end sm:items-center">
+                                {template.estimated_duration_range && (
+                                  <Badge variant="outline">
+                                    {template.estimated_duration_range.min}-{template.estimated_duration_range.max} min
+                                  </Badge>
+                                )}
+                                {template.usage_stats?.success_rate && (
+                                  <Badge variant="secondary">
+                                    {Math.round(template.usage_stats.success_rate)}% success
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                            
+                            {/* Additional details section */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-3 pt-2 border-t text-xs text-muted-foreground">
+                              {template.required_tools && template.required_tools.length > 0 && (
+                                <div>
+                                  <span className="font-medium">Required tools:</span> {template.required_tools.join(", ")}
+                                </div>
+                              )}
+                              
+                              {template.required_certifications?.length > 0 && (
+                                <div>
+                                  <span className="font-medium">Certifications:</span> {template.required_certifications.join(", ")}
+                                </div>
+                              )}
+                              
+                              {template.compatibility?.length > 0 && (
+                                <div>
+                                  <span className="font-medium">Compatible:</span> {template.compatibility.map(c => 
+                                    `${c.make || ''} ${c.model || ''} ${c.year_start ? `(${c.year_start}-${c.year_end || 'present'})` : ''}`).slice(0, 2).join(", ")}
+                                  {template.compatibility.length > 2 && ` +${template.compatibility.length - 2} more`}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </TabsContent>
+            </Tabs>
+          </ErrorBoundary>
         </div>
       </div>
     </div>

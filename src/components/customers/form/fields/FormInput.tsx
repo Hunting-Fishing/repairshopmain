@@ -67,6 +67,19 @@ export function FormInput({
   const error = form.formState.errors[name as keyof CustomerFormValues];
   const isTouched = form.formState.touchedFields[name as keyof CustomerFormValues];
   const value = form.getValues(name);
+
+  // Add detailed logging for input value changes
+  useEffect(() => {
+    console.log('Input value details:', {
+      name,
+      value,
+      type: typeof value,
+      formValue: form.getValues(name),
+      isTouched,
+      error
+    });
+  }, [value, name, isTouched, error]);
+
   const isEmpty = required && (!value || (typeof value === 'string' && value.trim() === ""));
   
   const inputClasses = cn(

@@ -77,9 +77,12 @@ export function CustomerForm({ mode = "create", onSuccess, customerId }: Custome
     mode: "onChange"
   });
 
+  // Add detailed logging for form changes
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
       console.log("Form field changed:", { name, type, value });
+      console.log("Current form values:", form.getValues());
+      console.log("Form state:", form.formState);
     });
     return () => subscription.unsubscribe();
   }, [form.watch]);

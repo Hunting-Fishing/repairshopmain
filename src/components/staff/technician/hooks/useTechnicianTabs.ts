@@ -1,10 +1,26 @@
+
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { technicianSettingsFormSchema, type TechnicianSettingsFormValues } from "../../types";
+
+interface TechnicianSettingsFormValues {
+  showTechnicianWorkload: boolean;
+  showTechnicianAvailability: boolean;
+  showTechnicianStats: boolean;
+  enableAutoAssignment: boolean;
+  enableTechnicianSpecialties: boolean;
+  technicianScheduleConflictHandling: string;
+  enableTechnicianColors: boolean;
+  technicianViewMode: string;
+  maxDailyBookings: number;
+  preferredWorkTypes: string[];
+  autoAssignmentPreferences: {
+    considerSpecialties: boolean;
+    considerWorkload: boolean;
+    considerLocation: boolean;
+  };
+}
 
 export function useTechnicianTabs() {
   const form = useForm<TechnicianSettingsFormValues>({
-    resolver: zodResolver(technicianSettingsFormSchema),
     defaultValues: {
       showTechnicianWorkload: false,
       showTechnicianAvailability: false,

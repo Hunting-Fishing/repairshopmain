@@ -81,6 +81,13 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
     console.log("Exporting report...");
   };
 
+  // Render the appropriate chart title based on report type
+  const renderChartTitle = () => {
+    if (reportType === 'efficiency') return 'Staff Efficiency Analysis';
+    if (reportType === 'historical') return 'Historical Performance Metrics';
+    return 'Workload Distribution by Role';
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-y-auto">
@@ -138,11 +145,7 @@ export function PerformanceReports({ isOpen, onClose }: PerformanceReportsProps)
             <TabsContent value="chart" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>
-                    {reportType === 'efficiency' && 'Staff Efficiency Analysis'}
-                    {reportType === 'historical' && 'Historical Performance Metrics'}
-                    {reportType === 'workload' && 'Workload Distribution by Role'}
-                  </CardTitle>
+                  <CardTitle>{renderChartTitle()}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[400px]">

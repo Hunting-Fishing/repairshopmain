@@ -1,5 +1,5 @@
 
-import { BarChart2, Calendar, FileText, ShoppingCart, Users, Settings2, MessageSquare, Home } from "lucide-react";
+import { BarChart2, Calendar, FileText, ShoppingCart, Users, Settings2, MessageSquare, Home, Wrench } from "lucide-react";
 
 export function getBaseMenuItems() {
   return [
@@ -8,6 +8,7 @@ export function getBaseMenuItems() {
     { title: "Customers", icon: Users, path: "/customers" },
     { title: "Shop", icon: ShoppingCart, path: "/shop" },
     { title: "Job Templates", icon: FileText, path: "/job-templates" },
+    { title: "Staff", icon: Users, path: "/staff" },
     { title: "Reports", icon: BarChart2, path: "/reports" }
   ];
 }

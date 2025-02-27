@@ -1,42 +1,30 @@
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Home, Briefcase, GripVertical } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface AddressTypeSelectorProps {
-  type: string;
-  onChange: (type: 'home' | 'work' | 'other') => void;
+  value: "billing" | "shipping" | "other";
+  onValueChange: (value: "billing" | "shipping" | "other") => void;
+  disabled?: boolean;
 }
 
-const ADDRESS_TYPES = [
-  { value: 'home', label: 'Home', icon: Home },
-  { value: 'work', label: 'Work', icon: Briefcase },
-  { value: 'other', label: 'Other', icon: GripVertical }
-] as const;
-
-export function AddressTypeSelector({ type, onChange }: AddressTypeSelectorProps) {
+export function AddressTypeSelector({
+  value,
+  onValueChange,
+  disabled
+}: AddressTypeSelectorProps) {
   return (
     <Select
-      value={type}
-      onValueChange={(value: 'home' | 'work' | 'other') => onChange(value)}
+      value={value}
+      onValueChange={onValueChange}
+      disabled={disabled}
     >
-      <SelectTrigger className="w-[140px]">
-        <SelectValue />
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select type" />
       </SelectTrigger>
       <SelectContent>
-        {ADDRESS_TYPES.map(({ value, label, icon: Icon }) => (
-          <SelectItem key={value} value={value}>
-            <div className="flex items-center gap-2">
-              <Icon className="h-4 w-4" />
-              {label}
-            </div>
-          </SelectItem>
-        ))}
+        <SelectItem value="billing">Billing</SelectItem>
+        <SelectItem value="shipping">Shipping</SelectItem>
+        <SelectItem value="other">Other</SelectItem>
       </SelectContent>
     </Select>
   );

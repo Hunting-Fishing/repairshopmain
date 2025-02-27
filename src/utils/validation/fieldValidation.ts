@@ -2,11 +2,15 @@
 export const FILE_RESTRICTIONS = {
   maxSize: 5 * 1024 * 1024, // 5MB
   allowedTypes: {
-    image: ['.jpg', '.jpeg', '.png', '.gif', '.webp'],
-    document: ['.pdf', '.doc', '.docx', '.xls', '.xlsx'],
-    generic: ['.txt', '.csv']
+    image: ['.jpg', '.jpeg', '.png', '.gif', '.webp'] as const,
+    document: ['.pdf', '.doc', '.docx', '.xls', '.xlsx'] as const,
+    generic: ['.txt', '.csv'] as const
   }
 } as const;
+
+type AllowedFileType = typeof FILE_RESTRICTIONS.allowedTypes.image[number] | 
+                       typeof FILE_RESTRICTIONS.allowedTypes.document[number] |
+                       typeof FILE_RESTRICTIONS.allowedTypes.generic[number];
 
 type ValidationResult = {
   isValid: boolean;
@@ -27,7 +31,7 @@ export const validateFile = (file: File): ValidationResult => {
   }
 
   // Check file type
-  const extension = `.${file.name.split('.').pop()?.toLowerCase()}`;
+  const extension = `.${file.name.split('.').pop()?.toLowerCase()}` as AllowedFileType;
   const allowedTypes = Object.values(FILE_RESTRICTIONS.allowedTypes).flat();
   
   if (!allowedTypes.includes(extension)) {

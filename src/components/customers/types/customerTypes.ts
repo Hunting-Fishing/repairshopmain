@@ -77,6 +77,8 @@ export interface CustomerRelationship {
   parent_customer_id: string;
   related_customer_id: string;
   relationship_type: string;
+  is_primary?: boolean;
+  notes?: string;
   parent_first_name?: string;
   parent_last_name?: string;
   related_first_name?: string;
@@ -87,6 +89,8 @@ export interface CustomerRelationshipFormValues {
   customer_id: string;
   related_customer_id: string;
   relationship_type: string;
+  is_primary?: boolean;
+  notes?: string;
 }
 
 export interface Customer {
@@ -96,5 +100,4 @@ export interface Customer {
   email: string;
   customer_type: CustomerType;
   created_at: string;
-  // Add other relevant fields
 }

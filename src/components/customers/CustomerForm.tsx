@@ -9,7 +9,7 @@ import { SubmitButton } from "./form/fields/SubmitButton";
 import { useForm, FormProvider } from "react-hook-form";
 import { CustomerFormValues } from "./types/customerTypes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { customerValidationSchema } from "./schemas/customerValidationSchema";
+import { customerValidationSchema } from "./schemas/customerFormSchema";
 import { useCustomerAutosave } from "./hooks/useCustomerAutosave";
 import { CustomerErrorBoundary } from "./error-boundary/CustomerErrorBoundary";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

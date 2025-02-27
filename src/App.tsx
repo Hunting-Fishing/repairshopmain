@@ -18,7 +18,7 @@ import Index from "@/pages/Index";
 import { Loader2 } from "lucide-react";
 import { useIsMobile } from "./hooks/use-mobile";
 import { useEffect } from "react";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -62,7 +62,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Placeholder component for routes that are not yet implemented
 function PlaceholderPage({ title }: { title: string }) {
   useEffect(() => {
-    toast.info(`${title} page is under development`);
+    toast({
+      title: "Under Development",
+      description: `The ${title} page is still being built.`
+    });
   }, [title]);
 
   return (

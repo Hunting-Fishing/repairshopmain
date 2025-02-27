@@ -11,6 +11,26 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { LoadingScreen } from "./components/LoadingScreen";
+import { DashboardBooking } from "@/types/dashboard/consolidated";
+
+// Define proper prop types for CalendarTabContent
+interface CalendarTabContentProps {
+  selectedDate: Date;
+  view: "day" | "week" | "month";
+  bookings: DashboardBooking[];
+  isBookingsLoading: boolean;
+  isCalendarExpanded: boolean;
+  onDateChange: (date?: Date) => void;
+  onViewChange: (view: "day" | "week" | "month") => void;
+  toggleCalendarSize: () => void;
+  colorPreferences: {
+    primary_color: string;
+    secondary_color: string;
+    border_color: string;
+    background_color: string;
+  };
+  isModernTheme: boolean;
+}
 
 // Memoized TabContent components to prevent unnecessary renders
 const CalendarTabContent = memo(function CalendarTabContent({
@@ -24,7 +44,7 @@ const CalendarTabContent = memo(function CalendarTabContent({
   toggleCalendarSize,
   colorPreferences,
   isModernTheme,
-}) {
+}: CalendarTabContentProps) {
   return (
     <TabsContent value="calendar" className="mt-0 h-full">
       <CalendarContainer

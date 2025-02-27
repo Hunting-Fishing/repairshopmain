@@ -5,7 +5,8 @@ import {
   Wrench,
   Clock,
   Star,
-  LucideIcon
+  LucideIcon,
+  BarChart // Added as default icon
 } from "lucide-react";
 
 export const useStatsIcons = () => {
@@ -15,6 +16,7 @@ export const useStatsIcons = () => {
     pending_jobs: Wrench,
     average_service_time: Clock,
     customer_satisfaction: Star,
+    default: BarChart // Adding a default icon
   };
 
   return statIcons;

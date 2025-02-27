@@ -10,6 +10,7 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 import { toast } from "sonner";
 import { memo, useCallback, useMemo } from "react";
 import { StatData } from "../../hooks/useStatsQuery";
+import { LucideIcon } from "lucide-react";
 
 interface StatCardGridProps {
   isModernTheme?: boolean;
@@ -33,7 +34,7 @@ const MemoizedStatCard = memo(function MemoizedStatCard({
   index
 }: {
   stat: StatData;
-  icon: React.ElementType;
+  icon: LucideIcon;
   isModernTheme: boolean;
   index: number;
 }) {
@@ -108,6 +109,7 @@ export function StatCardGrid({ isModernTheme = false }: StatCardGridProps) {
     <ErrorBoundary onError={handleStatsError}>
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {orderedStats.map((stat, index) => {
+          // Use type guard to safely access the icon
           const Icon = statIcons[stat.type] || statIcons.default;
           return (
             <MemoizedStatCard 
